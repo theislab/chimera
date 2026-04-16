@@ -1,0 +1,72 @@
+{
+  "study_name": "chimera_v2.4_hpo",
+  "description": "Optuna hyperparameter search space for Chimera v2.4 (Task 9.5). All loss weights use loguniform sampling to cover the correct order-of-magnitude range. Architecture choices use categorical sampling.",
+  "parameters": {
+    "lambda_aux": {
+      "type": "loguniform",
+      "low": 0.01,
+      "high": 1.0,
+      "description": "Weight for L_shared_aux (shared-only reconstruction). Collapse-prevention #2."
+    },
+    "lambda_res": {
+      "type": "loguniform",
+      "low": 0.001,
+      "high": 0.5,
+      "description": "Weight for L_residual_sparsity (L1 on residual). Collapse-prevention #1."
+    },
+    "lambda_anchor": {
+      "type": "loguniform",
+      "low": 0.0001,
+      "high": 0.1,
+      "description": "Weight for L_alpha_anchor (correction.pow(2).sum()). Collapse-prevention #3."
+    },
+    "lambda_fit": {
+      "type": "loguniform",
+      "low": 0.001,
+      "high": 0.1,
+      "description": "Weight for L_fit_reward (FQR). Asymmetry-repair #4."
+    },
+    "n_latent": {
+      "type": "categorical",
+      "choices": [8, 10, 15, 20],
+      "description": "Latent space dimensionality."
+    },
+    "n_hidden": {
+      "type": "categorical",
+      "choices": [64, 128, 256],
+      "description": "Hidden layer width for encoder and decoder MLPs."
+    },
+    "adv_weight": {
+      "type": "uniform",
+      "low": 0.01,
+      "high": 0.5,
+      "description": "Adversarial species classifier weight."
+    },
+    "dropout_rate": {
+      "type": "uniform",
+      "low": 0.05,
+      "high": 0.3,
+      "description": "Dropout rate for encoder."
+    },
+    "lr": {
+      "type": "loguniform",
+      "low": 1e-4,
+      "high": 1e-2,
+      "description": "Base learning rate for encoder, decoder, dispersion."
+    },
+    "gin_lr_factor": {
+      "type": "loguniform",
+      "low": 0.01,
+      "high": 0.5,
+      "description": "GIN learning rate = base_lr * gin_lr_factor."
+    }
+  },
+  "defaults": {
+    "max_epochs": 200,
+    "batch_size": 256,
+    "early_stopping": true,
+    "n_trials": 50,
+    "pruner": "median",
+    "sampler": "tpe"
+  }
+}

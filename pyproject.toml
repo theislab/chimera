@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chimera"
+version = "0.1.0"
+description = "Cross-species scRNA-seq integration with learnable per-gene evolutionary gating"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+dependencies = [
+    # Core scvi-tools ecosystem
+    "scvi-tools>=1.1.0",
+    "anndata>=0.10.0",
+    "scanpy>=1.10.0",
+    "mudata>=0.2.0",
+
+    # PyTorch (scvi-tools will pull compatible version, but pin floor)
+    "torch>=2.1.0",
+    "lightning>=2.1.0",
+
+    # Experiment tracking
+    "wandb>=0.16.0",
+
+    # Hyperparameter optimization
+    "optuna>=3.4.0",
+
+    # Ensembl ortholog queries
+    "pybiomart>=0.2.0",
+
+    # Benchmarking
+    "scib-metrics>=0.5.0",
+
+    # Data processing
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.11.0",
+    "scikit-learn>=1.3.0",
+
+    # Notebook support
+    "jupyter>=1.0.0",
+    "papermill>=2.5.0",
+    "matplotlib>=3.8.0",
+    "seaborn>=0.13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.7.0",
+    "ruff>=0.1.0",
+]
+scatter = [
+    "torch-scatter>=2.1.0",
+]
+data = [
+    "gdown>=4.7.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["chimera*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "gpu: marks tests as requiring GPU (deselect with '-m \"not gpu\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
