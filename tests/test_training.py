@@ -239,3 +239,116 @@ class TestShortTrainingLoop:
         assert mu.shape == (adata.n_obs, adata.n_vars)
         assert (mu >= 0).all(), "mu_shared_only has negative values"
         assert np.isfinite(mu).all(), "mu_shared_only has NaN/Inf"
+
+
+# =========================================================================
+# Config M: per-gene nn.Parameter alpha (no GIN)
+# =========================================================================
+
+
+class TestConfigM:
+    """Config M replaces the GIN MLP with a per-gene learnable correction parameter.
+
+    Pre-2026-04-17 the per_gene_correction was created and optimized but the
+    training forward pass always pulled alpha/correction from self.gin(),
+    leaving the parameter dangling (no gradient from the training loss).
+    These tests pin the fixed wiring: forward() uses per_gene_correction when
+    _use_per_gene_alpha is set, so the parameter receives gradient and the
+    GIN parameters stay frozen.
+    """
+
+    def test_forward_uses_per_gene_correction_not_gin(self):
+        """Changing per_gene_correction changes forward alpha; changing GIN weights does not."""
+        adata = _prepare_adata(N=120, G=80, K=2, Nb=4)
+        model = ChimeraModel.from_config(adata, config_name="M", n_latent=8, n_hidden=32)
+
+        module = model.module
+        assert getattr(module, "_use_per_gene_alpha", False), "Config M flag not set"
+        assert hasattr(module, "per_gene_correction"), "per_gene_correction parameter missing"
+
+        # Manually set per_gene_correction to a nonzero pattern and recompute alpha.
+        with torch.no_grad():
+            module.per_gene_correction.data.fill_(0.5)
+        alpha_pgc = model.get_alpha()
+
+        with torch.no_grad():
+            module.per_gene_correction.data.fill_(-0.5)
+        alpha_neg = model.get_alpha()
+        assert not np.allclose(alpha_pgc, alpha_neg), (
+            "alpha did not change when per_gene_correction changed — "
+            "get_alpha is not wired to per_gene_correction"
+        )
+
+        # Perturbing GIN weights must NOT change alpha under Config M.
+        with torch.no_grad():
+            module.per_gene_correction.data.fill_(0.0)
+        alpha_before = model.get_alpha()
+        with torch.no_grad():
+            for p in module.gin.parameters():
+                p.data.add_(1.0)  # arbitrary large perturbation
+        alpha_after = model.get_alpha()
+        assert np.allclose(alpha_before, alpha_after), (
+            "alpha changed when GIN weights changed — Config M is still calling the GIN"
+        )
+
+    def test_per_gene_correction_receives_training_gradient(self):
+        """After one epoch the per-gene correction must have moved from zero."""
+        adata = _prepare_adata(N=200, G=80, K=2, Nb=4)
+        model = ChimeraModel.from_config(adata, config_name="M", n_latent=8, n_hidden=32)
+
+        module = model.module
+        initial_correction = module.per_gene_correction.detach().clone()
+
+        # Take a GIN-weight snapshot — must be unchanged after training.
+        initial_gin = {
+            n: p.detach().clone()
+            for n, p in module.gin.named_parameters()
+        }
+
+        # Warm up FQR immediately and skip adversarial so the fit_reward
+        # gradient on correction is nonzero from epoch 0.
+        model.train(
+            max_epochs=2,
+            batch_size=64,
+            plan_kwargs={
+                "warmup_kl_epochs": 0,
+                "warmup_fqr_epochs": 0,
+                "warmup_adversarial_epochs": 0,
+                "min_training_epochs": 0,
+            },
+        )
+
+        delta = (module.per_gene_correction.detach() - initial_correction).abs().max().item()
+        assert delta > 0.0, (
+            "per_gene_correction unchanged after training — it's dangling again. "
+            f"max |delta| = {delta}"
+        )
+
+        # GIN params must be frozen (requires_grad=False set in from_config).
+        for n, p in module.gin.named_parameters():
+            assert torch.equal(p.data, initial_gin[n]), (
+                f"GIN parameter '{n}' changed under Config M — GIN should be frozen."
+            )
+
+    def test_config_m_alpha_consistent_across_readouts(self):
+        """get_alpha / dump-path / forward all agree on alpha under Config M."""
+        adata = _prepare_adata(N=120, G=80, K=2, Nb=4)
+        model = ChimeraModel.from_config(adata, config_name="M", n_latent=8, n_hidden=32)
+
+        module = model.module
+        with torch.no_grad():
+            module.per_gene_correction.data.copy_(
+                torch.linspace(-1.0, 1.0, module.n_genes)
+            )
+
+        alpha_api = model.get_alpha()
+
+        # Forward-path alpha (same formula as inside _module.forward when
+        # _use_per_gene_alpha is set).
+        expected = torch.sigmoid(
+            torch.logit(module.conservation_prior) + module.per_gene_correction
+        ).detach().cpu().numpy()
+
+        assert np.allclose(alpha_api, expected, atol=1e-6), (
+            "get_alpha and the forward-path formula disagree on Config M alpha"
+        )

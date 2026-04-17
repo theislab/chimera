@@ -237,6 +237,7 @@ def download_camex_pancreas(
     for f in h5ad_files:
         logger.info("Loading %s", f.name)
         a = ad.read_h5ad(f)
+        a.var_names_make_unique()
         _standardize_obs_columns(a)
 
         # Raw-counts check (try .X, then .layers['counts'], then .raw.X)
@@ -254,7 +255,12 @@ def download_camex_pancreas(
                 _validate_raw_counts(a, f.name)
 
         if "species" not in a.obs.columns:
-            sp_name = f.stem.split("_")[0].replace("-", " ").title()
+            # CAMEX filenames: raw-{tissue}-{species}-{author}.h5ad
+            parts = f.stem.replace("_", "-").split("-")
+            if len(parts) >= 3:
+                sp_name = parts[2].title()
+            else:
+                sp_name = parts[0].title()
             logger.info("  Inferring species='%s' from filename", sp_name)
             a.obs["species"] = sp_name
         if "batch" not in a.obs.columns:
@@ -443,6 +449,7 @@ def download_camex_testis(
     for f in h5ad_files:
         logger.info("Loading %s", f.name)
         a = ad.read_h5ad(f)
+        a.var_names_make_unique()
         _standardize_obs_columns(a)
         try:
             _validate_raw_counts(a, f.name)
@@ -453,7 +460,9 @@ def download_camex_testis(
                 a = a.raw.to_adata()
                 _standardize_obs_columns(a)
         if "species" not in a.obs.columns:
-            a.obs["species"] = f.stem.split("_")[0].replace("-", " ").title()
+            parts = f.stem.replace("_", "-").split("-")
+            sp_name = parts[2].title() if len(parts) >= 3 else parts[0].title()
+            a.obs["species"] = sp_name
         if "batch" not in a.obs.columns:
             a.obs["batch"] = a.obs["species"].astype(str)
         a.obs["species"] = pd.Categorical(a.obs["species"].astype(str))
@@ -530,10 +539,24 @@ def query_ortholog_table(
     non_ref = [s for s in species_list if s != reference_species]
 
     # Connect to Ensembl BioMart for the reference species.
-    ref_dataset = BioMartDataset(
-        name=f"{reference_species}_gene_ensembl",
-        host=f"https://e{ensembl_version}.ensembl.org",
-    )
+    # Try versioned archive first, fall back to main Ensembl server.
+    for host in [
+        f"http://e{ensembl_version}.ensembl.org",
+        "http://www.ensembl.org",
+    ]:
+        try:
+            ref_dataset = BioMartDataset(
+                name=f"{reference_species}_gene_ensembl",
+                host=host,
+            )
+            # Trigger connection to verify it works.
+            _ = ref_dataset.attributes
+            logger.info("Connected to BioMart at %s", host)
+            break
+        except Exception as e:
+            logger.warning("BioMart at %s failed: %s — trying next", host, e)
+    else:
+        raise RuntimeError("Could not connect to any Ensembl BioMart server.")
 
     # Build a merged table of 1:1 orthologs.
     merged: Optional[pd.DataFrame] = None
@@ -548,23 +571,26 @@ def query_ortholog_table(
             f"{sp}_homolog_perc_id",
         ]
         result = ref_dataset.query(attributes=attrs)
+
+        # pybiomart returns display names as columns — force to standard names.
+        standard_names = [
+            f"{reference_species}_gene_id",
+            f"{reference_species}_gene_name",
+            f"{sp}_gene_id",
+            f"{sp}_gene_name",
+            f"{sp}_orthology_type",
+            f"{sp}_identity",
+        ]
+        result.columns = standard_names
+
         # Keep only 1:1 orthologs.
-        orth_col = f"{sp}_homolog_orthology_type"
+        orth_col = f"{sp}_orthology_type"
         result = result[result[orth_col] == "ortholog_one2one"].copy()
         # Drop rows with missing gene IDs.
-        gene_col = f"{sp}_homolog_ensembl_gene"
+        gene_col = f"{sp}_gene_id"
         result = result.dropna(subset=[gene_col])
         result = result[result[gene_col] != ""].copy()
 
-        # Rename columns for clarity.
-        rename_map = {
-            "ensembl_gene_id": f"{reference_species}_gene_id",
-            "external_gene_name": f"{reference_species}_gene_name",
-            gene_col: f"{sp}_gene_id",
-            f"{sp}_homolog_associated_gene_name": f"{sp}_gene_name",
-            f"{sp}_homolog_perc_id": f"{sp}_identity",
-        }
-        result = result.rename(columns=rename_map)
         keep_cols = [
             f"{reference_species}_gene_id",
             f"{reference_species}_gene_name",
@@ -676,7 +702,15 @@ def download_and_process_esm2(
         else _DEFAULT_DATA_DIR / "raw" / "saturn_esm2"
     )
 
-    if not saturn_data_dir.exists() or not any(saturn_data_dir.rglob("*.pt")):
+    # SATURN embedding files use .torch extension and live in ESM2/ subdir.
+    _emb_globs = ("*.pt", "*.torch")
+    def _find_emb_files(d: Path) -> list:
+        files = []
+        for g in _emb_globs:
+            files.extend(d.rglob(g))
+        return files
+
+    if not saturn_data_dir.exists() or not _find_emb_files(saturn_data_dir):
         tar_path = saturn_data_dir.parent / "protein_embeddings.tar.gz"
         _download_url(
             "http://snap.stanford.edu/saturn/data/protein_embeddings.tar.gz",
@@ -684,59 +718,93 @@ def download_and_process_esm2(
             desc="SATURN protein embeddings (3.5 GB)",
         )
         _extract_tar(tar_path, saturn_data_dir)
-        pt_files = list(saturn_data_dir.rglob("*.pt"))
-        if not pt_files:
+        emb_files = _find_emb_files(saturn_data_dir)
+        if not emb_files:
             raise FileNotFoundError(
-                f"No .pt files found after extracting to {saturn_data_dir}"
+                f"No .pt/.torch files found after extracting to {saturn_data_dir}"
             )
-        logger.info("Found %d .pt embedding files in %s", len(pt_files), saturn_data_dir)
+        logger.info("Found %d embedding files in %s", len(emb_files), saturn_data_dir)
+
+    # Map Ensembl species names to common names used in SATURN filenames.
+    _ENSEMBL_TO_COMMON = {
+        "hsapiens": "human", "mmusculus": "mouse", "rnorvegicus": "rat",
+        "mmulatta": "macaca_mulatta", "mfascicularis": "macaca_fascicularis",
+        "sscrofa": "pig", "drerio": "zebrafish", "ggallus": "chicken",
+        "ptroglodytes": "chimpanzee", "ggorilla": "gorilla",
+        "ppaniscus": "bonobo", "nleucogenys": "gibbon",
+        "cjacchus": "marmoset", "mdomestica": "opossum",
+        "oanatinus": "platypus", "xlaevis": "frog",
+    }
 
     n_groups = len(ortholog_table)
     emb_dim = 5120
     consensus = np.zeros((n_groups, emb_dim), dtype=np.float32)
 
+    # Prefer ESM2 subdirectory if present (5120-dim); fall back to ESM1b (1280-dim).
+    esm2_dir = None
+    for candidate in saturn_data_dir.rglob("ESM2"):
+        if candidate.is_dir():
+            esm2_dir = candidate
+            break
+    search_dir = esm2_dir if esm2_dir is not None else saturn_data_dir
+
     for sp in species_list:
         gene_id_col = f"{sp}_gene_id"
-        if gene_id_col not in ortholog_table.columns:
-            logger.warning("Skipping species %s: no gene ID column in ortholog table.", sp)
+        gene_name_col = f"{sp}_gene_name"
+        if gene_id_col not in ortholog_table.columns and gene_name_col not in ortholog_table.columns:
+            logger.warning("Skipping species %s: no gene column in ortholog table.", sp)
             continue
 
-        # --- Try .npy first (our cached format), then find matching .pt ---
+        # --- Try .npy first (our cached format), then find matching .pt/.torch ---
         emb_path_npy = saturn_data_dir / f"{sp}_esm2.npy"
         sp_data = None
 
         if emb_path_npy.exists():
             sp_data = np.load(emb_path_npy, allow_pickle=True).item()
         else:
-            # Search for .pt files matching this species name
-            for pt_file in saturn_data_dir.rglob("*.pt"):
-                if sp.lower() in pt_file.stem.lower():
+            # Resolve the common name for filename matching
+            common_name = _ENSEMBL_TO_COMMON.get(sp.lower(), sp.lower())
+            search_names = {common_name, sp.lower()}
+
+            for emb_file in _find_emb_files(search_dir):
+                stem = emb_file.stem.lower().replace("_embedding", "")
+                if stem in search_names or any(n in stem for n in search_names):
                     import torch as _torch
-                    raw = _torch.load(pt_file, map_location="cpu", weights_only=False)
+                    raw = _torch.load(emb_file, map_location="cpu", weights_only=False)
                     if isinstance(raw, dict):
                         sp_data = {
                             k: (v.numpy() if hasattr(v, "numpy") else np.asarray(v))
                             for k, v in raw.items()
                         }
-                        logger.info("Loaded .pt embeddings for %s from %s (%d genes)",
-                                    sp, pt_file.name, len(sp_data))
+                        logger.info("Loaded embeddings for %s from %s (%d genes, dim=%d)",
+                                    sp, emb_file.name, len(sp_data),
+                                    next(iter(sp_data.values())).shape[0] if sp_data else 0)
                     break
 
         if sp_data is None:
             logger.warning("No embeddings found for species %s", sp)
             continue
 
-        gene_ids = ortholog_table[gene_id_col].values
+        # Try matching by gene ID first, then gene name (SATURN uses gene symbols).
+        gene_ids = ortholog_table[gene_id_col].values if gene_id_col in ortholog_table.columns else None
+        gene_names = ortholog_table[gene_name_col].values if gene_name_col in ortholog_table.columns else None
         n_matched = 0
-        for i, gid in enumerate(gene_ids):
-            if gid in sp_data:
-                emb = sp_data[gid]
+        for i in range(n_groups):
+            gid = gene_ids[i] if gene_ids is not None else None
+            gname = gene_names[i] if gene_names is not None else None
+            matched_key = None
+            if gid is not None and gid in sp_data:
+                matched_key = gid
+            elif gname is not None and gname in sp_data:
+                matched_key = gname
+            if matched_key is not None:
+                emb = sp_data[matched_key]
                 if len(emb) >= emb_dim:
                     consensus[i] += emb[:emb_dim]
                 else:
                     consensus[i, :len(emb)] += emb
                 n_matched += 1
-        logger.info("  %s: matched %d / %d ortholog genes", sp, n_matched, len(gene_ids))
+        logger.info("  %s: matched %d / %d ortholog genes", sp, n_matched, n_groups)
 
     # Average over species.
     n_species = len(species_list)
@@ -995,20 +1063,36 @@ def construct_unified_adata(
         gene_name_col = f"{species_name}_gene_name"
 
         # Build mapping from species gene -> ortholog group index.
-        if gene_id_col in ortholog_table.columns:
-            mapping_col = gene_id_col
-        elif gene_name_col in ortholog_table.columns:
-            mapping_col = gene_name_col
-        else:
+        # Try gene_id (Ensembl IDs) and gene_name (symbols) — use whichever
+        # matches more var_names in the AnnData.
+        gene_names_set = set(sp_adata.var_names.values)
+        best_col = None
+        best_count = 0
+        for candidate_col in [gene_id_col, gene_name_col]:
+            if candidate_col not in ortholog_table.columns:
+                continue
+            n_match = sum(
+                1 for v in ortholog_table[candidate_col].values
+                if v in gene_names_set
+            )
+            if n_match > best_count:
+                best_count = n_match
+                best_col = candidate_col
+
+        if best_col is None or best_count == 0:
             logger.warning(
-                "No gene mapping column found for species %s. Skipping.",
-                species_name,
+                "No gene mapping found for species %s (tried %s, %s). Skipping.",
+                species_name, gene_id_col, gene_name_col,
             )
             continue
+        logger.info(
+            "Mapping %s via %s: %d / %d ortholog genes matched",
+            species_name, best_col, best_count, len(ortholog_table),
+        )
 
         ortho_map = dict(
             zip(
-                ortholog_table[mapping_col],
+                ortholog_table[best_col],
                 ortholog_table["ortholog_group_id"],
             )
         )

@@ -33,11 +33,32 @@ class GeneIntegrationNetwork(nn.Module):
         Hidden layer width of the correction MLP.
     """
 
-    def __init__(self, n_features: int = 72, n_hidden: int = 32) -> None:
+    def __init__(
+        self,
+        n_features: int = 72,
+        n_hidden: int = 32,
+        hidden_activation: str = "tanh",
+    ) -> None:
         super().__init__()
+        # Tanh is used by default instead of ReLU (v2.4 spec).
+        #
+        # Empirical finding (2026-04-17): with ReLU the hidden activations are
+        # non-negative, so the single 1×n_hidden output weight vector W2 can
+        # only ever produce one-signed corrections for a given input sign. In
+        # practice the L_recon gradient drives W2 uniformly negative early in
+        # training; ReLU(hidden) * W2_negative ≤ 0 puts an upper bound of b2
+        # (the output bias, also negative) on the correction — and therefore
+        # on delta_alpha — for *every* gene, regardless of features. This
+        # architecturally blocks FM4 resolution (`delta_alpha > 0`).
+        #
+        # tanh outputs are signed in (-1, 1), so even all-negative W2 can
+        # produce positive corrections for genes whose hidden activations are
+        # negative. The zero-output-at-init property (`alpha == prior` at
+        # epoch 0) still holds because W2 is zero-initialized below.
+        act_cls = {"tanh": nn.Tanh, "relu": nn.ReLU, "gelu": nn.GELU}[hidden_activation.lower()]
         self.correction_mlp = nn.Sequential(
             nn.Linear(n_features, n_hidden),
-            nn.ReLU(),
+            act_cls(),
             nn.Linear(n_hidden, 1),
         )
         # Zero-init last layer so correction starts at 0, alpha starts at prior.

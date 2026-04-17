@@ -168,6 +168,25 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         self.warmup_lr_epochs: int = kwargs.pop("warmup_lr_epochs", 5)
         self.min_training_epochs: int = kwargs.pop("min_training_epochs", MIN_TRAINING_EPOCHS)
         self.grad_clip_max_norm: float = kwargs.pop("grad_clip_max_norm", GRAD_CLIP_MAX_NORM)
+        # Target adversarial weight after warmup; the Lightning attribute
+        # ``scale_adversarial_loss`` is swapped between 0 and this value
+        # per-epoch in ``training_step``.
+        self._adv_weight_target: float = float(kwargs.pop("adv_weight", ADV_WEIGHT))
+        # Learning rate for the adversarial species classifier. Default is 1e-3
+        # (matches encoder) which is the scvi-tools default. Lower values (1e-4)
+        # slow the classifier so the encoder can fool it for more of training —
+        # useful on datasets where the classifier trivially out-trains the
+        # encoder (2-species close-primate). See workflow.md §"E6.2 analysis".
+        self._adv_lr: float = float(kwargs.pop("adv_lr", 1e-3))
+        # Hidden widths of the adversarial species classifier. Default ``(32,)``
+        # preserves the 1-hidden-layer MLP used by iter1–21. Passing e.g.
+        # ``(64, 32)`` makes the classifier a 2-hidden-layer MLP — useful when
+        # the post-hoc nonlinear z-leakage probe (Caveat 34) reveals that the
+        # encoder is hiding species in nonlinearly-separable directions the
+        # linear/shallow classifier cannot catch.
+        self._adv_classifier_hidden: tuple[int, ...] = tuple(
+            kwargs.pop("adv_classifier_hidden", (32,))
+        )
 
         # KL-FQR warmup constraint
         assert self.warmup_fqr_epochs >= self.warmup_kl_epochs, (
@@ -175,19 +194,21 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
             f"warmup_kl_epochs ({self.warmup_kl_epochs})"
         )
 
-        # Adversarial classifier: 1-hidden MLP, latent_dim → 32 → K
+        # Adversarial classifier: arbitrary-depth MLP, latent_dim → H1 → … → K
         n_latent = getattr(module, "n_latent", 10)
         n_species = getattr(module, "n_species", 2)
 
+        cls_layers: list[nn.Module] = []
+        d = n_latent
+        for h in self._adv_classifier_hidden:
+            cls_layers += [nn.Linear(d, h), nn.ReLU(), nn.Dropout(0.1)]
+            d = h
+        cls_layers.append(nn.Linear(d, n_species))
+
         super().__init__(
             module,
-            adversarial_classifier=nn.Sequential(
-                nn.Linear(n_latent, 32),
-                nn.ReLU(),
-                nn.Dropout(0.1),
-                nn.Linear(32, n_species),
-            ),
-            scale_adversarial_loss=ADV_WEIGHT,
+            adversarial_classifier=nn.Sequential(*cls_layers),
+            scale_adversarial_loss=self._adv_weight_target,
             **kwargs,
         )
 
@@ -259,8 +280,12 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
 
         scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=5)
 
-        # Adversarial classifier optimizer
-        adv_optimizer = torch.optim.Adam(self.adversarial_classifier.parameters(), lr=1e-3)
+        # Adversarial classifier optimizer. The LR is a hyperparameter set by
+        # ``adv_lr`` (default 1e-3 matches scvi-tools). Slower classifiers
+        # (1e-4) give the encoder more time to fool; see workflow.md §E6.2.
+        adv_optimizer = torch.optim.Adam(
+            self.adversarial_classifier.parameters(), lr=self._adv_lr
+        )
 
         return (
             {
@@ -300,7 +325,7 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         if self.current_epoch < self.warmup_adversarial_epochs:
             self.scale_adversarial_loss = 0.0
         else:
-            self.scale_adversarial_loss = ADV_WEIGHT
+            self.scale_adversarial_loss = self._adv_weight_target
 
         kappa = self.scale_adversarial_loss
 
@@ -317,9 +342,11 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         z = outputs["z"]
 
         # Adversarial fool loss (if active) — classifies SPECIES, not batch
+        fool_loss_raw = None
         if kappa > 0 and self.adversarial_classifier is not False:
             species_tensor = batch.get(REGISTRY_KEYS.LABELS_KEY, batch.get("labels", batch.get("species")))
             fool_loss = self.loss_adversarial_classifier(z, species_tensor, False)
+            fool_loss_raw = fool_loss.detach()
             loss = loss + fool_loss * kappa
 
         self.log("train_loss", loss, on_epoch=True, prog_bar=True)
@@ -330,13 +357,23 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         opt1.step()
 
         # Adversarial classifier step — classifies SPECIES
+        adv_cls_loss_raw = None
         if opt2 is not None and kappa > 0:
             species_tensor = batch.get(REGISTRY_KEYS.LABELS_KEY, batch.get("labels", batch.get("species")))
             adv_loss = self.loss_adversarial_classifier(z.detach(), species_tensor, True)
+            adv_cls_loss_raw = adv_loss.detach()
             adv_loss = adv_loss * kappa
             opt2.zero_grad()
             self.manual_backward(adv_loss)
             opt2.step()
+
+        # Log adversarial-internal signals on the first batch of each epoch.
+        if batch_idx == 0 and kappa > 0:
+            if fool_loss_raw is not None:
+                self.log("adv/fool_loss", fool_loss_raw, prog_bar=False)
+            if adv_cls_loss_raw is not None:
+                self.log("adv/classifier_loss", adv_cls_loss_raw, prog_bar=False)
+            self.log("schedule/adv_weight_effective", float(kappa), prog_bar=False)
 
         # Log metrics once per epoch (first batch)
         if batch_idx == 0:

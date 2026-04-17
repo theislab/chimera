@@ -318,6 +318,8 @@ class ChimeraModule(nn.Module):
         lambda_anchor: float = 0.005,
         lambda_fit: float = 0.01,
         lambda_disp: float = 1e-4,
+        mask_species_in_encoder: bool = False,
+        mask_batch_in_encoder: bool = False,
     ) -> None:
         super().__init__()
 
@@ -336,6 +338,18 @@ class ChimeraModule(nn.Module):
         self.current_epoch: int = 0
         self.free_bits: float = FREE_BITS
         self.kl_weight: float = 1.0  # set by ChimeraTrainingPlan during training
+        # When True, the species one-hot is zeroed before being fed to the encoder.
+        # The residual decoder still receives species one-hot for species-specific fitting.
+        # This is a *spec deviation* for close-species datasets where adversarial training
+        # alone cannot remove species from z within a reasonable training budget.
+        self.mask_species_in_encoder = bool(mask_species_in_encoder)
+        # When True, the batch one-hot is *also* zeroed in the encoder input.
+        # On datasets where batch→species is 1:1 (our E1.4 invariant), masking
+        # species alone leaves species inferable from batch_oh; both must be
+        # masked to truly prevent species leakage into z. The batch_offset
+        # submodule still receives batch_idx for its constrained per-batch
+        # offset, so batch correction is preserved.
+        self.mask_batch_in_encoder = bool(mask_batch_in_encoder)
 
         # ---- Buffers ----
         if conservation_prior is None:
@@ -512,6 +526,21 @@ class ChimeraModule(nn.Module):
         beta = SG_EMA_BETA
         self.S_g_ema.mul_(beta).add_(S_g.detach(), alpha=1.0 - beta)
 
+    def _encoder_input(
+        self,
+        x: torch.Tensor,
+        species_oh: torch.Tensor,
+        batch_oh: torch.Tensor,
+    ) -> torch.Tensor:
+        """Build the encoder input ``cat([x, species_oh, batch_oh])`` with the
+        mask flags applied. Used by both the forward pass and every inference-
+        time method in ``ChimeraModel`` so that training and inference encoder
+        inputs are identical.
+        """
+        sp = torch.zeros_like(species_oh) if self.mask_species_in_encoder else species_oh
+        ba = torch.zeros_like(batch_oh) if self.mask_batch_in_encoder else batch_oh
+        return torch.cat([x, sp, ba], dim=-1)
+
     # ------------------------------------------------------------------
     # Forward
     # ------------------------------------------------------------------
@@ -558,7 +587,7 @@ class ChimeraModule(nn.Module):
         batch_oh = F.one_hot(batch_idx, self.n_batch).float()  # (B, n_batch)
 
         # Step 3: Encode
-        enc_input = torch.cat([x, species_oh, batch_oh], dim=-1)
+        enc_input = self._encoder_input(x, species_oh, batch_oh)
         h_enc = self.encoder(enc_input)
         z_mean = self.z_mean_linear(h_enc)
         z_logvar = self.z_logvar_linear(h_enc)
@@ -588,9 +617,21 @@ class ChimeraModule(nn.Module):
                 ).sum(-1).mean()
 
         # Step 4: GIN -- per-gene alpha and correction
-        alpha, correction = self.gin(
-            self.gene_features, self.conservation_prior
-        )  # (G,), (G,)
+        # Config M short-circuits the GIN: `correction` is a learnable per-gene
+        # parameter (added in _model.from_config when `per_gene_alpha=True`).
+        # `alpha` is then computed in the same logit-space convention so that
+        # L_alpha_anchor (correction.pow(2)) and L_fit_reward (-correction * S_g)
+        # drive the per-gene parameter directly. See workflow.md §"GIN-input
+        # ablation" and CHANGELOG for the rationale.
+        if getattr(self, "_use_per_gene_alpha", False):
+            correction = self.per_gene_correction  # (G,)
+            alpha = torch.sigmoid(
+                torch.logit(self.conservation_prior) + correction
+            )  # (G,)
+        else:
+            alpha, correction = self.gin(
+                self.gene_features, self.conservation_prior
+            )  # (G,), (G,)
 
         # Step 5: Dual-h (Fix 15)
         h_full = self.decoder_hidden(z)  # (B, n_hidden)

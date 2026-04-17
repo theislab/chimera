@@ -81,10 +81,12 @@ class _SqrtSpeciesDataSplitter(DataSplitter):
         # with batch_size=None so it yields pre-batched index lists with
         # the correct tensor shapes.
         batch_size = self.data_loader_kwargs.get("batch_size", 128)
+        # Match scvi-tools' DataSplitter.train_dataloader, which hard-codes
+        # ``drop_last=False``. ``self.drop_last`` does not exist on the parent.
         batch_sampler = BatchSampler(
             weighted_sampler,
             batch_size=batch_size,
-            drop_last=self.drop_last,
+            drop_last=False,
         )
         dataset = self.adata_manager.create_torch_dataset(
             indices=self.train_idx,
@@ -415,23 +417,27 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
         kwargs.setdefault("early_stopping_monitor", "validation_loss")
 
         if sqrt_species_sampling:
-            # Use a custom DataSplitter that injects a WeightedRandomSampler
-            # for the training DataLoader with sqrt-proportional species weights.
-            datasplitter_kwargs = datasplitter_kwargs or {}
-            datamodule = _SqrtSpeciesDataSplitter(
-                self.adata_manager,
-                cell_weights=self._sqrt_species_weights,
-                batch_size=batch_size,
-                **datasplitter_kwargs,
-            )
-            return super().train(
-                max_epochs=max_epochs,
-                batch_size=batch_size,
-                early_stopping=early_stopping,
-                plan_kwargs=plan_kwargs,
-                datamodule=datamodule,
-                **kwargs,
-            )
+            # Inject a custom DataSplitter that uses a WeightedRandomSampler
+            # with sqrt-proportional species weights. scvi-tools 1.1.2 builds
+            # the splitter internally when adata is registered (passing
+            # ``data_module=`` is forbidden in that case), so we hot-swap
+            # ``self._data_splitter_cls`` for the duration of this call and
+            # hand ``cell_weights`` through ``datasplitter_kwargs``.
+            datasplitter_kwargs = dict(datasplitter_kwargs or {})
+            datasplitter_kwargs["cell_weights"] = self._sqrt_species_weights
+            original_cls = self._data_splitter_cls
+            self._data_splitter_cls = _SqrtSpeciesDataSplitter
+            try:
+                return super().train(
+                    max_epochs=max_epochs,
+                    batch_size=batch_size,
+                    early_stopping=early_stopping,
+                    plan_kwargs=plan_kwargs,
+                    datasplitter_kwargs=datasplitter_kwargs,
+                    **kwargs,
+                )
+            finally:
+                self._data_splitter_cls = original_cls
         else:
             return super().train(
                 max_epochs=max_epochs,
@@ -490,7 +496,7 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             # Reconstruct encoder input: cat([x, species_oh, batch_oh])
             species_oh = F.one_hot(species_idx, self.module.n_species).float()
             batch_oh = F.one_hot(batch_idx, self.module.n_batch).float()
-            enc_input = torch.cat([x, species_oh, batch_oh], dim=-1)
+            enc_input = self.module._encoder_input(x, species_oh, batch_oh)
 
             h_enc = self.module.encoder(enc_input)
             z_mean = self.module.z_mean_linear(h_enc)
@@ -782,7 +788,7 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             # Encode
             species_oh = F.one_hot(species_idx, self.module.n_species).float()
             batch_oh = F.one_hot(batch_idx, self.module.n_batch).float()
-            enc_input = torch.cat([x, species_oh, batch_oh], dim=-1)
+            enc_input = self.module._encoder_input(x, species_oh, batch_oh)
             h_enc = self.module.encoder(enc_input)
             z_mean = self.module.z_mean_linear(h_enc)
 
@@ -1023,7 +1029,7 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             # Encode (deterministic: use z_mean, not reparameterized z)
             species_oh = F.one_hot(species_idx, self.module.n_species).float()
             batch_oh = F.one_hot(batch_idx, self.module.n_batch).float()
-            enc_input = torch.cat([x, species_oh, batch_oh], dim=-1)
+            enc_input = self.module._encoder_input(x, species_oh, batch_oh)
             h_enc = self.module.encoder(enc_input)
             z_mean = self.module.z_mean_linear(h_enc)
 
