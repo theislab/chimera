@@ -437,6 +437,7 @@ def train_and_diagnose(
     mask_batch_in_encoder: bool = False,
     gin_feature_op: str | None = None,
     free_bits: float | None = None,
+    lambda_mmd: float | None = None,
 ) -> Path:
     """Train a ChimeraModel and dump diagnostic artefacts.
 
@@ -483,6 +484,8 @@ def train_and_diagnose(
         extra_model_kwargs["mask_species_in_encoder"] = True
     if mask_batch_in_encoder:
         extra_model_kwargs["mask_batch_in_encoder"] = True
+    if lambda_mmd is not None:
+        extra_model_kwargs["lambda_mmd"] = float(lambda_mmd)
     model = ChimeraModel.from_config(
         adata,
         config_name=config,
@@ -590,6 +593,7 @@ def train_and_diagnose(
         ),
         gin_feature_op=gin_feature_op,
         free_bits=free_bits,
+        lambda_mmd=lambda_mmd,
         WARMUP_KL_EPOCHS=WARMUP_KL_EPOCHS,
         WARMUP_FQR_EPOCHS=WARMUP_FQR_EPOCHS,
         WARMUP_ADV_EPOCHS=WARMUP_ADV_EPOCHS,
@@ -671,6 +675,13 @@ def main() -> int:
                         help="Comma-separated hidden widths of the adversarial classifier "
                              "MLP (e.g. '32' for default, '64,32' for a 2-hidden MLP). "
                              "Needed to close the Caveat 34 nonlinear z-leakage gap.")
+    parser.add_argument("--free-bits", type=float, default=None,
+                        help="Per-dim KL floor override (default 0.5)")
+    parser.add_argument("--gin-feature-op", type=str, default=None,
+                        help="Diagnostic GIN feature patch (zero_esm2, zero_expr_stats, etc.)")
+    parser.add_argument("--lambda-mmd", type=float, default=None,
+                        help="Weight for MMD loss on z for species mixing. "
+                             "Recommended range [10, 200]. 0 disables.")
     parser.add_argument("--mask-species-in-encoder", action="store_true",
                         help="Architecture deviation: zero species_oh in encoder input. "
                              "Residual decoder still receives species explicitly.")
@@ -710,6 +721,9 @@ def main() -> int:
         ),
         mask_species_in_encoder=args.mask_species_in_encoder,
         mask_batch_in_encoder=args.mask_batch_in_encoder,
+        gin_feature_op=args.gin_feature_op,
+        free_bits=args.free_bits,
+        lambda_mmd=args.lambda_mmd,
     )
     return 0
 

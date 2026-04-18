@@ -35,6 +35,7 @@ from chimera._constants import (
     LAMBDA_AUX,
     LAMBDA_DISP,
     LAMBDA_FIT,
+    LAMBDA_MMD,
     LAMBDA_RES,
     N_HIDDEN,
     N_LATENT,

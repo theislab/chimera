@@ -26,6 +26,12 @@ LAMBDA_FIT: float = 0.01
 LAMBDA_DISP: float = 1e-4
 """Weight for dispersion regularization."""
 
+LAMBDA_MMD: float = 0.0
+"""Weight for MMD (Maximum Mean Discrepancy) loss on z between species.
+When > 0, directly penalizes species-stratified latent distributions,
+producing species-mixed z embeddings. Recommended range: [10, 200].
+Set to 0 to disable (backward compatible)."""
+
 # ---------------------------------------------------------------------------
 # Adversarial training
 # ---------------------------------------------------------------------------

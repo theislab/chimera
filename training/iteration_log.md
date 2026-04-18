@@ -278,6 +278,46 @@ Changes made during this pass:
   re-parameterisation of a per-gene α. Paper-relevant table saved at
   [`runs/config_m_vs_d_report.md`](runs/config_m_vs_d_report.md).
 
+## Cross-species z integration fix (2026-04-18)
+
+**Problem**: z was completely species-stratified (kNN species purity = 1.0, species
+silhouette = 0.286). Cells from different species never mixed in latent space.
+
+**Root cause**: Three compounding issues:
+1. Encoder receives species one-hot → z encodes species directly
+2. L_recon gradient through residual pathway incentivizes species encoding in z
+3. Adversarial training (32-unit MLP) too weak to remove all species signal
+
+**Solution (three-part, all needed)**:
+1. **MMD loss on z** (`lambda_mmd`): Multi-kernel RBF MMD directly penalizes
+   species-stratified z distributions. `_module.py:_compute_mmd`, `_mmd_rbf`.
+2. **Mask species/batch from encoder** (`mask_species_in_encoder=True`,
+   `mask_batch_in_encoder=True`): Encoder sees only expression.
+3. **Detach z from residual pathway**: When masking is enabled, the residual
+   decoder uses `h_detached` instead of `h_full`. L_recon gradient to encoder
+   flows ONLY through the shared head, removing species encoding incentive.
+
+**Lambda sweep (all with masking + z-detach):**
+
+| iter | lambda_mmd | kNN-sp | sil-sp | sil-ct | alpha_std | Verdict |
+|------|-----------|--------|--------|--------|-----------|---------|
+| 16   | 0 (baseline) | 1.000 | 0.286 | 0.217 | 0.150 | No integration |
+| 30   | 100 | 0.999 | 0.026 | 0.509 | 0.152 | Global mixing, no local |
+| **31** | **1000** | **0.988** | **0.033** | **0.642** | **0.122** | **Best balance** |
+| 32   | 5000 | 0.951 | 0.011 | 0.304 | 0.115 | Over-mixed, ct lost |
+
+**Best run: iter31** — `lambda_mmd=1000` + masking + z-detach. 31/32 expectations pass
+(E6.1 marginal: adversarial accuracy nearly flat at ~0.66 with masking, expected).
+
+**Canonical recipe update:**
+```
+--lambda-mmd 1000 --mask-species-in-encoder --mask-batch-in-encoder
+```
+(All other flags same as iter16 canonical.)
+
+**Notebooks created**: `40_integration_analysis.ipynb`, `41_alpha_biology.ipynb`,
+`42_biological_validation.ipynb`.
+
 ## Recipe for a new dataset
 
 1. `python training/build_subset.py --species <A> <B> ...` (if slicing a larger set).

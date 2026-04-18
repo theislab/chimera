@@ -23,6 +23,7 @@ from chimera._components import (
 from chimera._constants import (
     DROPOUT_RATE,
     FREE_BITS,
+    LAMBDA_MMD,
     MIN_CELLS_FQR,
     N_HIDDEN,
     N_LATENT,
@@ -318,6 +319,7 @@ class ChimeraModule(nn.Module):
         lambda_anchor: float = 0.005,
         lambda_fit: float = 0.01,
         lambda_disp: float = 1e-4,
+        lambda_mmd: float = LAMBDA_MMD,
         mask_species_in_encoder: bool = False,
         mask_batch_in_encoder: bool = False,
     ) -> None:
@@ -334,6 +336,7 @@ class ChimeraModule(nn.Module):
         self.lambda_anchor = lambda_anchor
         self.lambda_fit = lambda_fit
         self.lambda_disp = lambda_disp
+        self.lambda_mmd = lambda_mmd
         self.warmup_fqr_epochs = WARMUP_FQR_EPOCHS
         self.current_epoch: int = 0
         self.free_bits: float = FREE_BITS
@@ -542,6 +545,97 @@ class ChimeraModule(nn.Module):
         return torch.cat([x, sp, ba], dim=-1)
 
     # ------------------------------------------------------------------
+    # MMD (Maximum Mean Discrepancy) for species-mixed z
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _pairwise_sq_dist(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Squared pairwise Euclidean distances (MPS-compatible, no cdist)."""
+        # ||x_i - y_j||^2 = ||x_i||^2 + ||y_j||^2 - 2 * x_i . y_j
+        x_sq = (x * x).sum(-1, keepdim=True)  # (N, 1)
+        y_sq = (y * y).sum(-1, keepdim=True)  # (M, 1)
+        return x_sq + y_sq.T - 2.0 * x @ y.T  # (N, M)
+
+    @staticmethod
+    def _mmd_rbf(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Multi-scale RBF kernel MMD^2 between two sample sets.
+
+        Uses the median heuristic for bandwidth selection with 5 scales
+        around the median pairwise distance. MPS-compatible (no cdist).
+
+        Parameters
+        ----------
+        x, y
+            Sample matrices of shape ``(N, d)`` and ``(M, d)``.
+
+        Returns
+        -------
+        torch.Tensor
+            Scalar MMD^2 estimate (non-negative in expectation).
+        """
+        xx = ChimeraModule._pairwise_sq_dist(x, x)
+        yy = ChimeraModule._pairwise_sq_dist(y, y)
+        xy = ChimeraModule._pairwise_sq_dist(x, y)
+
+        # Median heuristic for bandwidth
+        with torch.no_grad():
+            n_x, n_y = x.shape[0], y.shape[0]
+            # Upper-triangle of xx and yy (exclude diagonal self-distances)
+            triu_xx = xx[torch.triu(torch.ones(n_x, n_x, device=x.device), diagonal=1).bool()]
+            triu_yy = yy[torch.triu(torch.ones(n_y, n_y, device=y.device), diagonal=1).bool()]
+            all_dists = torch.cat([triu_xx, triu_yy, xy.reshape(-1)])
+            median_dist = all_dists.median().clamp(min=1e-5)
+
+        bandwidths = [median_dist * f for f in (0.25, 0.5, 1.0, 2.0, 4.0)]
+
+        mmd_sq = torch.tensor(0.0, device=x.device)
+        for bw in bandwidths:
+            k_xx = torch.exp(-xx / (2 * bw))
+            k_yy = torch.exp(-yy / (2 * bw))
+            k_xy = torch.exp(-xy / (2 * bw))
+            # Unbiased estimator: exclude diagonals for k_xx and k_yy
+            mmd_sq = mmd_sq + (
+                (k_xx.sum() - n_x) / max(n_x * (n_x - 1), 1)
+                + (k_yy.sum() - n_y) / max(n_y * (n_y - 1), 1)
+                - 2.0 * k_xy.mean()
+            )
+        return mmd_sq
+
+    def _compute_mmd(self, z: torch.Tensor, species_idx: torch.Tensor) -> torch.Tensor:
+        """Compute MMD between all species pairs in the minibatch.
+
+        Parameters
+        ----------
+        z
+            Latent representations, shape ``(B, n_latent)``.
+        species_idx
+            Species indices, shape ``(B,)``.
+
+        Returns
+        -------
+        torch.Tensor
+            Mean MMD^2 across all species pairs present in the batch.
+        """
+        mmd_total = torch.tensor(0.0, device=z.device)
+        n_pairs = 0
+
+        for i in range(self.n_species):
+            for j in range(i + 1, self.n_species):
+                mask_i = species_idx == i
+                mask_j = species_idx == j
+                z_i = z[mask_i]
+                z_j = z[mask_j]
+                # Need at least 2 samples per species for unbiased MMD
+                if z_i.shape[0] < 2 or z_j.shape[0] < 2:
+                    continue
+                mmd_total = mmd_total + self._mmd_rbf(z_i, z_j)
+                n_pairs += 1
+
+        if n_pairs == 0:
+            return torch.tensor(0.0, device=z.device)
+        return mmd_total / n_pairs
+
+    # ------------------------------------------------------------------
     # Forward
     # ------------------------------------------------------------------
 
@@ -642,8 +736,14 @@ class ChimeraModule(nn.Module):
         log_rate_shared_det = self.output_shared(h_detached)  # (B, G)
 
         # Step 7: Residual head
+        # When species is masked from the encoder, also detach z for the
+        # residual pathway.  The residual head still receives species_oh
+        # explicitly, so it can produce species-specific corrections.  But
+        # the encoder gradient from L_recon flows ONLY through the shared
+        # head, removing the incentive to encode species in z.
+        h_for_residual = h_detached if self.mask_species_in_encoder else h_full
         log_rate_residual = self.output_residual(
-            torch.cat([h_full, species_oh, batch_oh], dim=-1)
+            torch.cat([h_for_residual, species_oh, batch_oh], dim=-1)
         )  # (B, G)
 
         # Step 8: Batch offset
@@ -720,6 +820,12 @@ class ChimeraModule(nn.Module):
         else:
             L_fit_reward = torch.tensor(0.0, device=x.device)
 
+        # MMD loss on z for species mixing
+        if self.lambda_mmd > 0:
+            L_mmd = self._compute_mmd(z, species_idx)
+        else:
+            L_mmd = torch.tensor(0.0, device=x.device)
+
         # KL weight (set by training plan during warmup; defaults to 1.0)
         kl_weight = getattr(self, "kl_weight", 1.0)
 
@@ -732,6 +838,7 @@ class ChimeraModule(nn.Module):
             + self.lambda_anchor * L_alpha_anchor
             + self.lambda_fit * L_fit_reward
             + self.lambda_disp * L_disp
+            + self.lambda_mmd * L_mmd
             + L_kl_l  # Library KL (no lambda; zero when using observed lib size)
         )
 
@@ -757,6 +864,7 @@ class ChimeraModule(nn.Module):
             "L_alpha_anchor": L_alpha_anchor,
             "L_fit_reward": L_fit_reward,
             "L_disp": L_disp,
+            "L_mmd": L_mmd,
             "L_KL_l": L_kl_l,
             "loss": loss,
             "L_total": loss,

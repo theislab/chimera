@@ -466,6 +466,7 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
             "L_residual_sparsity",
             "L_alpha_anchor",
             "L_fit_reward",
+            "L_mmd",
             "L_KL_l",
             "L_unified",
         ]:
