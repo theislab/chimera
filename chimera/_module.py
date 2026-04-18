@@ -322,6 +322,7 @@ class ChimeraModule(nn.Module):
         lambda_mmd: float = LAMBDA_MMD,
         mask_species_in_encoder: bool = False,
         mask_batch_in_encoder: bool = False,
+        detach_z_residual: bool = False,
     ) -> None:
         super().__init__()
 
@@ -353,6 +354,7 @@ class ChimeraModule(nn.Module):
         # submodule still receives batch_idx for its constrained per-batch
         # offset, so batch correction is preserved.
         self.mask_batch_in_encoder = bool(mask_batch_in_encoder)
+        self.detach_z_residual = bool(detach_z_residual)
 
         # ---- Buffers ----
         if conservation_prior is None:
@@ -741,7 +743,7 @@ class ChimeraModule(nn.Module):
         # explicitly, so it can produce species-specific corrections.  But
         # the encoder gradient from L_recon flows ONLY through the shared
         # head, removing the incentive to encode species in z.
-        h_for_residual = h_detached if self.mask_species_in_encoder else h_full
+        h_for_residual = h_detached if self.detach_z_residual else h_full
         log_rate_residual = self.output_residual(
             torch.cat([h_for_residual, species_oh, batch_oh], dim=-1)
         )  # (B, G)

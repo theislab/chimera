@@ -187,6 +187,11 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         self._adv_classifier_hidden: tuple[int, ...] = tuple(
             kwargs.pop("adv_classifier_hidden", (32,))
         )
+        # Maximum KL weight after warmup.  Default 1.0 preserves standard VAE
+        # behaviour.  When the encoder receives less reconstruction gradient
+        # (e.g. z detached from residual path), lowering this to 0.3–0.5
+        # prevents the KL from dominating and collapsing latent dimensions.
+        self._kl_weight_max: float = float(kwargs.pop("kl_weight_max", 1.0))
 
         # KL-FQR warmup constraint
         assert self.warmup_fqr_epochs >= self.warmup_kl_epochs, (
@@ -318,7 +323,7 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         from scvi import REGISTRY_KEYS
 
         # Set epoch-dependent weights on module
-        self.module.kl_weight = min(1.0, self.current_epoch / max(self.warmup_kl_epochs, 1))
+        self.module.kl_weight = min(self._kl_weight_max, self.current_epoch / max(self.warmup_kl_epochs, 1))
         self.module.current_epoch = self.current_epoch
 
         # Adversarial delayed start

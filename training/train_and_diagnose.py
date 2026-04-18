@@ -438,6 +438,7 @@ def train_and_diagnose(
     gin_feature_op: str | None = None,
     free_bits: float | None = None,
     lambda_mmd: float | None = None,
+    kl_weight_max: float | None = None,
 ) -> Path:
     """Train a ChimeraModel and dump diagnostic artefacts.
 
@@ -557,6 +558,8 @@ def train_and_diagnose(
         plan_kwargs["adv_lr"] = float(adv_lr)
     if adv_classifier_hidden is not None:
         plan_kwargs["adv_classifier_hidden"] = tuple(int(h) for h in adv_classifier_hidden)
+    if kl_weight_max is not None:
+        plan_kwargs["kl_weight_max"] = float(kl_weight_max)
 
     # --- Trainer kwargs (scvi-tools forwards these as **trainer_kwargs to Lightning Trainer)
     csv_logger = CSVLogger(save_dir=str(RUNS_ROOT), name=run_name, version="lightning")
@@ -594,6 +597,7 @@ def train_and_diagnose(
         gin_feature_op=gin_feature_op,
         free_bits=free_bits,
         lambda_mmd=lambda_mmd,
+        kl_weight_max=kl_weight_max,
         WARMUP_KL_EPOCHS=WARMUP_KL_EPOCHS,
         WARMUP_FQR_EPOCHS=WARMUP_FQR_EPOCHS,
         WARMUP_ADV_EPOCHS=WARMUP_ADV_EPOCHS,
@@ -677,6 +681,9 @@ def main() -> int:
                              "Needed to close the Caveat 34 nonlinear z-leakage gap.")
     parser.add_argument("--free-bits", type=float, default=None,
                         help="Per-dim KL floor override (default 0.5)")
+    parser.add_argument("--kl-weight-max", type=float, default=None,
+                        help="Max KL weight after warmup (default 1.0). "
+                             "Lower (0.3-0.5) when z-detach reduces recon gradient.")
     parser.add_argument("--gin-feature-op", type=str, default=None,
                         help="Diagnostic GIN feature patch (zero_esm2, zero_expr_stats, etc.)")
     parser.add_argument("--lambda-mmd", type=float, default=None,
@@ -724,6 +731,7 @@ def main() -> int:
         gin_feature_op=args.gin_feature_op,
         free_bits=args.free_bits,
         lambda_mmd=args.lambda_mmd,
+        kl_weight_max=args.kl_weight_max,
     )
     return 0
 
