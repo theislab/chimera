@@ -5,14 +5,31 @@ loop. Every run produces a structured artifact that lists which pre-registered
 expectations passed and which failed, and points to a first-suspect root cause.
 We iterate on the model, never on wishful thinking.
 
-**Current state (2026-04-17, iter 16).** On the canonical 2-species Human+Monkey
-subset, the best-known configuration passes **28/28 expectations** after 100 epochs
-at ~3s/epoch on MPS (~5 minutes total). The single blocker across all prior runs —
-the adversarial classifier out-training the encoder — was resolved by a
-minimally-invasive addition of an `adv_lr` hyperparameter (default 1e-3 preserves
-scvi-tools behavior; set 1e-4 for close-species datasets where the classifier is
-trivially dominant). See [iteration_log.md](iteration_log.md) and §"E6.2 analysis"
-below for the diagnosis.
+**Current state (2026-04-18, iter 28).** On the canonical 2-species Human+Monkey
+subset, the iter16 configuration passes **32/32 expectations** after 100 epochs
+at ~3s/epoch on MPS (~5 minutes total). Verified again as iter28-baseline on
+2026-04-18 with the same seed (42).
+
+### Notebook-based workflow (recommended)
+
+Three notebooks provide a complete train, validate, analyze pipeline:
+
+| Notebook | Purpose | Runtime |
+|----------|---------|---------|
+| `notebooks/20_train_and_validate.ipynb` | Train model, all fast diagnostics, expectation gate | ~6 min |
+| `notebooks/21_integration_analysis.ipynb` | UMAP, kNN mixing, silhouette, label transfer | ~1 min |
+| `notebooks/22_alpha_biology.ipynb` | Alpha landscape, top genes, expression patterns, cross-seed reproducibility, S_g analysis | ~10 min |
+
+Each notebook is self-contained and parameterized by a `RUN_DIR` / `ADATA_PATH`
+constant at the top. Change these to point at different datasets or runs.
+
+### GIN input improvement (2026-04-18)
+
+The 3 zero-padding dimensions (indices 69-71) in `assemble_gin_features` were
+replaced with `std_identity`, `max_identity`, `min_identity` computed from per-species
+pairwise identity scores in the ortholog table. This provides the GIN with
+information about the spread of conservation across species pairs, not just
+the mean. All 120 tests pass. No architecture change, same 72-d input, same GIN.
 
 ---
 
@@ -109,7 +126,7 @@ table below.
 | # | Name | Metric | Threshold | Spec cite |
 |---|------|--------|-----------|-----------|
 | E1.1 | `conservation_signal` | Spearman r(conservation_prior, per-gene expression similarity via CPM-normalized log-means) | `r ≥ 0.02` OR `\|r\| < 0.15` AND prior_std ≥ 0.05 | critical_reexamination §96 (see "E1.1 analysis" below) |
-| E1.2 | `gene_features_normalized` | per-feature mean abs < 0.1 AND std in [0.5, 1.5] | all *active* features (ignoring 3 zero-padding dims) | critical_reexamination §95 |
+| E1.2 | `gene_features_normalized` | per-feature mean abs < 0.1 AND std in [0.5, 1.5] | all active features (72-d, no padding after 2026-04-18 GIN input fix) | critical_reexamination §95 |
 | E1.3 | `p_null_dynamic_range` | fraction of (species, gene) cells with 1e-5 < p_null < 0.5 | ≥ 0.5 | implementation prompt (p_null Laplace) |
 | E1.4 | `batch_to_species_unique` | every batch maps to exactly one species | 100% | model setup invariant |
 | E1.5 | `conservation_prior_range` | min ≥ 0.05, max ≤ 0.95, std ≥ 0.05 | hard | GIN logit stability |

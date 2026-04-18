@@ -960,12 +960,12 @@ def assemble_gin_features(
 ) -> Tuple[np.ndarray, StandardScaler]:
     """Assemble and standardize per-gene features for the GIN.
 
-    Concatenates ~72 features per gene:
+    Concatenates 72 features per gene:
       - 64 ESM-2 PCA dimensions
       - 1 ESM-2 inter-species variance
       - 1 mean identity (from ortholog table)
       - 3 expression stats (log_mean_expr, log_expr_var, frac_nonzero)
-      - Remaining slots padded with zeros if needed (or additional stats)
+      - 3 identity spread stats (std, max, min across species pairs)
 
     StandardScaler is applied (MANDATORY).
 
@@ -991,6 +991,20 @@ def assemble_gin_features(
     G = esm2_pca.shape[0]
     n_pca = esm2_pca.shape[1]  # typically 64
 
+    # Per-species identity columns (e.g. mmulatta_identity, mmusculus_identity, ...)
+    # provide additional signal beyond mean_identity: the spread of pairwise
+    # identities across species matters for multi-species settings.
+    identity_cols = [c for c in ortholog_table.columns if c.endswith("_identity") and c != "mean_identity"]
+    if identity_cols:
+        id_matrix = ortholog_table[identity_cols].values.astype(np.float32)
+        std_identity = np.nanstd(id_matrix, axis=1)
+        max_identity = np.nanmax(id_matrix, axis=1)
+        min_identity = np.nanmin(id_matrix, axis=1)
+    else:
+        std_identity = np.zeros(G, dtype=np.float32)
+        max_identity = ortholog_table["mean_identity"].values.astype(np.float32)
+        min_identity = ortholog_table["mean_identity"].values.astype(np.float32)
+
     parts = [
         esm2_pca,  # (G, 64)
         esm2_interspecies_var.reshape(-1, 1),  # (G, 1)
@@ -998,9 +1012,12 @@ def assemble_gin_features(
         expression_stats["log_mean_expr"].reshape(-1, 1),  # (G, 1)
         expression_stats["log_expr_var"].reshape(-1, 1),  # (G, 1)
         expression_stats["frac_nonzero"].reshape(-1, 1),  # (G, 1)
+        std_identity.reshape(-1, 1),  # (G, 1) — replaces zero padding
+        max_identity.reshape(-1, 1),  # (G, 1) — replaces zero padding
+        min_identity.reshape(-1, 1),  # (G, 1) — replaces zero padding
     ]
 
-    raw_features = np.hstack(parts)  # (G, 69) typically
+    raw_features = np.hstack(parts)  # (G, 72) typically
     current_d = raw_features.shape[1]
     target_d = max(current_d, 72)
 
