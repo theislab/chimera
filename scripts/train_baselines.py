@@ -133,7 +133,8 @@ def _train_harmony(adata: ad.AnnData):
     meta = adata_harmony.obs[["species"]].copy()
 
     ho = harmonypy.run_harmony(pca_matrix, meta, "species")
-    adata.obsm["X_Harmony"] = ho.Z_corr.T
+    z_corr = ho.Z_corr.T if ho.Z_corr.shape[0] != adata.n_obs else ho.Z_corr
+    adata.obsm["X_Harmony"] = z_corr
 
     logger.info("Harmony complete; stored in obsm['X_Harmony'].")
 
@@ -211,6 +212,8 @@ def compute_scvi_f_statistics(adata: ad.AnnData, scvi_model) -> np.ndarray:
     logger.info("Computing per-gene scVI F-statistics ...")
 
     denoised = scvi_model.get_normalized_expression(library_size=1e4)
+    if hasattr(denoised, 'values'):
+        denoised = denoised.values  # DataFrame -> ndarray
     species = adata.obs["species"].values
     unique_species = np.unique(species)
     n_genes = denoised.shape[1]
