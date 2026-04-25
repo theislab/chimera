@@ -169,8 +169,10 @@ class TestLossScaleCalibration:
             f"Phase 1: L_recon should be positive, got {L_recon_p1}"
         )
         ratio_l1_p1 = weighted_l1_p1 / (L_recon_p1 + 1e-12)
-        assert ratio_l1_p1 > 0.0002, (
-            f"Phase 1: weighted L1 ({weighted_l1_p1:.6f}) is < 0.02% of "
+        # With lambda_res=0.001 (validated iter50), the weighted L1 ratio
+        # is small but non-negligible. The .mean() bug would give ~Gx smaller ratio.
+        assert ratio_l1_p1 > 2e-6, (
+            f"Phase 1: weighted L1 ({weighted_l1_p1:.6f}) is negligible vs "
             f"L_recon ({L_recon_p1:.4f}). Ratio = {ratio_l1_p1:.6f}. "
             f"This suggests the wrong reduction (.mean() instead of "
             f".sum(-1).mean()) was used -- the buggy reduction would give "
@@ -184,6 +186,12 @@ class TestLossScaleCalibration:
         # - Weighted L1 must still be meaningful
         # ==================================================================
         optimizer = torch.optim.Adam(module.parameters(), lr=1e-3)
+
+        # Set epoch past FQR warmup so FQR provides gradient to the GIN.
+        # Under detach_alpha_from_recon (default True), L_recon does NOT
+        # flow gradient to the GIN — only FQR + anchor do.  FQR activates
+        # at warmup_fqr_epochs (default 20), so we must be past that.
+        module.current_epoch = module.warmup_fqr_epochs + 1
 
         for _ in range(10):
             optimizer.zero_grad()
@@ -199,29 +207,26 @@ class TestLossScaleCalibration:
         correction_drift = correction_p2.abs().mean().item()
         assert correction_drift > 0.01, (
             f"Phase 2: GIN correction has not drifted from zero after 10 "
-            f"training steps. correction.abs().mean() = {correction_drift:.6f}, "
+            f"training steps (epoch={module.current_epoch}). "
+            f"correction.abs().mean() = {correction_drift:.6f}, "
             f"expected > 0.01."
         )
 
-        # Verify anchor uses .sum() reduction (not .mean()).
-        # With G=200 genes, .sum() gives a value 200x larger than .mean().
-        # This is the same class of bug as the L1 reduction issue.
+        # Verify anchor uses .mean() reduction (dataset-size invariant).
         L_anchor_p2 = outputs_p2["L_alpha_anchor"]
-        expected_anchor_sum = correction_p2.pow(2).sum()
         expected_anchor_mean = correction_p2.pow(2).mean()
-        assert torch.allclose(L_anchor_p2, expected_anchor_sum, atol=1e-5), (
+        assert torch.allclose(L_anchor_p2, expected_anchor_mean, atol=1e-5), (
             f"Phase 2: L_alpha_anchor ({L_anchor_p2.item():.6f}) does not "
-            f"match correction.pow(2).sum() ({expected_anchor_sum.item():.6f}). "
-            f"Expected .sum(), not .mean() ({expected_anchor_mean.item():.6f})."
+            f"match correction.pow(2).mean() ({expected_anchor_mean.item():.6f})."
         )
 
         # Weighted L1 must remain meaningful after training
         L_recon_p2 = outputs_p2["L_recon"].item()
         weighted_l1_p2 = LAMBDA_RES * outputs_p2["L_residual_sparsity"].item()
         ratio_l1_p2 = weighted_l1_p2 / (L_recon_p2 + 1e-12)
-        assert ratio_l1_p2 > 0.0002, (
+        assert ratio_l1_p2 > 2e-5, (
             f"Phase 2: weighted L1 ({weighted_l1_p2:.6f}) collapsed below "
-            f"0.02% of L_recon ({L_recon_p2:.4f}) after 10 training steps. "
+            f"0.002% of L_recon ({L_recon_p2:.4f}) after 10 training steps. "
             f"Ratio = {ratio_l1_p2:.6f}."
         )
 
@@ -274,10 +279,13 @@ class TestLossScaleCalibration:
         # below (max Δα > 0 on at least one gene).
         L_fit_p3 = outputs_p3["L_fit_reward"].item()
         weighted_fqr_p3 = LAMBDA_FIT * abs(L_fit_p3)
+        # FQR uses .mean() (dataset-size invariant), so the ratio is smaller
+        # for datasets with more genes. Threshold is 1e-6 to catch "silent FQR"
+        # while accommodating the per-gene normalization.
         ratio_fqr_p3 = weighted_fqr_p3 / (L_recon_p3 + 1e-12)
-        assert ratio_fqr_p3 > 1e-5, (
+        assert ratio_fqr_p3 > 1e-6, (
             f"Phase 3: weighted FQR ({weighted_fqr_p3:.6f}) is below "
-            f"1e-5 × L_recon ({L_recon_p3:.4f}). Ratio = {ratio_fqr_p3:.8f}. "
+            f"1e-6 × L_recon ({L_recon_p3:.4f}). Ratio = {ratio_fqr_p3:.8f}. "
             f"FQR is effectively silent."
         )
 
@@ -285,9 +293,10 @@ class TestLossScaleCalibration:
         # sufficient training (correction has had 60 total steps to grow).
         weighted_anchor_p3 = LAMBDA_ANCHOR * outputs_p3["L_alpha_anchor"].item()
         ratio_anchor_p3 = weighted_anchor_p3 / (L_recon_p3 + 1e-12)
-        assert ratio_anchor_p3 > 0.0001, (
-            f"Phase 3: weighted anchor ({weighted_anchor_p3:.6f}) is < 0.01% "
+        # With .mean() reduction, anchor is per-gene. Threshold adjusted to
+        # catch "anchor is silent" while accommodating per-gene normalization.
+        assert ratio_anchor_p3 > 1e-6, (
+            f"Phase 3: weighted anchor ({weighted_anchor_p3:.6f}) is < 1e-6 "
             f"of L_recon ({L_recon_p3:.4f}). Ratio = {ratio_anchor_p3:.8f}. "
-            f"Anchor term is negligible -- correction may not be growing, "
-            f"or anchor uses wrong reduction (.mean() instead of .sum())."
+            f"Anchor term is negligible -- correction may not be growing."
         )

@@ -7,13 +7,17 @@ work?" artifact — `iteration_log.md` is populated from these.
 
 Usage
 -----
-    python training/run_experiment.py --run-name iter14-example \
+    # iter50 canonical recipe (VAMP + MMD, close-primate):
+    # VAMP prior is on by default; pass --no-vamp-prior to disable.
+    python training/run_experiment.py --run-name my-run \
         --adata data/processed/camex_human_monkey.h5ad \
-        --max-epochs 50 --adv-weight 100 --lambda-fit 0.1 \
-        --lambda-anchor 0.001 --lambda-res 0.01
+        --max-epochs 100 --adv-weight 100 --lambda-mmd 10
+
+    # mid-divergent (H+Mouse): add --free-bits 1.0 --adv-weight 200
+    # very-divergent (H+Zebrafish): keep --adv-weight 100 (not 200)
 
 Or via config file:
-    python training/run_experiment.py --plan training/plans/iter10_reproduction.json
+    python training/run_experiment.py --plan training/plans/iter50.json
 """
 
 from __future__ import annotations
@@ -114,14 +118,14 @@ def summarize_run(run_dir: Path) -> dict[str, Any]:
 def run_experiment(
     run_name: str,
     adata_path: Path,
-    max_epochs: int = 50,
-    config: str = "D",
+    max_epochs: int = 150,
+    config: str = "A",
     adv_weight: float | None = 100.0,
     adv_lr: float | None = None,
     adv_classifier_hidden: tuple[int, ...] | None = None,
     lambda_fit: float | None = 0.1,
-    lambda_anchor: float | None = 0.001,
-    lambda_res: float | None = 0.01,
+    lambda_anchor: float | None = 0.003,
+    lambda_res: float | None = 0.001,
     warmup_adversarial_epochs: int | None = 5,
     warmup_fqr_epochs: int | None = 20,
     warmup_kl_epochs: int | None = 20,
@@ -130,10 +134,21 @@ def run_experiment(
     seed: int = 42,
     accelerator: str | None = "mps",
     snapshot_every_n_epochs: int = 5,
-    mask_species_in_encoder: bool = False,
-    mask_batch_in_encoder: bool = False,
+    mask_species_in_encoder: bool = True,
+    mask_batch_in_encoder: bool = True,
     gin_feature_op: str | None = None,
     free_bits: float | None = None,
+    lambda_mmd: float | None = None,
+    lambda_z_balance: float | None = None,
+    use_vamp_prior: bool = True,
+    n_vamp_components: int = 500,
+    vamp_init_from_data: bool = True,
+    use_celltype_conditional_mmd: bool = False,
+    celltype_key: str | None = None,
+    batch_key: str = "batch",
+    prior_clamp_max: float | None = None,
+    gin_n_hidden: int | None = None,
+    sg_ema_beta: float | None = None,
 ) -> dict[str, Any]:
     """Train a Chimera model end-to-end and return a summary dict."""
     run_dir = train_and_diagnose(
@@ -159,6 +174,17 @@ def run_experiment(
         mask_batch_in_encoder=mask_batch_in_encoder,
         gin_feature_op=gin_feature_op,
         free_bits=free_bits,
+        lambda_mmd=lambda_mmd,
+        lambda_z_balance=lambda_z_balance,
+        use_vamp_prior=use_vamp_prior,
+        n_vamp_components=n_vamp_components,
+        vamp_init_from_data=vamp_init_from_data,
+        use_celltype_conditional_mmd=use_celltype_conditional_mmd,
+        celltype_key=celltype_key,
+        batch_key=batch_key,
+        prior_clamp_max=prior_clamp_max,
+        gin_n_hidden=gin_n_hidden,
+        sg_ema_beta=sg_ema_beta,
     )
     return summarize_run(run_dir)
 
@@ -167,8 +193,8 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--run-name", required=True)
     p.add_argument("--adata", type=Path, default=Path("data/processed/camex_human_monkey.h5ad"))
-    p.add_argument("--max-epochs", type=int, default=50)
-    p.add_argument("--config", default="D")
+    p.add_argument("--max-epochs", type=int, default=150)
+    p.add_argument("--config", default="A")
     p.add_argument("--adv-weight", type=float, default=100.0)
     p.add_argument("--adv-lr", type=float, default=None,
                    help="LR of the adversarial species classifier. None=default 1e-3.")
@@ -177,8 +203,8 @@ def main() -> int:
                         "MLP (e.g. '64,32'). Deeper classifier closes Caveat 34 "
                         "nonlinear z-leakage gap. None=default (32,).")
     p.add_argument("--lambda-fit", type=float, default=0.1)
-    p.add_argument("--lambda-anchor", type=float, default=0.001)
-    p.add_argument("--lambda-res", type=float, default=0.01)
+    p.add_argument("--lambda-anchor", type=float, default=0.003)
+    p.add_argument("--lambda-res", type=float, default=0.001)
     p.add_argument("--warmup-adversarial-epochs", type=int, default=5)
     p.add_argument("--warmup-fqr-epochs", type=int, default=20)
     p.add_argument("--warmup-kl-epochs", type=int, default=20)
@@ -187,10 +213,10 @@ def main() -> int:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--accelerator", default="mps")
     p.add_argument("--snapshot-every-n-epochs", type=int, default=5)
-    p.add_argument("--mask-species-in-encoder", action="store_true")
-    p.add_argument("--mask-batch-in-encoder", action="store_true",
-                   help="Also zero batch_oh in encoder input (Caveat 34 "
-                        "nonlinear z-leakage when batch→species is 1:1).")
+    p.add_argument("--mask-species-in-encoder", action=argparse.BooleanOptionalAction,
+                   default=True, help="Zero species_oh in encoder input (default: True).")
+    p.add_argument("--mask-batch-in-encoder", action=argparse.BooleanOptionalAction,
+                   default=True, help="Zero batch_oh in encoder input (default: True).")
     p.add_argument(
         "--free-bits",
         type=float,
@@ -206,6 +232,46 @@ def main() -> int:
         help="Diagnostic-only: patch GIN gene_features matrix after model construction. "
              "Used for the round2 GIN-input ablation sweep.",
     )
+    p.add_argument("--lambda-mmd", type=float, default=None,
+                   help="MMD loss weight. None=module default (50.0). "
+                        "Set 0 to disable species mixing.")
+    p.add_argument("--lambda-z-balance", type=float, default=None,
+                   help="z-dim variance balance loss weight. None=module default (1.0). "
+                        "0 disables. Penalizes imbalanced per-dim z variance.")
+    p.add_argument("--vamp-prior", action=argparse.BooleanOptionalAction,
+                   default=True,
+                   help="Use VAMP prior (default: True, canonical for iter50+). "
+                        "Pass --no-vamp-prior to use N(0,I) instead.")
+    p.add_argument("--n-vamp-components", type=int, default=500,
+                   help="Number of VAMP pseudo-input components.")
+    p.add_argument("--no-vamp-init-from-data", action="store_true",
+                   help="Initialize VAMP pseudo-inputs from Gaussian noise "
+                        "instead of random training cells.")
+    p.add_argument("--celltype-conditional-mmd", action="store_true",
+                   help="Use celltype-conditional MMD: match species within each "
+                        "cell type instead of globally. Directly targets E8.4.")
+    p.add_argument("--batch-key", type=str, default="batch",
+                   help="obs column to use as batch_key (default 'batch'; use "
+                        "'sample_batch' for donor-level correction)")
+    p.add_argument("--celltype-key", type=str, default=None,
+                   help="Column in adata.obs with cell-type labels for "
+                        "--celltype-conditional-mmd. Default: 'cell_type'.")
+    p.add_argument("--prior-clamp-max", type=float, default=None,
+                   help="iter109: optional upper clamp on conservation_prior "
+                        "applied in-memory before training. Default 0.95 (data). "
+                        "Use 0.85 on testis to give the GIN ±1.21 logit units of "
+                        "headroom and break the prior-saturation lock.")
+    p.add_argument("--gin-hidden", type=int, default=None,
+                   help="iter114: GIN MLP hidden width. Default 32 "
+                        "(architecture 72 -> 64 -> 32 -> 1, ~6.8K params). "
+                        "Set 64 to widen to 72 -> 128 -> 64 -> 1 (~17.7K params, 2.6x). "
+                        "Targets feature-space discriminability ceiling on testis E9.2 down.")
+    p.add_argument("--sg-ema-beta", type=float, default=None,
+                   help="iter116: S_g EMA decay (default SG_EMA_BETA=0.9, ~10-batch "
+                        "averaging). Larger β slows the EMA and reduces per-minibatch "
+                        "noise on rare neg-S_g testis genes. 0.97 → ~33-batch averaging "
+                        "(3.3× the iter109 default), 0.99 → ~100-batch. Targets the "
+                        "iter115 mechanistic finding (signal density, not MLP capacity).")
     p.add_argument("--plan", type=Path, default=None,
                    help="JSON file overriding all above args (single experiment).")
     args = p.parse_args()
@@ -240,6 +306,17 @@ def main() -> int:
             mask_batch_in_encoder=args.mask_batch_in_encoder,
             gin_feature_op=args.gin_feature_op,
             free_bits=args.free_bits,
+            lambda_mmd=args.lambda_mmd,
+            lambda_z_balance=getattr(args, 'lambda_z_balance', None),
+            use_vamp_prior=args.vamp_prior,
+            n_vamp_components=args.n_vamp_components,
+            vamp_init_from_data=not args.no_vamp_init_from_data,
+            use_celltype_conditional_mmd=args.celltype_conditional_mmd,
+            celltype_key=args.celltype_key,
+            batch_key=args.batch_key,
+            prior_clamp_max=args.prior_clamp_max,
+            gin_n_hidden=args.gin_hidden,
+            sg_ema_beta=args.sg_ema_beta,
         )
 
     es = summary["expectation_summary"]

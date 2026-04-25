@@ -7,6 +7,7 @@ Two variants:
      S_g EMA, adversarial support.
 """
 
+import math
 from typing import Dict, Optional, Tuple
 
 import torch
@@ -23,7 +24,13 @@ from chimera._components import (
 from chimera._constants import (
     DROPOUT_RATE,
     FREE_BITS,
+    LAMBDA_ANCHOR,
+    LAMBDA_AUX,
+    LAMBDA_DISP,
+    LAMBDA_FIT,
     LAMBDA_MMD,
+    LAMBDA_RES,
+    LAMBDA_Z_BALANCE,
     MIN_CELLS_FQR,
     N_HIDDEN,
     N_LATENT,
@@ -71,8 +78,8 @@ class ChimeraMinimalModule(nn.Module):
         n_latent: int = N_LATENT,
         n_hidden: int = N_HIDDEN,
         conservation_prior: Optional[torch.Tensor] = None,
-        lambda_aux: float = 0.3,
-        lambda_res: float = 0.05,
+        lambda_aux: float = LAMBDA_AUX,
+        lambda_res: float = LAMBDA_RES,
     ) -> None:
         super().__init__()
 
@@ -314,15 +321,22 @@ class ChimeraModule(nn.Module):
         p_null: Optional[torch.Tensor] = None,
         batch_to_species_idx: Optional[torch.Tensor] = None,
         use_observed_lib_size: bool = True,
-        lambda_aux: float = 0.3,
-        lambda_res: float = 0.05,
-        lambda_anchor: float = 0.005,
-        lambda_fit: float = 0.01,
-        lambda_disp: float = 1e-4,
+        lambda_aux: float = LAMBDA_AUX,
+        lambda_res: float = LAMBDA_RES,
+        lambda_anchor: float = LAMBDA_ANCHOR,
+        lambda_fit: float = LAMBDA_FIT,
+        lambda_disp: float = LAMBDA_DISP,
         lambda_mmd: float = LAMBDA_MMD,
-        mask_species_in_encoder: bool = False,
-        mask_batch_in_encoder: bool = False,
-        detach_z_residual: bool = False,
+        lambda_z_balance: float = LAMBDA_Z_BALANCE,
+        mask_species_in_encoder: bool = True,
+        mask_batch_in_encoder: bool = True,
+        detach_z_residual: bool = True,
+        gin_n_hidden_layers: int = 2,
+        gin_n_hidden: int = 32,
+        use_celltype_conditional_mmd: bool = False,
+        use_vamp_prior: bool = True,
+        n_vamp_components: int = 500,
+        sg_ema_beta: float | None = None,
     ) -> None:
         super().__init__()
 
@@ -338,8 +352,15 @@ class ChimeraModule(nn.Module):
         self.lambda_fit = lambda_fit
         self.lambda_disp = lambda_disp
         self.lambda_mmd = lambda_mmd
+        self.lambda_z_balance = lambda_z_balance
         self.warmup_fqr_epochs = WARMUP_FQR_EPOCHS
         self.current_epoch: int = 0
+        # iter116: S_g EMA decay is configurable. SG_EMA_BETA=0.9 gives effective
+        # ~10-batch averaging. Larger β (e.g. 0.97 → 33-batch) tests the per-
+        # minibatch S_g noise hypothesis from iter115's 3-sp brainstorm: tighter
+        # S_g_ema for rare neg-S_g testis genes (~1% class) may break the
+        # universal E9.2 down architectural ceiling on testis 2-sp.
+        self.sg_ema_beta: float = float(sg_ema_beta) if sg_ema_beta is not None else SG_EMA_BETA
         self.free_bits: float = FREE_BITS
         self.kl_weight: float = 1.0  # set by ChimeraTrainingPlan during training
         # When True, the species one-hot is zeroed before being fed to the encoder.
@@ -355,6 +376,37 @@ class ChimeraModule(nn.Module):
         # offset, so batch correction is preserved.
         self.mask_batch_in_encoder = bool(mask_batch_in_encoder)
         self.detach_z_residual = bool(detach_z_residual)
+        # When True, alpha is detached from L_recon in the mu_full computation.
+        # The GIN then learns ONLY from FQR (biological fit signal) + anchor
+        # (regularization), not from L_recon's gradient through (1-α)×residual.
+        # Under strong integration (VAMP+MMD), L_recon creates a uniform
+        # downward force on all corrections that overwhelms FQR, collapsing
+        # Δα to one-sided negative. Detaching α breaks this feedback loop and
+        # allows bidirectional Δα: conserved genes (S_g>0) get α>prior,
+        # divergent genes (S_g<0) get α<prior.  Validated iter81+.
+        self.detach_alpha_from_recon = True
+        # When True AND ``tensors["celltype"]`` is available at forward time,
+        # MMD is evaluated within each cell type (species are matched per
+        # cell type) rather than globally. See ChimeraModel.setup_anndata's
+        # ``celltype_key`` argument and ``_compute_mmd_celltype_conditional``
+        # below for the rationale. Falls back transparently to the global
+        # MMD when the cell-type field is not registered.
+        self.use_celltype_conditional_mmd = bool(use_celltype_conditional_mmd)
+        # VAMP prior: multimodal p(z) induced by K learnable pseudo-inputs
+        # passed through the same encoder. Replaces N(0, I) when active.
+        # The prior itself carries the cross-species alignment inductive
+        # bias (each shared celltype pulls toward one mode regardless of
+        # species), so MMD pressure can be reduced or removed without
+        # losing integration.
+        self.use_vamp_prior = bool(use_vamp_prior)
+        self.n_vamp_components = int(n_vamp_components)
+        self.pseudo_inputs: Optional[nn.Parameter] = None
+        if self.use_vamp_prior:
+            # Random init; the factory can overwrite with data samples.
+            # Scale ~0.5 so that after ReLU the values span a sensible range.
+            self.pseudo_inputs = nn.Parameter(
+                torch.randn(self.n_vamp_components, n_genes) * 0.5
+            )
 
         # ---- Buffers ----
         if conservation_prior is None:
@@ -376,7 +428,10 @@ class ChimeraModule(nn.Module):
 
         # ---- GIN ----
         n_features = self.gene_features.shape[1]
-        self.gin = GeneIntegrationNetwork(n_features=n_features, n_hidden=32)
+        self.gin = GeneIntegrationNetwork(
+            n_features=n_features, n_hidden=int(gin_n_hidden), n_hidden_layers=gin_n_hidden_layers,
+        )
+        self.gin_n_hidden = int(gin_n_hidden)
         # GIN last layer is already zero-initialized in GeneIntegrationNetwork.__init__.
         # First-layer gradient is zero at init (expected: last-layer weights are zero,
         # so first-layer output has no effect). Gradients appear after first optimizer step.
@@ -428,17 +483,20 @@ class ChimeraModule(nn.Module):
 
         # ---- Output heads ----
         self.output_shared = nn.Linear(n_hidden, n_genes)
-        # WARNING (Component 15.2, critical_reexamination_modules.md):
-        # The residual head is intentionally a SINGLE LINEAR layer, not an MLP.
-        # The alpha gradient monotonicity proof (Component 2b's weight-level
-        # telescope) depends on linearity: d(L)/d(alpha) is monotonic in the
-        # residual magnitude only because the residual head has no nonlinearity.
-        # If upgrading to an MLP residual, the four-failure-mode framework and
-        # alpha equilibrium analysis must be re-derived.  This is a known
-        # limitation accepted for v1; see Caveat 32 for consequences.
-        self.output_residual = nn.Linear(n_hidden + n_species + n_batch, n_genes)
-        nn.init.normal_(self.output_residual.weight, std=0.01)
-        nn.init.zeros_(self.output_residual.bias)
+        # Residual head: 2-layer MLP with bottleneck for species-specific corrections.
+        # Uses n_hidden//2 as bottleneck to limit capacity — prevents the residual
+        # from absorbing ALL species variation (which causes bimodal alpha collapse).
+        # The bottleneck + L1 penalty together keep alpha smooth and continuous.
+        residual_input_dim = n_hidden + n_species + n_batch
+        residual_hidden = n_hidden // 2  # bottleneck
+        self.output_residual = nn.Sequential(
+            nn.Linear(residual_input_dim, residual_hidden),
+            nn.LayerNorm(residual_hidden),
+            nn.ReLU(),
+            nn.Linear(residual_hidden, n_genes),
+        )
+        nn.init.normal_(self.output_residual[-1].weight, std=0.01)
+        nn.init.zeros_(self.output_residual[-1].bias)
 
         # ---- Per-gene-per-batch dispersion ----
         self.dispersion = nn.Parameter(torch.zeros(n_batch, n_genes))
@@ -516,10 +574,17 @@ class ChimeraModule(nn.Module):
         if n_species_present > 0:
             S_g = S_g / n_species_present
 
-        # Apply ReLU (mandatory: S_g = ReLU(Q_g - Q_null_g), round2 spec)
-        # Without ReLU, negative S_g causes FQR to push alpha downward
-        # when shared decoder hasn't yet learned — fights the architecture.
-        S_g = torch.clamp(S_g, min=0.0)
+        # S_g is NOT ReLU-clamped.  Negative S_g (shared decoder worse than
+        # null for this gene) is a valid biological signal: the gene is
+        # divergent across species, so alpha should be pushed BELOW the
+        # conservation prior.  Combined with detach_alpha_from_recon (which
+        # removes L_recon's overwhelming uniform downward force on corrections),
+        # unrectified S_g produces clean bidirectional Δα:
+        #   S_g > 0  ⟹  correction > 0  ⟹  α > prior  (gene more conserved)
+        #   S_g < 0  ⟹  correction < 0  ⟹  α < prior  (gene more divergent)
+        # The FQR warmup (epochs 0–20) ensures the shared decoder is trained
+        # before S_g_ema influences corrections.  The EMA (β=0.9) washes out
+        # any early-training noise well before epoch 20.
 
         # Apply sparse-gene mask
         S_g = S_g * sparse_mask
@@ -528,7 +593,7 @@ class ChimeraModule(nn.Module):
 
     def _update_S_g_ema(self, S_g: torch.Tensor) -> None:
         """Update the S_g exponential moving average (training only)."""
-        beta = SG_EMA_BETA
+        beta = self.sg_ema_beta
         self.S_g_ema.mul_(beta).add_(S_g.detach(), alpha=1.0 - beta)
 
     def _encoder_input(
@@ -636,6 +701,154 @@ class ChimeraModule(nn.Module):
         if n_pairs == 0:
             return torch.tensor(0.0, device=z.device)
         return mmd_total / n_pairs
+
+    # ------------------------------------------------------------------
+    # VAMP prior
+    # ------------------------------------------------------------------
+
+    def _encode_pseudo_inputs(self) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Pass the K pseudo-inputs through the shared encoder.
+
+        The pseudo-inputs are learnable "prototype" count vectors
+        (shape ``(K, G)``). They go through the SAME encoder as real
+        cells, with zeroed species / batch one-hots (matching the
+        ``mask_species_in_encoder`` / ``mask_batch_in_encoder`` regime).
+        A ``ReLU`` ensures non-negativity (cells have counts ≥ 0).
+
+        BatchNorm is temporarily put into eval mode during this call so
+        that (a) BN uses the accumulated running stats (trained on real
+        cells) rather than pseudo-input batch stats, and (b) pseudo-input
+        activations don't contaminate the running stats. Gradients still
+        flow back to ``pseudo_inputs`` and all encoder parameters.
+        """
+        assert self.pseudo_inputs is not None, "VAMP prior not initialized"
+        K = self.pseudo_inputs.shape[0]
+        device = self.pseudo_inputs.device
+        zeros_sp = torch.zeros(K, self.n_species, device=device)
+        zeros_ba = torch.zeros(K, self.n_batch, device=device)
+        pseudo = F.relu(self.pseudo_inputs)
+        enc_input = self._encoder_input(pseudo, zeros_sp, zeros_ba)
+        was_training = self.encoder.training
+        self.encoder.eval()
+        try:
+            h_pseudo = self.encoder(enc_input)
+        finally:
+            self.encoder.train(mode=was_training)
+        u_mean = self.z_mean_linear(h_pseudo)     # (K, d)
+        u_logvar = self.z_logvar_linear(h_pseudo) # (K, d)
+        return u_mean, u_logvar
+
+    def _vamp_kl(
+        self,
+        z_sample: torch.Tensor,
+        z_mean: torch.Tensor,
+        z_logvar: torch.Tensor,
+    ) -> torch.Tensor:
+        """MC estimate of KL(q(z|x) || p_vamp(z)), per cell.
+
+        ``p_vamp(z) = (1/K) Σ_k q(z | u_k)`` where ``u_k`` is the k-th
+        pseudo-input passed through the encoder. Using a single MC sample
+        ``z_sample ~ q(z|x)``:
+
+            log q(z|x) - log p_vamp(z)
+        """
+        u_mean, u_logvar = self._encode_pseudo_inputs()
+        # Clamp logvars to keep exponents numerically safe.
+        u_logvar = u_logvar.clamp(min=-10.0, max=10.0)
+        zz_logvar = z_logvar.clamp(min=-10.0, max=10.0)
+
+        u_var = torch.exp(u_logvar)
+        # log q(z_sample | u_k) — Gaussian log-pdf, summed over dims.
+        # z: (B, d); u_mean: (K, d) → broadcast to (B, K, d)
+        B, d = z_sample.shape
+        K = u_mean.shape[0]
+        z_b = z_sample.unsqueeze(1)                # (B, 1, d)
+        u_mean_b = u_mean.unsqueeze(0)             # (1, K, d)
+        u_logvar_b = u_logvar.unsqueeze(0)         # (1, K, d)
+        u_var_b = u_var.unsqueeze(0)               # (1, K, d)
+        log_q_z_u = -0.5 * (
+            math.log(2.0 * math.pi)
+            + u_logvar_b
+            + (z_b - u_mean_b).pow(2) / u_var_b
+        ).sum(-1)                                  # (B, K)
+        # log p_vamp(z_sample) = logsumexp_k log_q_z_u − log K
+        log_p_z = torch.logsumexp(log_q_z_u, dim=1) - math.log(float(K))  # (B,)
+
+        # log q(z_sample | x) — same family, per-cell variance.
+        z_var = torch.exp(zz_logvar)
+        log_q_z_x = -0.5 * (
+            math.log(2.0 * math.pi)
+            + zz_logvar
+            + (z_sample - z_mean).pow(2) / z_var
+        ).sum(-1)                                  # (B,)
+
+        return log_q_z_x - log_p_z                 # (B,)
+
+    def _compute_mmd_celltype_conditional(
+        self,
+        z: torch.Tensor,
+        species_idx: torch.Tensor,
+        celltype_idx: torch.Tensor,
+    ) -> torch.Tensor:
+        """MMD between species pairs evaluated **within each cell type**.
+
+        Rationale (derived iter44-46, 2026-04-21). Global MMD on `z` closes
+        the aggregate species-distribution gap but does not enforce
+        within-celltype species matching — it can be satisfied by
+        species-sub-clustering that mirrors across celltypes. Under strong
+        global MMD the shared decoder is also forced to predict species-
+        average expression at each cell state, inflating the residual, which
+        collapses `alpha` to a uniformly-low one-sided distribution and kills
+        E3.4 / E4.2. Celltype-conditional MMD penalizes species mismatch
+        only within each cell type, leaving the rest of `z` free to carry
+        cell-state information that the shared decoder can exploit. No
+        cell-type information is fed into the encoder, shared decoder, or
+        residual decoder — cell type labels are used **exclusively** to
+        group cells for the MMD grouping.
+
+        Parameters
+        ----------
+        z
+            Latent representations, shape ``(B, n_latent)``.
+        species_idx
+            Species indices, shape ``(B,)``.
+        celltype_idx
+            Cell-type indices, shape ``(B,)``. Values are the integer codes
+            produced by scvi-tools ``CategoricalObsField``.
+
+        Returns
+        -------
+        torch.Tensor
+            Mean MMD^2 over (celltype, species-pair) groups that had enough
+            cells of both species. Falls back to the global MMD when no
+            group had ≥2 cells per species.
+        """
+        mmd_total = torch.tensor(0.0, device=z.device)
+        n_groups = 0
+
+        unique_cts = torch.unique(celltype_idx)
+        for c in unique_cts.tolist():
+            ct_mask = celltype_idx == c
+            for i in range(self.n_species):
+                for j in range(i + 1, self.n_species):
+                    mask_i = ct_mask & (species_idx == i)
+                    mask_j = ct_mask & (species_idx == j)
+                    # Skip species-unique cell types transparently: if a
+                    # cell type only exists in one species, no MMD pair is
+                    # defined for it.
+                    if mask_i.sum() < 2 or mask_j.sum() < 2:
+                        continue
+                    z_i = z[mask_i]
+                    z_j = z[mask_j]
+                    mmd_total = mmd_total + self._mmd_rbf(z_i, z_j)
+                    n_groups += 1
+
+        if n_groups == 0:
+            # No celltype had both species in the batch — fall back so the
+            # loss still exerts pressure. This happens on very small batches
+            # with skewed species distributions.
+            return self._compute_mmd(z, species_idx)
+        return mmd_total / n_groups
 
     # ------------------------------------------------------------------
     # Forward
@@ -753,11 +966,16 @@ class ChimeraModule(nn.Module):
         log_rate_batch = constrained_offset[batch_idx]  # (B, G)
 
         # Step 9: Three mu predictions
+        # When detach_alpha_from_recon is True, alpha.detach() is used so that
+        # L_recon gradient does NOT flow back to the GIN.  The GIN learns only
+        # from FQR + anchor — a cleaner biological signal that preserves
+        # bidirectional Δα under strong integration.
+        alpha_for_recon = alpha.detach() if self.detach_alpha_from_recon else alpha
         mu_full = (
             torch.exp(
                 log_rate_shared_full
                 + log_rate_batch
-                + (1.0 - alpha) * log_rate_residual
+                + (1.0 - alpha_for_recon) * log_rate_residual
             )
             * library_size.unsqueeze(-1)
         )
@@ -782,13 +1000,26 @@ class ChimeraModule(nn.Module):
             .mean()
         )
 
-        # L_kl (with free-bits: Task 6.8)
-        kl_per_dim = 0.5 * (
-            z_mean.pow(2) + torch.exp(z_logvar) - z_logvar - 1.0
-        )  # (B, d)
-        if self.free_bits > 0:
-            kl_per_dim = torch.clamp(kl_per_dim, min=self.free_bits)
-        L_kl = kl_per_dim.sum(-1).mean()
+        # L_kl — standard N(0, I) analytic form by default, VAMP-prior
+        # Monte-Carlo form when active. Free-bits is applied per-cell in
+        # the VAMP case (using n_latent × free_bits as the per-cell floor)
+        # so it has a consistent interpretation in either regime.
+        if self.use_vamp_prior and self.pseudo_inputs is not None:
+            kl_per_cell = self._vamp_kl(z, z_mean, z_logvar)  # (B,)
+            if self.free_bits > 0:
+                # Per-cell floor matches the total per-cell free-bits budget
+                # of the analytic N(0, I) form (n_latent × free_bits).
+                kl_per_cell = torch.clamp(
+                    kl_per_cell, min=float(self.n_latent) * self.free_bits
+                )
+            L_kl = kl_per_cell.mean()
+        else:
+            kl_per_dim = 0.5 * (
+                z_mean.pow(2) + torch.exp(z_logvar) - z_logvar - 1.0
+            )  # (B, d)
+            if self.free_bits > 0:
+                kl_per_dim = torch.clamp(kl_per_dim, min=self.free_bits)
+            L_kl = kl_per_dim.sum(-1).mean()
 
         # L_shared_aux (theta detached)
         L_shared_aux = (
@@ -801,8 +1032,8 @@ class ChimeraModule(nn.Module):
         # L_residual_sparsity: .sum(-1).mean()
         L_residual_sparsity = log_rate_residual.abs().sum(-1).mean()
 
-        # L_alpha_anchor: correction.pow(2).sum()
-        L_alpha_anchor = correction.pow(2).sum()
+        # L_alpha_anchor: per-gene mean (dataset-size invariant)
+        L_alpha_anchor = correction.pow(2).mean()
 
         # L_dispersion regularization
         L_disp = self.dispersion.pow(2).mean()
@@ -816,17 +1047,44 @@ class ChimeraModule(nn.Module):
         if self.training:
             self._update_S_g_ema(S_g)
 
-        # FQR warmup check
+        # FQR warmup check (per-gene mean, dataset-size invariant)
         if self.current_epoch >= self.warmup_fqr_epochs:
-            L_fit_reward = -(correction * self.S_g_ema).sum()
+            L_fit_reward = -(correction * self.S_g_ema).mean()
         else:
             L_fit_reward = torch.tensor(0.0, device=x.device)
 
-        # MMD loss on z for species mixing
+        # MMD loss on z for species mixing. When celltype-conditional MMD
+        # is enabled AND a cell-type categorical field was registered via
+        # setup_anndata(celltype_key=...), match species within each cell
+        # type instead of globally. This directly targets E8.4 without the
+        # alpha-collapse failure mode that strong global MMD produces.
         if self.lambda_mmd > 0:
-            L_mmd = self._compute_mmd(z, species_idx)
+            celltype_idx = tensors.get("celltype")
+            if (
+                self.use_celltype_conditional_mmd
+                and celltype_idx is not None
+            ):
+                celltype_idx = celltype_idx.squeeze(-1).long()
+                L_mmd = self._compute_mmd_celltype_conditional(
+                    z, species_idx, celltype_idx
+                )
+            else:
+                L_mmd = self._compute_mmd(z, species_idx)
         else:
             L_mmd = torch.tensor(0.0, device=x.device)
+
+        # L_z_balance: penalize imbalanced per-dim variance in z_mean.
+        # Under VAMP prior, the per-cell KL provides no per-dim regularization
+        # (the mixture is too flexible), allowing some dims to explode (var=30)
+        # while others near-collapse (var=0.007). This creates thin/elongated
+        # UMAP clusters and wastes latent capacity. The balance loss penalizes
+        # the std of log-variances across dims, encouraging all dims to carry
+        # similar information.
+        if self.lambda_z_balance > 0 and z_mean.shape[0] > 1:
+            var_per_dim = z_mean.var(dim=0).clamp(min=1e-6)  # (d,)
+            L_z_balance = torch.log(var_per_dim).std()
+        else:
+            L_z_balance = torch.tensor(0.0, device=x.device)
 
         # KL weight (set by training plan during warmup; defaults to 1.0)
         kl_weight = getattr(self, "kl_weight", 1.0)
@@ -841,6 +1099,7 @@ class ChimeraModule(nn.Module):
             + self.lambda_fit * L_fit_reward
             + self.lambda_disp * L_disp
             + self.lambda_mmd * L_mmd
+            + self.lambda_z_balance * L_z_balance
             + L_kl_l  # Library KL (no lambda; zero when using observed lib size)
         )
 
@@ -867,6 +1126,7 @@ class ChimeraModule(nn.Module):
             "L_fit_reward": L_fit_reward,
             "L_disp": L_disp,
             "L_mmd": L_mmd,
+            "L_z_balance": L_z_balance,
             "L_KL_l": L_kl_l,
             "loss": loss,
             "L_total": loss,

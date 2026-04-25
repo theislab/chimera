@@ -397,6 +397,210 @@ def download_van_zyl(
     return adata
 
 
+def download_van_zyl_raw(
+    data_dir: Union[str, Path, None] = None,
+) -> ad.AnnData:
+    """Download the *raw* van Zyl AH atlas (5 species, per-species Ensembl genes).
+
+    This is a faithful re-implementation of SATURN's
+    ``Vignettes/ah_atlas/ah_atlas_data_loader.ipynb``
+    (https://github.com/snap-stanford/SATURN/blob/main/Vignettes/ah_atlas/ah_atlas_data_loader.ipynb)
+    with three additions needed for Chimera's cross-species pipeline:
+
+    1. Adds ``obs['species']`` (SATURN's loader keeps species implicit, one file
+       per species). Labels match SATURN's preprocessed export exactly:
+       ``{'human', 'mouse', 'pig', 'macaca_fascicularis', 'macaca_mulatta'}``.
+    2. Adds ``obs['batch']`` derived from the cell-barcode prefix before the
+       first ``_`` (e.g. ``H1TMS1`` for human sample 1, ``MM1LTM`` for macaque
+       mulatta sample 1). Each batch is nested within exactly one species.
+    3. Concatenates the 5 per-species AnnDatas with an outer gene join, so the
+       returned object is a single cached file (``data/raw/van_zyl_raw.h5ad``).
+
+    The pipeline otherwise mirrors SATURN cell-for-cell:
+      - Download 5 per-species gzipped CSVs from NCBI GEO (public, no auth).
+      - ``gunzip`` in-memory (skip if the decompressed ``.csv`` exists).
+      - ``sc.read(csv).T`` to flip the genes × cells layout to cells × genes.
+      - Align ``obs`` to the SATURN-curated metafile
+        ``all_five_species_metafile.csv`` (downloaded from SATURN's repo);
+        drop the SCP ``TYPE,group`` row at index 0.
+      - ``obs['cell_type'] = obs['Cluster']``.
+
+    Parameters
+    ----------
+    data_dir
+        Directory to store raw data. Defaults to ``<repo>/data/raw``. Creates a
+        ``van_zyl_raw/`` subdir with per-species ``.csv.gz`` / ``.csv`` and the
+        metafile, plus a top-level ``van_zyl_raw.h5ad`` cache.
+
+    Returns
+    -------
+    AnnData
+        Concatenated 5-species AnnData:
+          - ``.X``: raw UMI counts (sparse CSR, float32). Integer-valued.
+          - ``.obs['species']``: one of the 5 lowercase labels above.
+          - ``.obs['batch']``: barcode prefix (sample-level batch).
+          - ``.obs['cell_type']``: SATURN's cross-species cluster label.
+          - ``.obs['Cluster']``: retained for provenance / SATURN parity.
+          - ``.var_names``: union of per-species gene symbols (outer join).
+
+    Notes
+    -----
+    Unlike ``download_camex_*``, this function does **not** apply the Chimera
+    QC filter — SATURN's loader keeps every cell in every CSV and we preserve
+    that behavior so the cross-check against the cached SATURN export
+    (``data/raw/van_zyl_aqueous_humor.h5ad``) can verify cell-for-cell parity.
+    Apply ``_qc_filter`` downstream if you want stricter cells.
+    """
+    data_dir = Path(data_dir) if data_dir is not None else _DEFAULT_DATA_DIR / "raw"
+    _ensure_dir(data_dir)
+    cache_path = data_dir / "van_zyl_raw.h5ad"
+
+    if cache_path.exists():
+        logger.info("Loading cached van Zyl raw from %s", cache_path)
+        return ad.read_h5ad(cache_path)
+
+    # --- Per-species sources (species_label, GEO URL) in SATURN's order. ---
+    # species_label values match the SATURN preprocessed export on disk so
+    # cross-check is direct: human, mouse, pig, macaca_fascicularis,
+    # macaca_mulatta. "MacaF" = Macaca Fascicularis, "MacaqueM" = Macaca
+    # Mulatta (first-letter-of-species shorthand, not female/male).
+    _VZ_SOURCES: list[tuple[str, str]] = [
+        ("mouse",
+         "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE146nnn/GSE146186/suppl/GSE146186_Mouse_count_matrix.csv.gz"),
+        ("pig",
+         "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE146nnn/GSE146187/suppl/GSE146187_Pig_count_matrix.csv.gz"),
+        ("human",
+         "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148371/suppl/GSE148371_Human_count_matrix.csv.gz"),
+        ("macaca_fascicularis",
+         "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148373/suppl/GSE148373_MacaF_count_matrix.csv.gz"),
+        ("macaca_mulatta",
+         "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148374/suppl/GSE148374_MacaqueM_count_matrix.csv.gz"),
+    ]
+    _VZ_META_URL = (
+        "https://raw.githubusercontent.com/snap-stanford/SATURN/main/"
+        "Vignettes/ah_atlas/data/all_five_species_metafile.csv"
+    )
+
+    vz_dir = data_dir / "van_zyl_raw"
+    _ensure_dir(vz_dir)
+
+    # --- 1. Fetch each .csv.gz, then decompress to .csv (skip-if-exists). ---
+    import gzip, shutil
+    for sp_label, url in _VZ_SOURCES:
+        gz_name = url.rsplit("/", 1)[-1]
+        csv_name = gz_name[:-3]  # strip ".gz"
+        gz_path = vz_dir / gz_name
+        csv_path = vz_dir / csv_name
+        if csv_path.exists():
+            logger.info("Cached (decompressed): %s", csv_path.name)
+            continue
+        _download_url(url, gz_path, desc=f"van Zyl {sp_label}")
+        logger.info("Decompressing %s → %s", gz_path.name, csv_path.name)
+        # Decompress via tmp path + atomic rename so a killed process leaves no
+        # partial .csv that the next run would mistake for a complete cache.
+        tmp_path = csv_path.with_suffix(csv_path.suffix + ".part")
+        try:
+            with gzip.open(gz_path, "rb") as fin, open(tmp_path, "wb") as fout:
+                shutil.copyfileobj(fin, fout, length=16 * 1024 * 1024)
+            tmp_path.rename(csv_path)
+        except Exception:
+            if tmp_path.exists():
+                tmp_path.unlink()
+            raise
+
+    # --- 2. Metadata file from SATURN's repo ("NAME,Cluster" + SCP TYPE row). ---
+    meta_path = vz_dir / "all_five_species_metafile.csv"
+    if not meta_path.exists():
+        _download_url(_VZ_META_URL, meta_path, desc="van Zyl SATURN metafile")
+
+    meta = pd.read_csv(meta_path)
+    # SCP's convention is that row 0 after the header is a TYPE,group
+    # annotation row ("TYPE,group,group,..."). Drop it exactly as SATURN's
+    # loader does with `meta.drop(0)`.
+    meta = meta.drop(0)
+    meta = meta.set_index("NAME")
+    logger.info("van Zyl metafile: %d cells annotated", len(meta))
+
+    # --- 3. Per-species: sc.read + .T + obs attachment (SATURN parity). ---
+    import scanpy as sc
+    from scipy.sparse import issparse, csr_matrix
+
+    per_species_adatas: list[ad.AnnData] = []
+    for sp_label, url in _VZ_SOURCES:
+        gz_name = url.rsplit("/", 1)[-1]
+        csv_path = vz_dir / gz_name[:-3]
+        logger.info("Loading %s from %s", sp_label, csv_path.name)
+
+        # `sc.read` on CSV returns a dense matrix of genes × cells; .T flips
+        # to cells × genes. This matches SATURN's loader exactly.
+        a = sc.read(csv_path).T
+
+        # Align to metafile barcodes. SATURN's loader uses `.loc[obs_names]`
+        # and assumes every barcode has metadata; we intersect defensively.
+        overlap = a.obs_names.intersection(meta.index)
+        if len(overlap) < a.n_obs:
+            missing = a.n_obs - len(overlap)
+            logger.warning("  %s: %d cells missing from metafile — dropping", sp_label, missing)
+            a = a[a.obs_names.isin(overlap)].copy()
+
+        # SATURN: `pig_ad.obs = meta.set_index("NAME").loc[pig_ad.obs_names]`
+        a.obs = meta.loc[a.obs_names].copy()
+        # SATURN: `pig_ad.obs["cell_type"] = pig_ad.obs["Cluster"]`
+        # Then SATURN's downstream integration pipeline collapses subcluster
+        # labels by stripping a leading "<digit>_" prefix ("1_Uveal" → "Uveal",
+        # "3_Macrophage" → "Macrophage"). This step is not in the data loader
+        # notebook but is the exact difference between the metafile's
+        # `Cluster` column and the `cell_type` column of the SATURN-cached
+        # h5ad on disk (verified: applying `re.sub(r'^\d+_', '', Cluster)`
+        # yields 100% equality with SATURN's cached labels across all 50,112
+        # cells). We apply it here so `cell_type` matches SATURN's exactly
+        # while preserving the finer-grained labels in `Cluster` for
+        # provenance / downstream sub-annotation use.
+        import re as _re
+        _prefix = _re.compile(r"^\d+_")
+        a.obs["cell_type"] = a.obs["Cluster"].astype(str).map(
+            lambda s: _prefix.sub("", s)
+        )
+
+        # Chimera additions: species + batch.
+        a.obs["species"] = sp_label
+        # Batch = barcode prefix before the first underscore (sample-level).
+        a.obs["batch"] = a.obs_names.to_series().str.split("_").str[0].values
+
+        # Convert dense float to sparse CSR int-like to save memory and match
+        # the sparse storage used by every other raw cache.
+        if not issparse(a.X):
+            a.X = csr_matrix(a.X.astype(np.float32, copy=False))
+
+        _validate_raw_counts(a, f"van Zyl {sp_label}")
+
+        logger.info("  %s: %d cells × %d genes (X is sparse CSR, raw int counts)",
+                    sp_label, a.n_obs, a.n_vars)
+        per_species_adatas.append(a)
+
+    # --- 4. Concatenate with outer gene join. ---
+    adata = ad.concat(
+        per_species_adatas,
+        join="outer",
+        merge="unique",
+        label=None,
+        index_unique=None,
+    )
+    adata.obs_names_make_unique()
+
+    # Categorical dtypes (matches pancreas / testis convention).
+    for col in ("species", "batch", "cell_type", "Cluster"):
+        if col in adata.obs.columns:
+            adata.obs[col] = pd.Categorical(adata.obs[col].astype(str))
+
+    adata.write_h5ad(cache_path)
+    logger.info(
+        "Saved van Zyl raw: %d cells × %d genes, %d species → %s",
+        adata.n_obs, adata.n_vars, adata.obs["species"].nunique(), cache_path,
+    )
+    return adata
+
+
 def download_camex_testis(
     data_dir: Union[str, Path, None] = None,
 ) -> ad.AnnData:
@@ -425,9 +629,38 @@ def download_camex_testis(
         return ad.read_h5ad(cache_path)
 
     # --- Download CAMEX benchmarks (shared with dev dataset) ---
+    # Bug-fix (2026-04-23): the pre-fix check used `any(camex_dir.rglob("*.h5ad"))`
+    # which was True whenever the sibling liver tissue had already been pulled, so
+    # the gdown call never ran and we would FileNotFoundError at the locate step
+    # below. We now check for testis-specific h5ads. `gdown.download_folder` with
+    # `resume=True` is a no-op for files already on disk, so re-invoking it here
+    # only downloads what is missing (the testis h5ads).
     camex_dir = data_dir / "camex"
-    if not camex_dir.exists() or not any(camex_dir.rglob("*.h5ad")):
-        _download_gdrive_folder("1rwdjEvWFEFw82a0x2JzMi2jXICbUc5eb", camex_dir)
+    def _testis_h5ads_present() -> bool:
+        if not camex_dir.exists():
+            return False
+        for pattern in ("*testis*", "*Testis*", "2testis"):
+            for d in camex_dir.rglob(pattern):
+                if d.is_dir() and any(d.rglob("*.h5ad")):
+                    return True
+        return False
+    if not _testis_h5ads_present():
+        # gdown walks the whole root folder and can rate-limit mid-walk
+        # (observed 2026-04-23: all 11 testis h5ads completed, then failure
+        # on Margarida's bulk files with "Cannot retrieve the public link …
+        # may have had many accesses"). If the walk dies AFTER the testis
+        # files landed, that is success for our purposes — re-check and only
+        # propagate the error if testis is still missing.
+        try:
+            _download_gdrive_folder("1rwdjEvWFEFw82a0x2JzMi2jXICbUc5eb", camex_dir)
+        except Exception as e:
+            if _testis_h5ads_present():
+                logger.warning(
+                    "gdown raised %s, but testis h5ads are on disk — proceeding.",
+                    type(e).__name__,
+                )
+            else:
+                raise
 
     # --- Locate testis directory ---
     tissue_dir = None
@@ -490,6 +723,7 @@ def query_ortholog_table(
     reference_species: str = "hsapiens",
     ensembl_version: int = 110,
     cache_dir: Union[str, Path, None] = None,
+    cache_path: Union[str, Path, None] = None,
 ) -> pd.DataFrame:
     """Query Ensembl BioMart for 1:1 orthologs across all species.
 
@@ -503,7 +737,12 @@ def query_ortholog_table(
         Ensembl release version for BioMart queries.
     cache_dir
         Directory for caching the ortholog table CSV.
-        Defaults to ``<repo>/data/processed``.
+        Defaults to ``<repo>/data/processed``. Ignored if *cache_path* is given.
+    cache_path
+        Explicit path to the cache CSV. When provided, overrides *cache_dir*
+        so multiple datasets can keep their own ortholog tables side-by-side
+        (e.g. ``ortholog_table.csv`` for pancreas and
+        ``ortholog_table_testis.csv`` for testis) without clobbering.
 
     Returns
     -------
@@ -515,9 +754,13 @@ def query_ortholog_table(
         - ``{species}_identity``: % identity for each non-reference species
         - ``mean_identity``: mean % identity across non-reference species
     """
-    cache_dir = Path(cache_dir) if cache_dir else _DEFAULT_DATA_DIR / "processed"
-    _ensure_dir(cache_dir)
-    cache_path = cache_dir / "ortholog_table.csv"
+    if cache_path is not None:
+        cache_path = Path(cache_path)
+        _ensure_dir(cache_path.parent)
+    else:
+        cache_dir = Path(cache_dir) if cache_dir else _DEFAULT_DATA_DIR / "processed"
+        _ensure_dir(cache_dir)
+        cache_path = cache_dir / "ortholog_table.csv"
 
     if cache_path.exists():
         logger.info("Loading cached ortholog table from %s", cache_path)
@@ -674,7 +917,7 @@ def download_and_process_esm2(
     ortholog_table: pd.DataFrame,
     species_list: Sequence[str],
     saturn_data_dir: Union[str, Path, None] = None,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
     """Download ESM-2 embeddings from SATURN and compute consensus per ortholog group.
 
     For each ortholog group, the consensus embedding is the mean of the per-species
@@ -692,9 +935,15 @@ def download_and_process_esm2(
 
     Returns
     -------
-    np.ndarray
+    consensus : np.ndarray
         Consensus embeddings of shape ``(G, 5120)`` where G is the number of
-        ortholog groups.
+        ortholog groups. Rows for unmatched ortholog groups are all-zero.
+    per_species_matrices : Dict[str, np.ndarray]
+        Mapping from species name (as passed in ``species_list``) to its per-
+        ortholog ESM-2 matrix of shape ``(G, 5120)``. Rows where the species
+        had no match in the ortholog table are all-zero (used downstream as a
+        "missing" mask by :func:`compute_esm2_interspecies_variance`). Species
+        whose ortholog columns are absent are omitted from this dict.
     """
     saturn_data_dir = (
         Path(saturn_data_dir)
@@ -739,6 +988,7 @@ def download_and_process_esm2(
     n_groups = len(ortholog_table)
     emb_dim = 5120
     consensus = np.zeros((n_groups, emb_dim), dtype=np.float32)
+    per_species_matrices: Dict[str, np.ndarray] = {}
 
     # Prefer ESM2 subdirectory if present (5120-dim); fall back to ESM1b (1280-dim).
     esm2_dir = None
@@ -788,6 +1038,7 @@ def download_and_process_esm2(
         # Try matching by gene ID first, then gene name (SATURN uses gene symbols).
         gene_ids = ortholog_table[gene_id_col].values if gene_id_col in ortholog_table.columns else None
         gene_names = ortholog_table[gene_name_col].values if gene_name_col in ortholog_table.columns else None
+        sp_matrix = np.zeros((n_groups, emb_dim), dtype=np.float32)
         n_matched = 0
         for i in range(n_groups):
             gid = gene_ids[i] if gene_ids is not None else None
@@ -799,11 +1050,15 @@ def download_and_process_esm2(
                 matched_key = gname
             if matched_key is not None:
                 emb = sp_data[matched_key]
+                vec = np.zeros(emb_dim, dtype=np.float32)
                 if len(emb) >= emb_dim:
-                    consensus[i] += emb[:emb_dim]
+                    vec[:] = emb[:emb_dim]
                 else:
-                    consensus[i, :len(emb)] += emb
+                    vec[:len(emb)] = emb
+                consensus[i] += vec
+                sp_matrix[i] = vec
                 n_matched += 1
+        per_species_matrices[sp] = sp_matrix
         logger.info("  %s: matched %d / %d ortholog genes", sp, n_matched, n_groups)
 
     # Average over species.
@@ -811,7 +1066,7 @@ def download_and_process_esm2(
     if n_species > 0:
         consensus /= n_species
 
-    return consensus
+    return consensus, per_species_matrices
 
 
 def pca_esm2(
@@ -849,49 +1104,77 @@ def compute_esm2_interspecies_variance(
 ) -> np.ndarray:
     """Compute mean pairwise cosine distance per ortholog group across species.
 
+    Rows where a species has no embedding (all-zero vector) are treated as
+    missing: the pair is excluded from that gene's average. Genes with no
+    informative pairs (neither species matched the ortholog) are filled with
+    the median variance so they do not become outliers after
+    :class:`~sklearn.preprocessing.StandardScaler` is applied downstream.
+
     Parameters
     ----------
     per_species_embeddings
         Dictionary mapping species name to an ``(G, D)`` embedding array.
         All arrays must have the same number of rows (ortholog groups) and
-        columns (embedding dimensionality).
+        columns (embedding dimensionality). Rows with all-zero values are
+        interpreted as "species had no embedding for this ortholog".
 
     Returns
     -------
     np.ndarray
         Mean pairwise cosine distance per ortholog group, shape ``(G,)``.
         Values range from 0 (identical embeddings) to 2 (opposite embeddings).
+
+    Raises
+    ------
+    ValueError
+        If fewer than 2 species are provided. Inter-species variance is
+        undefined for 0 or 1 species; raising loudly prevents silently
+        returning an all-zero feature that later contaminates training.
     """
     species_names = list(per_species_embeddings.keys())
     n_species = len(species_names)
     if n_species < 2:
-        G = next(iter(per_species_embeddings.values())).shape[0]
-        return np.zeros(G, dtype=np.float32)
+        raise ValueError(
+            f"compute_esm2_interspecies_variance requires at least 2 species, "
+            f"got {n_species} ({species_names}). Check that species_list was "
+            f"mapped to valid Ensembl identifiers and that the ortholog table "
+            f"contains matching '{{species}}_gene_id' / '{{species}}_gene_name' "
+            f"columns."
+        )
 
-    # Stack all species embeddings: (K, G, D)
-    embeddings = np.stack(
-        [per_species_embeddings[sp] for sp in species_names], axis=0
-    )
-    # Normalize each embedding vector.
-    norms = np.linalg.norm(embeddings, axis=2, keepdims=True)
-    norms = np.maximum(norms, 1e-8)
-    embeddings_normed = embeddings / norms  # (K, G, D)
+    # Per-species mask: True where the gene has a non-zero embedding.
+    masks = {sp: np.any(per_species_embeddings[sp] != 0, axis=1) for sp in species_names}
 
-    G = embeddings.shape[1]
-    pairwise_sum = np.zeros(G, dtype=np.float64)
-    n_pairs = 0
+    # Unit-normalize each row (floor tiny norms to avoid div-by-zero on all-zero rows).
+    normed: Dict[str, np.ndarray] = {}
+    for sp in species_names:
+        mat = per_species_embeddings[sp]
+        norm = np.linalg.norm(mat, axis=1, keepdims=True)
+        norm = np.maximum(norm, 1e-8)
+        normed[sp] = (mat / norm).astype(np.float32)
+
+    G = normed[species_names[0]].shape[0]
+    pair_sum = np.zeros(G, dtype=np.float64)
+    pair_count = np.zeros(G, dtype=np.int32)
 
     for i in range(n_species):
         for j in range(i + 1, n_species):
-            # Cosine similarity per gene: (G,)
-            cos_sim = np.sum(
-                embeddings_normed[i] * embeddings_normed[j], axis=1
-            )
+            s1, s2 = species_names[i], species_names[j]
+            both = masks[s1] & masks[s2]
+            if not both.any():
+                continue
+            cos_sim = np.einsum("ij,ij->i", normed[s1], normed[s2])
             cos_dist = 1.0 - cos_sim
-            pairwise_sum += cos_dist
-            n_pairs += 1
+            pair_sum[both] += cos_dist[both]
+            pair_count[both] += 1
 
-    mean_dist = (pairwise_sum / n_pairs).astype(np.float32)
+    mean_dist = np.zeros(G, dtype=np.float32)
+    has_signal = pair_count > 0
+    mean_dist[has_signal] = (pair_sum[has_signal] / pair_count[has_signal]).astype(np.float32)
+    # Impute unmatched genes with the median so they don't become outliers after
+    # StandardScaler. Matches the behavior of training/recompute_esm2_variance.py.
+    if has_signal.any() and (~has_signal).any():
+        mean_dist[~has_signal] = float(np.median(mean_dist[has_signal]))
     return mean_dist
 
 
@@ -1258,6 +1541,36 @@ def get_sqrt_species_weights(
     # Normalize to sum to 1.
     cell_weights /= cell_weights.sum()
 
+    return cell_weights.astype(np.float64)
+
+
+def get_equal_species_weights(
+    adata: ad.AnnData,
+    species_key: str = "species",
+) -> np.ndarray:
+    """Per-cell weights giving each species equal total sampling probability.
+
+    Each of ``S`` species contributes ``1/S`` of the total sampling probability,
+    independent of cell count. A cell from species *s* gets per-cell weight
+    ``(1/S) / N_s``. Weights are normalized to sum to 1.
+
+    In a mini-batch of size ``B`` drawn with replacement, the expected number
+    of cells from each species is ``B/S`` with std ``sqrt(B (1/S)(1 - 1/S))``.
+    For ``B=128, S=2`` the std is ~5.65 — much tighter than sqrt-proportional
+    sampling on skewed datasets (~1:2) which produces ~42/58 expected splits.
+    This tightens the per-batch species distribution seen by MMD and
+    reduces seed-to-seed variance in the MMD-driven integration signal
+    on skewed celltypes (target: E8.5 Hepatocytes robustness).
+    """
+    species = adata.obs[species_key].values
+    unique_species, inverse = np.unique(species, return_inverse=True)
+    counts = np.bincount(inverse)  # (K,)
+    n_sp = len(unique_species)
+
+    # Total weight per species = 1/n_sp. Per-cell within species = (1/n_sp) / N_s.
+    species_weights = (1.0 / n_sp) / counts.astype(np.float64)  # (K,)
+    cell_weights = species_weights[inverse]  # (N_cells,)
+    cell_weights /= cell_weights.sum()
     return cell_weights.astype(np.float64)
 
 

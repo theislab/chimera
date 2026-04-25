@@ -55,10 +55,11 @@ class TestGeneIntegrationNetwork:
         )
 
     def test_gin_param_count(self):
-        """GIN with default settings has exactly 2369 parameters."""
+        """GIN with default settings: 72->64->32->1 (3-layer MLP)."""
         gin = GeneIntegrationNetwork(n_features=72, n_hidden=32)
         total = sum(p.numel() for p in gin.parameters())
-        assert total == 2369, f"GIN param count {total} != 2369"
+        # 72*64+64 + 64*32+32 + 32*1+1 = 6785
+        assert total == 6785, f"GIN param count {total} != 6785"
 
     def test_gin_gradient_flow(self, synthetic_data):
         """Gradients reach both layers after a few training steps."""
@@ -83,11 +84,11 @@ class TestGeneIntegrationNetwork:
         loss.backward()
 
         layer0_grad = gin.correction_mlp[0].weight.grad
-        layer2_grad = gin.correction_mlp[2].weight.grad
+        last_layer_grad = gin.correction_mlp[-1].weight.grad
         assert layer0_grad is not None, "No gradient on first layer weight"
-        assert layer2_grad is not None, "No gradient on last layer weight"
+        assert last_layer_grad is not None, "No gradient on last layer weight"
         assert layer0_grad.abs().sum().item() > 0, "First layer gradient is all zeros"
-        assert layer2_grad.abs().sum().item() > 0, "Last layer gradient is all zeros"
+        assert last_layer_grad.abs().sum().item() > 0, "Last layer gradient is all zeros"
 
     def test_gin_alpha_range(self, synthetic_data):
         """alpha stays in [0, 1] even after training steps.

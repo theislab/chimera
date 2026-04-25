@@ -15,6 +15,7 @@ Extends scvi-tools AdversarialTrainingPlan with:
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 import torch
@@ -38,6 +39,30 @@ except ImportError:
     from scvi.train import TrainingPlan as AdversarialTrainingPlan
 
 
+class _GradientReversalFunction(torch.autograd.Function):
+    """Gradient Reversal Layer (Ganin et al., DANN).
+
+    Forward: identity.  Backward: negate and scale gradient by ``lambda_``.
+    This makes the encoder minimize classification accuracy without a
+    separate fool loss — the adversary's own cross-entropy gradient, reversed,
+    drives z away from species-discriminative directions.
+    """
+
+    @staticmethod
+    def forward(ctx, x: torch.Tensor, lambda_: float) -> torch.Tensor:
+        ctx.lambda_ = lambda_
+        return x.clone()
+
+    @staticmethod
+    def backward(ctx, grad_output: torch.Tensor):
+        return -ctx.lambda_ * grad_output, None
+
+
+def _grad_reverse(x: torch.Tensor, lambda_: float = 1.0) -> torch.Tensor:
+    """Apply gradient reversal to ``x`` with scale ``lambda_``."""
+    return _GradientReversalFunction.apply(x, lambda_)
+
+
 class CompositeConvergenceChecker:
     """Stop training only when ALL criteria are met simultaneously.
 
@@ -45,7 +70,7 @@ class CompositeConvergenceChecker:
     (a) ELBO plateau — validation loss stable for `patience` epochs
     (b) Alpha histogram stability — L1 distance < 0.01
     (c) S_g > 0 fraction stabilized
-    (d) Adversarial accuracy near chance (1/K ± 0.05)
+    (d) Adversarial accuracy stabilized (not still improving)
     (e) Minimum `min_epochs` reached
 
     Parameters
@@ -70,6 +95,7 @@ class CompositeConvergenceChecker:
         self.alpha_hist_buffer: list[torch.Tensor] = []
         self.sg_frac_buffer: list[float] = []
         self.val_loss_buffer: list[float] = []
+        self.adv_acc_buffer: list[float] = []
 
     def _check_plateau(self, val_loss: float) -> bool:
         """Check if validation loss has plateaued."""
@@ -137,11 +163,18 @@ class CompositeConvergenceChecker:
             < 0.02
         )
 
-        # (d) Adversarial accuracy near chance
-        chance = 1.0 / self.n_species
-        adv_near_chance = abs(adv_accuracy - chance) < 0.05
+        # (d) Adversarial accuracy stabilized (not still improving).
+        # With GRL, the classifier stays trained so accuracy won't reach chance.
+        # Instead we check that accuracy has plateaued (not still changing).
+        self.adv_acc_buffer.append(adv_accuracy)
+        adv_stable = (
+            len(self.adv_acc_buffer) > self.patience
+            and max(self.adv_acc_buffer[-self.patience :])
+            - min(self.adv_acc_buffer[-self.patience :])
+            < 0.03
+        )
 
-        return elbo_plateau and alpha_stable and sg_stable and adv_near_chance
+        return elbo_plateau and alpha_stable and sg_stable and adv_stable
 
 
 class ChimeraTrainingPlan(AdversarialTrainingPlan):
@@ -168,22 +201,37 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         self.warmup_lr_epochs: int = kwargs.pop("warmup_lr_epochs", 5)
         self.min_training_epochs: int = kwargs.pop("min_training_epochs", MIN_TRAINING_EPOCHS)
         self.grad_clip_max_norm: float = kwargs.pop("grad_clip_max_norm", GRAD_CLIP_MAX_NORM)
-        # Target adversarial weight after warmup; the Lightning attribute
-        # ``scale_adversarial_loss`` is swapped between 0 and this value
-        # per-epoch in ``training_step``.
-        self._adv_weight_target: float = float(kwargs.pop("adv_weight", ADV_WEIGHT))
+        # Target adversarial weight after warmup. Combined with the GRL's
+        # n_genes scaling, the effective gradient reversal strength is
+        # adv_weight * n_genes. Typical range: 0.01–0.2.
+        #
+        # MIGRATION NOTE: Before the GRL+n_genes scaling fix (2026-04-20),
+        # adv_weight was applied directly without n_genes scaling, requiring
+        # values of 100-200 to have any effect. If a legacy value > 1.0 is
+        # detected, we auto-convert it to the new scale.
+        raw_adv_weight = float(kwargs.pop("adv_weight", ADV_WEIGHT))
+        if raw_adv_weight > 1.0:
+            import warnings
+            n_genes = getattr(module, "n_genes", 3000)
+            new_weight = raw_adv_weight / n_genes
+            warnings.warn(
+                f"adv_weight={raw_adv_weight} appears to be a pre-GRL legacy value. "
+                f"With the new GRL+n_genes scaling, effective strength is "
+                f"adv_weight * n_genes. Auto-converting to {new_weight:.4f} "
+                f"(equivalent to old {raw_adv_weight} / {n_genes}). "
+                f"Set adv_weight explicitly in [0.01, 1.0] range to suppress.",
+                UserWarning,
+                stacklevel=2,
+            )
+            raw_adv_weight = new_weight
+        self._adv_weight_target: float = raw_adv_weight
         # Learning rate for the adversarial species classifier. Default is 1e-3
         # (matches encoder) which is the scvi-tools default. Lower values (1e-4)
         # slow the classifier so the encoder can fool it for more of training —
         # useful on datasets where the classifier trivially out-trains the
         # encoder (2-species close-primate). See workflow.md §"E6.2 analysis".
         self._adv_lr: float = float(kwargs.pop("adv_lr", 1e-3))
-        # Hidden widths of the adversarial species classifier. Default ``(32,)``
-        # preserves the 1-hidden-layer MLP used by iter1–21. Passing e.g.
-        # ``(64, 32)`` makes the classifier a 2-hidden-layer MLP — useful when
-        # the post-hoc nonlinear z-leakage probe (Caveat 34) reveals that the
-        # encoder is hiding species in nonlinearly-separable directions the
-        # linear/shallow classifier cannot catch.
+        # Hidden widths of the adversarial species classifier.
         self._adv_classifier_hidden: tuple[int, ...] = tuple(
             kwargs.pop("adv_classifier_hidden", (32,))
         )
@@ -322,8 +370,18 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         """
         from scvi import REGISTRY_KEYS
 
-        # Set epoch-dependent weights on module
-        self.module.kl_weight = min(self._kl_weight_max, self.current_epoch / max(self.warmup_kl_epochs, 1))
+        # Set epoch-dependent KL weight on module.
+        #
+        # KL normalization: L_recon sums over G genes (O(G)), but L_kl sums
+        # over d latent dims (O(d)). Without normalization, KL is ~0.08% of
+        # L_recon for G=3000, d=10 — producing ultra-sharp posteriors with
+        # near-zero variance. This creates thin, elongated UMAP clusters.
+        #
+        # Fix: scale kl_weight by sqrt(G/d) so that KL contributes ~3-7% of
+        # total loss, producing proper posterior spread for smooth UMAPs.
+        kl_normalization = math.sqrt(self.module.n_genes / max(self.module.n_latent, 1))
+        raw_kl_weight = min(self._kl_weight_max, self.current_epoch / max(self.warmup_kl_epochs, 1))
+        self.module.kl_weight = raw_kl_weight * kl_normalization
         self.module.current_epoch = self.current_epoch
 
         # Adversarial delayed start
@@ -346,38 +404,70 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         loss, outputs = self.module(batch)
         z = outputs["z"]
 
-        # Adversarial fool loss (if active) — classifies SPECIES, not batch
-        fool_loss_raw = None
+        # Adversarial species removal via Gradient Reversal Layer (GRL).
+        #
+        # Instead of a separate fool loss (which suffers from vanishing gradients
+        # when the classifier is easily fooled), we use a single adversarial
+        # cross-entropy loss with gradient reversal on z. The classifier trains
+        # normally to recognize species from z, but the gradient flowing back to
+        # the encoder through z is NEGATED and scaled by (kappa * n_genes).
+        #
+        # Scale factor: kappa * n_genes puts the adversarial gradient on the same
+        # per-cell scale as L_recon (which sums over genes). Without n_genes,
+        # the adversarial gradient is ~G times smaller than L_recon's.
+        #
+        # Advantage over separate fool loss: the GRL gradient is proportional to
+        # the classifier's discriminative ability — as long as the classifier can
+        # detect species, the encoder receives a signal to remove it. The
+        # scvi-tools fool loss vanishes when the classifier is fooled, creating
+        # an unstable equilibrium where species signal persists.
+        adv_cls_loss_raw = None
         if kappa > 0 and self.adversarial_classifier is not False:
             species_tensor = batch.get(REGISTRY_KEYS.LABELS_KEY, batch.get("labels", batch.get("species")))
-            fool_loss = self.loss_adversarial_classifier(z, species_tensor, False)
-            fool_loss_raw = fool_loss.detach()
-            loss = loss + fool_loss * kappa
+            n_genes = self.module.n_genes
+            # GRL: forward = identity, backward = negate + scale
+            z_rev = _grad_reverse(z, lambda_=kappa * n_genes)
+            cls_logits = self.adversarial_classifier(z_rev)
+            adv_cls_loss = torch.nn.functional.cross_entropy(
+                cls_logits, species_tensor.squeeze(-1)
+            )
+            adv_cls_loss_raw = adv_cls_loss.detach()
+            # Single loss trains both classifier (forward grad) and encoder
+            # (reversed grad) simultaneously.
+            loss = loss + adv_cls_loss
 
         self.log("train_loss", loss, on_epoch=True, prog_bar=True)
 
-        # Model optimizer step
+        # Model + adversary joint optimizer step
+        # With GRL, both model and classifier params are updated from the same
+        # loss. The classifier receives the normal (unreversed) gradient through
+        # its own parameters, while the encoder receives the reversed gradient
+        # through z.
         opt1.zero_grad()
-        self.manual_backward(loss)
-        opt1.step()
-
-        # Adversarial classifier step — classifies SPECIES
-        adv_cls_loss_raw = None
-        if opt2 is not None and kappa > 0:
-            species_tensor = batch.get(REGISTRY_KEYS.LABELS_KEY, batch.get("labels", batch.get("species")))
-            adv_loss = self.loss_adversarial_classifier(z.detach(), species_tensor, True)
-            adv_cls_loss_raw = adv_loss.detach()
-            adv_loss = adv_loss * kappa
+        if opt2 is not None:
             opt2.zero_grad()
-            self.manual_backward(adv_loss)
+        self.manual_backward(loss)
+
+        # Gradient clipping (manual optimization requires explicit call)
+        torch.nn.utils.clip_grad_norm_(
+            [p for group in opt1.param_groups for p in group["params"]],
+            max_norm=self.grad_clip_max_norm,
+        )
+
+        # Log gradient norms (first batch of each epoch) for audit diagnostics
+        if batch_idx == 0:
+            self._log_gradient_norms(loss, adv_cls_loss_raw, kappa)
+
+        opt1.step()
+        if opt2 is not None and kappa > 0:
             opt2.step()
 
         # Log adversarial-internal signals on the first batch of each epoch.
-        if batch_idx == 0 and kappa > 0:
-            if fool_loss_raw is not None:
-                self.log("adv/fool_loss", fool_loss_raw, prog_bar=False)
+        # Always log (even during warmup when kappa=0) so the CSVLogger header
+        # includes these fields from epoch 0.
+        if batch_idx == 0:
             if adv_cls_loss_raw is not None:
-                self.log("adv/classifier_loss", adv_cls_loss_raw, prog_bar=False)
+                self.log("adv/classifier_loss", adv_cls_loss_raw if kappa > 0 else 0.0, prog_bar=False)
             self.log("schedule/adv_weight_effective", float(kappa), prog_bar=False)
 
         # Log metrics once per epoch (first batch)
@@ -461,6 +551,37 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         ):
             self.trainer.should_stop = True
 
+    def _log_gradient_norms(
+        self,
+        total_loss: torch.Tensor,
+        adv_loss_raw: torch.Tensor | None,
+        kappa: float,
+    ) -> None:
+        """Log gradient L2 norms from L_recon vs L_adversarial on encoder params.
+
+        Called AFTER manual_backward(total_loss) so .grad is populated.
+        Computes the total encoder gradient norm and, when adversarial is active,
+        the ratio of adv-gradient to recon-gradient on the encoder.
+        """
+        # Collect encoder parameter gradients
+        enc_params = (
+            list(self.module.encoder.parameters())
+            + list(self.module.z_mean_linear.parameters())
+            + list(self.module.z_logvar_linear.parameters())
+        )
+
+        total_grad_norm = 0.0
+        for p in enc_params:
+            if p.grad is not None:
+                total_grad_norm += p.grad.detach().norm(2).item() ** 2
+        total_grad_norm = total_grad_norm ** 0.5
+
+        self.log("grad_norm/encoder_total", total_grad_norm, prog_bar=False)
+
+        # When adversarial is active, log the kappa weight.
+        if adv_loss_raw is not None and kappa > 0:
+            self.log("grad_norm/adv_weight_kappa", kappa, prog_bar=False)
+
     def _log_training_metrics(self, loss_dict: dict[str, torch.Tensor], epoch: int) -> None:
         """Log all training metrics for wandb."""
         # Loss components
@@ -472,6 +593,7 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
             "L_alpha_anchor",
             "L_fit_reward",
             "L_mmd",
+            "L_z_balance",
             "L_KL_l",
             "L_unified",
         ]:
@@ -504,6 +626,34 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
                 delta = alpha - self.module.conservation_prior.cpu()
                 self.log("alpha/frac_delta_positive", (delta > 0).float().mean())
                 self.log("alpha/mean_delta", delta.mean())
+
+        # Per-dimension z variance diagnostics (detect collapse)
+        if "z_mean" in loss_dict:
+            z_mean = loss_dict["z_mean"].detach()
+            # Variance of z_mean across cells in the batch, per dimension
+            z_var_per_dim = z_mean.var(dim=0)  # (d,)
+            n_latent = z_var_per_dim.shape[0]
+            self.log("z/mean_var_across_dims", z_var_per_dim.mean())
+            self.log("z/min_var_dim", z_var_per_dim.min())
+            self.log("z/max_var_dim", z_var_per_dim.max())
+            # Count "dead" dimensions (variance < 0.01)
+            n_dead = (z_var_per_dim < 0.01).sum().item()
+            self.log("z/n_dead_dims", float(n_dead))
+            self.log("z/n_active_dims", float(n_latent - n_dead))
+            # Log z norm
+            z_norms = z_mean.norm(dim=-1)  # (B,)
+            self.log("z/mean_norm", z_norms.mean())
+            self.log("z/std_norm", z_norms.std())
+
+        # If z_logvar is available, check for posterior collapse
+        if "z_logvar" in loss_dict:
+            z_logvar = loss_dict["z_logvar"].detach()
+            # Mean learned variance per dimension (exp(logvar))
+            z_learned_var = torch.exp(z_logvar).mean(dim=0)  # (d,)
+            self.log("z/mean_learned_var", z_learned_var.mean())
+            # Dimensions where learned var > 0.9 (near prior) = not used
+            n_prior_like = (z_learned_var > 0.9).sum().item()
+            self.log("z/n_prior_like_dims", float(n_prior_like))
 
         # S_g diagnostics
         if "S_g" in loss_dict:

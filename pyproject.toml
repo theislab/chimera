@@ -17,7 +17,12 @@ dependencies = [
     "scanpy>=1.10.0",
     "mudata>=0.2.0",
 
-    # PyTorch (scvi-tools will pull compatible version, but pin floor)
+    # PyTorch (scvi-tools will pull compatible version, but pin floor).
+    # Wheel selection is platform-driven and handled by pip at install time:
+    #   - macOS (arm64/x86_64): CPU + MPS wheel from PyPI (no CUDA on macOS).
+    #   - Linux + NVIDIA GPU:   CUDA wheel from the default PyPI index.
+    #   - Linux, CPU-only:      install via notebooks/00_environment.ipynb,
+    #                           which routes to https://download.pytorch.org/whl/cpu.
     "torch>=2.1.0",
     "lightning>=2.1.0",
 
@@ -53,11 +58,38 @@ dev = [
     "mypy>=1.7.0",
     "ruff>=0.1.0",
 ]
+# Graph-neural-net bits. `scatter` has C++ extensions that import torch at
+# build time → must be installed with --no-build-isolation AFTER torch.
+# `graph` is pure-Python and builds under default build isolation.
 scatter = [
     "torch-scatter>=2.1.0",
 ]
+graph = [
+    "torch-geometric>=2.4.0",
+]
+# Feature-attribution / interpretability stack for probing the VAE and GIN gates.
+attributions = [
+    "captum>=0.7.0",
+    "shap>=0.44.0",
+]
+# Protein sequence + structure toolkit. fair-esm gives Meta's ESM-2 embeddings
+# (already used in chimera's GIN feature vector), biopython covers sequence and
+# structure IO, py3Dmol renders 3D structures inline in notebooks.
+protein = [
+    "biopython>=1.83",
+    "fair-esm>=2.0.0",
+    "py3Dmol>=2.0.4",
+]
+# Phylogenetics / evolution. dendropy is the canonical tree-manipulation lib
+# and installs cleanly on Python 3.12 (ete3 does not yet).
+evolution = [
+    "dendropy>=5.0.1",
+]
 data = [
     "gdown>=4.7.0",
+]
+all = [
+    "chimera[dev,scatter,graph,attributions,protein,evolution,data]",
 ]
 
 [tool.setuptools.packages.find]

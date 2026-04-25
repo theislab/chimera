@@ -39,17 +39,17 @@ class TestLossReductions:
         )
 
     def test_anchor_reduction_correct(self, synthetic_data):
-        """L_alpha_anchor uses .sum(), not .mean()."""
+        """L_alpha_anchor uses .mean() (dataset-size invariant)."""
         module = _make_full_module(synthetic_data)
         module.train()
         _, outputs = module(synthetic_data["batch_dict"])
 
         correction = outputs["correction"]
-        expected = correction.pow(2).sum()
+        expected = correction.pow(2).mean()
         actual = outputs["L_alpha_anchor"]
 
         assert torch.allclose(actual, expected, atol=1e-5), (
-            f"L_alpha_anchor ({actual.item():.6f}) != correction.pow(2).sum() ({expected.item():.6f})"
+            f"L_alpha_anchor ({actual.item():.6f}) != correction.pow(2).mean() ({expected.item():.6f})"
         )
 
 
@@ -121,8 +121,8 @@ class TestGradientIsolation:
         module.zero_grad()
         outputs["L_fit_reward"].backward(retain_graph=True)
 
-        # GIN should get gradient
-        gin_grad = module.gin.correction_mlp[2].weight.grad
+        # GIN should get gradient (check last layer, robust to GIN depth)
+        gin_grad = module.gin.correction_mlp[-1].weight.grad
         assert gin_grad is not None, "GIN last layer has no gradient from L_fit_reward"
 
         # Encoder should NOT get gradient from L_fit_reward
@@ -189,8 +189,12 @@ class TestLossScaleCalibration:
 
         assert L_recon > 0, f"L_recon should be positive, got {L_recon}"
         ratio = weighted_l1 / (L_recon + 1e-12)
-        assert ratio > 0.001, (
-            f"Weighted L1 ({weighted_l1:.4f}) is < 0.1% of L_recon ({L_recon:.4f}). "
+        # With lambda_res=0.001 (validated iter50), the weighted L1 is ~0.008%
+        # of L_recon after 10 steps on synthetic data. The critical check is that
+        # .sum(-1).mean() reduction is used (not .mean(), which would make the
+        # ratio ~1/G ≈ 0.000003%). Threshold 2e-5 catches the wrong reduction.
+        assert ratio > 2e-5, (
+            f"Weighted L1 ({weighted_l1:.4f}) is < 0.002% of L_recon ({L_recon:.4f}). "
             f"Ratio = {ratio:.6f}. This suggests the wrong reduction is used."
         )
 
@@ -267,8 +271,8 @@ class TestFitRewardGradientIsolation:
         module.zero_grad()
         outputs["L_fit_reward"].backward(retain_graph=True)
 
-        # GIN should get gradient
-        gin_last_layer = module.gin.correction_mlp[2].weight.grad
+        # GIN should get gradient (check last layer, robust to GIN depth)
+        gin_last_layer = module.gin.correction_mlp[-1].weight.grad
         assert gin_last_layer is not None, "GIN last layer has no gradient from L_fit_reward"
 
         # Encoder should NOT get gradient
@@ -364,35 +368,33 @@ def _make_full_module(sd):
 # =========================================================================
 
 
-class TestSgReluRegression:
-    """Regression: S_g must be non-negative (ReLU applied).
+class TestSgBidirectional:
+    """S_g must be unrectified (bidirectional) for clean Δα biology.
 
-    Bug found: S_g = Q_g - Q_null_g was computed without ReLU clamp.
-    Spec: S_g = ReLU(Q_g - Q_null_g) — negative values must be clamped
-    to zero so FQR doesn't push alpha downward when shared decoder is weak.
+    S_g = mean_over_species[ mean_over_cells[ log p(x|shared) - log p(x|null) ] ]
+    Positive S_g → gene is well-reconstructed by the shared decoder → conserved.
+    Negative S_g → gene is poorly reconstructed by shared decoder → divergent.
+    Both signs carry biological information for the FQR mechanism.
     """
 
-    def test_S_g_nonnegative(self, synthetic_data):
-        """S_g in forward pass outputs must be >= 0 for all genes."""
+    def test_S_g_has_both_signs(self, synthetic_data):
+        """S_g must contain both positive and negative values."""
         module = _make_full_module(synthetic_data)
         module.train()
         module.current_epoch = 25  # Past FQR warmup
         _, outputs = module(synthetic_data["batch_dict"])
         S_g = outputs["S_g"]
-        assert (S_g >= 0).all(), (
-            f"S_g has {(S_g < 0).sum()} negative values. "
-            f"ReLU must be applied: S_g = max(0, Q_g - Q_null_g)"
-        )
+        assert (S_g > 0).any(), "S_g has no positive values"
+        assert (S_g < 0).any(), "S_g has no negative values"
 
-    def test_S_g_ema_nonnegative(self, synthetic_data):
-        """S_g EMA buffer must remain non-negative after updates."""
+    def test_S_g_ema_finite(self, synthetic_data):
+        """S_g EMA buffer must remain finite after updates."""
         module = _make_full_module(synthetic_data)
         module.train()
         module.current_epoch = 25
-        # Run several forward passes to accumulate EMA
         for _ in range(5):
             module(synthetic_data["batch_dict"])
-        assert (module.S_g_ema >= 0).all(), "S_g EMA buffer has negative values"
+        assert torch.isfinite(module.S_g_ema).all(), "S_g EMA buffer has non-finite values"
 
 
 class TestMinimalVariantFreeBits:

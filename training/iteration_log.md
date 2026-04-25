@@ -41,6 +41,78 @@ human-readable ledger of the decision chain.
 | **iter21** | **4-sp** | **100** | **200** | 1e-4 | Tanh | 0.01/0.1/0.001 / **fb=1.0** | +0.56 | 48.4% | 18.9% | **0.337** | 0.021 | **32/32** ✓ (first 4-sp 32/32!) |
 | iter21-verify-seed43 | 4-sp | 100 | 200 | 1e-4 | Tanh | 0.01/0.1/0.001 / fb=1.0 | — | 48.6% | 18.2% | 0.674 | 0.021 | 32/32 ✓ (trajectory pass, seed 43) |
 
+## Integration-gap iteration pass (2026-04-21, iter44 → iter51)
+
+Focus shifted from 32-gate expectation suite to **the acute integration gap
+vs vanilla scVI** (governing doc §Integration). Added E8 expectations (see
+[`workflow.md`](workflow.md) §E8) and ran an 8-variant sweep of MMD, L1,
+anchor, celltype-conditional MMD, and VAMP prior to close E8.4 (per-
+celltype within-celltype species purity must match scVI).
+
+Baseline for reference: `vanilla scVI (species-as-batch, seed 42, 100 ep)`
+cached at `training/runs/baselines_scvi/camex_human_monkey-s42-e100-nl10/`.
+Chimera run: seed 42, config A, 100 epochs, masked encoder, z-detach
+residual, `adv_weight=100` (legacy, auto-scaled).
+
+| iter | VAMP | λ_mmd | other  | E3.4 | E4.2 | E8/6 | worst-ct gap vs scVI | sil-ct | LT-acc | Verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 42   | no | 50    | baseline            | ✓ | ✓ | 3/6 | +0.060 Chol  | 0.576 | 0.902 | α-first default |
+| 45a  | no | 500   | —                   | ✗ | ✗ | 5/6 | −0.026 Hep   | 0.632 | 0.987 | best pure-MMD |
+| 45b  | no | 1000  | —                   | ✗ | ✗ | 4/6 | −0.010 Hep   | 0.561 | 0.935 | regression |
+| 46a  | no | 500   | λ_res 1e-4          | ✗ | ✗ | 5/6 | +0.010 Fib   | 0.664 | 0.978 | L1↓ fails to restore α |
+| 46b  | no | 200   | —                   | ✗ | ✗ | 4/6 | +0.041 Endo  | 0.659 | 0.989 | interpolation doesn't help |
+| 46c  | no | 500   | λ_anchor 0.1        | ✗ | ✗ | 5/6 | −0.073 Hep   | 0.660 | 0.990 | 100× anchor fails to restore α |
+| 47   | no | 500   | ct-cond MMD (sup.)  | ✗ | ✗ | 3/6 | +0.045 Endo  | 0.470 | 0.863 | regression |
+| 48   | yes| 0     | —                   | **✓**| **✓** | 2/6 | +0.022 Chol  | 0.347 | 0.580 | α-healthy but integration fails |
+| 51   | yes| 2     | —                   | ✗ | ✗ | 5/6 | −0.156 Hep   | 0.535 | 0.987 | almost 6/6 but E8.5 fails |
+| 49   | yes| 50    | —                   | ✗ | ✗ | 5/6 | −0.145 Hep   | 0.514 | 0.983 | less efficient than iter50 |
+| **50** | **yes** | **10**  | —   | ✗ | ✗ | **6/6** | **−0.215 Fib** | 0.543 | 0.987 | **integration BREAKTHROUGH** |
+| 52 s42 | yes | 10 | stratify-VAMP-init | ✗ | ✗ | 5/6 | −0.079 Hep | 0.606 | 0.986 | **regression from iter50 s42 6/6** |
+| 52 s43 | yes | 10 | stratify-VAMP-init | ✗ | ✗ | 5/6 | −0.084 Chol | 0.628 | 0.987 | celltype swap (Hep→Chol), no net win |
+| 52 s44 | yes | 10 | stratify-VAMP-init | ✗ | ✗ | 5/6 | −0.150 Chol | 0.602 | 0.988 | Hep +0.187→+0.161, Chol regressed |
+| 53 s43 | yes | 10 | K=1000 uniform | ✗ | ✗ | **4/6** | +0.003 Chol | 0.459 | **0.902 ✗** | strict regression — prior too loose |
+| 54 s43 | yes | 10 | **equal-species sampling** | ✗ | ✗ | **4/6** | +0.047 Fib ✗ | 0.520 | 0.965 | **rejected — fixes Hep (+0.241) but breaks Fib (+0.256)** |
+| xds-hmouse-iter50 | yes | 10 | **H+Mouse**, adv=200, fb=1.0 | rev ✓ | rev ✓ | **5/6** | −0.058 Hep | 0.402 | 0.943 | **PASS — 32/32 revised, beats scVI on E8.4 primary** |
+| xds-hzeb-iter50 adv200 | yes | 10 | H+Zebrafish, adv=200 | rev ✓ | rev ✓ | 2/6 | +0.001 Hep | **−0.291** | **0.392** | **REJECTED — sil-ct goes negative, LT-acc collapses** |
+| xds-hzeb-iter50 adv100 | yes | 10 | **H+Zebrafish, adv=100** | rev ✓ | rev ✓ | **4/6** | +0.003 Macro | 0.432 | **0.954** | **ACCEPT — close-primate knobs on very-divergent** |
+| xds-4sp-iter50 | yes | 10 | 4-species, adv=200, fb=1.0 | — | — | — | (pending) | — | — | — |
+
+**Key finding (iter50)**: VAMP prior with K=500 pseudo-inputs (data-
+initialized) plus `lambda_mmd=10` is the first configuration to pass all
+six E8 integration gates, decisively beating vanilla scVI on every
+cross-species integration metric (global + per-celltype within-celltype).
+
+**Follow-up (iter52–54)**: three principled attempts to robustify E8.5
+across seeds all REGRESSED some celltype or seed. Pattern: every
+"balance across species" intervention hurts a different part of the
+integration. Stratified VAMP init (iter52) hurts seed 42 by creating
+two equal-strength Hep species attractors MMD can't merge. K=1000
+uniform init (iter53) makes the VAMP prior too loose, weakening KL
+regularization and crashing LT-acc. Equal-species sampling (iter54)
+fixes Hep (+0.325 → +0.241) by tightening per-batch MMD signal but
+breaks Fibroblasts (-0.014 → +0.256) because Human cells get 2.05×
+per-cell weight, starving Monkey sub-cell-type gradients.
+
+**Architectural conclusion**: within the governing doc's hard
+prohibition on conditioning the shared decoder on species/batch,
+the three natural levers for E8.5 robustification (mode-init
+balance, mode count, batch composition) all have trade-offs that
+leave at least one celltype above the 0.15 threshold. The remaining
+hypothetical lever — species-bias term in the shared decoder — is
+explicitly ruled out by the governing doc. **iter50 is the best-effort
+recipe on this architecture.** Seed variance (E8.5 passes on 1/3
+seeds) is a known limitation; full 3/3 E8.5 pass would require an
+architectural change beyond this iteration pass's scope.
+
+**Residual open issue**: E3.4 / E4.2 (Δα sign symmetry) fails under any
+regime that integrates well. Mechanism is understood and architectural
+(species-agnostic shared → residual dominates → L_recon pushes all
+corrections negative uniformly). Alpha biology IS preserved in
+magnitude (std=0.114, prior-Spearman=0.877, smooth & non-bimodal), but
+the "both tails ≥ 5 %" form of E3.4 is satisfied only in iter42-regime
+weaker-integration runs. See [`workflow.md`](workflow.md) §"Residual
+tension" for the formal derivation and decision chain.
+
 ## GIN input-ablation sweep (2026-04-17, post-verify)
 
 Round2 §1526 (ESM-2 skepticism) and Issue 15.3 (GIN smoothness) required
@@ -317,6 +389,53 @@ silhouette = 0.286). Cells from different species never mixed in latent space.
 
 **Notebooks created**: `40_integration_analysis.ipynb`, `41_alpha_biology.ipynb`,
 `42_biological_validation.ipynb`.
+
+## Default constant update + 3-seed validation (2026-04-21, iter37)
+
+Updated `_constants.py` to match the validated post-GRL best config:
+- `LAMBDA_RES` 0.05 → 0.005 (keeps residual alive across all seeds including the
+  pathological seed 43 which had dead residual at 0.01+)
+- `LAMBDA_FIT` 0.05 → 0.1 (validated in iter10+)
+- `LAMBDA_ANCHOR` 0.01 → 0.002 (post-GRL scaling fix)
+- Training script default `--config D` → `--config A` (was incorrectly using the
+  "no anchor" ablation config as default)
+
+3-seed results on H+Monkey (iter37, config A, `--adv-lr 1e-4`):
+
+| Metric | Seed 42 | Seed 43 | Seed 44 | Mean ± Std |
+|--------|---------|---------|---------|------------|
+| Pass/32 | 32/32 | 32/32 | 32/32 | — |
+| α std | 0.193 | 0.170 | 0.169 | 0.178 ± 0.011 |
+| Δα > 0.02 | 14.0% | 8.0% | 8.8% | 10.3% ± 2.7% |
+| Δα < -0.02 | 77.9% | 82.6% | 80.2% | 80.2% ± 1.9% |
+| Residual RMS | 0.526 | 0.614 | 0.607 | 0.582 ± 0.040 |
+| Sil. species | 0.023 | 0.018 | 0.025 | 0.022 ± 0.003 |
+| Sil. cell-type | 0.443 | 0.467 | 0.489 | 0.466 ± 0.019 |
+| Adv. accuracy | 0.673 | 0.673 | 0.673 | 0.673 ± 0.000 |
+| Label transfer | 0.895 | 0.871 | 0.927 | 0.898 ± 0.023 |
+
+Cross-dataset sweep:
+
+| Dataset | Pass/32 | Sil. species | Adv. accuracy | Note |
+|---------|---------|-------------|---------------|------|
+| H+Monkey (canonical) | 32/32 | 0.023 | 0.673 | 3 seeds verified |
+| H+Mouse | 32/32 | 0.092 | 0.735 | Mid-divergent |
+| H+Zebrafish | 31/32 | 0.214 | 0.660 | E1.3 data property (p_null range) |
+
+## Final configuration (updated 2026-04-21)
+
+```python
+ChimeraModel.from_config(adata, config_name='A', n_latent=10, n_hidden=128)
+model.train(
+    max_epochs=100,
+    plan_kwargs={
+        'adv_lr': 1e-4,  # close-species default; 1e-3 for very divergent
+    },
+)
+```
+
+All loss weights are now correct defaults in `_constants.py` — no manual overrides
+needed. Config "A" uses GRL adversary + MMD + masking + z-detach by default.
 
 ## Recipe for a new dataset
 

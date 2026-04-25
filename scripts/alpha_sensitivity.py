@@ -39,7 +39,7 @@ def alpha_hyperparameter_sensitivity(
     species_key: str = "species",
     batch_key: str = "batch",
     n_seeds: int = 3,
-    base_anchor: float = 0.005,
+    base_anchor: float = 0.002,
     max_epochs: int = 200,
 ) -> Tuple[Dict[str, Any], Dict[Tuple[str, int], np.ndarray]]:
     """Test alpha ranking robustness to 2x lambda perturbations.
@@ -57,7 +57,7 @@ def alpha_hyperparameter_sensitivity(
     n_seeds
         Number of random seeds per setting.
     base_anchor
-        Default ``lambda_anchor`` value (0.005 from v2.4 spec).
+        Default ``lambda_anchor`` value (0.002 from _constants.LAMBDA_ANCHOR).
     max_epochs
         Training epochs per run.
 

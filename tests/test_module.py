@@ -66,7 +66,11 @@ class TestChimeraMinimalModule:
         loss.backward()
 
         shared_grad = module.output_shared.weight.grad
-        residual_grad = module.output_residual.weight.grad
+        # Handle both Sequential (full module) and Linear (minimal module) residual
+        if hasattr(module.output_residual, 'weight'):
+            residual_grad = module.output_residual.weight.grad
+        else:
+            residual_grad = module.output_residual[-1].weight.grad
         assert shared_grad is not None, "No gradient on output_shared.weight"
         assert residual_grad is not None, "No gradient on output_residual.weight"
         assert shared_grad.abs().sum().item() > 0, "output_shared gradient is all zeros"
@@ -183,10 +187,14 @@ class TestChimeraModule:
         """All parameter groups get gradients (after a few steps for GIN)."""
         module = self._make_module(synthetic_data)
         module.train()
+        # Set epoch past FQR warmup so FQR provides gradient to the GIN.
+        # Under detach_alpha_from_recon, the GIN gets gradient only from
+        # FQR + anchor, and FQR activates after warmup_fqr_epochs.
+        module.current_epoch = module.warmup_fqr_epochs + 1
 
         optimizer = torch.optim.Adam(module.parameters(), lr=1e-3)
 
-        # Run a few steps so GIN gradients propagate through ReLU
+        # Run a few steps so GIN gradients propagate
         for _ in range(5):
             optimizer.zero_grad()
             loss, _ = module(synthetic_data["batch_dict"])
@@ -202,10 +210,10 @@ class TestChimeraModule:
             "encoder": module.encoder[0].weight,
             "decoder": module.decoder_hidden[0].weight,
             "output_shared": module.output_shared.weight,
-            "output_residual": module.output_residual.weight,
+            "output_residual": module.output_residual[-1].weight,
             "dispersion": module.dispersion,
             "gin_layer0": module.gin.correction_mlp[0].weight,
-            "gin_layer2": module.gin.correction_mlp[2].weight,
+            "gin_last_layer": module.gin.correction_mlp[-1].weight,
             "batch_offset": module.batch_offset.batch_offset_raw,
         }
         for name, param in groups.items():
@@ -311,12 +319,14 @@ class TestChimeraModule:
         """Comprehensive trace test: shape checks for all outputs + gradient flow verification."""
         module = self._make_module(synthetic_data)
         module.train()
+        # Past FQR warmup so GIN gets gradient from FQR (not just L_recon).
+        module.current_epoch = module.warmup_fqr_epochs + 1
 
         B = synthetic_data["batch_dict"]["X"].shape[0]
         G = synthetic_data["n_genes"]
         D = module.n_latent
 
-        # Run a few optimizer steps so GIN gradients propagate (zero-init last layer)
+        # Run a few optimizer steps so GIN gradients propagate
         optimizer = torch.optim.Adam(module.parameters(), lr=1e-3)
         for _ in range(3):
             optimizer.zero_grad()
@@ -360,9 +370,9 @@ class TestChimeraModule:
             "encoder[0].weight": module.encoder[0].weight,
             "decoder_hidden[0].weight": module.decoder_hidden[0].weight,
             "output_shared.weight": module.output_shared.weight,
-            "output_residual.weight": module.output_residual.weight,
+            "output_residual.weight": module.output_residual[-1].weight,
             "gin.correction_mlp[0].weight": module.gin.correction_mlp[0].weight,
-            "gin.correction_mlp[2].weight": module.gin.correction_mlp[2].weight,
+            "gin.correction_mlp[-1].weight": module.gin.correction_mlp[-1].weight,
             "batch_offset.batch_offset_raw": module.batch_offset.batch_offset_raw,
             "dispersion": module.dispersion,
         }

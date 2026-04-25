@@ -38,6 +38,7 @@ class GeneIntegrationNetwork(nn.Module):
         n_features: int = 72,
         n_hidden: int = 32,
         hidden_activation: str = "tanh",
+        n_hidden_layers: int = 2,
     ) -> None:
         super().__init__()
         # Tanh is used by default instead of ReLU (v2.4 spec).
@@ -56,11 +57,16 @@ class GeneIntegrationNetwork(nn.Module):
         # negative. The zero-output-at-init property (`alpha == prior` at
         # epoch 0) still holds because W2 is zero-initialized below.
         act_cls = {"tanh": nn.Tanh, "relu": nn.ReLU, "gelu": nn.GELU}[hidden_activation.lower()]
-        self.correction_mlp = nn.Sequential(
-            nn.Linear(n_features, n_hidden),
+        layers: list[nn.Module] = [
+            nn.Linear(n_features, n_hidden * 2),
             act_cls(),
-            nn.Linear(n_hidden, 1),
-        )
+        ]
+        # Hidden layers: first maps n_hidden*2 → n_hidden, rest are n_hidden → n_hidden
+        for i in range(n_hidden_layers - 1):
+            in_dim = n_hidden * 2 if i == 0 else n_hidden
+            layers += [nn.Linear(in_dim, n_hidden), act_cls()]
+        layers.append(nn.Linear(n_hidden, 1))
+        self.correction_mlp = nn.Sequential(*layers)
         # Zero-init last layer so correction starts at 0, alpha starts at prior.
         nn.init.zeros_(self.correction_mlp[-1].weight)
         nn.init.zeros_(self.correction_mlp[-1].bias)

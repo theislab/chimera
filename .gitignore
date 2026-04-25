@@ -193,3 +193,4 @@ cython_debug/
 .pybiomart.sqlite
 /training/runs
 /results/
+/data backup

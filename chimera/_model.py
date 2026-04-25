@@ -43,7 +43,7 @@ from chimera._constants import (
     WARMUP_FQR_EPOCHS,
     WARMUP_KL_EPOCHS,
 )
-from chimera._data_utils import get_sqrt_species_weights
+from chimera._data_utils import get_equal_species_weights, get_sqrt_species_weights
 from chimera._module import ChimeraModule
 from chimera._training_plan import ChimeraTrainingPlan
 
@@ -252,6 +252,7 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
         species_key: str = "species",
         batch_key: str = "batch",
         layer: str | None = None,
+        celltype_key: str | None = None,
         **kwargs,
     ) -> None:
         """Register an AnnData object for use with ChimeraModel.
@@ -270,6 +271,14 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             Column in ``adata.obs`` identifying batches.
         layer
             Layer in ``adata.layers`` to use as count data. If None, uses ``.X``.
+        celltype_key
+            Optional column in ``adata.obs`` with cell-type labels. When provided
+            AND the module is configured with ``use_celltype_conditional_mmd=True``,
+            MMD is evaluated within each cell type (species are matched per
+            cell type) rather than globally. This targets E8.4 (within-celltype
+            species mixing) directly. Cell type labels are NOT fed to the encoder
+            or to either decoder pathway — they influence only the MMD loss
+            signal. If None, the global MMD is used.
         **kwargs
             Additional keyword arguments forwarded to
             :meth:`AnnDataManager.register_fields`.
@@ -361,6 +370,18 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             # Species goes into LABELS_KEY so that n_labels = n_species
             CategoricalObsField(_SPECIES_REGISTRY_KEY, species_key),
         ]
+        # Optionally register a cell-type field for celltype-conditional MMD.
+        # The key ``"celltype"`` is read from the tensors dict inside
+        # ``ChimeraModule.forward`` when conditional MMD is active. The
+        # encoder / decoders never see this field — it is exclusively a
+        # training-signal input for MMD grouping.
+        if celltype_key is not None:
+            if celltype_key not in adata.obs.columns:
+                raise ValueError(
+                    f"celltype_key={celltype_key!r} is not a column in adata.obs. "
+                    f"Available: {list(adata.obs.columns)}"
+                )
+            anndata_fields.append(CategoricalObsField("celltype", celltype_key))
         adata_manager = AnnDataManager(
             fields=anndata_fields,
             setup_method_args=setup_method_args,
@@ -380,6 +401,7 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
         plan_kwargs: dict | None = None,
         datasplitter_kwargs: dict | None = None,
         sqrt_species_sampling: bool = True,
+        equal_species_sampling: bool = False,
         **kwargs,
     ):
         """Train the Chimera model.
@@ -406,6 +428,12 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
             that each species' effective sampling probability is proportional
             to the square root of its cell count, reducing dominance by the
             largest species.
+        equal_species_sampling
+            If True, overrides ``sqrt_species_sampling`` and uses per-species
+            equal weighting so each species contributes 1/S of sampling
+            probability. Tightens per-batch species distribution for MMD
+            and reduces seed-variance in integration on skewed datasets.
+            Default False.
         **kwargs
             Additional keyword arguments forwarded to the parent ``train``.
         """
@@ -417,15 +445,23 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
         # Override early stopping monitor: we log "validation_loss" not "elbo_validation"
         kwargs.setdefault("early_stopping_monitor", "validation_loss")
 
-        if sqrt_species_sampling:
+        # Resolve which species-weighted sampling scheme to use.
+        # equal_species_sampling takes precedence when requested.
+        use_weighted = sqrt_species_sampling or equal_species_sampling
+        if equal_species_sampling:
+            _weights = get_equal_species_weights(self.adata)
+        else:
+            _weights = self._sqrt_species_weights
+
+        if use_weighted:
             # Inject a custom DataSplitter that uses a WeightedRandomSampler
-            # with sqrt-proportional species weights. scvi-tools 1.1.2 builds
+            # with per-species weights. scvi-tools 1.1.2 builds
             # the splitter internally when adata is registered (passing
             # ``data_module=`` is forbidden in that case), so we hot-swap
             # ``self._data_splitter_cls`` for the duration of this call and
             # hand ``cell_weights`` through ``datasplitter_kwargs``.
             datasplitter_kwargs = dict(datasplitter_kwargs or {})
-            datasplitter_kwargs["cell_weights"] = self._sqrt_species_weights
+            datasplitter_kwargs["cell_weights"] = _weights
             original_cls = self._data_splitter_cls
             self._data_splitter_cls = _SqrtSpeciesDataSplitter
             try:
@@ -1075,6 +1111,183 @@ class ChimeraModel(UnsupervisedTrainingMixin, BaseModelClass):
                 results.append(mu_full.cpu().numpy())
 
         return np.concatenate(results, axis=0)
+
+    # ------------------------------------------------------------------
+    # Held-out evaluation (audit recommendation #3)
+    # ------------------------------------------------------------------
+
+    @torch.no_grad()
+    def evaluate_holdout(
+        self,
+        adata: AnnData | None = None,
+        holdout_fraction: float = 0.2,
+        seed: int = 42,
+        n_neighbors: int = 15,
+    ) -> dict:
+        """Compute integration metrics on a held-out cell subset.
+
+        Splits cells so that entire batches are held out (no within-batch
+        leakage), then computes metrics on the held-out cells only.
+
+        Parameters
+        ----------
+        adata
+            AnnData to evaluate. If None, uses the registered AnnData.
+        holdout_fraction
+            Fraction of batches to hold out for evaluation.
+        seed
+            Random seed for batch selection.
+        n_neighbors
+            Number of neighbors for kNN-based metrics.
+
+        Returns
+        -------
+        dict
+            Dictionary with keys: ``sil_species``, ``sil_celltype``,
+            ``label_transfer_acc``, ``n_cells_holdout``, ``holdout_batches``,
+            ``z_var_per_dim``, ``z_n_dead_dims``.
+        """
+        from sklearn.metrics import silhouette_score
+        from sklearn.neighbors import KNeighborsClassifier
+
+        adata = self._validate_anndata(adata)
+
+        # --- Batch-stratified holdout ---
+        # Resolve the batch column: scvi-tools stores the encoded column in
+        # the AnnDataManager registry, but the original column name is what
+        # we need for interpretable batch IDs.
+        batch_attr = None
+        try:
+            mgr = self._get_most_recent_anndata_manager(adata)
+            batch_attr = mgr.data_registry["batch"]["attr_key"]
+        except Exception:
+            pass
+        # Prefer the original "batch" column for interpretable names;
+        # fall back to the scvi-encoded column.
+        if "batch" in adata.obs.columns:
+            batch_col = adata.obs["batch"]
+        elif batch_attr and batch_attr in adata.obs.columns:
+            batch_col = adata.obs[batch_attr]
+        else:
+            raise ValueError("Cannot find batch column in adata.obs")
+
+        unique_batches = np.array(sorted(batch_col.unique()))
+        rng = np.random.RandomState(seed)
+
+        # If we have enough batches (>= 4), hold out entire batches ensuring
+        # both species are represented. Otherwise, do a per-batch stratified
+        # cell-level split so both species appear in the holdout.
+        if len(unique_batches) >= 4:
+            n_holdout = max(1, int(len(unique_batches) * holdout_fraction))
+            holdout_batches = set(rng.choice(unique_batches, size=n_holdout, replace=False))
+            holdout_mask = batch_col.isin(holdout_batches).values
+        else:
+            # Few batches: stratified cell-level split within each batch
+            holdout_mask = np.zeros(adata.n_obs, dtype=bool)
+            for b in unique_batches:
+                b_idx = np.where(batch_col == b)[0]
+                n_ho = max(1, int(len(b_idx) * holdout_fraction))
+                chosen = rng.choice(b_idx, size=n_ho, replace=False)
+                holdout_mask[chosen] = True
+            holdout_batches = set(unique_batches)  # all batches represented
+
+        train_mask = ~holdout_mask
+        holdout_idx = np.where(holdout_mask)[0]
+        train_idx = np.where(train_mask)[0]
+
+        if len(holdout_idx) < 20:
+            raise ValueError(
+                f"Only {len(holdout_idx)} holdout cells. "
+                f"Need more data for evaluation."
+            )
+
+        # --- Get latent representations ---
+        z_all = self.get_latent_representation(adata=adata)
+        z_holdout = z_all[holdout_idx]
+        z_train = z_all[train_idx]
+
+        # --- Species and cell-type labels ---
+        # Prefer original "species" column over scvi-encoded "_scvi_labels"
+        if "species" in adata.obs.columns:
+            species_all = adata.obs["species"].values
+        else:
+            species_attr = None
+            try:
+                species_attr = mgr.data_registry["labels"]["attr_key"]
+            except Exception:
+                pass
+            if species_attr and species_attr in adata.obs.columns:
+                species_all = adata.obs[species_attr].values
+            else:
+                raise ValueError("Cannot find species column in adata.obs")
+        species_holdout = species_all[holdout_idx]
+        species_train = species_all[train_idx]
+
+        # Cell type (look for common column names)
+        ct_key = None
+        for k in ["cell_type", "celltype", "cell_ontology_class", "CellType"]:
+            if k in adata.obs.columns:
+                ct_key = k
+                break
+
+        results = {
+            "n_cells_holdout": len(holdout_idx),
+            "n_cells_train": len(train_idx),
+            "holdout_batches": list(holdout_batches),
+        }
+
+        # --- Silhouette scores on holdout ---
+        if len(np.unique(species_holdout)) >= 2:
+            results["sil_species"] = float(
+                silhouette_score(z_holdout, species_holdout, metric="euclidean")
+            )
+        else:
+            results["sil_species"] = float("nan")
+
+        if ct_key and len(np.unique(adata.obs[ct_key].values[holdout_idx])) >= 2:
+            ct_holdout = adata.obs[ct_key].values[holdout_idx]
+            results["sil_celltype"] = float(
+                silhouette_score(z_holdout, ct_holdout, metric="euclidean")
+            )
+        else:
+            results["sil_celltype"] = float("nan")
+
+        # --- Label transfer: train on species A holdout, predict species B holdout ---
+        unique_species = np.unique(species_holdout)
+        if len(unique_species) >= 2 and ct_key:
+            ct_all = adata.obs[ct_key].values
+            ct_holdout = ct_all[holdout_idx]
+            # Shared cell types across species in holdout
+            per_sp_types = [set(ct_holdout[species_holdout == s]) for s in unique_species]
+            shared_types = per_sp_types[0]
+            for s in per_sp_types[1:]:
+                shared_types &= s
+
+            if len(shared_types) >= 2:
+                accs = []
+                for train_sp in unique_species:
+                    test_sps = [s for s in unique_species if s != train_sp]
+                    tr_mask = (species_holdout == train_sp) & np.isin(ct_holdout, list(shared_types))
+                    te_mask = np.isin(species_holdout, test_sps) & np.isin(ct_holdout, list(shared_types))
+                    if tr_mask.sum() < 5 or te_mask.sum() < 5:
+                        continue
+                    knn = KNeighborsClassifier(n_neighbors=min(n_neighbors, tr_mask.sum()))
+                    knn.fit(z_holdout[tr_mask], ct_holdout[tr_mask])
+                    accs.append(float(knn.score(z_holdout[te_mask], ct_holdout[te_mask])))
+                results["label_transfer_acc"] = float(np.mean(accs)) if accs else float("nan")
+            else:
+                results["label_transfer_acc"] = float("nan")
+        else:
+            results["label_transfer_acc"] = float("nan")
+
+        # --- Per-dimension z variance on holdout (collapse check) ---
+        z_var = np.var(z_holdout, axis=0)
+        results["z_var_per_dim"] = z_var.tolist()
+        results["z_n_dead_dims"] = int((z_var < 0.01).sum())
+        results["z_n_active_dims"] = int((z_var >= 0.01).sum())
+        results["z_mean_var"] = float(z_var.mean())
+
+        return results
 
     # ------------------------------------------------------------------
     # String representation

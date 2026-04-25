@@ -14,35 +14,79 @@ from typing import Any, Dict, Optional
 LAMBDA_AUX: float = 0.3
 """Weight for L_shared_aux (shared-only reconstruction). Collapse-prevention #2."""
 
-LAMBDA_RES: float = 0.05
-"""Weight for L_residual_sparsity (L1 on residual). Collapse-prevention #1."""
+LAMBDA_RES: float = 0.001
+"""Weight for L_residual_sparsity (L1 on residual). Collapse-prevention #1.
+Controls the trade-off between residual expressiveness and sparsity.
+Validated in iter50 (VAMP+MMD=10 canonical recipe) at 0.001 across 3 seeds.
+Previous value 0.005 (iter36) was for the pre-VAMP regime; under strong
+integration (iter50) the residual carries more per-species variance and
+needs a lighter L1 penalty to stay alive."""
 
-LAMBDA_ANCHOR: float = 0.005
-"""Weight for L_alpha_anchor (correction.pow(2).sum()). Collapse-prevention #3."""
+LAMBDA_ANCHOR: float = 0.003
+"""Weight for L_alpha_anchor (correction.pow(2).mean()).
+Prevents the GIN from pushing alpha to extremes (saturation at sigmoid
+boundaries). Validated in iter85 (z-balance + VAMP + MMD=50 + α-detach)
+at 0.003 across 2 seeds on corrected data. Equilibrium correction =
+λ_fit × S_g / (2 × λ_anchor) = 16.7 × S_g, keeping frac(α>0.95) ≈ 5%.
+Previous value 0.001 (iter50/81b) produced 13-17% saturation."""
 
-LAMBDA_FIT: float = 0.01
-"""Weight for L_fit_reward (FQR). Asymmetry-repair #4."""
+LAMBDA_FIT: float = 0.1
+"""Weight for L_fit_reward (FQR). Asymmetry-repair #4.
+Equilibrium correction = lambda_fit * S_g / (2 * lambda_anchor) = 50 * S_g.
+With lambda_anchor=0.001 and lambda_fit=0.1: equilibrium correction = 50*S_g.
+Validated in iter50 (VAMP+MMD=10 canonical recipe) at 0.1 across 3 seeds."""
 
 LAMBDA_DISP: float = 1e-4
 """Weight for dispersion regularization."""
 
-LAMBDA_MMD: float = 0.0
+LAMBDA_Z_BALANCE: float = 1.0
+"""Weight for L_z_balance (std of log per-dim z_mean variance).
+Under VAMP prior, per-cell KL provides no per-dim regularization because
+the mixture is too flexible — individual dims can explode (var=30) or
+near-collapse (var=0.007) without KL cost. L_z_balance directly penalizes
+the spread of log-variances across latent dimensions, encouraging all
+dims to carry similar information. Produces isotropic z embeddings with
+round UMAP clusters. Validated in iter84/85 (z-ratio drops from 4617 to
+1.04, integration improves). Set to 0 to disable."""
+
+LAMBDA_MMD: float = 50.0
 """Weight for MMD (Maximum Mean Discrepancy) loss on z between species.
-When > 0, directly penalizes species-stratified latent distributions,
-producing species-mixed z embeddings. Recommended range: [10, 200].
-Set to 0 to disable (backward compatible)."""
+Directly penalizes species-stratified latent distributions, producing
+species-mixed z embeddings. Works synergistically with the GRL adversary
+and VAMP prior to achieve species-agnostic z.
+
+Validated at 50.0 for 2-species with α-detach (iter81b, seeds 42+43: 32/32
++ 6/6 E8 + bidirectional Δα). Under α-detach, the shared pathway dominates
+(high α) → z carries more species info → needs stronger MMD than the old
+iter50 regime (λ_mmd=10, α collapsed to 0.20).
+For 4-species, use 30 with adv_weight=80 (iter59a/iter74 recipe).
+Set to 0 to disable species mixing entirely."""
 
 # ---------------------------------------------------------------------------
 # Adversarial training
 # ---------------------------------------------------------------------------
-ADV_WEIGHT: float = 0.1
-"""Adversarial species classifier weight. Mandatory when lambda_aux > 0.1 AND lambda_fit > 0."""
+ADV_WEIGHT: float = 0.033
+"""Adversarial species classifier weight (GRL, scaled by n_genes).
+
+The GRL reverses the adversarial classifier's gradient on z with scale
+``adv_weight * n_genes``. With n_genes=3000 and adv_weight=0.033, the effective
+reversal strength is ~100, giving ~1-3% of the L_recon gradient magnitude on
+the encoder — sufficient to produce species-mixed z when combined with
+detach_z_residual=True (which removes the reconstruction incentive to encode
+species through the residual pathway).
+
+Matches the iter50 canonical recipe (legacy adv_weight=100, auto-converted
+to 100/n_genes ≈ 0.033 for n_genes≈3000)."""
 
 # ---------------------------------------------------------------------------
 # Gradient clipping
 # ---------------------------------------------------------------------------
-GRAD_CLIP_MAX_NORM: float = 1.0
-"""Max gradient norm for gradient clipping."""
+GRAD_CLIP_MAX_NORM: float = 5.0
+"""Max gradient norm for gradient clipping.
+Clip the total L2 norm of model gradients. With the GRL scaling
+(adv_weight * n_genes), gradients can be large. A value of 5.0
+prevents explosions while preserving the adversarial signal's
+relative contribution within the total gradient."""
 
 # ---------------------------------------------------------------------------
 # GIN (Gene Integration Network) architecture
@@ -51,7 +95,7 @@ GIN_N_FEATURES: int = 72
 """Default GIN input features (64 ESM-2 PCA + 8 scalars). Overridden by actual gene_features.shape[1]."""
 
 GIN_N_HIDDEN: int = 32
-"""GIN hidden layer size. 72 -> 32 -> 1. Total params: ~2,369."""
+"""GIN hidden layer size. 72 -> 64 -> 32 -> 1. Total params: ~6,753."""
 
 GIN_LR_FACTOR: float = 0.1
 """GIN learning rate = base_lr * GIN_LR_FACTOR. Default: 1e-4 when base_lr=1e-3."""
@@ -74,8 +118,10 @@ FREE_BITS: float = 0.5
 # ---------------------------------------------------------------------------
 # Training schedule
 # ---------------------------------------------------------------------------
-WARMUP_ADV_EPOCHS: int = 15
-"""Start adversarial training after this many epochs."""
+WARMUP_ADV_EPOCHS: int = 5
+"""Start adversarial training after this many epochs.
+Validated in iter50 canonical recipe. Earlier warmup (5 vs old 15) allows
+the adversary more epochs to shape z before other schedules activate."""
 
 WARMUP_KL_EPOCHS: int = 20
 """Number of epochs to linearly ramp KL weight from 0 to 1."""
