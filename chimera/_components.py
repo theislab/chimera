@@ -31,6 +31,16 @@ class GeneIntegrationNetwork(nn.Module):
         scalars). May be 73 when dN/dS is included.
     n_hidden
         Hidden layer width of the correction MLP.
+    n_genes
+        Number of genes (only required when ``use_per_gene_bias`` is True).
+    use_per_gene_bias
+        iter119 opt-in: when True, add a per-gene scalar bias to the correction:
+        ``correction = MLP(features) + per_gene_bias[gene]``. Zero-initialized so
+        the model starts byte-identical to the MLP-only baseline. Targets the
+        universal testis E9.2 push<-0.05 architectural ceiling — the MLP's
+        feature-space smoothness clamps rare neg-S_g genes' output positive
+        regardless of anchor cost (iter118 diagnosis); per-gene dof bypasses
+        this constraint.
     """
 
     def __init__(
@@ -39,6 +49,8 @@ class GeneIntegrationNetwork(nn.Module):
         n_hidden: int = 32,
         hidden_activation: str = "tanh",
         n_hidden_layers: int = 2,
+        n_genes: int | None = None,
+        use_per_gene_bias: bool = False,
     ) -> None:
         super().__init__()
         # Tanh is used by default instead of ReLU (v2.4 spec).
@@ -71,6 +83,17 @@ class GeneIntegrationNetwork(nn.Module):
         nn.init.zeros_(self.correction_mlp[-1].weight)
         nn.init.zeros_(self.correction_mlp[-1].bias)
 
+        # iter119: optional per-gene bias parameter alongside the MLP.
+        self.use_per_gene_bias = bool(use_per_gene_bias)
+        if self.use_per_gene_bias:
+            if n_genes is None:
+                raise ValueError(
+                    "n_genes must be provided when use_per_gene_bias=True"
+                )
+            self.per_gene_bias = nn.Parameter(torch.zeros(int(n_genes)))
+        else:
+            self.per_gene_bias = None  # type: ignore[assignment]
+
     def forward(
         self,
         gene_features: torch.Tensor,
@@ -90,11 +113,14 @@ class GeneIntegrationNetwork(nn.Module):
         alpha
             Per-gene integration coefficient in ``(0, 1)``, shape ``(G,)``.
         correction
-            Raw correction output from the MLP (before adding to prior logit),
-            shape ``(G,)``. Used by ``L_alpha_anchor`` and ``L_fit_reward``.
+            Raw correction output (before adding to prior logit), shape ``(G,)``.
+            When ``use_per_gene_bias`` is True, equals ``MLP(features) + per_gene_bias``.
+            Used by ``L_alpha_anchor`` and ``L_fit_reward``.
         """
         prior_logit = torch.logit(conservation_prior)  # (G,)
         correction = self.correction_mlp(gene_features).squeeze(-1)  # (G,)
+        if self.use_per_gene_bias and self.per_gene_bias is not None:
+            correction = correction + self.per_gene_bias  # (G,)
         alpha = torch.sigmoid(prior_logit + correction)  # (G,)
         return alpha, correction
 

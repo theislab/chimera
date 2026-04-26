@@ -149,6 +149,9 @@ def run_experiment(
     prior_clamp_max: float | None = None,
     gin_n_hidden: int | None = None,
     sg_ema_beta: float | None = None,
+    lambda_anchor_neg_factor: float | None = None,
+    use_per_gene_bias: bool = False,
+    lambda_mmd_aux: float | None = None,
 ) -> dict[str, Any]:
     """Train a Chimera model end-to-end and return a summary dict."""
     run_dir = train_and_diagnose(
@@ -185,6 +188,9 @@ def run_experiment(
         prior_clamp_max=prior_clamp_max,
         gin_n_hidden=gin_n_hidden,
         sg_ema_beta=sg_ema_beta,
+        lambda_anchor_neg_factor=lambda_anchor_neg_factor,
+        use_per_gene_bias=use_per_gene_bias,
+        lambda_mmd_aux=lambda_mmd_aux,
     )
     return summarize_run(run_dir)
 
@@ -272,6 +278,34 @@ def main() -> int:
                         "noise on rare neg-S_g testis genes. 0.97 → ~33-batch averaging "
                         "(3.3× the iter109 default), 0.99 → ~100-batch. Targets the "
                         "iter115 mechanistic finding (signal density, not MLP capacity).")
+    p.add_argument("--lambda-anchor-neg-factor", type=float, default=None,
+                   help="iter118: asymmetric L_alpha_anchor factor for the negative-"
+                        "correction half-axis. Default 1.0 (symmetric, byte-identical "
+                        "to all prior best-knowns). Set < 1.0 to relax the negative "
+                        "anchor penalty (e.g. 0.3 → 3.33× more negative equilibrium "
+                        "for correctly-identified neg-S_g genes). Targets the universal "
+                        "testis E9.2 down architectural ceiling. Prediction (testis H+Mac, "
+                        "factor=0.3): mean correction on neg-S_g genes shifts from +0.353 "
+                        "toward 0 or negative; E9.2 push<-0.05 from 0.01%% to 1.5-5%%.")
+    p.add_argument("--use-per-gene-bias", action="store_true",
+                   help="iter119: opt-in per-gene bias hybrid in GIN. When set, "
+                        "correction = MLP(features) + per_gene_bias[gene], where "
+                        "per_gene_bias = nn.Parameter(torch.zeros(n_genes)) (zero-init). "
+                        "Default OFF (byte-identical to all current best-knowns). "
+                        "Targets the universal testis E9.2 push<-0.05 architectural "
+                        "ceiling: iter118 proved MLP feature-space smoothness is the "
+                        "dominant binding constraint. Per-gene scalar bias gives each "
+                        "gene its own dof, bypassing MLP smoothness without discarding "
+                        "feature-space generalization (the MLP still learns the smooth "
+                        "bulk). Predicted: ρ(S_g, corr) → 0.85-0.97; mean corr on neg-S_g "
+                        "→ -0.5 to -1.5; E9.2 push<-0.05 → 5-15%%.")
+    p.add_argument("--lambda-mmd-aux", type=float, default=None,
+                   help="iter121: opt-in dual-MMD weight. When >0 AND "
+                        "--celltype-conditional-mmd is set, adds a global MMD term "
+                        "alongside CT-cond MMD: total = lambda_mmd*L_ct + lambda_mmd_aux*L_global. "
+                        "Restores species-mixing pressure on cells in UNSHARED CTs "
+                        "(iter107 4-sp failure: alpha frozen, adv leaked because "
+                        "6 of 8 CTs got zero MMD). Default unset/0.0 = byte-identical legacy.")
     p.add_argument("--plan", type=Path, default=None,
                    help="JSON file overriding all above args (single experiment).")
     args = p.parse_args()
@@ -317,6 +351,9 @@ def main() -> int:
             prior_clamp_max=args.prior_clamp_max,
             gin_n_hidden=args.gin_hidden,
             sg_ema_beta=args.sg_ema_beta,
+            lambda_anchor_neg_factor=args.lambda_anchor_neg_factor,
+            use_per_gene_bias=args.use_per_gene_bias,
+            lambda_mmd_aux=args.lambda_mmd_aux,
         )
 
     es = summary["expectation_summary"]

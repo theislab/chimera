@@ -282,13 +282,27 @@ def dump_final_state(model: ChimeraModel, adata: ad.AnnData, out_path: Path) -> 
     if getattr(module, "_use_per_gene_alpha", False):
         correction = module.per_gene_correction.detach().cpu().float().numpy()
         alpha = 1.0 / (1.0 + np.exp(-(np.log(prior / (1 - prior)) + correction)))
+        mlp_correction = np.zeros_like(correction)
+        per_gene_bias_arr = correction.copy()
     elif hasattr(module, "gin"):
         alpha_t, correction_t = module.gin(module.gene_features, module.conservation_prior)
         alpha = alpha_t.detach().cpu().float().numpy()
         correction = correction_t.detach().cpu().float().numpy()
+        # iter119: when use_per_gene_bias=True, recover the MLP-only output and the
+        # per-gene bias separately so downstream diagnostics can compute the
+        # bias / MLP magnitude ratio (the iter119 falsifying probe).
+        if getattr(module.gin, "use_per_gene_bias", False) and module.gin.per_gene_bias is not None:
+            per_gene_bias_arr = module.gin.per_gene_bias.detach().cpu().float().numpy()
+            # MLP-only output = full correction - per_gene_bias.
+            mlp_correction = correction - per_gene_bias_arr
+        else:
+            per_gene_bias_arr = np.zeros_like(correction)
+            mlp_correction = correction.copy()
     else:
         alpha = module.alpha.detach().cpu().float().numpy()
         correction = np.zeros_like(alpha)
+        mlp_correction = np.zeros_like(alpha)
+        per_gene_bias_arr = np.zeros_like(alpha)
 
     S_g_ema = module.S_g_ema.detach().cpu().float().numpy() if hasattr(module, "S_g_ema") else np.zeros_like(alpha)
 
@@ -379,6 +393,11 @@ def dump_final_state(model: ChimeraModel, adata: ad.AnnData, out_path: Path) -> 
         "prior": prior,
         "alpha": alpha,
         "correction": correction,
+        # iter119: per-gene-bias decomposition. mlp_correction + per_gene_bias = correction.
+        # When use_per_gene_bias is OFF, per_gene_bias is identically zero and mlp_correction
+        # equals correction exactly (byte-identical legacy behavior).
+        "mlp_correction": mlp_correction,
+        "per_gene_bias": per_gene_bias_arr,
         "S_g_ema": S_g_ema,
         "mu_shared_mean": mu_shared_mean,
         "mu_shared_var": mu_shared_var,
@@ -451,6 +470,9 @@ def train_and_diagnose(
     prior_clamp_max: float | None = None,
     gin_n_hidden: int | None = None,
     sg_ema_beta: float | None = None,
+    lambda_anchor_neg_factor: float | None = None,
+    use_per_gene_bias: bool = False,
+    lambda_mmd_aux: float | None = None,
 ) -> Path:
     """Train a ChimeraModel and dump diagnostic artefacts.
 
@@ -546,6 +568,33 @@ def train_and_diagnose(
         # the iter115 mechanistic finding that signal density (not MLP capacity
         # or loss-weight scaling) is the bottleneck for testis 2-sp E9.2 down.
         extra_model_kwargs["sg_ema_beta"] = float(sg_ema_beta)
+    if lambda_anchor_neg_factor is not None:
+        # iter118: asymmetric L_alpha_anchor. Default factor 1.0 (symmetric, byte-
+        # identical to iter109/iter111/iter115). factor < 1.0 relaxes the penalty
+        # on negative corrections to attack the universal testis E9.2 down
+        # architectural ceiling. Mechanism: the symmetric `correction.pow(2)`
+        # squash forces the MLP's joint-loss minimum to be "all small-positive"
+        # for rare neg-S_g testis genes (mean corr ≈ +0.353 at iter109). With
+        # factor=0.3 the equilibrium for correctly-identified neg-S_g genes is
+        # 3.33× more negative, encouraging the MLP to use feature-space
+        # discriminability (linear AUC=0.84 from iter114_input_separability)
+        # during training.
+        extra_model_kwargs["lambda_anchor_neg_factor"] = float(lambda_anchor_neg_factor)
+    if use_per_gene_bias:
+        # iter119: per-gene bias hybrid. correction = MLP(features) + per_gene_bias[gene].
+        # Default OFF (byte-identical to all current best-knowns). Targets the universal
+        # testis E9.2 push<-0.05 architectural ceiling: iter118 proved MLP feature-space
+        # smoothness is the dominant binding constraint (relaxing the anchor by 70% on
+        # the negative side moved equilibrium by only 5% of predicted). Per-gene scalar
+        # bias gives each gene its own dof, bypassing the MLP smoothness without
+        # discarding feature-space generalization (the MLP still learns the smooth bulk).
+        extra_model_kwargs["use_per_gene_bias"] = True
+    if lambda_mmd_aux is not None and lambda_mmd_aux > 0:
+        # iter121: opt-in dual MMD. When use_celltype_conditional_mmd=True,
+        # lambda_mmd_aux > 0 adds a global MMD term on top of the CT-cond term,
+        # restoring species-mixing pressure on cells in unshared CTs (the
+        # iter107 4-sp failure mode). Default unset/0.0 = byte-identical legacy.
+        extra_model_kwargs["lambda_mmd_aux"] = float(lambda_mmd_aux)
     model = ChimeraModel.from_config(
         adata,
         config_name=config,
@@ -723,6 +772,11 @@ def train_and_diagnose(
         prior_clamp_max=(None if prior_clamp_max is None else float(prior_clamp_max)),
         gin_n_hidden=(None if gin_n_hidden is None else int(gin_n_hidden)),
         sg_ema_beta=(None if sg_ema_beta is None else float(sg_ema_beta)),
+        lambda_anchor_neg_factor=(
+            None if lambda_anchor_neg_factor is None else float(lambda_anchor_neg_factor)
+        ),
+        use_per_gene_bias=bool(use_per_gene_bias),
+        lambda_mmd_aux=(None if lambda_mmd_aux is None else float(lambda_mmd_aux)),
         mask_species_in_encoder=bool(mask_species_in_encoder),
         mask_batch_in_encoder=bool(mask_batch_in_encoder),
         WARMUP_KL_EPOCHS=WARMUP_KL_EPOCHS,
@@ -875,6 +929,32 @@ def main() -> int:
                              "averaging). Larger β slows the EMA and reduces per-minibatch "
                              "noise on rare neg-S_g testis genes. Try 0.97 (~33-batch) or "
                              "0.99 (~100-batch) on testis 2-sp to attack E9.2 down ceiling.")
+    parser.add_argument("--lambda-anchor-neg-factor", type=float, default=None,
+                        help="iter118: asymmetric L_alpha_anchor factor for the negative-"
+                             "correction half-axis. Default 1.0 (symmetric, byte-identical "
+                             "to all prior best-knowns). Set < 1.0 to relax the negative "
+                             "anchor penalty (e.g. 0.3 → 3.33× more negative equilibrium "
+                             "for correctly-identified neg-S_g genes). Targets the "
+                             "universal testis E9.2 down architectural ceiling.")
+    parser.add_argument("--use-per-gene-bias", action="store_true",
+                        help="iter119: opt-in per-gene bias hybrid in GIN. When set, "
+                             "correction = MLP(features) + per_gene_bias[gene], where "
+                             "per_gene_bias = nn.Parameter(torch.zeros(n_genes)) (zero-init). "
+                             "Default OFF (byte-identical to all current best-knowns). "
+                             "Targets the universal testis E9.2 push<-0.05 architectural "
+                             "ceiling: iter118 proved MLP feature-space smoothness is the "
+                             "dominant binding constraint (relaxing the anchor by 70%% on "
+                             "the negative side moved equilibrium by only 5%% of predicted). "
+                             "Per-gene scalar bias gives each gene its own dof, bypassing "
+                             "MLP smoothness without discarding feature-space generalization.")
+    parser.add_argument("--lambda-mmd-aux", type=float, default=None,
+                        help="iter121: opt-in dual-MMD weight. When >0 AND "
+                             "--celltype-conditional-mmd is set, the global (across-all-cells) "
+                             "MMD is added to the loss as `lambda_mmd_aux * L_mmd_global`, "
+                             "ALONGSIDE the CT-cond MMD `lambda_mmd * L_mmd_ct`. "
+                             "Restores species-mixing pressure on cells in UNSHARED CTs "
+                             "(which CT-cond MMD cannot reach — iter107 4-sp failure mode). "
+                             "Default unset/0.0 = byte-identical legacy.")
     args = parser.parse_args()
 
     train_and_diagnose(
@@ -920,6 +1000,9 @@ def main() -> int:
         batch_key=args.batch_key,
         prior_clamp_max=args.prior_clamp_max,
         sg_ema_beta=args.sg_ema_beta,
+        lambda_anchor_neg_factor=args.lambda_anchor_neg_factor,
+        use_per_gene_bias=args.use_per_gene_bias,
+        lambda_mmd_aux=args.lambda_mmd_aux,
     )
     return 0
 

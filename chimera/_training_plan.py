@@ -284,6 +284,24 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
         Returns TWO optimizer configs: model optimizer + adversarial classifier optimizer.
         AdversarialTrainingPlan expects [model_opt, adv_opt].
         """
+        # iter120: per-gene bias parameter (when --use-per-gene-bias is set) needs
+        # its own LR=1e-3 param group. iter119 placed it implicitly in the GIN MLP's
+        # 1e-4 group, where Adam under the per-gene mean-reduced FQR/anchor
+        # (per-bias gradient ~3e-7) only moved it to abs_max~0.056 over 200ep —
+        # not enough to break the testis E9.2 down ceiling. Config M's
+        # per_gene_correction follows the same pattern (separate 1e-3 group) for
+        # the same reason. Keep MLP weights at 1e-4.
+        gin_has_pgbias = (
+            getattr(self.module.gin, "use_per_gene_bias", False)
+            and getattr(self.module.gin, "per_gene_bias", None) is not None
+        )
+        if gin_has_pgbias:
+            gin_mlp_params = [
+                p for n, p in self.module.gin.named_parameters() if n != "per_gene_bias"
+            ]
+        else:
+            gin_mlp_params = list(self.module.gin.parameters())
+
         param_groups = [
             # Encoder (including z_mean_linear and z_logvar_linear)
             {
@@ -306,9 +324,13 @@ class ChimeraTrainingPlan(AdversarialTrainingPlan):
             },
             # Dispersion
             {"params": [self.module.dispersion], "lr": 1e-3},
-            # GIN at 10x lower LR
-            {"params": list(self.module.gin.parameters()), "lr": 1e-4},
+            # GIN MLP at 10x lower LR (per_gene_bias carved out separately below)
+            {"params": gin_mlp_params, "lr": 1e-4},
         ]
+        if gin_has_pgbias:
+            param_groups.append(
+                {"params": [self.module.gin.per_gene_bias], "lr": 1e-3}
+            )
 
         # Library encoder (conditional)
         if hasattr(self.module, "library_encoder"):

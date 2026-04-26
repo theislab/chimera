@@ -337,6 +337,9 @@ class ChimeraModule(nn.Module):
         use_vamp_prior: bool = True,
         n_vamp_components: int = 500,
         sg_ema_beta: float | None = None,
+        lambda_anchor_neg_factor: float = 1.0,
+        use_per_gene_bias: bool = False,
+        lambda_mmd_aux: float = 0.0,
     ) -> None:
         super().__init__()
 
@@ -352,6 +355,15 @@ class ChimeraModule(nn.Module):
         self.lambda_fit = lambda_fit
         self.lambda_disp = lambda_disp
         self.lambda_mmd = lambda_mmd
+        # iter121: optional dual-MMD weight on the AUXILIARY MMD term. When
+        # ``use_celltype_conditional_mmd=True`` AND ``lambda_mmd_aux > 0``, the
+        # global (across-all-cells) MMD is added on top of the CT-conditional
+        # MMD, producing species-mixing pressure on cells in unshared CTs that
+        # CT-cond MMD cannot reach (memory `feedback_ctcond_mmd_4sp.md`: "either
+        # use global MMD alone, or combine global + CT-cond (dual MMD). Never
+        # drop global MMD entirely."). Default 0.0 = byte-identical to all
+        # current best-knowns (testis iter109/iter111/iter115 use CT-cond ONLY).
+        self.lambda_mmd_aux = float(lambda_mmd_aux)
         self.lambda_z_balance = lambda_z_balance
         self.warmup_fqr_epochs = WARMUP_FQR_EPOCHS
         self.current_epoch: int = 0
@@ -361,6 +373,16 @@ class ChimeraModule(nn.Module):
         # S_g_ema for rare neg-S_g testis genes (~1% class) may break the
         # universal E9.2 down architectural ceiling on testis 2-sp.
         self.sg_ema_beta: float = float(sg_ema_beta) if sg_ema_beta is not None else SG_EMA_BETA
+        # iter118: L_alpha_anchor asymmetry factor. When 1.0 (default), the anchor is
+        # the symmetric correction.pow(2).mean() preserved across all prior iterations.
+        # When < 1.0, the negative-correction tail is penalized at `factor × λ_anchor`
+        # instead of full λ_anchor, allowing rare neg-S_g genes' equilibrium correction
+        # to grow proportionally larger in magnitude. Targets the universal testis E9.2
+        # down architectural ceiling: with symmetric squashing, the MLP's joint-loss
+        # minimum is "all small-positive" (mean correction on neg-S_g genes ≈ +0.353
+        # at iter109); relaxing the negative-side cost lets the MLP find a separating
+        # feature dimension during training.
+        self.lambda_anchor_neg_factor: float = float(lambda_anchor_neg_factor)
         self.free_bits: float = FREE_BITS
         self.kl_weight: float = 1.0  # set by ChimeraTrainingPlan during training
         # When True, the species one-hot is zeroed before being fed to the encoder.
@@ -428,8 +450,17 @@ class ChimeraModule(nn.Module):
 
         # ---- GIN ----
         n_features = self.gene_features.shape[1]
+        # iter119: optional per-gene bias hybrid. When use_per_gene_bias=True,
+        # GeneIntegrationNetwork outputs correction = MLP(features) + per_gene_bias,
+        # giving each gene its own scalar dof to bypass MLP feature-space smoothness.
+        # Default False = byte-identical to all prior best-knowns.
+        self.use_per_gene_bias: bool = bool(use_per_gene_bias)
         self.gin = GeneIntegrationNetwork(
-            n_features=n_features, n_hidden=int(gin_n_hidden), n_hidden_layers=gin_n_hidden_layers,
+            n_features=n_features,
+            n_hidden=int(gin_n_hidden),
+            n_hidden_layers=gin_n_hidden_layers,
+            n_genes=n_genes if self.use_per_gene_bias else None,
+            use_per_gene_bias=self.use_per_gene_bias,
         )
         self.gin_n_hidden = int(gin_n_hidden)
         # GIN last layer is already zero-initialized in GeneIntegrationNetwork.__init__.
@@ -1032,8 +1063,18 @@ class ChimeraModule(nn.Module):
         # L_residual_sparsity: .sum(-1).mean()
         L_residual_sparsity = log_rate_residual.abs().sum(-1).mean()
 
-        # L_alpha_anchor: per-gene mean (dataset-size invariant)
-        L_alpha_anchor = correction.pow(2).mean()
+        # L_alpha_anchor: per-gene mean (dataset-size invariant).
+        # iter118: when lambda_anchor_neg_factor < 1.0, the negative-correction
+        # half-axis is penalized at `factor × λ_anchor` (relaxed). At factor=1.0
+        # this branch is byte-identical to the symmetric `correction.pow(2).mean()`
+        # form preserved across all prior iterations. See module docstring for
+        # mechanism (testis E9.2 down architectural-ceiling attack).
+        if self.lambda_anchor_neg_factor != 1.0:
+            pos_sq = F.relu(correction).pow(2)
+            neg_sq = F.relu(-correction).pow(2)
+            L_alpha_anchor = (pos_sq + self.lambda_anchor_neg_factor * neg_sq).mean()
+        else:
+            L_alpha_anchor = correction.pow(2).mean()
 
         # L_dispersion regularization
         L_disp = self.dispersion.pow(2).mean()
@@ -1058,13 +1099,18 @@ class ChimeraModule(nn.Module):
         # setup_anndata(celltype_key=...), match species within each cell
         # type instead of globally. This directly targets E8.4 without the
         # alpha-collapse failure mode that strong global MMD produces.
+        # iter121: optional dual-MMD — when ``lambda_mmd_aux > 0`` AND CT-cond
+        # is the primary mode, also add the global MMD on top. This restores
+        # species-mixing pressure on cells in UNSHARED CTs (which CT-cond MMD
+        # cannot reach), the failure mode that collapsed iter107 (alpha
+        # frozen at prior, adv leaked).
+        celltype_idx_raw = tensors.get("celltype")
         if self.lambda_mmd > 0:
-            celltype_idx = tensors.get("celltype")
             if (
                 self.use_celltype_conditional_mmd
-                and celltype_idx is not None
+                and celltype_idx_raw is not None
             ):
-                celltype_idx = celltype_idx.squeeze(-1).long()
+                celltype_idx = celltype_idx_raw.squeeze(-1).long()
                 L_mmd = self._compute_mmd_celltype_conditional(
                     z, species_idx, celltype_idx
                 )
@@ -1072,6 +1118,15 @@ class ChimeraModule(nn.Module):
                 L_mmd = self._compute_mmd(z, species_idx)
         else:
             L_mmd = torch.tensor(0.0, device=x.device)
+        # iter121 auxiliary MMD term (default 0.0 → no extra term, byte-identical).
+        if (
+            self.lambda_mmd_aux > 0
+            and self.use_celltype_conditional_mmd
+            and celltype_idx_raw is not None
+        ):
+            L_mmd_aux = self._compute_mmd(z, species_idx)
+        else:
+            L_mmd_aux = torch.tensor(0.0, device=x.device)
 
         # L_z_balance: penalize imbalanced per-dim variance in z_mean.
         # Under VAMP prior, the per-cell KL provides no per-dim regularization
@@ -1099,6 +1154,7 @@ class ChimeraModule(nn.Module):
             + self.lambda_fit * L_fit_reward
             + self.lambda_disp * L_disp
             + self.lambda_mmd * L_mmd
+            + self.lambda_mmd_aux * L_mmd_aux  # iter121 dual-MMD aux term (0 when off)
             + self.lambda_z_balance * L_z_balance
             + L_kl_l  # Library KL (no lambda; zero when using observed lib size)
         )
@@ -1126,6 +1182,7 @@ class ChimeraModule(nn.Module):
             "L_fit_reward": L_fit_reward,
             "L_disp": L_disp,
             "L_mmd": L_mmd,
+            "L_mmd_aux": L_mmd_aux,
             "L_z_balance": L_z_balance,
             "L_KL_l": L_kl_l,
             "loss": loss,
