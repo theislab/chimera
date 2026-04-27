@@ -49,6 +49,11 @@ dependencies = [
     "papermill>=2.5.0",
     "matplotlib>=3.8.0",
     "seaborn>=0.13.0",
+
+    # Pathway / gene-set enrichment (used by paper notebook 06).
+    # Provides pre-ranked GSEA + ORA against MSigDB Hallmark, Reactome, GO BP,
+    # KEGG via the Enrichr library catalog (cached locally on first call).
+    "gseapy>=1.1.0",
 ]
 
 [project.optional-dependencies]
@@ -88,8 +93,17 @@ evolution = [
 data = [
     "gdown>=4.7.0",
 ]
+# Cross-method integration baselines for `chimera/training/baseline_runner.py`.
+# After editing this list, re-sync via the "Force re-sync" cell in
+# `chimera/notebooks/00_environment.ipynb` (never pip-install ad-hoc).
+# Note: SysVI (cross-species VampPrior cVAE, theislab/cross_system_integration)
+# now lives in scvi-tools as `scvi.external.SysVI`, so no separate package is
+# pinned here — the scvi-tools dep above already provides it.
+baselines = [
+    "harmonypy>=0.0.10",
+]
 all = [
-    "chimera[dev,scatter,graph,attributions,protein,evolution,data]",
+    "chimera[dev,scatter,graph,attributions,protein,evolution,data,baselines]",
 ]
 
 [tool.setuptools.packages.find]

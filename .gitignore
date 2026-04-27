@@ -194,3 +194,4 @@ cython_debug/
 /training/runs
 /results/
 /data backup
+/notebooks/cache

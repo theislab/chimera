@@ -152,6 +152,7 @@ def run_experiment(
     lambda_anchor_neg_factor: float | None = None,
     use_per_gene_bias: bool = False,
     lambda_mmd_aux: float | None = None,
+    mmd_pair_weights: list[float] | None = None,
 ) -> dict[str, Any]:
     """Train a Chimera model end-to-end and return a summary dict."""
     run_dir = train_and_diagnose(
@@ -191,6 +192,7 @@ def run_experiment(
         lambda_anchor_neg_factor=lambda_anchor_neg_factor,
         use_per_gene_bias=use_per_gene_bias,
         lambda_mmd_aux=lambda_mmd_aux,
+        mmd_pair_weights=mmd_pair_weights,
     )
     return summarize_run(run_dir)
 
@@ -306,6 +308,14 @@ def main() -> int:
                         "Restores species-mixing pressure on cells in UNSHARED CTs "
                         "(iter107 4-sp failure: alpha frozen, adv leaked because "
                         "6 of 8 CTs got zero MMD). Default unset/0.0 = byte-identical legacy.")
+    p.add_argument("--mmd-pair-weights", type=str, default=None,
+                   help="iter122: opt-in species-pair-conditional MMD weights "
+                        "(comma-separated, length C(n_species, 2), in lex pair order). "
+                        "For 4 species: (0,1),(0,2),(0,3),(1,2),(1,3),(2,3). When set, "
+                        "_compute_mmd uses weighted-pair averaging Sum_k w_k MMD_k / Sum_k w_k "
+                        "instead of uniform. Down-weight 'impossible' pairs (e.g. Zebrafish "
+                        "at 450 Myr) to concentrate pressure on close-pair mixing. Default "
+                        "unset = uniform = byte-identical legacy.")
     p.add_argument("--plan", type=Path, default=None,
                    help="JSON file overriding all above args (single experiment).")
     args = p.parse_args()
@@ -354,6 +364,10 @@ def main() -> int:
             lambda_anchor_neg_factor=args.lambda_anchor_neg_factor,
             use_per_gene_bias=args.use_per_gene_bias,
             lambda_mmd_aux=args.lambda_mmd_aux,
+            mmd_pair_weights=(
+                None if args.mmd_pair_weights is None
+                else [float(w) for w in args.mmd_pair_weights.split(",") if w.strip()]
+            ),
         )
 
     es = summary["expectation_summary"]

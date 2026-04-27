@@ -473,6 +473,7 @@ def train_and_diagnose(
     lambda_anchor_neg_factor: float | None = None,
     use_per_gene_bias: bool = False,
     lambda_mmd_aux: float | None = None,
+    mmd_pair_weights: list[float] | None = None,
 ) -> Path:
     """Train a ChimeraModel and dump diagnostic artefacts.
 
@@ -595,6 +596,15 @@ def train_and_diagnose(
         # restoring species-mixing pressure on cells in unshared CTs (the
         # iter107 4-sp failure mode). Default unset/0.0 = byte-identical legacy.
         extra_model_kwargs["lambda_mmd_aux"] = float(lambda_mmd_aux)
+    if mmd_pair_weights is not None and len(mmd_pair_weights) > 0:
+        # iter122: opt-in species-pair-conditional MMD weights. When passed,
+        # `_compute_mmd` switches to weighted-pair averaging (Σ w_k MMD_k /
+        # Σ w_k) over species pairs in lex order. Heterogeneous weights down-
+        # weight "impossible" pairs (e.g. 4-sp Zebrafish pairs at 450 Myr) and
+        # concentrate pressure on close-pair mixing where data permits. Default
+        # None = uniform pair averaging = byte-identical legacy. Length must
+        # equal C(n_species, 2).
+        extra_model_kwargs["mmd_pair_weights"] = [float(w) for w in mmd_pair_weights]
     model = ChimeraModel.from_config(
         adata,
         config_name=config,
@@ -777,6 +787,9 @@ def train_and_diagnose(
         ),
         use_per_gene_bias=bool(use_per_gene_bias),
         lambda_mmd_aux=(None if lambda_mmd_aux is None else float(lambda_mmd_aux)),
+        mmd_pair_weights=(
+            None if mmd_pair_weights is None else [float(w) for w in mmd_pair_weights]
+        ),
         mask_species_in_encoder=bool(mask_species_in_encoder),
         mask_batch_in_encoder=bool(mask_batch_in_encoder),
         WARMUP_KL_EPOCHS=WARMUP_KL_EPOCHS,
@@ -955,7 +968,21 @@ def main() -> int:
                              "Restores species-mixing pressure on cells in UNSHARED CTs "
                              "(which CT-cond MMD cannot reach — iter107 4-sp failure mode). "
                              "Default unset/0.0 = byte-identical legacy.")
+    parser.add_argument("--mmd-pair-weights", type=str, default=None,
+                        help="iter122: opt-in species-pair-conditional MMD weights. "
+                             "Comma-separated list of length C(n_species, 2), one weight "
+                             "per species pair in lex order. For 4 species (idx 0..3) the "
+                             "order is (0,1),(0,2),(0,3),(1,2),(1,3),(2,3). When provided, "
+                             "_compute_mmd switches from uniform-pair averaging to weighted "
+                             "averaging (Sum_k w_k * MMD_k / Sum_k w_k). Down-weight "
+                             "'impossible' pairs (e.g. Zebrafish at 450 Myr) to concentrate "
+                             "MMD pressure on close-pair mixing where data permits. Default "
+                             "unset = uniform averaging = byte-identical legacy.")
     args = parser.parse_args()
+    _mmd_pair_weights_cli = (
+        None if args.mmd_pair_weights is None
+        else [float(w) for w in args.mmd_pair_weights.split(",") if w.strip()]
+    )
 
     train_and_diagnose(
         adata_path=args.adata,
@@ -1003,6 +1030,7 @@ def main() -> int:
         lambda_anchor_neg_factor=args.lambda_anchor_neg_factor,
         use_per_gene_bias=args.use_per_gene_bias,
         lambda_mmd_aux=args.lambda_mmd_aux,
+        mmd_pair_weights=_mmd_pair_weights_cli,
     )
     return 0
 

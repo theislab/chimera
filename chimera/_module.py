@@ -8,7 +8,7 @@ Two variants:
 """
 
 import math
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Sequence, Tuple
 
 import torch
 import torch.nn as nn
@@ -340,6 +340,7 @@ class ChimeraModule(nn.Module):
         lambda_anchor_neg_factor: float = 1.0,
         use_per_gene_bias: bool = False,
         lambda_mmd_aux: float = 0.0,
+        mmd_pair_weights: Optional[Sequence[float]] = None,
     ) -> None:
         super().__init__()
 
@@ -364,6 +365,39 @@ class ChimeraModule(nn.Module):
         # drop global MMD entirely."). Default 0.0 = byte-identical to all
         # current best-knowns (testis iter109/iter111/iter115 use CT-cond ONLY).
         self.lambda_mmd_aux = float(lambda_mmd_aux)
+        # iter122: optional species-pair-conditional MMD weights — heterogeneous
+        # per-pair weighting that down-weights "impossible" species pairs (e.g.
+        # 4-sp pancreas Zebrafish pairs at 450 Myr divergence) and concentrates
+        # MMD pressure on close-pair mixing where data permits. When None
+        # (default), `_compute_mmd` averages uniformly across all pairs (byte-
+        # identical to legacy). When provided, the list is length C(K, 2) where
+        # K=n_species; pair index k follows lex order over (i, j) for i < j:
+        # K=2 → [(0,1)]; K=3 → [(0,1), (0,2), (1,2)]; K=4 → [(0,1), (0,2),
+        # (0,3), (1,2), (1,3), (2,3)]. Weights need not sum to 1; the inner
+        # average is `Σ w_k × MMD_k / Σ w_k` over pairs that have ≥2 cells per
+        # species side. CT-cond MMD path is unaffected.
+        if mmd_pair_weights is not None:
+            n_pairs_expected = (n_species * (n_species - 1)) // 2
+            mpw = list(mmd_pair_weights)
+            if len(mpw) != n_pairs_expected:
+                raise ValueError(
+                    f"mmd_pair_weights must have length C({n_species},2)"
+                    f" = {n_pairs_expected}; got {len(mpw)}."
+                )
+            if any(float(w) < 0.0 for w in mpw):
+                raise ValueError(
+                    f"mmd_pair_weights must be non-negative; got {mpw}."
+                )
+            if sum(float(w) for w in mpw) <= 0.0:
+                raise ValueError(
+                    f"mmd_pair_weights must sum to > 0; got {mpw}."
+                )
+            self.register_buffer(
+                "mmd_pair_weights",
+                torch.as_tensor(mpw, dtype=torch.float32),
+            )
+        else:
+            self.mmd_pair_weights = None  # sentinel for `_compute_mmd`
         self.lambda_z_balance = lambda_z_balance
         self.warmup_fqr_epochs = WARMUP_FQR_EPOCHS
         self.current_epoch: int = 0
@@ -702,6 +736,15 @@ class ChimeraModule(nn.Module):
     def _compute_mmd(self, z: torch.Tensor, species_idx: torch.Tensor) -> torch.Tensor:
         """Compute MMD between all species pairs in the minibatch.
 
+        When ``self.mmd_pair_weights`` is None (default), pairs are averaged
+        uniformly. When non-None (iter122 species-pair-conditional MMD), the
+        per-pair MMDs are weighted by the corresponding entries before the
+        average. Pair index follows lex order: for ``i < j`` enumerated as
+        ``(0,1), (0,2), ..., (0, K-1), (1,2), ..., (K-2, K-1)``. Pairs whose
+        minibatch sample is < 2 on either species are skipped (and their
+        weight is excluded from the normalizer), matching the legacy
+        behavior of n_pairs counting only-present pairs.
+
         Parameters
         ----------
         z
@@ -712,10 +755,13 @@ class ChimeraModule(nn.Module):
         Returns
         -------
         torch.Tensor
-            Mean MMD^2 across all species pairs present in the batch.
+            Weighted (or uniform) average MMD^2 across present species pairs.
         """
+        weighted = self.mmd_pair_weights is not None
         mmd_total = torch.tensor(0.0, device=z.device)
+        weight_total = 0.0
         n_pairs = 0
+        pair_idx = 0
 
         for i in range(self.n_species):
             for j in range(i + 1, self.n_species):
@@ -725,10 +771,22 @@ class ChimeraModule(nn.Module):
                 z_j = z[mask_j]
                 # Need at least 2 samples per species for unbiased MMD
                 if z_i.shape[0] < 2 or z_j.shape[0] < 2:
+                    pair_idx += 1
                     continue
-                mmd_total = mmd_total + self._mmd_rbf(z_i, z_j)
-                n_pairs += 1
+                if weighted:
+                    w = float(self.mmd_pair_weights[pair_idx].item())
+                    if w > 0.0:
+                        mmd_total = mmd_total + w * self._mmd_rbf(z_i, z_j)
+                        weight_total += w
+                else:
+                    mmd_total = mmd_total + self._mmd_rbf(z_i, z_j)
+                    n_pairs += 1
+                pair_idx += 1
 
+        if weighted:
+            if weight_total <= 0.0:
+                return torch.tensor(0.0, device=z.device)
+            return mmd_total / weight_total
         if n_pairs == 0:
             return torch.tensor(0.0, device=z.device)
         return mmd_total / n_pairs

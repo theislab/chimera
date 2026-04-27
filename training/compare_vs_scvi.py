@@ -53,7 +53,12 @@ logging.basicConfig(
 logger = logging.getLogger("compare_vs_scvi")
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-RUNS_ROOT = REPO_ROOT / "training" / "runs"
+# Honor CHIMERA_RUNS_ROOT (same hook used by baseline_runner.py /
+# run_all_baselines.py) so a test or downstream consumer can redirect
+# the cache to a tmp path. Default unchanged.
+RUNS_ROOT = Path(os.environ["CHIMERA_RUNS_ROOT"]) if os.environ.get(
+    "CHIMERA_RUNS_ROOT"
+) else REPO_ROOT / "training" / "runs"
 
 
 def _set_seed(seed: int):
@@ -215,8 +220,15 @@ def compute_integration_metrics(
 def get_or_train_scvi(
     adata_path: Path, seed: int, max_epochs: int, n_latent: int, n_hidden: int,
     batch_key: str = "species",
+    accelerator: str = "auto",
 ) -> np.ndarray:
-    """Train (or load cached) vanilla scVI with the given batch_key."""
+    """Train (or load cached) vanilla scVI with the given batch_key.
+
+    `accelerator` defaults to "auto" (Lightning's auto-detect) so existing
+    callers (the Chimera ↔ scVI scorecard CLI) are unchanged. The
+    `baseline_runner.py` shared-helper path passes `accelerator="cpu"` to
+    honor the baseline pipeline's CPU-only rule.
+    """
     import anndata as ad
     import scvi
 
@@ -244,7 +256,7 @@ def get_or_train_scvi(
 
     scvi.model.SCVI.setup_anndata(adata, batch_key=batch_key)
     model = scvi.model.SCVI(adata, n_latent=n_latent, n_hidden=n_hidden)
-    model.train(max_epochs=max_epochs, early_stopping=True)
+    model.train(max_epochs=max_epochs, accelerator=accelerator, early_stopping=True)
 
     z = model.get_latent_representation()
     np.save(z_path, z)
