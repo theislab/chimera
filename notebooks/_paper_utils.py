@@ -602,14 +602,117 @@ def annotate_gene_categories(var_names: Iterable[str]) -> pd.DataFrame:
                         index=var_names)
 
 
+def bh_fdr(p_values) -> np.ndarray:
+    """Benjamini–Hochberg FDR-adjusted p-values (q-values).
+
+    Returns an array the same shape as ``p_values`` with each entry's
+    BH-corrected q-value. Use ``q < 0.05`` (or your chosen FDR cutoff)
+    to decide significance — that controls the *expected* false-
+    discovery rate at 5 %, which is the standard genomics convention
+    for enrichment-heatmap stars.
+
+    NaNs in the input are passed through (NaN out, NaN ignored when
+    counting tests).
+    """
+    p = np.asarray(p_values, dtype=float)
+    n_total = p.size
+    if n_total == 0:
+        return p.copy()
+    valid = np.isfinite(p)
+    n = int(valid.sum())
+    out = np.full(p.shape, np.nan, dtype=float)
+    if n == 0:
+        return out
+    pv = p[valid]
+    order = np.argsort(pv)
+    ranked = pv[order]
+    adj = ranked * n / np.arange(1, n + 1, dtype=float)
+    adj = np.minimum.accumulate(adj[::-1])[::-1]
+    adj = np.clip(adj, 0.0, 1.0)
+    inv = np.empty_like(adj)
+    inv[order] = adj
+    out[valid] = inv
+    return out
+
+
+def perm_zscore_category(
+    values: np.ndarray,
+    in_set_mask: np.ndarray,
+    n_perm: int = 2000,
+    seed: int = 0,
+) -> dict[str, float]:
+    """Permutation-test z-scores for two non-Fisher statistics on a gene
+    category, computed against a null in which the same number of genes
+    is randomly drawn from the dataset (without replacement).
+
+    Returns a dict with:
+      ``z_med``  — z-score of the category's *median* of ``values`` under the
+                   null. Catches *directional location shifts* of the category.
+      ``z_mag``  — z-score of the category's *mean of |values|* under the null.
+                   Catches *bidirectional amplitude inflation* (genes pulled
+                   strongly in either direction). This is the test that fires
+                   on Mitochondria & OXPHOS in testis where the median barely
+                   shifts but |Δα| is dramatically larger than chance.
+      ``p_med``  — empirical two-sided p-value for ``z_med``.
+      ``p_mag``  — empirical one-sided p-value for ``z_mag`` (only "magnitude
+                   greater than null" is biologically interesting).
+      ``obs_med``, ``obs_mag`` — the observed test statistics.
+
+    Vectorised: builds an ``(n_perm, n_in)`` index matrix once, then
+    computes all null statistics with a single ``np.median`` /
+    ``np.mean`` reduction across axis 1.
+    """
+    rng = np.random.default_rng(seed)
+    values = np.asarray(values, dtype=float)
+    in_set_mask = np.asarray(in_set_mask, dtype=bool)
+    n = int(values.size)
+    n_in = int(in_set_mask.sum())
+    av = np.abs(values)
+
+    indices = np.empty((n_perm, n_in), dtype=np.int64)
+    for i in range(n_perm):
+        indices[i] = rng.choice(n, size=n_in, replace=False)
+    null_med = np.median(values[indices], axis=1)
+    null_mag = np.mean(av[indices], axis=1)
+
+    obs_med = float(np.median(values[in_set_mask]))
+    obs_mag = float(np.mean(av[in_set_mask]))
+
+    sd_med = float(null_med.std(ddof=1))
+    sd_mag = float(null_mag.std(ddof=1))
+    z_med = float((obs_med - null_med.mean()) / sd_med) if sd_med > 0 else 0.0
+    z_mag = float((obs_mag - null_mag.mean()) / sd_mag) if sd_mag > 0 else 0.0
+    p_med = float(2.0 * min((null_med >= obs_med).mean(), (null_med <= obs_med).mean()))
+    p_med = max(p_med, 1.0 / n_perm)
+    p_mag = max(float((null_mag >= obs_mag).mean()), 1.0 / n_perm)
+    return {
+        "z_med": z_med, "z_mag": z_mag,
+        "p_med": p_med, "p_mag": p_mag,
+        "obs_med": obs_med, "obs_mag": obs_mag,
+    }
+
+
 def fisher_enrichment(
     in_set_mask: np.ndarray,
     hit_mask: np.ndarray,
+    alternative: str = "two-sided",
 ) -> dict[str, float]:
-    """Two-sided Fisher exact on contingency table (hit × in_set).
+    """Fisher exact test on contingency table (hit × in_set).
 
     hit_mask : bool array of gene-level "hits" (e.g. α in top 10 %).
     in_set_mask : bool array of genes in a reference set (e.g. ribosomal).
+
+    `alternative` is forwarded to ``scipy.stats.fisher_exact`` with one
+    extra mode supported here:
+
+    - ``"two-sided"`` (default) — symmetric H1: OR ≠ 1. Conservative.
+    - ``"greater"`` / ``"less"`` — one-sided as in scipy.
+    - ``"directional"`` — pick ``"greater"`` if the observed OR ≥ 1 and
+      ``"less"`` otherwise. Use this for enrichment heatmaps where the
+      cell color already encodes direction and the star should flag
+      significant deviation from OR=1 in *either* direction. Roughly
+      halves p-values vs two-sided, which is appropriate when the
+      direction-of-effect is read off the heatmap, not pre-specified.
 
     Returns dict with keys: odds_ratio, p_value, n_hit_in_set, n_hit,
     n_in_set, n_total.
@@ -621,9 +724,15 @@ def fisher_enrichment(
     b = int(np.sum(hit & ~s))
     c = int(np.sum(~hit & s))
     d = int(np.sum(~hit & ~s))
-    # scipy returns (odds_ratio, p); odds_ratio can be np.inf if b=0 or c=0
+    table = [[a, b], [c, d]]
     try:
-        odds, p = fisher_exact([[a, b], [c, d]], alternative="two-sided")
+        odds_ts, _ = fisher_exact(table, alternative="two-sided")
+        if alternative == "directional":
+            side = "greater" if (np.isfinite(odds_ts) and odds_ts >= 1.0) else "less"
+            _, p = fisher_exact(table, alternative=side)
+            odds = odds_ts
+        else:
+            odds, p = fisher_exact(table, alternative=alternative)
     except ValueError:
         odds, p = float("nan"), 1.0
     return {

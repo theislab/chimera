@@ -352,10 +352,20 @@ cells.append(code(r"""
         return np.array(keep), means_A, means_B, n_per
 
 
+    # Default `lim` covers the cross-tissue / cross-organism range; cross-seed
+    # comparisons live in a tighter window and pass `lim=(-0.075, 0.075)`.
+    # Testis cross-organism Δα is positive-skewed and tightly compressed by
+    # the prior-clamp at 0.85, so testis cross-organism by_category panels
+    # use [0, 0.05] on both axes.
+    LIM_CROSSSEED          = (-0.075, 0.075)
+    LIM_CROSSCORGAN        = (-0.100, 0.075)
+    LIM_TESTIS_CROSSCORGAN = (0.0, 0.05)
+
     def _category_pair_panel(
         mA: np.ndarray, mB: np.ndarray, n_per: np.ndarray,
         xlabel: str, ylabel: str, save_name: str,
         *, n_pair_label: str | None = None,
+        lim: tuple[float, float] = LIM_CROSSCORGAN,
     ) -> None:
         '''Companion to `density_scatter` for ~40 per-category mean points.
 
@@ -367,14 +377,17 @@ cells.append(code(r"""
         sizes = 12 + 0.05 * n_per
         ax.scatter(mA, mB, s=sizes, color="#222222", alpha=0.75, linewidths=0,
                    rasterized=True)
-        # Symmetric square range, padded so points don't touch the spines.
-        rng = float(max(np.abs(mA).max(), np.abs(mB).max()) * 1.20 + 1e-6)
-        ax.set_xlim(-rng, rng); ax.set_ylim(-rng, rng)
+        ax.set_xlim(*lim); ax.set_ylim(*lim)
         ax.set_aspect("equal")
+        # Format tick labels to 2 decimal places — matplotlib's auto-format
+        # otherwise produces unhelpful labels like "0.075" / "−0.05" mixed.
+        from matplotlib.ticker import FormatStrFormatter
+        ax.xaxis.set_major_formatter(FormatStrFormatter("%.2f"))
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
         ax.axhline(0, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
         ax.axvline(0, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
         ax.set_xlabel(xlabel); ax.set_ylabel(ylabel)
-        fd.add_identity_line(ax, lim=(-rng, rng))
+        fd.add_identity_line(ax, lim=lim)
         rho = stats.spearmanr(mA, mB).correlation
         pearson = stats.pearsonr(mA, mB).statistic
         prefix = f"$k={len(mA)}$ programs"
@@ -547,7 +560,8 @@ cells.append(md("""
 cells.append(code(r"""
     da = delta_alpha(r)
     fig, ax = fd.make_axes(fd.FIGSIZE_SQUARE)
-    ax.hist(da, bins=fd.DELTA_ALPHA_BINS, color="#222222", edgecolor="none")
+    ax.hist(da, bins=fd.DELTA_ALPHA_BINS, color="#bdbdbd", edgecolor="#888888",
+            linewidth=0.4)
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
     fd.style_delta_alpha_axis(ax, "x")
     ax.set_ylabel(fd.LABEL["n_genes"])
@@ -572,6 +586,7 @@ cells.append(md("""
 
 # Fig A1.3: α vs prior scatter
 cells.append(code(r"""
+    # Full-range version: prior and α both span [0, 1].
     fig, ax = fd.make_axes(fd.FIGSIZE_SQUARE)
     fd.density_scatter(ax, prior, alpha)
     fd.style_alpha_axis(ax, "x"); ax.set_xlabel(fd.LABEL["prior"])
@@ -580,6 +595,22 @@ cells.append(code(r"""
     rho = stats.spearmanr(prior, alpha).correlation
     fd.annotate_stat(ax, f"Spearman $\\rho = {rho:.3f}$", "lower right")
     fd.save_figure(fig, "A1_3_alpha_vs_prior_scatter")
+    plt.show()
+
+    # Zoomed alternative: lower-bound both axes at 0.4 to surface the
+    # central ridge near the identity line where ~95 % of the genes
+    # actually live (most genes have prior > 0.4 on this dataset).
+    fig, ax = fd.make_axes(fd.FIGSIZE_SQUARE)
+    fd.density_scatter(ax, prior, alpha)
+    ax.set_xlim(0.4, 1.0); ax.set_ylim(0.4, 1.0)
+    ax.set_xticks([0.4, 0.6, 0.8, 1.0])
+    ax.set_yticks([0.4, 0.6, 0.8, 1.0])
+    ax.set_xlabel(fd.LABEL["prior"])
+    ax.set_ylabel(fd.LABEL["alpha"])
+    fd.add_identity_line(ax, lim=(0.4, 1.0))
+    fd.annotate_stat(ax, f"Spearman $\\rho = {rho:.3f}$  (zoomed: prior, $\\alpha\\in[0.4,1]$)",
+                     "lower right")
+    fd.save_figure(fig, "A1_3_alpha_vs_prior_scatter_zoom04")
     plt.show()
 """))
 
@@ -1124,6 +1155,7 @@ cells.append(code(r"""
             xlabel=fr"mean $\Delta\alpha$ per program ({lA})",
             ylabel=fr"mean $\Delta\alpha$ per program ({lB})",
             save_name=f"B1_delta_alpha_pair_{lA}_vs_{lB}_by_category",
+            lim=LIM_CROSSSEED,    # cross-seed range
         )
 """))
 
@@ -1223,13 +1255,20 @@ cells.append(code(r"""
         "pancreas_hmonkey_s42": "H+Monkey",
         "pancreas_hmouse_s42":  "H+Mouse",
         "pancreas_hzeb_s42":    "H+Zebrafish",
-        "pancreas_4sp_s42":     "4-species (H+Mo+Mu+Zb)",
+        "pancreas_4sp_s42":     "4-species",
     }
     panc_4sp = "pancreas_4sp_s42"
 
 
-    def compare_two_runs(keyA: str, keyB: str, quantity: str, fig_name: str):
-        '''One single-panel figure: aligned alpha (or delta_alpha) of two runs.'''
+    def compare_two_runs(keyA: str, keyB: str, quantity: str, fig_name: str,
+                          *, with_by_category: bool = True,
+                          by_category_lim: tuple[float, float] | None = None):
+        '''One single-panel figure: aligned alpha (or delta_alpha) of two runs.
+
+        `with_by_category=False` suppresses the per-extended-category-mean
+        companion. `by_category_lim` overrides the lim of that companion
+        (defaults to the package-level cross-organism range).
+        '''
         rA, rB = load_run(keyA), load_run(keyB)
         vnA, vnB = var_names_for_run(rA), var_names_for_run(rB)
         common = pd.Index(vnA).intersection(pd.Index(vnB))
@@ -1267,18 +1306,22 @@ cells.append(code(r"""
         # Companion: per-extended-category mean (~40 gene programs).
         # Only emitted for the Δα view — α-vs-α program means would just
         # mirror the prior, which is not the reproducibility quantity.
-        if quantity == "delta":
+        if quantity == "delta" and with_by_category:
             cats, mA, mB, n_per = category_means_aligned(
                 rA, rB,
                 rA["fs"]["alpha"] - rA["fs"]["prior"],
                 rB["fs"]["alpha"] - rB["fs"]["prior"],
             )
+            _kwargs = {}
+            if by_category_lim is not None:
+                _kwargs["lim"] = by_category_lim
             _category_pair_panel(
                 mA, mB, n_per,
                 xlabel=f"mean {label} per program ({panc_pair_labels[keyA]})",
                 ylabel=f"mean {label} per program ({panc_pair_labels[keyB]})",
                 save_name=f"{fig_name}_by_category",
                 n_pair_label=f"$n={len(common)}$ shared genes",
+                **_kwargs,
             )
 
 
@@ -1287,7 +1330,7 @@ cells.append(code(r"""
         compare_two_runs(panc_4sp, keyB, "delta",
                          f"B2_panc_4sp_vs_{keyB.split('_')[1]}_delta")
 
-    # Pair vs pair (3 panels — Δα only)
+    # Pair vs pair (3 panels — Δα only). by_category companions kept for all.
     for i in range(len(panc_pairs)):
         for j in range(i + 1, len(panc_pairs)):
             kA, kB = panc_pairs[i], panc_pairs[j]
@@ -1322,17 +1365,19 @@ cells.append(code(r"""
     test_labels = {
         "testis_hmac_s42":   "testis H+Macaque",
         "testis_hmouse_s42": "testis H+Mouse",
-        "testis_3sp_s42":    "testis 3-sp (H+Ma+Mu)",
+        "testis_3sp_s42":    "testis 3-sp",
     }
     panc_pair_labels.update(test_labels)
     test_unified = "testis_3sp_s42"
 
     for keyB in test_pairs:
         tagB = keyB.split("_")[1]
-        compare_two_runs(test_unified, keyB, "delta", f"B3_test_3sp_vs_{tagB}_delta")
+        compare_two_runs(test_unified, keyB, "delta", f"B3_test_3sp_vs_{tagB}_delta",
+                          by_category_lim=LIM_TESTIS_CROSSCORGAN)
 
     compare_two_runs(test_pairs[0], test_pairs[1], "delta",
-                     f"B3_test_hmac_vs_hmouse_delta")
+                     f"B3_test_hmac_vs_hmouse_delta",
+                     by_category_lim=LIM_TESTIS_CROSSCORGAN)
 """))
 
 cells.append(md("""

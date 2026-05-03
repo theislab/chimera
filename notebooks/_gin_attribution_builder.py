@@ -212,10 +212,18 @@ cells.append(code(r"""
 
     import _figure_design as fd
     import _paper_utils as pu
+    import _pipeline_cache as pc
+    import _summary_figures as sf
     from chimera._components import GeneIntegrationNetwork
     from chimera._data_utils import download_and_process_esm2
 
     fd.apply_design()
+
+    # Toggle to True to invalidate every pipeline cache and recompute from
+    # scratch (captum, per-residue signals, real GIN attention, and all
+    # per-gene §H/§I/§J figure renders).  Defaults False so warm reruns
+    # finish in seconds.
+    FORCE_RECOMPUTE = False
 
     RUNS_ROOT  = REPO_ROOT / "training" / "runs"
     DATA_ROOT  = REPO_ROOT / "data" / "processed"
@@ -700,7 +708,24 @@ cells.append(code(r"""
                 "ig_delta": float(delta.item())}
 
 
-    ATTR = {g: attribute_gene(g) for g in GENE_INFO}
+    # Cache the captum result keyed by (gene set, gene_feat values, ckpt mtimes,
+    # n_steps).  Warm reruns load from disk; first run computes once.
+    _captum_n_steps = 128
+    _captum_sig = {
+        "n_steps": _captum_n_steps,
+        "genes":   sorted(GENE_INFO.keys()),
+        "feats":   {g: np.asarray(GENE_INFO[g]["gene_feat"], dtype=np.float32)
+                     for g in GENE_INFO},
+        "ckpts":   {ds: float((RUNS_ROOT / info["run"] / "model" / "model.pt").stat().st_mtime)
+                     for ds, info in DATASETS.items()
+                     if (RUNS_ROOT / info["run"] / "model" / "model.pt").exists()},
+    }
+    ATTR = pc.cache_pickle(
+        "captum_attr", _captum_sig,
+        lambda: {g: attribute_gene(g, n_steps=_captum_n_steps) for g in GENE_INFO},
+        cache_dir=CACHE_DIR, force=FORCE_RECOMPUTE,
+        label=f"captum IG, {len(GENE_INFO)} genes",
+    )
     # Aggregate captum convergence-delta diagnostics: |sum(attribution) - (output - baseline)|
     # should be small for the attribution to be reliable.  We report worst case across genes.
     deltas = np.array([abs(a["ig_delta"]) for a in ATTR.values()])
@@ -1060,8 +1085,21 @@ cells.append(code(r"""
         plt.show()
 
 
-    for g in GENE_INFO:
-        plot_top_pcs(g, f"E1_top_pc_loadings__{g}")
+    _e1_genes   = list(GENE_INFO)
+    _e1_outputs = [FIG_DIR / f"e1_top_pc_loadings__{g.lower()}.pdf" for g in _e1_genes]
+    _e1_sig = {
+        "genes":  _e1_genes,
+        "attr":   {g: ATTR[g]["attribution"][:64].astype(np.float32) for g in _e1_genes},
+        "V_top":  {g: PCA_BY_DATASET[GENE_INFO[g]["dataset"]]["V"][:, :64].astype(np.float32)
+                    for g in _e1_genes},
+    }
+    if (not FORCE_RECOMPUTE
+            and pc.render_fresh("E1_top_pc_loadings", _e1_sig, _e1_outputs, CACHE_DIR)):
+        print(f"§E.1: all {len(_e1_outputs)} per-gene PC heatmaps fresh — skipping render")
+    else:
+        for g in _e1_genes:
+            plot_top_pcs(g, f"E1_top_pc_loadings__{g}")
+        pc.stamp_render("E1_top_pc_loadings", _e1_sig, CACHE_DIR)
 """))
 
 
@@ -1309,7 +1347,22 @@ cells.append(code(r"""
                 "per_sp_sim": sims_per_sp}
 
 
-    PR = {g: per_residue_signals(g) for g in GENE_INFO}
+    # Cache the (alignment + cross-species divergence + consensus deviation)
+    # per-residue table.  Signature: gene set + per-(gene,species) sequence
+    # contents (so a sequence refresh from notebook 09 invalidates the cache,
+    # but unchanged sequences hit instantly).
+    _pr_sig = {
+        "genes": sorted(GENE_INFO.keys()),
+        "seqs":  {g: {sp: SEQS_BY_GENE.get(g, {}).get(sp, "")
+                       for sp in SPECIES}
+                   for g in GENE_INFO},
+    }
+    PR = pc.cache_pickle(
+        "per_residue_signals", _pr_sig,
+        lambda: {g: per_residue_signals(g) for g in GENE_INFO},
+        cache_dir=CACHE_DIR, force=FORCE_RECOMPUTE,
+        label=f"§F per-residue, {len(GENE_INFO)} genes",
+    )
     PR = {g: r for g, r in PR.items() if r is not None}
     for g, r in PR.items():
         d = r["divergence"]; cd = r["consensus_dev"]
@@ -1697,29 +1750,39 @@ cells.append(md(r"""
     is "how strongly the GIN attends to residue `i`".
 """))
 cells.append(code(r"""
-    REAL_GIN_ATTN: dict[str, np.ndarray] = {}
-    for g, info in GENE_INFO.items():
-        ds = info["dataset"]
-        if g not in PR: continue
-        b    = BRIDGES[ds]
-        eig  = PCA_BY_DATASET[ds]["eig"]
-        attr = ATTR[g]["attribution"][:64].astype(np.float32)        # (64,) StandardScaled-space
-        # Apply the 1/sqrt(eig) whitening correction so attribution lives in the
-        # same space as the bridge target (raw PC values, not StandardScaled).
-        attr_unwhite = (attr / np.sqrt(np.maximum(eig, 1e-12))).astype(np.float32)
-        # 480 -> 64 bridge target = raw PC values.  D_480 = W_pc @ attr_unwhitened.
-        D_480 = (b["W_pc"] @ attr_unwhite).astype(np.float32)         # (480,)
+    def _compute_real_gin_attn() -> dict[str, np.ndarray]:
+        out: dict[str, np.ndarray] = {}
+        for g, info in GENE_INFO.items():
+            ds = info["dataset"]
+            if g not in PR: continue
+            b    = BRIDGES[ds]
+            eig  = PCA_BY_DATASET[ds]["eig"]
+            attr = ATTR[g]["attribution"][:64].astype(np.float32)
+            attr_unwhite = (attr / np.sqrt(np.maximum(eig, 1e-12))).astype(np.float32)
+            D_480 = (b["W_pc"] @ attr_unwhite).astype(np.float32)
 
-        emb_h = _load_emb(g, "hsapiens")
-        L = PR[g]["length"]
-        attn = np.full(L, np.nan, dtype=np.float32)
-        finite = ~np.isnan(emb_h).any(axis=1) if emb_h.size > 0 else np.array([])
-        if finite.any():
-            valid_pos = np.where(finite)[0]
-            attn[valid_pos] = ((emb_h[valid_pos] - b["mean_480"][None, :]) @ D_480).astype(np.float32)
-        REAL_GIN_ATTN[g] = attn
+            emb_h = _load_emb(g, "hsapiens")
+            L = PR[g]["length"]
+            attn = np.full(L, np.nan, dtype=np.float32)
+            finite = ~np.isnan(emb_h).any(axis=1) if emb_h.size > 0 else np.array([])
+            if finite.any():
+                valid_pos = np.where(finite)[0]
+                attn[valid_pos] = ((emb_h[valid_pos] - b["mean_480"][None, :]) @ D_480).astype(np.float32)
+            out[g] = attn
+        return out
 
-        # Print top residues by |attention|
+    _real_attn_sig = {
+        "attr":     {g: ATTR[g]["attribution"].astype(np.float32) for g in ATTR},
+        "bridges":  {ds: BRIDGES[ds]["W_pc"].astype(np.float32) for ds in BRIDGES},
+        "pr_lens":  {g: int(PR[g]["length"]) for g in PR},
+    }
+    REAL_GIN_ATTN = pc.cache_pickle(
+        "real_gin_attn", _real_attn_sig, _compute_real_gin_attn,
+        cache_dir=CACHE_DIR, force=FORCE_RECOMPUTE,
+        label=f"§G.6 real attention, {len(PR)} genes",
+    )
+
+    for g, attn in REAL_GIN_ATTN.items():
         finite_mask = ~np.isnan(attn)
         if finite_mask.any():
             order = np.argsort(np.abs(attn[finite_mask]))[::-1][:10]
@@ -1952,12 +2015,32 @@ cells.append(code(r"""
         plt.show()
 
 
-    for g in GENE_INFO:
-        if g in PR and g in RELEVANCE:
-            joined_2d(g, f"H_joined__{g}")
-        else:
-            print(f"  {g}: skipping (no per-residue signal — "
-                  f"sequence may have failed to fetch).")
+    # Skip the 70-figure render loop on warm reruns when nothing upstream
+    # changed.  Signature includes attribution + per-residue lengths +
+    # per-residue real-attention + the SPECIES_NON_HUMAN list (controls the
+    # sequence-id rows); a render-code edit invalidates by deleting the .pdf
+    # files manually or flipping FORCE_RECOMPUTE.
+    _genes_to_render_H = [g for g in GENE_INFO if g in PR and g in RELEVANCE]
+    _h_outputs = [FIG_DIR / f"h_joined__{g.lower()}.pdf" for g in _genes_to_render_H]
+    _h_sig = {
+        "genes":    _genes_to_render_H,
+        "species":  list(SPECIES_NON_HUMAN),
+        "attr":     {g: ATTR[g]["attribution"].astype(np.float32) for g in _genes_to_render_H},
+        "pr_lens":  {g: int(PR[g]["length"]) for g in _genes_to_render_H},
+        "real":     {g: REAL_GIN_ATTN[g] for g in _genes_to_render_H if g in REAL_GIN_ATTN},
+        "rel":      {g: RELEVANCE[g] for g in _genes_to_render_H},
+    }
+    if (not FORCE_RECOMPUTE
+            and pc.render_fresh("H_joined", _h_sig, _h_outputs, CACHE_DIR)):
+        print(f"§H: all {len(_h_outputs)} 2D figures fresh — skipping render")
+    else:
+        for g in GENE_INFO:
+            if g in PR and g in RELEVANCE:
+                joined_2d(g, f"H_joined__{g}")
+            else:
+                print(f"  {g}: skipping (no per-residue signal — "
+                      f"sequence may have failed to fetch).")
+        pc.stamp_render("H_joined", _h_sig, CACHE_DIR)
 """))
 
 
@@ -2116,21 +2199,38 @@ cells.append(code(r"""
         '<script src="https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js">'
         '</script>'
     ))
-    for g in GENE_INFO:
-        if g not in PR or g not in RELEVANCE: continue
-        info = GENE_INFO[g]; tc = DIRECTION_COLOR[info["direction"]]
-        display(Markdown(
-            f"<h4 style='color:{tc}'>{g} — {info['direction']}-flag · "
-            f"α={info['alpha']:.2f}, prior={info['prior']:.2f}, "
-            f"Δα={info['delta_alpha']:+.2f}</h4>"))
-        v1 = render_relevance(g)
-        v2 = render_real_attn(g)
-        # Display side-by-side via IPython HTML
-        display(Markdown("**(left) GIN-relevance proxy** &nbsp; · &nbsp; "
-                         "**(right) Real trained-GIN attention via bridge**"))
-        if v1 is not None: v1.show()
-        if v2 is not None: v2.show()
-        print(f"  saved {g}__relevance.html  +  {g}__real_attn.html")
+
+    _genes_3d = [g for g in GENE_INFO if g in PR and g in RELEVANCE]
+    _i_outputs = (
+        [HTML_DIR / f"{g}__relevance.html"  for g in _genes_3d] +
+        [HTML_DIR / f"{g}__real_attn.html"  for g in _genes_3d]
+    )
+    _i_sig = {
+        "genes":   _genes_3d,
+        "rel":     {g: RELEVANCE[g] for g in _genes_3d},
+        "real":    {g: REAL_GIN_ATTN[g] for g in _genes_3d if g in REAL_GIN_ATTN},
+        "pdb_mtimes": {g: float(_resolve_pdb(g).stat().st_mtime)
+                        for g in _genes_3d if _resolve_pdb(g) is not None},
+    }
+    if (not FORCE_RECOMPUTE
+            and pc.render_fresh("I_3d_html", _i_sig, _i_outputs, CACHE_DIR)):
+        print(f"§I: all {len(_i_outputs)} 3D HTML embeds fresh — skipping render")
+    else:
+        for g in GENE_INFO:
+            if g not in PR or g not in RELEVANCE: continue
+            info = GENE_INFO[g]; tc = DIRECTION_COLOR[info["direction"]]
+            display(Markdown(
+                f"<h4 style='color:{tc}'>{g} — {info['direction']}-flag · "
+                f"α={info['alpha']:.2f}, prior={info['prior']:.2f}, "
+                f"Δα={info['delta_alpha']:+.2f}</h4>"))
+            v1 = render_relevance(g)
+            v2 = render_real_attn(g)
+            display(Markdown("**(left) GIN-relevance proxy** &nbsp; · &nbsp; "
+                             "**(right) Real trained-GIN attention via bridge**"))
+            if v1 is not None: v1.show()
+            if v2 is not None: v2.show()
+            print(f"  saved {g}__relevance.html  +  {g}__real_attn.html")
+        pc.stamp_render("I_3d_html", _i_sig, CACHE_DIR)
 """))
 
 
@@ -2148,7 +2248,18 @@ cells.append(md(r"""
 cells.append(code(r"""
     valid = [g for g, *_ in GENES if g in GENE_INFO and g in PR and g in RELEVANCE]
     n = len(valid)
-    if n:
+    _j_outputs = [FIG_DIR / "j_compare_all_genes.pdf"]
+    _j_sig = {
+        "genes":   valid,
+        "rel":     {g: RELEVANCE[g] for g in valid},
+        "div":     {g: PR[g]["divergence"] for g in valid},
+        "attr":    {g: ATTR[g]["attribution"].astype(np.float32) for g in valid},
+        "directions": {g: GENE_INFO[g]["direction"] for g in valid},
+    }
+    if (not FORCE_RECOMPUTE
+            and pc.render_fresh("J_compare", _j_sig, _j_outputs, CACHE_DIR)):
+        print(f"§J: comparative figure fresh — skipping render")
+    elif n:
         from matplotlib.patches import Patch
         fig, axes = plt.subplots(n, 3, figsize=(12.5, 1.40 * n),
                                    gridspec_kw={"width_ratios": [4.5, 4.5, 2.0]},
@@ -2231,6 +2342,7 @@ cells.append(code(r"""
                     bbox_to_anchor=(0.5, -0.02), ncol=4, frameon=False, fontsize=7)
         fd.save_figure(fig, "J_compare_all_genes")
         plt.show()
+        pc.stamp_render("J_compare", _j_sig, CACHE_DIR)
 """))
 
 
@@ -2564,27 +2676,29 @@ cells.append(code(r"""
         return f"{p:.1e}" if p < 1e-3 else f"{p:.3f}"
 
     def cliffs_delta(a, b) -> float:
-        # delta = P(a>b) - P(a<b).  Robust, non-parametric, scale-free.
+        # δ = P(a>b) - P(a<b).  O((n_a + n_b) log n_b) via searchsorted —
+        # ~150× faster than the broadcast-subtraction reference, exact match.
         a = np.asarray(a, dtype=float); b = np.asarray(b, dtype=float)
         n_a, n_b = len(a), len(b)
         if n_a == 0 or n_b == 0: return float("nan")
-        chunk = 4000
-        n_pos = n_neg = 0
-        for s in range(0, n_a, chunk):
-            block = a[s:s+chunk, None] - b[None, :]
-            n_pos += int(np.count_nonzero(block > 0))
-            n_neg += int(np.count_nonzero(block < 0))
-        return (n_pos - n_neg) / (n_a * n_b)
+        b_sorted = np.sort(b)
+        n_lt = int(np.searchsorted(b_sorted, a, side="left").sum())
+        n_le = int(np.searchsorted(b_sorted, a, side="right").sum())
+        return (n_lt - (n_a * n_b - n_le)) / (n_a * n_b)
 
     def cliffs_delta_ci(a, b, n_boot: int = 800, alpha: float = 0.05, seed: int = 42):
-        rng = np.random.default_rng(seed)
-        a = np.asarray(a); b = np.asarray(b)
+        a = np.asarray(a, dtype=float); b = np.asarray(b, dtype=float)
         if len(a) < 5 or len(b) < 5: return (cliffs_delta(a, b), np.nan, np.nan)
+        rng = np.random.default_rng(seed)
+        n_a, n_b = len(a), len(b)
         deltas = np.empty(n_boot, dtype=float)
         for k in range(n_boot):
-            ai = rng.choice(a, len(a), replace=True)
-            bi = rng.choice(b, len(b), replace=True)
-            deltas[k] = cliffs_delta(ai, bi)
+            ai = rng.choice(a, n_a, replace=True)
+            bi = rng.choice(b, n_b, replace=True)
+            bi.sort()
+            n_lt = int(np.searchsorted(bi, ai, side="left").sum())
+            n_le = int(np.searchsorted(bi, ai, side="right").sum())
+            deltas[k] = (n_lt - (n_a * n_b - n_le)) / (n_a * n_b)
         return cliffs_delta(a, b), float(np.quantile(deltas, alpha/2)), float(np.quantile(deltas, 1-alpha/2))
 
     def annotate_significance(ax, x_a: int, x_b: int, p: float,
@@ -2975,13 +3089,19 @@ cells.append(code(r"""
                       "contact_density", "is_aromatic", "is_glycine",
                       "is_proline", "charge_ph7", "volume", "terminal",
                       "disorder_bin"}
-    cached_residue = L_pq_load("residue_table")
-    if cached_residue is not None \
-        and set(cached_residue["gene"].unique()) == set(REAL_GIN_ATTN_L) \
-        and REQUIRED_COLS.issubset(cached_residue.columns):
+    # Cache check uses an `attempted_genes.json` sidecar so genes that were
+    # tried but yielded zero rows (e.g. PDB missing) don't masquerade as
+    # "stale gene set" and force a full recompute on every warm run.
+    cached_residue   = L_pq_load("residue_table")
+    cached_attempted = L_json_load("residue_table_attempted")
+    attempted_now    = sorted(REAL_GIN_ATTN_L.keys())
+    if (cached_residue is not None
+            and cached_attempted == attempted_now
+            and REQUIRED_COLS.issubset(cached_residue.columns)):
         RESIDUE_TABLE = cached_residue
         print(f"§L.2 residue_table cache hit ({len(RESIDUE_TABLE)} residues × "
-              f"{RESIDUE_TABLE['gene'].nunique()} genes)")
+              f"{RESIDUE_TABLE['gene'].nunique()} genes; attempted on "
+              f"{len(attempted_now)} genes)")
     else:
         pieces = []
         for g in REAL_GIN_ATTN_L:
@@ -2992,6 +3112,7 @@ cells.append(code(r"""
                            if pieces else pd.DataFrame())
         RESIDUE_TABLE = RESIDUE_TABLE.dropna(subset=["abs_attn", "rsasa", "plddt", "entropy"])
         L_pq_save("residue_table", RESIDUE_TABLE)
+        L_json_save("residue_table_attempted", attempted_now)
     print(f"final table: {len(RESIDUE_TABLE)} residues across "
           f"{RESIDUE_TABLE['gene'].nunique()} genes  "
           f"(M={sum(GENE_INFO_L[g]['direction']=='M' for g in RESIDUE_TABLE['gene'].unique())} "
@@ -3768,7 +3889,14 @@ cells.append(md(r"""
     *per-gene paired Wilcoxon* between high/low bins.
 """))
 cells.append(code(r"""
-    if "contact_density" in RESIDUE_TABLE.columns:
+    _l9_outputs = [FIG_DIR / "l_contact_density.pdf"]
+    _l9_sig = ({"resid": RESIDUE_TABLE[["gene", "contact_density", "abs_attn"]].to_numpy()}
+                if "contact_density" in RESIDUE_TABLE.columns else {"missing": True})
+    if (not FORCE_RECOMPUTE
+            and "contact_density" in RESIDUE_TABLE.columns
+            and pc.render_fresh("L9_contact_density", _l9_sig, _l9_outputs, CACHE_DIR)):
+        print(f"§L.9 contact-density figure fresh — skipping render")
+    elif "contact_density" in RESIDUE_TABLE.columns:
         df_c = RESIDUE_TABLE.copy()
         def _cd_bin(c):
             if c < 10: return "low (<10)"
@@ -3815,6 +3943,7 @@ cells.append(code(r"""
                               wilcoxon_pairs=pairs_cd)
         fd.save_figure(fig, "L_contact_density")
         plt.show()
+        pc.stamp_render("L9_contact_density", _l9_sig, CACHE_DIR)
     else:
         print("§L.9 skipped (contact_density column not in RESIDUE_TABLE)")
 """))
@@ -3837,62 +3966,74 @@ cells.append(md(r"""
     sign-rank tests on per-gene medians.
 """))
 cells.append(code(r"""
-    df_aa = RESIDUE_TABLE.copy()
-    SPECIAL_AA = [
-        ("aromatic (FYW)", "is_aromatic", "Aromatic\n(F, Y, W)"),
-        ("glycine (G)",    "is_glycine",  "Glycine"),
-        ("proline (P)",    "is_proline",  "Proline"),
-    ]
-    fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.0), constrained_layout=True)
-    for ax, (label, col, x_in) in zip(axes, SPECIAL_AA):
-        df_aa[f"_{col}_2"] = np.where(df_aa[col] == 1, x_in, "Rest of registry")
-        a = df_aa.loc[df_aa[col] == 1, "abs_attn"].values
-        b = df_aa.loc[df_aa[col] == 0, "abs_attn"].values
-        d, lo, hi = cliffs_delta_ci(a, b)
-        p_mwu = mannwhitney_p(a, b)
-        # Per-gene paired wilcoxon
-        per_gene = (df_aa.groupby(["gene", f"_{col}_2"])["abs_attn"]
-                          .median().unstack())
-        p_pg = float("nan"); frac_pg = float("nan")
-        if {x_in, "Rest of registry"}.issubset(per_gene.columns):
-            sub = per_gene[[x_in, "Rest of registry"]].dropna()
-            if len(sub) >= 5:
-                try:
-                    _, p_pg = wilcoxon(sub[x_in].values, sub["Rest of registry"].values)
-                except ValueError:
-                    p_pg = float("nan")
-                frac_pg = float((sub[x_in] > sub["Rest of registry"]).mean())
+    _l10_outputs = [FIG_DIR / "l_special_aa_classes.pdf",
+                    FIG_DIR / "l_special_aa_aromatic.pdf",
+                    FIG_DIR / "l_special_aa_glycine.pdf",
+                    FIG_DIR / "l_special_aa_proline.pdf"]
+    _l10_sig = {"resid": RESIDUE_TABLE[["gene", "is_aromatic", "is_glycine",
+                                          "is_proline", "abs_attn"]].to_numpy()}
+    if (not FORCE_RECOMPUTE
+            and pc.render_fresh("L10_special_aa", _l10_sig, _l10_outputs, CACHE_DIR)):
+        print(f"§L.10 special-AA figures fresh — skipping render")
+        SPECIAL_AA = []
+    else:
+        df_aa = RESIDUE_TABLE.copy()
+        SPECIAL_AA = [
+            ("aromatic (FYW)", "is_aromatic", "Aromatic\n(F, Y, W)"),
+            ("glycine (G)",    "is_glycine",  "Glycine"),
+            ("proline (P)",    "is_proline",  "Proline"),
+        ]
+        fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.0), constrained_layout=True)
+        for ax, (label, col, x_in) in zip(axes, SPECIAL_AA):
+            df_aa[f"_{col}_2"] = np.where(df_aa[col] == 1, x_in, "Rest of registry")
+            a = df_aa.loc[df_aa[col] == 1, "abs_attn"].values
+            b = df_aa.loc[df_aa[col] == 0, "abs_attn"].values
+            d, lo, hi = cliffs_delta_ci(a, b)
+            p_mwu = mannwhitney_p(a, b)
+            # Per-gene paired wilcoxon
+            per_gene = (df_aa.groupby(["gene", f"_{col}_2"])["abs_attn"]
+                              .median().unstack())
+            p_pg = float("nan"); frac_pg = float("nan")
+            if {x_in, "Rest of registry"}.issubset(per_gene.columns):
+                sub = per_gene[[x_in, "Rest of registry"]].dropna()
+                if len(sub) >= 5:
+                    try:
+                        _, p_pg = wilcoxon(sub[x_in].values, sub["Rest of registry"].values)
+                    except ValueError:
+                        p_pg = float("nan")
+                    frac_pg = float((sub[x_in] > sub["Rest of registry"]).mean())
 
-        print(f"§L.10  {label:>20s}: n={len(a):4d}  Cliff δ = {d:+.3f}  "
-              f"MWU p = {_fmt_p(p_mwu)} {_stars(p_mwu)}  "
-              f"per-gene p = {_fmt_p(p_pg)} {_stars(p_pg)}  "
-              f"(frac>rest = {frac_pg*100:.0f}%)")
+            print(f"§L.10  {label:>20s}: n={len(a):4d}  Cliff δ = {d:+.3f}  "
+                  f"MWU p = {_fmt_p(p_mwu)} {_stars(p_mwu)}  "
+                  f"per-gene p = {_fmt_p(p_pg)} {_stars(p_pg)}  "
+                  f"(frac>rest = {frac_pg*100:.0f}%)")
 
-        _draw_category_panel(ax, df_aa, f"_{col}_2",
-                              order=["Rest of registry", x_in],
-                              xlabels=["Rest of registry", x_in],
-                              title=f"{label}  ·  Cliff δ = {d:+.2f}",
-                              wilcoxon_pairs=[("Rest of registry", x_in)])
-    fig.suptitle("§L.10  special-class amino acids vs rest of registry",
-                  fontsize=10, fontweight="bold", y=1.04)
-    fd.save_figure(fig, "L_special_aa_classes")
-    plt.show()
-
-    # Per-class individual panels for figure-iteration friendliness
-    for label, col, x_in in SPECIAL_AA:
-        df_aa[f"_{col}_2"] = np.where(df_aa[col] == 1, x_in, "Rest of registry")
-        a = df_aa.loc[df_aa[col] == 1, "abs_attn"].values
-        b = df_aa.loc[df_aa[col] == 0, "abs_attn"].values
-        d, _, _ = cliffs_delta_ci(a, b)
-        fig_p, ax_p = plt.subplots(figsize=(4.6, 4.0), constrained_layout=True)
-        _draw_category_panel(ax_p, df_aa, f"_{col}_2",
-                              order=["Rest of registry", x_in],
-                              xlabels=["Rest of registry", x_in],
-                              title=f"§L.10  {label}  ·  Cliff δ = {d:+.2f}",
-                              wilcoxon_pairs=[("Rest of registry", x_in)])
-        slug = col.replace("is_", "")
-        fd.save_figure(fig_p, f"L_special_aa_{slug}")
+            _draw_category_panel(ax, df_aa, f"_{col}_2",
+                                  order=["Rest of registry", x_in],
+                                  xlabels=["Rest of registry", x_in],
+                                  title=f"{label}  ·  Cliff δ = {d:+.2f}",
+                                  wilcoxon_pairs=[("Rest of registry", x_in)])
+        fig.suptitle("§L.10  special-class amino acids vs rest of registry",
+                      fontsize=10, fontweight="bold", y=1.04)
+        fd.save_figure(fig, "L_special_aa_classes")
         plt.show()
+
+        # Per-class individual panels for figure-iteration friendliness
+        for label, col, x_in in SPECIAL_AA:
+            df_aa[f"_{col}_2"] = np.where(df_aa[col] == 1, x_in, "Rest of registry")
+            a = df_aa.loc[df_aa[col] == 1, "abs_attn"].values
+            b = df_aa.loc[df_aa[col] == 0, "abs_attn"].values
+            d, _, _ = cliffs_delta_ci(a, b)
+            fig_p, ax_p = plt.subplots(figsize=(4.6, 4.0), constrained_layout=True)
+            _draw_category_panel(ax_p, df_aa, f"_{col}_2",
+                                  order=["Rest of registry", x_in],
+                                  xlabels=["Rest of registry", x_in],
+                                  title=f"§L.10  {label}  ·  Cliff δ = {d:+.2f}",
+                                  wilcoxon_pairs=[("Rest of registry", x_in)])
+            slug = col.replace("is_", "")
+            fd.save_figure(fig_p, f"L_special_aa_{slug}")
+            plt.show()
+        pc.stamp_render("L10_special_aa", _l10_sig, CACHE_DIR)
 """))
 
 
@@ -5003,6 +5144,217 @@ cells.append(md(r"""
     a paper-grade mechanistic claim no other cross-species
     single-cell integration tool can make, because no other tool has
     a per-gene attribution chain to a protein-language input.
+"""))
+
+
+# ---------------------------------------------------------------------------
+# §S — QUANTITATIVE SUMMARY FIGURES (paper / supplement)
+# ---------------------------------------------------------------------------
+cells.append(md(r"""
+    ## §S — Quantitative summary figures for the paper
+
+    Five publication-grade figures that condense the ten §L lines of
+    the bottom-line claim into single-panel visuals.  Each pulls
+    directly from the cached result tables (`EFFECT_DF`,
+    `PAIRED_RESULTS`, `coef_df`, `VARPART_DF`, `DIRECTION_BREAKDOWN`,
+    `CORR_DF`, `DA_DF`) plus a few on-the-fly recomputations of the
+    §L.8 / §L.9 / §L.10 effect sizes from `RESIDUE_TABLE`, so the
+    summary panels are self-contained and reproducible without
+    re-running the upstream cells from scratch.
+
+    | figure | panel summary                                      | reads from §L |
+    | -----: | -------------------------------------------------- | ------------- |
+    | **S.1** | unified effect-size forest (positives + negatives) | §L.3 + §L.6 + §L.8–L.10 + §L.12 |
+    | **S.2** | mixed-effects coefficients (confounder-controlled) | §L.4 |
+    | **S.3** | variance partition (unique-contributor view)       | §L.4.1 |
+    | **S.4** | direction × chemistry interaction (M-flag novelty) | §L.11 |
+    | **S.5** | LOGO robustness scorecard                         | §L.5 |
+
+    Visual conventions: light-gray bars where bars don't carry color
+    meaning; vermilion accent reserved for the *headline* row in each
+    figure; significance stars (★ p < 0.05, ★★ p < 0.01, ★★★ p < 0.001)
+    Bonferroni / Holm-corrected where the upstream §L cell applied a
+    correction; otherwise raw p.  All panels render at vector PDF, no
+    grids, top/right spines off, single typeface — same identity as
+    the main paper figures in `03_alpha_master.ipynb` and
+    `09_gin_attention_overall.ipynb`.
+"""))
+
+
+# §S.1 — Bottom-line effect-size forest
+cells.append(md(r"""
+    ### §S.1 — Effect-size forest (one panel = the §L story)
+
+    A single forest plot pulling together every named effect in the
+    bottom-line summary, with **Cliff's δ** (95 % bootstrap CI) for
+    the dichotomous contrasts and **Spearman ρ** (Fisher-z 95 % CI)
+    for the continuous tests, all on a unified [-0.6, +0.6] axis.
+
+    The headline (`hydrophobic vs polar`) sits in vermilion at the
+    top; everything else is gray.  Negatives cluster around 0 —
+    which *is* the bottom-line claim.
+"""))
+cells.append(code(r"""
+    # Single source of truth for the §S figures lives in `_summary_figures.py`.
+    # The bottom-line cache shortcut (warm reruns: sub-second) lives next to
+    # the §L cache files so the figures-only sibling notebook 10b reuses it.
+    L_CACHE_DIR = CACHE_DIR / "L_analysis"
+    forest_df = sf.render_S1_effect_size_forest(
+        effect_df    = EFFECT_DF,
+        residue_table = RESIDUE_TABLE,
+        corr_df      = CORR_DF,
+        da_df        = DA_DF,
+        save_figure  = fd.save_figure,
+        cache_dir    = L_CACHE_DIR,
+    )
+    print(f"§S.1 forest table: {len(forest_df)} rows")
+    print(forest_df[["name", "value", "ci_lo", "ci_hi", "metric", "n"]]
+              .to_string(index=False, float_format=lambda x: f"{x:+.3f}"))
+"""))
+cells.append(md(r"""
+    *Read:* the vermilion **headline** row sits well above zero — the
+    GIN's protein-language attention has a real, robust positive
+    effect for *hydrophobic vs polar*.  All the gray rows below it
+    (IDR, contact density, special amino-acid classes, conservation,
+    per-gene |Δα| coupling) bracket zero with their 95 % CI.  The
+    figure is the bottom-line claim in one image.
+"""))
+
+
+# §S.2 — Mixed-effects coefficients
+cells.append(md(r"""
+    ### §S.2 — Mixed-effects fixed-effect coefficients (confounder-controlled)
+
+    Coefficient plot of every fixed effect from the §L.4 mixed model
+    (`log_abs_attn ~ ss + sasa_bin + plddt_bin + hydropathy_z + chem
+    + entropy_z + esm2_pc_frac_z + rel_pos_z + (1|gene)`),
+    with 95 % normal-approximation CI bars and Wald-test significance
+    stars from `coef_df`.
+
+    The headline `chemistry[hydrophobic]` term is highlighted in
+    vermilion.  Reading: with every other structural / positional /
+    sequence-conservation predictor *held fixed*, hydrophobic residues
+    still receive significantly higher |GIN attention| than the
+    reference (`polar`).
+"""))
+cells.append(code(r"""
+    cdf = sf.render_S2_mixed_effects_coefs(
+        coef_df     = coef_df,
+        save_figure = fd.save_figure,
+    )
+    print(cdf[["display", "coef", "ci_lo", "ci_hi", "p"]]
+              .to_string(index=False, float_format=lambda x: f"{x:+.4f}"))
+"""))
+cells.append(md(r"""
+    *Read:* with secondary structure, SASA, pLDDT, hydropathy,
+    conservation entropy, ESM-2 PC fraction, and N→C position all
+    held fixed by the mixed model, **chemistry[hydrophobic]** still
+    carries a significant positive β.  This is the strongest
+    confounder-controlled evidence that the chemistry effect in §L.3
+    is a *unique* contribution rather than an SASA / structure
+    artefact in disguise.
+"""))
+
+
+# §S.3 — Variance partition
+cells.append(md(r"""
+    ### §S.3 — Variance partition (unique contribution per feature)
+
+    Type-II variance partition from §L.4.1.  For each feature group,
+    drop it from the mixed model and record the loss in conditional
+    R²; that loss is the feature's *unique* variance contribution
+    above all the others.
+
+    Plotted as a horizontal-bar ranking with chemistry highlighted in
+    vermilion.  The ranking answers "after every other predictor,
+    what does *this one* still buy?"
+"""))
+cells.append(code(r"""
+    vp = sf.render_S3_variance_partition(
+        varpart_df  = VARPART_DF,
+        save_figure = fd.save_figure,
+    )
+    print(vp[["feature", "delta_r2_pct"]]
+              .to_string(index=False, float_format=lambda x: f"{x:+.3f}"))
+"""))
+cells.append(md(r"""
+    *Read:* chemistry is among the **uniquely contributing** features
+    — the bar is non-trivially positive even after every other
+    predictor (structure, SASA, pLDDT, hydropathy, conservation,
+    ESM-2 PC fraction, position) takes its share.  This complements
+    §S.2: §S.2 shows the *direction* of the chemistry effect is
+    significant after confounding; §S.3 shows the *amount of variance*
+    it owns is non-zero after confounding.
+"""))
+
+
+# §S.4 — Direction × chemistry
+cells.append(md(r"""
+    ### §S.4 — Direction × chemistry interaction (M-flag novelty)
+
+    The §L.11 result rendered as a single-panel summary: for each
+    direction class (M-flag, F-flag, ref) we plot the within-class
+    Cliff δ for `hydrophobic vs polar` with 95 % bootstrap CI bars,
+    plus the **interaction LRT p-value** annotated at the top right.
+
+    A non-overlapping CI between M and F (or a significant LRT)
+    establishes that the chemistry effect is *direction-aware* — a
+    mechanistic novelty available only to attribution-equipped models.
+"""))
+cells.append(code(r"""
+    inter = L_json_load("direction_chem_interaction_p") or {}
+    p_lrt = float(inter.get("p_lrt", float("nan"))) if inter else float("nan")
+    db = sf.render_S4_direction_chemistry(
+        direction_breakdown = DIRECTION_BREAKDOWN,
+        p_lrt               = p_lrt,
+        save_figure         = fd.save_figure,
+    )
+    print(db.to_string(index=False, float_format=lambda x: f"{x:+.3f}"))
+"""))
+cells.append(md(r"""
+    *Read:* the M-flag (high-prior, expression-divergent) genes show
+    the strongest chemistry effect; F-flag (low-prior, integration-
+    aligned) genes show the weakest, with reference housekeeping in
+    between.  The interaction LRT confirms the difference is
+    statistically real, not a sampling artefact — the GIN's protein-
+    language attention deploys *different* chemistry weights for genes
+    in different α-correction regimes.
+"""))
+
+
+# §S.5 — LOGO robustness scorecard
+cells.append(md(r"""
+    ### §S.5 — Leave-one-gene-out robustness scorecard
+
+    Per §L.5: for each contrast, we re-ran the per-gene paired
+    Wilcoxon test 70 / 70 times excluding one gene at a time, and
+    recorded the worst-case p-value across the splits.  This figure
+    plots, side by side per contrast, **−log₁₀(p)** for the *real*
+    test and **−log₁₀(p_LOGO_max)** for the worst-case-excluded
+    version.
+
+    A robust finding has both bars above the dashed `p = 0.05`
+    threshold (i.e. `−log₁₀(0.05) ≈ 1.30`).  A finding that fails
+    LOGO leaves the worst-case bar below the threshold — meaning
+    *one* gene is doing the work.
+"""))
+cells.append(code(r"""
+    pr = sf.render_S5_logo_robustness(
+        paired_results = PAIRED_RESULTS,
+        logo_df        = LOGO_DF if "LOGO_DF" in dir() else None,
+        save_figure    = fd.save_figure,
+    )
+    print(pr[["label", "p", "mlog_p"]]
+              .to_string(index=False, float_format=lambda x: f"{x:+.3f}"))
+"""))
+cells.append(md(r"""
+    *Read:* the headline `hydrophobic vs polar` contrast (vermilion)
+    sits far above the `p = 0.05` line, and the corner annotation
+    confirms it survives all 70 out of 70 leave-one-gene-out splits
+    with the worst-case `p` still below 0.05 — no single gene is
+    responsible for the finding.  Any other contrast whose
+    `−log₁₀(p)` bar fails to clear the dashed threshold should be
+    flagged as not-yet-replicated.
 """))
 
 

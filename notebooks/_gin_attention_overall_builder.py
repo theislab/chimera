@@ -380,7 +380,7 @@ cells.append(code(r"""
     names = list(R2_HIER)
     vals  = [R2_HIER[n] for n in names]
     y = np.arange(len(names))
-    ax.barh(y, vals, color="#222222", edgecolor="none")
+    ax.barh(y, vals, color="#cccccc", edgecolor="none")
     for yi, v in zip(y, vals):
         ax.text(v + 0.01, yi, f"{v:.3f}", va="center", ha="left", fontsize=7)
     ax.set_yticks(y); ax.set_yticklabels(names, fontsize=8)
@@ -419,17 +419,18 @@ cells.append(code(r"""
 cells.append(code(r"""
     active = df_sc[df_sc["active"]].copy()
     active = active.reindex(active["rho"].abs().sort_values(ascending=True).index)
-    fig, ax = fd.make_axes(figsize=(4.4, 3.4))
+    # Half the original width (4.4 → 2.2). Tighten tick fontsizes and use
+    # explicit sparse x-ticks so the labels don't overlap at this width.
+    fig, ax = fd.make_axes(figsize=(2.2, 3.4))
     y = np.arange(len(active))
-    colors = ["#0072B2" if v >= 0 else "#D55E00" for v in active["rho"].values]
-    ax.barh(y, active["rho"].values, color=colors, edgecolor="none")
+    ax.barh(y, active["rho"].values, color="#cccccc", edgecolor="none")
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
-    ax.set_yticks(y); ax.set_yticklabels(active["scalar"].values, fontsize=8)
-    ax.set_xlabel(r"Spearman $\rho$(scalar, correction)")
-    rng = float(np.abs(active["rho"]).max() * 1.15 + 0.05)
-    ax.set_xlim(-rng, rng)
-    ax.set_title("liver 4-sp  ·  per-scalar Spearman with correction",
-                 loc="left", fontsize=8, color="#444444", pad=8)
+    ax.set_yticks(y)
+    ax.set_yticklabels(active["scalar"].values, fontsize=7)
+    ax.set_xlabel(r"Spearman $\rho$", fontsize=8)
+    ax.set_xlim(-0.8, 0.3)
+    ax.set_xticks([-0.8, -0.4, 0.0])
+    ax.tick_params(axis="x", labelsize=7)
     fd.save_figure(fig, "A2_scalar_correlations")
     plt.show()
 """))
@@ -495,7 +496,7 @@ cells.append(code(r"""
         vals = [group_to_value[g] for g in names]
         total = sum(vals) or 1.0
         y = np.arange(len(names))
-        ax.barh(y, vals, color="#222222", edgecolor="none")
+        ax.barh(y, vals, color="#cccccc", edgecolor="none")
         for yi, v in zip(y, vals):
             ax.text(v, yi, f"  {100*v/total:.1f} %", va="center", ha="left",
                     fontsize=7, color="#444444")
@@ -518,7 +519,7 @@ cells.append(code(r"""
     order = np.argsort(weight_path)[::-1][:20][::-1]
     fig, ax = fd.make_axes(figsize=(4.4, 4.6))
     y = np.arange(len(order))
-    ax.barh(y, weight_path[order], color="#222222", edgecolor="none")
+    ax.barh(y, weight_path[order], color="#cccccc", edgecolor="none")
     ax.set_yticks(y); ax.set_yticklabels([FEATURE_NAMES[i] for i in order],
                                          fontsize=7)
     ax.set_xlabel("weight-path L1 importance")
@@ -557,8 +558,9 @@ cells.append(code(r"""
     vals = gxi_signed_mean[sc_idx]
     order = np.argsort(np.abs(vals))
     y = np.arange(len(order))
-    colors = ["#0072B2" if vals[order][i] >= 0 else "#D55E00" for i in range(len(order))]
-    ax.barh(y, vals[order], color=colors, edgecolor="none")
+    # Sign is already encoded by left/right of the axvline at 0; color is
+    # redundant. Keep all bars in a single quiet gray.
+    ax.barh(y, vals[order], color="#cccccc", edgecolor="none")
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
     ax.set_yticks(y)
     ax.set_yticklabels([SCALAR_NAMES[i] for i in order], fontsize=8)
@@ -666,8 +668,9 @@ cells.append(code(r"""
     names = GROUP_ORDER
     vals = [abl_corr_pearson[g] for g in names]
     y = np.arange(len(names))
-    colors = ["#D55E00" if v < 0.5 else "#222222" for v in vals]
-    ax.barh(y, vals, color=colors, edgecolor="none")
+    # Same quiet gray everywhere; the r=1 dashed line + the printed "r=…"
+    # values let the reader see which groups are critical without color.
+    ax.barh(y, vals, color="#cccccc", edgecolor="none")
     ax.axvline(1.0, color="#888888", linewidth=0.6, linestyle="--",
                label="r = 1 (no impact)")
     for yi, v in zip(y, vals):
@@ -707,7 +710,9 @@ cells.append(code(r"""
     fig, ax = fd.make_axes(figsize=(5.6, 3.4))
     width = 0.18
     x = np.arange(len(GROUP_ORDER))
-    colors = ["#222222", "#0072B2", "#009E73", "#D55E00"]
+    # Same palette family as b5c (lightgray + Okabe-Ito blues + vermilion);
+    # no harsh black, color-blind safe, four visually distinct hues.
+    colors = ["#cccccc", "#56B4E9", "#0072B2", "#D55E00"]
     method_names = list(methods.keys())
     for i, m in enumerate(method_names):
         vals = [methods[m][g] for g in GROUP_ORDER]
@@ -747,26 +752,37 @@ cells.append(md("""
 # §B.5b — heatmap (alternative view of the same consensus_df).
 cells.append(code(r"""
     # Heatmap rows = methods, columns = feature groups, cells = % of total
-    # importance. Magma colormap (paper-friendly continuous scale, prints
-    # well in B&W). Cell text shows the exact percentage.
+    # importance. `Blues` is the standard publication-friendly sequential
+    # palette (color-blind safe, prints well in B&W as a light → dark
+    # gradient). Cell text uses dynamic dark-on-light / white-on-dark
+    # contrast and a slightly larger font; thin white separators between
+    # cells give the heatmap a crisp scientific-figure feel.
     M = consensus_df.values  # (n_methods, n_groups), rows sum to 100
     fig, ax = fd.make_axes(figsize=(5.4, 2.6))
-    im = ax.imshow(M, aspect="auto", cmap="magma", vmin=0,
-                   vmax=float(np.ceil(M.max() / 10.0) * 10.0))
+    vmax_cb = float(np.ceil(M.max() / 10.0) * 10.0)
+    im = ax.imshow(M, aspect="auto", cmap="Blues", vmin=0, vmax=vmax_cb)
 
     ax.set_xticks(np.arange(len(GROUP_ORDER)))
     ax.set_xticklabels(GROUP_ORDER, rotation=20, ha="right", fontsize=8)
     ax.set_yticks(np.arange(len(consensus_df.index)))
     ax.set_yticklabels(list(consensus_df.index), fontsize=8)
 
-    # Cell-text labels: dark on light cells, light on dark cells.
+    # Cell-text labels: dark on light cells, white on dark cells.
+    # `Blues` is *light at 0, dark at vmax* (opposite of magma), so the
+    # threshold logic is inverted from the previous magma version.
     thresh = 0.55 * im.norm.vmax
     for i in range(M.shape[0]):
         for j in range(M.shape[1]):
             v = M[i, j]
             ax.text(j, i, f"{v:.1f}",
-                    ha="center", va="center", fontsize=7,
-                    color=("#222222" if v < thresh else "#eeeeee"))
+                    ha="center", va="center", fontsize=8,
+                    color=("#ffffff" if v >= thresh else "#222222"))
+
+    # Crisp white separators between cells (standard in publication heatmaps).
+    ax.set_xticks(np.arange(M.shape[1] + 1) - 0.5, minor=True)
+    ax.set_yticks(np.arange(M.shape[0] + 1) - 0.5, minor=True)
+    ax.grid(which="minor", color="white", linewidth=1.0)
+    ax.tick_params(which="minor", bottom=False, left=False)
 
     cb = fig.colorbar(im, ax=ax, shrink=0.85, pad=0.02)
     cb.set_label("% of total importance", fontsize=7)
@@ -784,16 +800,20 @@ cells.append(code(r"""
     # Each bar sums to 100 %. Group colors are consistent with the §B grouped-
     # bar palette so a reader can map the two views onto each other.
     GROUP_PALETTE = {
-        "ESM-2 PCs":        "#222222",   # near-black (load-bearing)
+        "ESM-2 PCs":        "#cccccc",   # quiet gray (load-bearing but no longer shouting)
         "esm2_intersp_var": "#56B4E9",   # light blue
         "mean_identity":    "#0072B2",   # blue
         "expression":       "#D55E00",   # vermilion
-        "identity_spread":  "#999999",   # mid-gray
+        "identity_spread":  "#888888",   # darker gray (was #999999) so it stays
+                                         #   distinguishable from ESM-2 PCs at #cccccc
     }
     method_names_disp = list(consensus_df.index)
-    fig, ax = fd.make_axes(figsize=(5.6, 2.4))
+    fig, ax = fd.make_axes(figsize=(5.0, 2.4))
     y = np.arange(len(method_names_disp))
     left = np.zeros(len(method_names_disp))
+    # Segments where the bar is dark enough that white text reads better.
+    # ESM-2 PCs is now light-gray, so its in-bar % is dark text.
+    DARK_BG = ("expression", "mean_identity", "identity_spread")
     for g in GROUP_ORDER:
         vals = consensus_df[g].values
         ax.barh(y, vals, left=left, color=GROUP_PALETTE[g],
@@ -803,13 +823,13 @@ cells.append(code(r"""
             if v >= 6.0:
                 ax.text(l + v / 2, yi, f"{v:.0f}%",
                         ha="center", va="center", fontsize=6.5,
-                        color="white" if g in ("ESM-2 PCs", "expression",
-                                               "mean_identity") else "#222222")
+                        color="white" if g in DARK_BG else "#222222")
         left = left + vals
     ax.set_yticks(y); ax.set_yticklabels(method_names_disp, fontsize=8)
     ax.invert_yaxis()
     ax.set_xlim(0, 100)
     ax.set_xlabel("% of total importance")
+    # Legend at the right-side anchor (outside axes, vertically centered).
     ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5),
               frameon=False, fontsize=7, handlelength=0.9,
               handletextpad=0.4, borderpad=0.2)
@@ -875,7 +895,7 @@ cells.append(code(r"""
 
 cells.append(code(r"""
     fig, ax = fd.make_axes(figsize=(4.4, 3.4))
-    ax.hist(pc_r2_from_expr, bins=30, color="#222222", edgecolor="none")
+    ax.hist(pc_r2_from_expr, bins=30, color="#cccccc", edgecolor="none")
     ax.axvline(0.05, color="#D55E00", linewidth=0.6, linestyle="--",
                label=r"$R^2 = 0.05$")
     ax.set_xlabel(r"$R^2$(expression scalars $\to$ ESM-2 PC$_i$)")
@@ -908,12 +928,15 @@ cells.append(code(r"""
 
     fig, ax = fd.make_axes(figsize=(4.6, 3.4))
     bins = np.linspace(-0.4, 0.4, 81)
-    ax.hist(da_full,   bins=bins, color="#222222", alpha=0.85, edgecolor="none",
-            label="full GIN")
-    ax.hist(da_no_esm, bins=bins, color="#0072B2", alpha=0.55, edgecolor="none",
-            label="ablate ESM-2 PCs")
-    ax.hist(da_no_exp, bins=bins, color="#D55E00", alpha=0.55, edgecolor="none",
-            label="ablate expression")
+    # full GIN = light-gray filled baseline; ablation candidates = step
+    # histograms (edge only, no fill) so the three distributions stack cleanly
+    # without alpha-blending muddling the colors.
+    ax.hist(da_full,   bins=bins, color="#cccccc", edgecolor="none",
+            label="full GIN", zorder=1)
+    ax.hist(da_no_esm, bins=bins, histtype="step", edgecolor="#0072B2",
+            linewidth=1.3, label="ablate ESM-2 PCs", zorder=3)
+    ax.hist(da_no_exp, bins=bins, histtype="step", edgecolor="#D55E00",
+            linewidth=1.3, label="ablate expression", zorder=2)
     fd.style_delta_alpha_axis(ax, "x")
     ax.set_ylabel("# genes")
     fd.thin_legend(ax, loc="upper right")
@@ -964,11 +987,14 @@ cells.append(code(r"""
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
     ax.set_xlabel("ESM-2-only correction contribution")
     ax.set_ylabel("expression-only correction contribution")
-    fd.annotate_stat(ax,
-                     f"$\\rho$(ESM-2, expr) = {rho_esm2_expr:+.3f}\n"
-                     f"$\\rho$(ESM-2, full) = {rho_esm2_full:+.3f}\n"
-                     f"$\\rho$(expr, full)  = {rho_expr_full:+.3f}",
-                     "upper left")
+    # ρ text in the lower-right corner (no background box), at a smaller font
+    # size so it stays out of the way of the dot density.
+    ax.text(0.97, 0.03,
+            f"$\\rho$(ESM-2, expr) = {rho_esm2_expr:+.3f}\n"
+            f"$\\rho$(ESM-2, full) = {rho_esm2_full:+.3f}\n"
+            f"$\\rho$(expr, full)  = {rho_expr_full:+.3f}",
+            transform=ax.transAxes, ha="right", va="bottom",
+            fontsize=5.5, color="#222222")
     ax.set_title("liver 4-sp  ·  ESM-2 and expression contributions disagree per-gene",
                  loc="left", fontsize=8, color="#444444", pad=8)
     fd.save_figure(fig, "C3_per_gene_esm2_vs_expression_disagreement")
@@ -1000,7 +1026,7 @@ cells.append(code(r"""
         ("ESM-2 → corr",          r2_esm2_to_corr),
     ]
     y = np.arange(len(rows))
-    ax.barh(y, [r for _, r in rows], color="#222222", edgecolor="none")
+    ax.barh(y, [r for _, r in rows], color="#cccccc", edgecolor="none")
     for yi, (_, r) in zip(y, rows):
         ax.text(r + 0.005, yi, f"{r:.3f}", va="center", ha="left", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels([n for n, _ in rows], fontsize=8)
@@ -1092,7 +1118,7 @@ cells.append(code(r"""
 cells.append(code(r"""
     # D.2 — saturation distribution.
     fig, ax = fd.make_axes(figsize=(4.4, 3.0))
-    ax.hist(neuron_sat, bins=np.linspace(0, 1, 21), color="#222222", edgecolor="none")
+    ax.hist(neuron_sat, bins=np.linspace(0, 1, 21), color="#cccccc", edgecolor="none")
     ax.axvline(0.05, color="#888888", linewidth=0.5, linestyle="--", label="dead floor")
     ax.axvline(0.95, color="#888888", linewidth=0.5, linestyle=":",  label="saturated ceiling")
     ax.set_xlabel(r"mean $|H_2|$ per neuron")
@@ -1271,7 +1297,7 @@ cells.append(code(r"""
     # F.1 — IG importance per PC.
     fig, ax = fd.make_axes(figsize=(5.6, 3.0))
     x = np.arange(64)
-    ax.bar(x, pc_ig, color="#222222", edgecolor="none", width=0.8)
+    ax.bar(x, pc_ig, color="#cccccc", edgecolor="none", width=0.8)
     ax.set_xlabel("ESM-2 PC index")
     ax.set_ylabel("integrated-gradients importance (mean $|$IG$|$)")
     ax.set_xticks(np.arange(0, 64, 8))
@@ -1283,11 +1309,11 @@ cells.append(code(r"""
 
 
 cells.append(code(r"""
-    # F.2 — Spearman ρ(PC, Δα).
+    # F.2 — Spearman ρ(PC, Δα). Sign is already encoded by bars sitting above
+    # vs below the y=0 reference line; color was redundant.
     fig, ax = fd.make_axes(figsize=(5.6, 3.0))
     x = np.arange(64)
-    colors = ["#0072B2" if r >= 0 else "#D55E00" for r in pc_rho]
-    ax.bar(x, pc_rho, color=colors, edgecolor="none", width=0.8)
+    ax.bar(x, pc_rho, color="#cccccc", edgecolor="none", width=0.8)
     ax.axhline(0, color="#888888", linewidth=0.4, linestyle="--")
     ax.set_xlabel("ESM-2 PC index")
     ax.set_ylabel(r"Spearman $\rho$(PC, $\Delta\alpha$)")

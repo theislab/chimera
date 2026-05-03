@@ -165,33 +165,37 @@ cells.append(code(r"""
     print(f"figures will be written to: {FIG_DIR}")
     print(f"per-(model, dataset) metric cache: {CACHE_DIR}")
 
+    # NOTE: the four `camex_*` files are LIVER datasets (cell_type column
+    # contains Hepatocytes / Cholangio / Kupffer cells / etc.); we keep the
+    # `panc_*` registry keys for cache-file consistency but the public-facing
+    # labels and `tissue` field correctly say "liver".
     DATASETS = {
         "panc_hmonkey":  {"adata_stem": "camex_human_monkey",
-                          "label": "panc H+Monkey",   "tissue": "pancreas",
+                          "label": "liver H+Monkey",  "tissue": "liver",
                           "donor_batch_key": "batch",
                           "chimera_run": "iter90-150ep-s42"},
         "panc_hmouse":   {"adata_stem": "camex_human_mouse",
-                          "label": "panc H+Mouse",    "tissue": "pancreas",
+                          "label": "liver H+Mouse",   "tissue": "liver",
                           "donor_batch_key": "batch",
                           "chimera_run": "xds-hmouse-iter90-150ep-s42"},
         "panc_hzeb":     {"adata_stem": "camex_human_zebrafish",
-                          "label": "panc H+Zeb",      "tissue": "pancreas",
+                          "label": "liver H+Zeb",     "tissue": "liver",
                           "donor_batch_key": "batch",
                           "chimera_run": "xds-hzeb-iter85-s42"},
         "panc_4sp":      {"adata_stem": "camex_pancreas_unified",
-                          "label": "panc 4-sp",       "tissue": "pancreas",
+                          "label": "liver 4-sp",      "tissue": "liver",
                           "donor_batch_key": "batch",
                           "chimera_run": "xds-4sp-iter101-adv200-mmd100-fb10-200ep-s42"},
         "test_hmac":     {"adata_stem": "camex_testis_human_macaque",
-                          "label": "test H+Mac",      "tissue": "testis",
+                          "label": "testis H+Mac",    "tissue": "testis",
                           "donor_batch_key": "sample_batch",
                           "chimera_run": "testis-hmac-iter109-pclamp085-200ep-s42"},
         "test_hmouse":   {"adata_stem": "camex_testis_human_mouse",
-                          "label": "test H+Mouse",    "tissue": "testis",
+                          "label": "testis H+Mouse",  "tissue": "testis",
                           "donor_batch_key": "sample_batch",
                           "chimera_run": "testis-hmouse-iter111-pclamp-coc-200ep-s42"},
         "test_3sp":      {"adata_stem": "camex_testis_unified",
-                          "label": "test 3-sp",       "tissue": "testis",
+                          "label": "testis 3-sp",     "tissue": "testis",
                           "donor_batch_key": "sample_batch",
                           "chimera_run": "testis-unified-iter115-pclamp-coc-100ep-s42"},
     }
@@ -730,6 +734,83 @@ cells.append(code(r"""
         cbar_label="# metrics beating PCA  (0..6;  ≥ 4 is the floor)",
         text_dark_above=3.5, mark_row_max=False,
     )
+
+
+    # ALT version of E_master_score: square cells, no wasted vertical space,
+    # explicit axis labels, Chimera highlight rectangle drawn LAST (zorder 50)
+    # so all four edges are visible and not occluded by neighboring cells.
+    def master_heatmap_square(metric: str, save_name: str, *,
+                               cmap, vmin: float, vmax: float,
+                               cell_fmt: str = "{:.2f}",
+                               cbar_label: str = "",
+                               text_dark_above: float | None = None,
+                               mark_row_max: bool = False):
+        M = pd.DataFrame(
+            {m: [SCORED[k].loc[m, metric] if m in SCORED[k].index else np.nan
+                 for k in DATASET_ORDER]
+             for m in MODEL_ORDER},
+            index=[DATASETS[k]["label"] for k in DATASET_ORDER],
+        )
+        n_rows, n_cols = M.shape
+        # square cells: pick a tight per-cell side and let figsize follow
+        cell = 0.55  # inches per cell
+        fig_w = cell * n_cols + 2.0   # leave room for left ylabel + right cbar
+        fig_h = cell * n_rows + 1.0   # tight vertical
+        fig, ax = plt.subplots(figsize=(fig_w, fig_h), layout="constrained")
+        ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+        im = ax.imshow(M.values, cmap=cmap, aspect="equal",
+                       vmin=vmin, vmax=vmax)
+        if mark_row_max:
+            row_max_idx = np.nanargmax(M.values, axis=1)
+        else:
+            row_max_idx = np.full(n_rows, -1)
+        for i in range(n_rows):
+            for j in range(n_cols):
+                v = M.iloc[i, j]
+                if pd.isna(v):
+                    txt = "—"
+                elif metric == "wins_vs_pca":
+                    txt = f"{int(v)}"
+                else:
+                    txt = cell_fmt.format(v)
+                if pd.isna(v) or text_dark_above is None:
+                    text_color = "#222222"
+                else:
+                    text_color = "#222222" if v >= text_dark_above else "#f5f5f5"
+                if j == row_max_idx[i]:
+                    ax.text(j, i, txt + "★", ha="center", va="center",
+                            fontsize=8, fontweight="bold", color=text_color)
+                else:
+                    ax.text(j, i, txt, ha="center", va="center",
+                            fontsize=8, color=text_color)
+        ax.set_xticks(range(n_cols))
+        xticks = [rf"$\bf{{{m}}}$" if m == HIGHLIGHT_MODEL else m
+                   for m in M.columns]
+        ax.set_xticklabels(xticks, rotation=20, ha="right", fontsize=8.5)
+        ax.set_yticks(range(n_rows))
+        ax.set_yticklabels(M.index, fontsize=8.5)
+        ax.set_xlabel("Method", fontsize=9, labelpad=4)
+        ax.set_ylabel("Dataset", fontsize=9, labelpad=4)
+        # Half-height colorbar — keeps the heatmap as the visual focus.
+        cb = fig.colorbar(im, ax=ax, shrink=0.39, label=cbar_label)
+        cb.ax.tick_params(labelsize=7)
+        # Chimera highlight LAST (zorder 50) so all edges sit above cell borders
+        if HIGHLIGHT_MODEL in MODEL_ORDER:
+            jx = MODEL_ORDER.index(HIGHLIGHT_MODEL)
+            ax.add_patch(Rectangle((jx - 0.5, -0.5), 1, n_rows,
+                                    fill=False, edgecolor="#222222",
+                                    linewidth=1.8, zorder=50))
+        fd.save_figure(fig, save_name)
+        plt.show()
+        return M
+
+
+    master_heatmap_square(
+        "total_score", "E_master_score_alt",
+        cmap="viridis", vmin=0.0, vmax=1.0,
+        cbar_label="Composite integration score",
+        text_dark_above=0.55, mark_row_max=True,
+    )
 """))
 
 
@@ -835,6 +916,38 @@ cells.append(code(r"""
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylabel("mean Composite Integration Score across 7 datasets")
     fd.save_figure(fig, "E2_cross_dataset_mean_score")
+    plt.show()
+
+
+    # ALT version designed to stack ON TOP of E_master_score_alt:
+    # same width / x-axis layout, single grayscale fill, Chimera bar gets
+    # the thick black frame (matching the heatmap rectangle), simplified
+    # y-axis (ticks at 0 / 0.5 / 1, single short label).
+    cell = 0.55                              # match heatmap's cell width
+    fig_w_alt = cell * len(MODEL_ORDER) + 2.0
+    fig, ax = plt.subplots(figsize=(fig_w_alt, 2.0), layout="constrained")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    x = np.arange(len(MODEL_ORDER))
+    bars = ax.bar(
+        x, bar_vals,
+        color="#bdbdbd",                      # single mid-gray for every bar
+        edgecolor="#222222", linewidth=0.6,
+    )
+    if HIGHLIGHT_MODEL in MODEL_ORDER:
+        jx = MODEL_ORDER.index(HIGHLIGHT_MODEL)
+        bars[jx].set_linewidth(1.8)
+    for i, m in enumerate(MODEL_ORDER):
+        ax.text(i, bar_vals[i] + 0.012,
+                f"{bar_vals[i]:.2f}\nrank {median_rk[i]:.1f}\nwon {int(won_n[i])}/7",
+                ha="center", va="bottom", fontsize=6.5, color="#222222")
+    ax.set_xticks(x)
+    xticks = [rf"$\bf{{{m}}}$" if m == HIGHLIGHT_MODEL else m
+               for m in MODEL_ORDER]
+    ax.set_xticklabels(xticks, rotation=20, ha="right", fontsize=8.5)
+    ax.set_ylim(0, 1.18)
+    ax.set_yticks([0, 0.5, 1.0])             # simplified ticks
+    ax.set_ylabel("Mean Score", fontsize=9, labelpad=4)
+    fd.save_figure(fig, "E2_cross_dataset_mean_score_alt")
     plt.show()
 """))
 

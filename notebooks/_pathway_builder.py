@@ -341,6 +341,77 @@ cells.append(code(r"""
 """))
 
 
+# ============ §0.5 Tissue grouping + pathway-name + multi-panel helpers ============
+cells.append(md("""
+    ## §0.5 — Tissue grouping, pathway-name cleanup, multi-panel layout
+
+    The registry covers two organs (4 pancreas datasets, 3 testis
+    datasets). For paper-ready figures we group panels by organ so a
+    reviewer can read off each organ's enrichment story in a single
+    glance, without flipping back and forth between mixed grids.
+
+    Pathway names from MSigDB / Reactome carry library-specific
+    cruft (`HALLMARK_*` prefix, `R-HSA-#####` accession suffix,
+    SHOUTING_SNAKE casing). `clean_pathway_name` normalizes them:
+    title-case with biology-aware all-caps tokens preserved
+    (`OXPHOS`, `MAPK`, `mTORC1`, etc.), so the printed labels read
+    like ordinary text.
+"""))
+cells.append(code(r"""
+    import re
+
+    PANC_KEYS = ["panc_hmonkey", "panc_hmouse", "panc_hzeb", "panc_4sp"]
+    TEST_KEYS = ["test_hmac", "test_hmouse", "test_3sp"]
+    TISSUE_GROUPS = {"pancreas": PANC_KEYS, "testis": TEST_KEYS}
+    TISSUE_TITLE  = {"pancreas": "Pancreas datasets",
+                     "testis":   "Testis datasets"}
+
+    # Biology / acronym tokens to keep all-caps after title-case normalization.
+    KEEP_CAPS = {
+        "RNA", "DNA", "RRNA", "MRNA", "TRNA", "ATP", "ADP", "GTP", "GDP", "AMP",
+        "TCA", "MHC", "ETC", "ROS", "NRF2", "NFKB", "HIF", "OXPHOS", "BMP",
+        "TGF", "EGF", "VEGF", "IGF", "FGF", "PDGF", "JAK", "STAT", "MAPK",
+        "PI3K", "AKT", "MTOR", "MTORC1", "MTORC2", "AMPK", "ERK", "JNK",
+        "P53", "MYC", "G2M", "G1S", "EMT", "WNT", "IL", "IFN", "TNF", "PPAR",
+        "UV", "DSB", "ER", "GPCR", "NOTCH", "SMAD", "RAS", "RHO", "RAC",
+        "NK", "BCR", "TCR", "TLR", "NFAT",
+    }
+
+    _RE_HALLMARK_PREFIX = re.compile(r"^HALLMARK[_ -]+", re.IGNORECASE)
+    _RE_REACTOME_ACC    = re.compile(r"\s*R[- ]HSA[- ]\d+\s*$", re.IGNORECASE)
+
+
+    def clean_pathway_name(name: str, *, max_len: int = 38) -> str:
+        # Strip database prefix/suffix, title-case, preserve biology acronyms.
+        s = parse_pathway_name(name)
+        s = _RE_HALLMARK_PREFIX.sub("", s)
+        s = _RE_REACTOME_ACC.sub("", s)
+        s = s.replace("_", " ").strip()
+        out_tokens = []
+        for tok in s.split():
+            if tok.upper() in KEEP_CAPS:
+                out_tokens.append(tok.upper())
+            elif tok.isupper() and len(tok) <= 4:
+                out_tokens.append(tok.upper())
+            else:
+                out_tokens.append(tok.title())
+        s = " ".join(out_tokens)
+        if len(s) > max_len:
+            s = s[: max_len - 1].rstrip() + "…"
+        return s
+
+
+    def _tissue_grid_size(n_panels: int, ncols: int) -> tuple[int, int]:
+        nrows = (n_panels + ncols - 1) // ncols
+        return nrows, ncols
+
+
+    def _hide_extra_axes(axes: np.ndarray, n_used: int) -> None:
+        for ax in axes.flatten()[n_used:]:
+            ax.set_visible(False)
+"""))
+
+
 # ============ §A: Hallmark Δα-GSEA per dataset ============
 cells.append(md("""
     # §A — What biology does Δα flag? (Hallmark per dataset)
@@ -369,43 +440,63 @@ cells.append(code(r"""
 
 # §A.1 per-dataset volcanoes
 cells.append(md("""
-    ## §A.1 — Per-dataset Hallmark volcano (7 panels)
+    ## §A.1 — Per-dataset Hallmark volcanoes
 
     NES (signed enrichment magnitude) on x; −log₁₀ FDR q on y.
-    Significance threshold (`FDR < 0.05` ⇒ y > 1.30) drawn as a
-    dashed horizontal. Hallmarks below threshold sit pale; above
-    threshold they're colored by sign (red = NES > 0, blue =
-    NES < 0). Top-3 hits per side labeled.
+    Dashed horizontal = significance threshold (`FDR < 0.05` ⇒
+    y > 1.30). Hallmarks below threshold sit pale; above threshold
+    they're colored by sign (red = NES > 0, blue = NES < 0). Top-2
+    hits per side labeled per panel.
+
+    **Two paper-ready composites** group the per-dataset panels by
+    organ — `A1_volcano_hallmark_pancreas.pdf` (2×2 of the 4 panc
+    datasets) and `A1_volcano_hallmark_testis.pdf` (1×3 of the 3
+    testis datasets). The 7 individual single-panel PDFs are also
+    written for supplements.
 """))
 cells.append(code(r"""
-    def volcano_panel(df: pd.DataFrame, save_name: str, title: str,
-                      xlabel: str = "NES (Δα-ranked GSEA)"):
+    def _draw_volcano(ax, df, *, label_n: int = 2,
+                      nes_lim: float | None = None,
+                      nlf_max: float | None = None,
+                      panel_id: str | None = None):
         d = df.copy()
         d["pathway"] = d["Term"].map(parse_pathway_name)
         d["nlog10_fdr"] = -np.log10(d["FDR q-val"].clip(1e-300, 1.0))
         d["sig"] = d["FDR q-val"] < FDR_THRESH
 
-        fig, ax = fd.make_axes(figsize=(5.0, 3.6))
         ns = d[~d["sig"]]
-        ax.scatter(ns["NES"], ns["nlog10_fdr"], s=18, c="#cccccc",
+        ax.scatter(ns["NES"], ns["nlog10_fdr"], s=12, c="#cccccc",
                    alpha=0.7, linewidths=0, rasterized=True, zorder=1)
         sp = d[d["sig"] & (d["NES"] > 0)]
         sn = d[d["sig"] & (d["NES"] < 0)]
-        ax.scatter(sp["NES"], sp["nlog10_fdr"], s=36, c="#b2182b",
-                   alpha=0.85, linewidths=0.4, edgecolor="#222222",
+        ax.scatter(sp["NES"], sp["nlog10_fdr"], s=24, c="#b2182b",
+                   alpha=0.9, linewidths=0.3, edgecolor="#222222",
                    rasterized=True, zorder=2, label="NES > 0")
-        ax.scatter(sn["NES"], sn["nlog10_fdr"], s=36, c="#2166ac",
-                   alpha=0.85, linewidths=0.4, edgecolor="#222222",
+        ax.scatter(sn["NES"], sn["nlog10_fdr"], s=24, c="#2166ac",
+                   alpha=0.9, linewidths=0.3, edgecolor="#222222",
                    rasterized=True, zorder=2, label="NES < 0")
         ax.axhline(-np.log10(FDR_THRESH), color="#888888",
                    linewidth=0.5, linestyle="--", zorder=0)
         ax.axvline(0, color="#444444", linewidth=0.5, zorder=0)
-        def label_top(sub, n=3):
-            for _, r in sub.nlargest(n, "nlog10_fdr").iterrows():
+        for sub in (sp, sn):
+            for _, r in sub.nlargest(label_n, "nlog10_fdr").iterrows():
                 ax.text(r["NES"], r["nlog10_fdr"] + 0.08,
-                        r["pathway"].replace("_", " ").title()[:36],
-                        fontsize=6, ha="center", va="bottom", color="#222222")
-        label_top(sp); label_top(sn)
+                        clean_pathway_name(r["pathway"], max_len=26),
+                        fontsize=5.8, ha="center", va="bottom", color="#222222")
+        if nes_lim is not None:
+            ax.set_xlim(-1.05 * nes_lim, 1.05 * nes_lim)
+        if nlf_max is not None:
+            ax.set_ylim(-0.05 * nlf_max, 1.10 * nlf_max)
+        if panel_id:
+            ax.text(0.97, 0.97, panel_id, transform=ax.transAxes,
+                    ha="right", va="top", fontsize=8, color="#222222",
+                    fontweight="semibold")
+
+
+    def volcano_panel(df: pd.DataFrame, save_name: str, title: str,
+                      xlabel: str = "NES  (Δα-ranked GSEA)"):
+        fig, ax = fd.make_axes(figsize=(4.6, 3.4))
+        _draw_volcano(ax, df, label_n=3)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(r"$-\log_{10}(\mathrm{FDR}\;q)$")
         fd.thin_legend(ax, loc="upper left")
@@ -414,27 +505,77 @@ cells.append(code(r"""
         plt.show()
 
 
+    def volcano_grid(GSEA: dict, keys: list[str], save_name: str, *,
+                     ncols: int, suptitle: str,
+                     xlabel: str = "NES  (Δα-ranked GSEA)"):
+        nrows, ncols_ = _tissue_grid_size(len(keys), ncols)
+        # Shared axis ranges so panels are directly comparable.
+        all_d = pd.concat([GSEA[k] for k in keys], ignore_index=True)
+        nes_lim = float(np.nanpercentile(np.abs(all_d["NES"].values), 99.5))
+        nlf_max = float(np.nanmax(
+            -np.log10(all_d["FDR q-val"].clip(1e-300, 1.0))))
+        if not np.isfinite(nes_lim) or nes_lim == 0: nes_lim = 2.5
+        if not np.isfinite(nlf_max) or nlf_max == 0: nlf_max = 2.0
+
+        fig, axes = plt.subplots(nrows, ncols_,
+                                  figsize=(3.0 * ncols_, 2.5 * nrows + 0.7),
+                                  layout="constrained", sharex=True, sharey=True)
+        axes = np.atleast_2d(axes)
+        for i, k in enumerate(keys):
+            r, c = divmod(i, ncols_)
+            ax = axes[r, c]
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+            _draw_volcano(ax, GSEA[k], label_n=2, nes_lim=nes_lim,
+                          nlf_max=nlf_max, panel_id=DATASETS[k]["label"])
+            if r == nrows - 1:
+                ax.set_xlabel(xlabel)
+            if c == 0:
+                ax.set_ylabel(r"$-\log_{10}(\mathrm{FDR}\;q)$")
+        _hide_extra_axes(axes, len(keys))
+        fig.suptitle(suptitle, fontsize=8.5, y=0.995)
+        fd.save_figure(fig, save_name)
+        plt.show()
+
+
+    # Per-dataset volcanoes (kept for supplements)
     for k in DATASET_ORDER:
         volcano_panel(HALL_DELTA[k], f"A1_volcano_hallmark__{k}",
-                      f"{DATASETS[k]['label']}  ×  Hallmark (Δα)")
+                      f"{DATASETS[k]['label']}  ·  Hallmark (Δα)")
+
+    # Tissue-grouped composites (paper-ready)
+    volcano_grid(HALL_DELTA, PANC_KEYS, "A1_volcano_hallmark_pancreas",
+                 ncols=2, suptitle="Pancreas · Hallmark Δα-GSEA")
+    volcano_grid(HALL_DELTA, TEST_KEYS, "A1_volcano_hallmark_testis",
+                 ncols=3, suptitle="Testis · Hallmark Δα-GSEA")
 """))
 
 
 # §A.2 cross-dataset Hallmark NES heatmap
 cells.append(md("""
-    ## §A.2 — Cross-dataset Hallmark NES heatmap (50 × 7)
+    ## §A.2 — Cross-dataset Hallmark NES heatmap (50 × 7) + tissue splits
 
-    Rows = Hallmark, columns = dataset. Cell = signed NES (RdBu_r,
-    diverging). `FDR < 0.05` cells starred. Rows ordered by
-    **dataset-coverage of significant same-sign hits** descending —
-    top of the heatmap = the most reproducible Δα-Hallmark
-    signatures of the entire registry.
+    Rows = Hallmark, columns = dataset. Cell colour = signed NES
+    (`RdBu_r`, diverging, symmetric). `FDR < 0.05` cells carry a
+    star. Rows ordered by **dataset-coverage of significant
+    same-sign hits** descending — the top of every heatmap is the
+    most reproducible Δα-Hallmark signature.
+
+    Three figures are written:
+
+    - `A2_hallmark_delta_nes_heatmap.pdf` — combined 50 × 7 with a
+      visual tissue divider between `panc_4sp` and `test_hmac`
+      and tissue-band labels above each column group.
+    - `A2_hallmark_nes_panc.pdf` — pancreas-only (50 × 4), row
+      order shared with the combined heatmap so a side-by-side
+      compare is one-to-one.
+    - `A2_hallmark_nes_test.pdf` — testis-only (50 × 3), same row
+      ordering convention.
 """))
 cells.append(code(r"""
-    def cross_dataset_nes_heatmap(GSEA: dict, library_label: str,
-                                   save_name: str, top_k: int | None = None):
+    def _build_nes_pivot(GSEA: dict, keys: list[str]):
         rows = []
-        for k in DATASET_ORDER:
+        for k in keys:
             df = GSEA[k].copy()
             df["pathway"] = df["Term"].map(parse_pathway_name)
             for _, r in df.iterrows():
@@ -445,50 +586,131 @@ cells.append(code(r"""
                     "sig": float(r["FDR q-val"]) < FDR_THRESH,
                 })
         long = pd.DataFrame(rows)
-        nes = long.pivot(index="pathway", columns="dataset", values="NES").reindex(columns=DATASET_ORDER)
-        sig = long.pivot(index="pathway", columns="dataset", values="sig").reindex(columns=DATASET_ORDER).fillna(False)
-        def coverage(row, sigrow):
-            sig_signs = np.sign(row.values[sigrow.values.astype(bool)])
-            if len(sig_signs) == 0: return 0
-            return int(max((sig_signs > 0).sum(), (sig_signs < 0).sum()))
-        cov = pd.Series({p: coverage(nes.loc[p], sig.loc[p]) for p in nes.index})
-        order = cov.sort_values(ascending=False).index
-        if top_k is not None:
-            order = order[:top_k]
-        nes_o = nes.loc[order]; sig_o = sig.loc[order]
+        nes = long.pivot(index="pathway", columns="dataset",
+                          values="NES").reindex(columns=keys)
+        sig = long.pivot(index="pathway", columns="dataset",
+                          values="sig").reindex(columns=keys).fillna(False)
+        return long, nes, sig
+
+
+    def _coverage(nes_row, sig_row) -> int:
+        sig_signs = np.sign(nes_row.values[sig_row.values.astype(bool)])
+        if len(sig_signs) == 0: return 0
+        return int(max((sig_signs > 0).sum(), (sig_signs < 0).sum()))
+
+
+    def _heatmap_panel(nes_o: pd.DataFrame, sig_o: pd.DataFrame, *,
+                       library_label: str, save_name: str,
+                       tissue_divider_after: int | None = None,
+                       tissue_band_labels: list[tuple[int, int, str]] | None = None,
+                       fig_w: float = 7.4):
+        n_rows = len(nes_o); n_cols = nes_o.shape[1]
+        if n_rows == 0:
+            print(f"  [{save_name}] no rows — skipping")
+            return
         vmax = float(np.nanpercentile(np.abs(nes_o.values), 99))
         if not np.isfinite(vmax) or vmax == 0: vmax = 2.5
 
-        h = 0.22 * len(nes_o) + 1.0
-        fig, ax = plt.subplots(figsize=(7.5, h), layout="constrained")
+        cell_h = 0.20
+        top_pad = 1.4 if tissue_band_labels else 0.9
+        fig_h = cell_h * n_rows + top_pad
+        fig, ax = plt.subplots(figsize=(fig_w, fig_h), layout="constrained")
         ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
         im = ax.imshow(nes_o.values, cmap="RdBu_r", aspect="auto",
                        vmin=-vmax, vmax=vmax)
-        for i, pw in enumerate(nes_o.index):
-            for j, ds in enumerate(nes_o.columns):
+        # Cell text (NES) + significance star at top-right corner of cell.
+        for i in range(n_rows):
+            for j in range(n_cols):
                 v = nes_o.iloc[i, j]
                 txt = "—" if not np.isfinite(v) else f"{v:+.1f}"
+                tcolor = "#ffffff" if (np.isfinite(v) and abs(v) > 0.65 * vmax) else "#222222"
                 ax.text(j, i, txt, ha="center", va="center",
-                        fontsize=6, color="#222222")
+                        fontsize=6.2, color=tcolor)
                 if sig_o.iloc[i, j]:
-                    ax.text(j + 0.32, i - 0.32, "★", ha="center", va="center",
-                            fontsize=8, color="#222222")
-        ax.set_xticks(range(len(DATASET_ORDER)))
-        ax.set_xticklabels([DATASETS[k]["label"] for k in DATASET_ORDER],
+                    ax.text(j + 0.36, i - 0.36, "★", ha="center", va="center",
+                            fontsize=7.5, color=tcolor)
+        # Tissue divider: vertical white line between two column groups.
+        if tissue_divider_after is not None:
+            ax.axvline(tissue_divider_after + 0.5, color="#ffffff",
+                       linewidth=2.0, zorder=10)
+            ax.axvline(tissue_divider_after + 0.5, color="#222222",
+                       linewidth=0.6, zorder=11)
+        # Tissue band labels above columns.
+        if tissue_band_labels:
+            for j_lo, j_hi, lab in tissue_band_labels:
+                xc = 0.5 * (j_lo + j_hi)
+                ax.annotate(lab, xy=(xc, -0.65), xycoords="data",
+                            ha="center", va="bottom", fontsize=8,
+                            color="#222222", fontweight="semibold",
+                            annotation_clip=False)
+                ax.plot([j_lo - 0.45, j_hi + 0.45], [-0.45, -0.45],
+                        color="#222222", linewidth=0.7,
+                        clip_on=False, transform=ax.transData)
+        ax.set_xticks(range(n_cols))
+        ax.set_xticklabels([DATASETS[k]["label"] for k in nes_o.columns],
                            rotation=30, ha="right", fontsize=7)
-        ax.set_yticks(range(len(nes_o)))
-        ax.set_yticklabels([p.replace("_", " ").title()[:48] for p in nes_o.index],
-                           fontsize=6)
-        cb = fig.colorbar(im, ax=ax, label=f"NES ({library_label})",
-                          shrink=0.55)
+        ax.set_yticks(range(n_rows))
+        ax.set_yticklabels([clean_pathway_name(p, max_len=42)
+                             for p in nes_o.index], fontsize=6.2)
+        ax.tick_params(axis="x", length=0)
+        ax.tick_params(axis="y", length=0)
+        cb = fig.colorbar(im, ax=ax, label=f"NES  ({library_label})",
+                          shrink=0.45)
         cb.ax.tick_params(labelsize=6)
+        cb.outline.set_linewidth(0.4)
         fd.save_figure(fig, save_name)
         plt.show()
-        return long, cov
 
 
-    HALLMARK_LONG, HALLMARK_COV = cross_dataset_nes_heatmap(
-        HALL_DELTA, "Hallmark, Δα", "A2_hallmark_delta_nes_heatmap")
+    def cross_dataset_nes_heatmap(GSEA: dict, library_label: str,
+                                   save_name: str, top_k: int | None = None,
+                                   *, keys: list[str] | None = None,
+                                   ref_order=None,
+                                   tissue_divider_after: int | None = None,
+                                   tissue_band_labels=None,
+                                   fig_w: float = 7.4):
+        keys = keys if keys is not None else DATASET_ORDER
+        long, nes, sig = _build_nes_pivot(GSEA, keys)
+        if ref_order is not None:
+            order = [p for p in ref_order if p in nes.index]
+        else:
+            cov = pd.Series({p: _coverage(nes.loc[p], sig.loc[p])
+                             for p in nes.index})
+            order = list(cov.sort_values(ascending=False).index)
+            if top_k is not None:
+                order = order[:top_k]
+        nes_o = nes.loc[order]; sig_o = sig.loc[order]
+        _heatmap_panel(nes_o, sig_o, library_label=library_label,
+                       save_name=save_name,
+                       tissue_divider_after=tissue_divider_after,
+                       tissue_band_labels=tissue_band_labels,
+                       fig_w=fig_w)
+        if ref_order is None:
+            cov_full = pd.Series({p: _coverage(nes.loc[p], sig.loc[p])
+                                  for p in nes.index})
+            return long, cov_full, order
+        return long, None, order
+
+
+    # Combined (with tissue divider + bands)
+    HALLMARK_LONG, HALLMARK_COV, HALLMARK_ROW_ORDER = cross_dataset_nes_heatmap(
+        HALL_DELTA, "Hallmark · Δα",
+        "A2_hallmark_delta_nes_heatmap",
+        tissue_divider_after=len(PANC_KEYS) - 1,
+        tissue_band_labels=[
+            (0, len(PANC_KEYS) - 1, "Pancreas"),
+            (len(PANC_KEYS), len(DATASET_ORDER) - 1, "Testis"),
+        ],
+        fig_w=7.6)
+
+    # Tissue-split heatmaps — same row order so they line up with the combined.
+    cross_dataset_nes_heatmap(HALL_DELTA, "Hallmark · Δα · Pancreas",
+        "A2_hallmark_nes_panc",
+        keys=PANC_KEYS, ref_order=HALLMARK_ROW_ORDER, fig_w=6.0)
+    cross_dataset_nes_heatmap(HALL_DELTA, "Hallmark · Δα · Testis",
+        "A2_hallmark_nes_test",
+        keys=TEST_KEYS, ref_order=HALLMARK_ROW_ORDER, fig_w=5.4)
+
     print(f"\nMost-reproducible Δα-Hallmark pathways (#datasets sig same-sign):")
     print(HALLMARK_COV.sort_values(ascending=False).head(15).to_string())
 """))
@@ -535,79 +757,131 @@ cells.append(code(r"""
 cells.append(md("""
     ## §B.1 — Per-dataset NES scatter: prior vs Δα
 
-    One panel per dataset. x-axis = NES from prior-ranked GSEA;
-    y-axis = NES from Δα-ranked GSEA. Each dot = one Hallmark.
+    One panel per dataset. x = NES from prior-ranked GSEA;
+    y = NES from Δα-ranked GSEA. Each dot = one Hallmark.
 
-    - Diagonal = Δα and prior agree (both magnitude and sign).
-    - Off-diagonal lower-left / upper-right = Chimera amplifies
-      a same-sign signal the prior already saw.
-    - Off-diagonal upper-left / lower-right (opposite-sign
-      quadrants) = **regulatory rewiring** Hallmarks — the most
-      Chimera-specific calls.
+    - Diagonal = Δα and prior agree (magnitude *and* sign).
+    - Lower-left / upper-right (off-diagonal, same-sign) =
+      Chimera **amplifies** what the prior already showed.
+    - Upper-left / lower-right (opposite-sign) = **regulatory
+      rewiring** — the most Chimera-specific call.
     - High |Δα-NES| with low |prior-NES| = **Δα-unique signal**.
 
-    Marker color encodes Δα significance (red = `FDR < 0.05` and
-    NES > 0, blue = `FDR < 0.05` and NES < 0, gray = NS in Δα).
-    Marker edge encodes prior-significance (black border = prior
-    `FDR < 0.05`).
+    Marker fill encodes Δα significance (red = sig & NES > 0,
+    blue = sig & NES < 0, gray = NS in Δα). Marker edge encodes
+    prior-significance (black border = prior `FDR < 0.05`).
+
+    **Two paper-ready composites:** `B1_scatter_prior_vs_delta_pancreas.pdf`
+    (2×2) and `B1_scatter_prior_vs_delta_testis.pdf` (1×3). The
+    7 individual single-panel PDFs are also written for supplements.
 """))
 cells.append(code(r"""
-    def plot_nes_scatter(key: str, save_name: str):
+    def _draw_prior_vs_delta_scatter(ax, key: str, *, label_n: int = 4,
+                                     lim: float | None = None,
+                                     panel_id: str | None = None):
         d = HALL_DELTA[key].copy()
         p = HALL_PRIOR[key].copy()
         d["pathway"] = d["Term"].map(parse_pathway_name)
         p["pathway"] = p["Term"].map(parse_pathway_name)
-        merged = d.merge(p, on="pathway", suffixes=("_delta","_prior"))
+        merged = d.merge(p, on="pathway", suffixes=("_delta", "_prior"))
         merged["sig_delta"] = merged["FDR q-val_delta"] < FDR_THRESH
         merged["sig_prior"] = merged["FDR q-val_prior"] < FDR_THRESH
 
-        fig, ax = fd.make_axes(figsize=(4.6, 4.0))
-        # quadrant guides
+        if lim is None:
+            lim_max = float(np.nanmax(
+                np.abs(merged[["NES_delta", "NES_prior"]].values)))
+            if not np.isfinite(lim_max) or lim_max == 0: lim_max = 2.5
+            lim = 1.05 * lim_max
+
         ax.axhline(0, color="#888888", linewidth=0.5, zorder=0)
         ax.axvline(0, color="#888888", linewidth=0.5, zorder=0)
-        # 1:1 reference
-        lim_max = float(np.nanmax(np.abs(merged[["NES_delta","NES_prior"]].values)))
-        if not np.isfinite(lim_max) or lim_max == 0: lim_max = 2.5
-        lim = 1.05 * lim_max
         ax.plot([-lim, lim], [-lim, lim], color="#888888",
                 linewidth=0.5, linestyle=":", zorder=0)
 
-        # color = sign × significance in Δα
         ns = merged[~merged["sig_delta"]]
         ax.scatter(ns["NES_prior"], ns["NES_delta"],
-                   s=20, c="#cccccc", alpha=0.7, linewidths=0,
+                   s=14, c="#cccccc", alpha=0.7, linewidths=0,
                    rasterized=True, zorder=1)
-        sd_pos = merged[merged["sig_delta"] & (merged["NES_delta"]>0)]
-        sd_neg = merged[merged["sig_delta"] & (merged["NES_delta"]<0)]
+        sd_pos = merged[merged["sig_delta"] & (merged["NES_delta"] > 0)]
+        sd_neg = merged[merged["sig_delta"] & (merged["NES_delta"] < 0)]
         for sub, color in [(sd_pos, "#b2182b"), (sd_neg, "#2166ac")]:
             ec = np.where(sub["sig_prior"], "#222222", "#999999")
             lw = np.where(sub["sig_prior"], 0.6, 0.2)
-            ax.scatter(sub["NES_prior"], sub["NES_delta"], s=44, c=color,
-                       alpha=0.85, edgecolors=ec, linewidths=lw,
+            ax.scatter(sub["NES_prior"], sub["NES_delta"], s=30, c=color,
+                       alpha=0.9, edgecolors=ec, linewidths=lw,
                        rasterized=True, zorder=2)
-
-        # Label top Chimera-specific pathways: |Δα-NES| big, |prior-NES| small,
-        # with priority for opposite-sign quadrants
+        # Chimera-specific labelling (opposite sign or |Δα|≫|prior|)
         merged["chimera_specificity"] = (
             np.abs(merged["NES_delta"]) - 0.5 * np.abs(merged["NES_prior"])
-        ) + 0.7 * (np.sign(merged["NES_delta"]) != np.sign(merged["NES_prior"])).astype(float)
-        for _, r in merged.nlargest(4, "chimera_specificity").iterrows():
+        ) + 0.7 * (np.sign(merged["NES_delta"]) !=
+                   np.sign(merged["NES_prior"])).astype(float)
+        for _, r in merged.nlargest(label_n, "chimera_specificity").iterrows():
             if r["sig_delta"]:
-                ax.text(r["NES_prior"], r["NES_delta"] + 0.07,
-                        r["pathway"].replace("_"," ").title()[:30],
-                        fontsize=6, ha="center", va="bottom", color="#222222")
-
+                ax.text(r["NES_prior"], r["NES_delta"] + 0.06,
+                        clean_pathway_name(r["pathway"], max_len=22),
+                        fontsize=5.6, ha="center", va="bottom", color="#222222")
         ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim)
-        ax.set_xlabel("NES — prior-ranked")
-        ax.set_ylabel("NES — Δα-ranked  *(Chimera)*")
+        if panel_id:
+            ax.text(0.97, 0.03, panel_id, transform=ax.transAxes,
+                    ha="right", va="bottom", fontsize=8, color="#222222",
+                    fontweight="semibold")
+        return lim
+
+
+    def plot_nes_scatter(key: str, save_name: str):
+        fig, ax = fd.make_axes(figsize=(4.0, 3.7))
+        _draw_prior_vs_delta_scatter(ax, key, label_n=4)
+        ax.set_xlabel("NES  ·  prior-ranked")
+        ax.set_ylabel("NES  ·  Δα-ranked  (Chimera)")
         fd.annotate_stat(ax, f"{DATASETS[key]['label']}  ·  Hallmark",
-                         "lower right")
+                         "upper left")
         fd.save_figure(fig, save_name)
         plt.show()
 
 
+    def scatter_grid(keys: list[str], save_name: str, *,
+                     ncols: int, suptitle: str):
+        nrows, ncols_ = _tissue_grid_size(len(keys), ncols)
+        # shared axis range across panels in the composite
+        all_lim = 0.0
+        for k in keys:
+            d = HALL_DELTA[k]; p = HALL_PRIOR[k]
+            all_lim = max(all_lim,
+                          float(np.nanmax(np.abs(d["NES"].values))),
+                          float(np.nanmax(np.abs(p["NES"].values))))
+        if not np.isfinite(all_lim) or all_lim == 0: all_lim = 2.5
+        lim = 1.05 * all_lim
+
+        fig, axes = plt.subplots(nrows, ncols_,
+                                  figsize=(2.7 * ncols_, 2.6 * nrows + 0.7),
+                                  layout="constrained", sharex=True, sharey=True)
+        axes = np.atleast_2d(axes)
+        for i, k in enumerate(keys):
+            r, c = divmod(i, ncols_)
+            ax = axes[r, c]
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+            _draw_prior_vs_delta_scatter(ax, k, label_n=3, lim=lim,
+                                         panel_id=DATASETS[k]["label"])
+            if r == nrows - 1:
+                ax.set_xlabel("NES  ·  prior-ranked")
+            if c == 0:
+                ax.set_ylabel("NES  ·  Δα-ranked  (Chimera)")
+        _hide_extra_axes(axes, len(keys))
+        fig.suptitle(suptitle, fontsize=8.5, y=0.995)
+        fd.save_figure(fig, save_name)
+        plt.show()
+
+
+    # Per-dataset (kept for supplements)
     for k in DATASET_ORDER:
         plot_nes_scatter(k, f"B1_nes_scatter_prior_vs_delta__{k}")
+
+    # Tissue-grouped composites
+    scatter_grid(PANC_KEYS, "B1_scatter_prior_vs_delta_pancreas",
+                 ncols=2, suptitle="Pancreas · prior-NES vs Δα-NES (Hallmark)")
+    scatter_grid(TEST_KEYS, "B1_scatter_prior_vs_delta_testis",
+                 ncols=3, suptitle="Testis · prior-NES vs Δα-NES (Hallmark)")
 """))
 
 
@@ -617,13 +891,20 @@ cells.append(md("""
     For each dataset, count Hallmarks in four exclusive bins:
 
     - `prior-only` significant (Δα misses)
+    - `both` significant, same direction (Δα *confirms* + amplifies)
     - `Δα-only` significant (Chimera adds)
-    - `both` significant — same direction (Δα *confirms* + amplifies)
-    - `both` significant — opposite direction (**regulatory rewiring**)
+    - `both` significant, opposite direction (**regulatory rewiring**)
 
-    Stacked bar chart per dataset. The taller the **Δα-only** +
-    **opposite-direction** bars, the more Chimera adds beyond the
-    prior on that dataset.
+    Stacked-bar chart per dataset, grouped visually by organ. The
+    taller the **Δα-only** + **opposite-direction** segments, the
+    more Chimera adds beyond the prior on that dataset.
+
+    Two figures:
+
+    - `B2_quadrant_stack_hallmark.pdf` — combined 7-bar layout with
+      visible gap and tissue-band labels separating Pancreas / Testis.
+    - `B2_quadrant_stack_hallmark_tissue.pdf` — paper-ready 2-panel
+      side-by-side (Pancreas | Testis) with shared y-axis.
 """))
 cells.append(code(r"""
     def quadrant_counts(d: pd.DataFrame, p: pd.DataFrame) -> dict:
@@ -646,34 +927,97 @@ cells.append(code(r"""
     for k in DATASET_ORDER:
         q = quadrant_counts(HALL_DELTA[k], HALL_PRIOR[k])
         q["dataset"] = k; qrows.append(q)
-    qdf = pd.DataFrame(qrows)
-    print(qdf.to_string(index=False))
+    qdf = pd.DataFrame(qrows).set_index("dataset").loc[DATASET_ORDER]
+    print(qdf.to_string())
 
 
-    fig, ax = fd.make_axes(figsize=(7.2, 3.6))
-    x = np.arange(len(DATASET_ORDER))
-    pri  = qdf["prior_only"].values
-    delt = qdf["delta_only"].values
-    both = qdf["both_same"].values
-    opp  = qdf["both_opp"].values
+    QUAD_LABELS = {
+        "prior_only": "prior-only  (Δα misses)",
+        "both_same":  "both  (same direction — confirms)",
+        "delta_only": "Δα-only  (Chimera adds)",
+        "both_opp":   "both  (opposite — regulatory rewiring)",
+    }
+    QUAD_COLORS = {
+        "prior_only": "#bdbdbd",
+        "both_same":  "#737373",
+        "delta_only": "#b2182b",
+        "both_opp":   "#542788",
+    }
+    QUAD_ORDER = ["prior_only", "both_same", "delta_only", "both_opp"]
 
-    ax.bar(x, pri,                  label="prior-only sig",
-           color="#bdbdbd", edgecolor="#222222", linewidth=0.4)
-    ax.bar(x, both,    bottom=pri,  label="both sig (same direction)",
-           color="#737373", edgecolor="#222222", linewidth=0.4)
-    ax.bar(x, delt,    bottom=pri+both,
-           label="Δα-only sig  (Chimera adds)",
-           color="#b2182b", edgecolor="#222222", linewidth=0.4)
-    ax.bar(x, opp,     bottom=pri+both+delt,
-           label="both sig (opposite direction — regulatory rewiring)",
-           color="#542788", edgecolor="#222222", linewidth=0.4)
-    ax.set_xticks(x)
+
+    def _stack_bars(ax, keys, *, x_offset: int = 0, x_step: float = 1.0):
+        x = np.arange(len(keys)) * x_step + x_offset
+        bottom = np.zeros(len(keys))
+        for q in QUAD_ORDER:
+            v = qdf.loc[keys, q].values
+            ax.bar(x, v, bottom=bottom, label=QUAD_LABELS[q],
+                   color=QUAD_COLORS[q], edgecolor="#222222",
+                   linewidth=0.4, width=0.78)
+            bottom = bottom + v
+        return x, bottom
+
+
+    # ---------- combined (one figure, with tissue gap) ----------
+    fig, ax = fd.make_axes(figsize=(7.2, 3.4))
+    x_panc, top_panc = _stack_bars(ax, PANC_KEYS, x_offset=0)
+    GAP = 0.7
+    x_test, top_test = _stack_bars(ax, TEST_KEYS,
+                                    x_offset=len(PANC_KEYS) + GAP)
+    x_all = np.concatenate([x_panc, x_test])
+    ax.set_xticks(x_all)
     ax.set_xticklabels([DATASETS[k]["label"] for k in DATASET_ORDER],
                        rotation=20, ha="right", fontsize=7)
     ax.set_ylabel("# Hallmark pathways at FDR < 0.05")
-    fd.thin_legend(ax, loc="upper left")
+    # Tissue band labels above each group
+    ymax = max(top_panc.max(), top_test.max())
+    band_y = ymax * 1.08
+    for label, xs in [("Pancreas", x_panc), ("Testis", x_test)]:
+        x_lo, x_hi = xs.min() - 0.45, xs.max() + 0.45
+        ax.plot([x_lo, x_hi], [band_y, band_y],
+                color="#222222", linewidth=0.7, clip_on=False)
+        ax.text(0.5 * (x_lo + x_hi), band_y * 1.02, label,
+                ha="center", va="bottom", fontsize=8.5,
+                color="#222222", fontweight="semibold", clip_on=False)
+    ax.set_ylim(0, band_y * 1.18)
+    # De-duplicate legend (we drew the same labels twice)
+    h, l = ax.get_legend_handles_labels()
+    seen = set(); h2, l2 = [], []
+    for hh, ll in zip(h, l):
+        if ll in seen: continue
+        seen.add(ll); h2.append(hh); l2.append(ll)
+    ax.legend(h2, l2, loc="upper left", frameon=False, fontsize=6.8,
+              handlelength=1.0, handletextpad=0.4, borderpad=0.2)
     fd.annotate_stat(ax, "Hallmark · 50 pathways", "upper right")
     fd.save_figure(fig, "B2_quadrant_stack_hallmark")
+    plt.show()
+
+
+    # ---------- 2-panel tissue-split ----------
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.3),
+                              gridspec_kw=dict(width_ratios=[len(PANC_KEYS),
+                                                              len(TEST_KEYS)]),
+                              sharey=True, layout="constrained")
+    for ax, keys, title in zip(
+        axes, [PANC_KEYS, TEST_KEYS], ["Pancreas", "Testis"]
+    ):
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        _stack_bars(ax, keys, x_offset=0)
+        ax.set_xticks(np.arange(len(keys)))
+        ax.set_xticklabels([DATASETS[k]["label"] for k in keys],
+                           rotation=20, ha="right", fontsize=7)
+        ax.set_title(title, fontsize=8.5, color="#222222")
+    axes[0].set_ylabel("# Hallmark pathways at FDR < 0.05")
+    # Single legend on the rightmost panel.
+    h, l = axes[-1].get_legend_handles_labels()
+    seen = set(); h2, l2 = [], []
+    for hh, ll in zip(h, l):
+        if ll in seen: continue
+        seen.add(ll); h2.append(hh); l2.append(ll)
+    axes[-1].legend(h2, l2, loc="upper right", frameon=False, fontsize=6.8,
+                    handlelength=1.0, handletextpad=0.4, borderpad=0.2)
+    fd.save_figure(fig, "B2_quadrant_stack_hallmark_tissue")
     plt.show()
 """))
 
@@ -763,11 +1107,34 @@ cells.append(code(r"""
 
 
 cells.append(md("""
-    ## §C.1 — Cross-dataset Reactome NES heatmap (top-40 reproducible)
+    ## §C.1 — Cross-dataset Reactome NES heatmap (top-40 reproducible) + tissue splits
+
+    Three figures, same convention as §A.2:
+
+    - `C1_reactome_nes_heatmap.pdf` — combined top-40 with tissue
+      divider + tissue-band labels.
+    - `C1_reactome_nes_panc.pdf` — pancreas-only, sharing the
+      combined heatmap's row order.
+    - `C1_reactome_nes_test.pdf` — testis-only, same convention.
 """))
 cells.append(code(r"""
-    REACTOME_LONG, REACTOME_COV = cross_dataset_nes_heatmap(
-        REACTOME, "Reactome 2024", "C1_reactome_nes_heatmap", top_k=40)
+    REACTOME_LONG, REACTOME_COV, REACTOME_ROW_ORDER = cross_dataset_nes_heatmap(
+        REACTOME, "Reactome 2024 · Δα",
+        "C1_reactome_nes_heatmap", top_k=40,
+        tissue_divider_after=len(PANC_KEYS) - 1,
+        tissue_band_labels=[
+            (0, len(PANC_KEYS) - 1, "Pancreas"),
+            (len(PANC_KEYS), len(DATASET_ORDER) - 1, "Testis"),
+        ],
+        fig_w=8.0)
+
+    cross_dataset_nes_heatmap(REACTOME, "Reactome 2024 · Δα · Pancreas",
+        "C1_reactome_nes_panc",
+        keys=PANC_KEYS, ref_order=REACTOME_ROW_ORDER, fig_w=6.4)
+    cross_dataset_nes_heatmap(REACTOME, "Reactome 2024 · Δα · Testis",
+        "C1_reactome_nes_test",
+        keys=TEST_KEYS, ref_order=REACTOME_ROW_ORDER, fig_w=5.8)
+
     print(f"\nMost-reproducible Δα-Reactome pathways (#datasets sig same-sign):")
     print(REACTOME_COV.sort_values(ascending=False).head(20).to_string())
 """))
@@ -857,37 +1224,57 @@ cells.append(code(r"""
         d["nlog10_fdr"] = -np.log10(d["FDR q-val"].clip(1e-300, 1.0))
         d["sig"] = d["FDR q-val"] < FDR_THRESH
 
-        fig, ax = fd.make_axes(figsize=(5.4, 3.6))
+        fig, ax = fd.make_axes(figsize=(5.6, 4.0))
         ns = d[~d["sig"]]
-        ax.scatter(ns["NES"], ns["nlog10_fdr"], s=18, c="#cccccc",
+        ax.scatter(ns["NES"], ns["nlog10_fdr"], s=14, c="#cccccc",
                    alpha=0.7, linewidths=0, rasterized=True, zorder=1)
         sp = d[d["sig"] & (d["NES"] > 0)]
         sn = d[d["sig"] & (d["NES"] < 0)]
-        ax.scatter(sp["NES"], sp["nlog10_fdr"], s=40, c="#b2182b",
-                   alpha=0.85, linewidths=0.4, edgecolor="#222222",
+        ax.scatter(sp["NES"], sp["nlog10_fdr"], s=32, c="#b2182b",
+                   alpha=0.9, linewidths=0.3, edgecolor="#222222",
                    rasterized=True, zorder=2,
-                   label="NES > 0 (more panc-conserved)")
-        ax.scatter(sn["NES"], sn["nlog10_fdr"], s=40, c="#2166ac",
-                   alpha=0.85, linewidths=0.4, edgecolor="#222222",
+                   label="NES > 0  (more panc-conserved)")
+        ax.scatter(sn["NES"], sn["nlog10_fdr"], s=32, c="#2166ac",
+                   alpha=0.9, linewidths=0.3, edgecolor="#222222",
                    rasterized=True, zorder=2,
-                   label="NES < 0 (more test-conserved)")
+                   label="NES < 0  (more testis-conserved)")
         ax.axhline(-np.log10(FDR_THRESH), color="#888888",
                    linewidth=0.5, linestyle="--", zorder=0)
         ax.axvline(0, color="#444444", linewidth=0.5, zorder=0)
+        # Top-5 labels per side
         for sub in (sp, sn):
             for _, r in sub.nlargest(5, "nlog10_fdr").iterrows():
-                ax.text(r["NES"], r["nlog10_fdr"] + 0.08,
-                        r["pathway"].replace("_", " ").title()[:36],
-                        fontsize=6, ha="center", va="bottom", color="#222222")
-        ax.set_xlabel(r"NES   (rank metric: $\Delta\alpha_{\rm panc}-\Delta\alpha_{\rm test}$)")
+                ax.text(r["NES"], r["nlog10_fdr"] + 0.07,
+                        clean_pathway_name(r["pathway"], max_len=32),
+                        fontsize=5.8, ha="center", va="bottom", color="#222222")
+        ax.set_xlabel(
+            r"NES   (rank metric: $\Delta\alpha_{\rm panc}-\Delta\alpha_{\rm test}$)")
         ax.set_ylabel(r"$-\log_{10}(\mathrm{FDR}\;q)$")
+        # x-axis directional arrows: which side means which tissue
+        x_lo, x_hi = ax.get_xlim()
+        y_arrow = ax.get_ylim()[0] - 0.10 * (ax.get_ylim()[1] - ax.get_ylim()[0])
+        ax.annotate("",
+                    xy=(x_hi * 0.95, y_arrow), xytext=(x_hi * 0.55, y_arrow),
+                    arrowprops=dict(arrowstyle="->", color="#b2182b",
+                                    linewidth=0.8), annotation_clip=False)
+        ax.annotate("",
+                    xy=(x_lo * 0.95, y_arrow), xytext=(x_lo * 0.55, y_arrow),
+                    arrowprops=dict(arrowstyle="->", color="#2166ac",
+                                    linewidth=0.8), annotation_clip=False)
+        ax.text(x_hi * 0.97, y_arrow * 1.6, "more panc-conserved",
+                ha="right", va="top", fontsize=6.2, color="#b2182b",
+                clip_on=False)
+        ax.text(x_lo * 0.97, y_arrow * 1.6, "more testis-conserved",
+                ha="left", va="top", fontsize=6.2, color="#2166ac",
+                clip_on=False)
         fd.thin_legend(ax, loc="upper left")
         fd.annotate_stat(ax, title, "lower right")
         fd.save_figure(fig, save_name)
         plt.show()
 
 
-    cross_tissue_volcano(XT_HALL, "D1_xt_volcano_hallmark", "Hallmark · panc − test")
+    cross_tissue_volcano(XT_HALL, "D1_xt_volcano_hallmark",
+                         "Hallmark · panc − test")
 """))
 
 
