@@ -2007,6 +2007,161 @@ cells.append(code(r"""
 """))
 
 
+# §I.3c — Grayscale-only variant (quadrants encoded as marker shape, no chromatic accent)
+cells.append(md(r"""
+    ### §I.3c — Grayscale variant (no color)
+
+    Same panel as §I.3b but stripped of chromatic accent.  Each
+    quadrant is encoded by **marker shape** plus a distinct gray
+    level so the panel still reads in monochrome print.  No pure
+    black is used — the darkest gray is ``#555555``.
+"""))
+cells.append(code(r"""
+    import random as _rnd
+    from adjustText import adjust_text
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import FormatStrFormatter
+
+    fig, ax = fd.make_axes(figsize=(3.6, 3.6))
+    # Quadrant → gray shade.  Same marker (circle) for all; the four
+    # quadrants are distinguished by gray level only.  Shades get
+    # progressively lighter going clockwise from the bottom-left
+    # (M/M, darkest) → top-left → top-right → bottom-right.  No pure
+    # black anywhere.  The dataset's "panc" axis is actually camex
+    # liver — labels and legend text use "liver"/"testis" accordingly,
+    # while internal quadrant keys keep the upstream "panc"/"test"
+    # spelling so the cached `XT['quadrant']` values still match.
+    QUAD_GRAY = {
+        "M | M":            "#555555",   # bottom-left  — darkest
+        "M panc / F test":  "#888888",   # top-left
+        "F | F":            "#aaaaaa",   # top-right
+        "F panc / M test":  "#cccccc",   # bottom-right — lightest
+        "axis":             "#e6e6e6",
+    }
+    QUAD_DISPLAY = {
+        "M | M":            "M | M",
+        "M panc / F test":  "M liver / F testis",
+        "F | F":            "F | F",
+        "F panc / M test":  "F liver / M testis",
+    }
+    QUAD_ORDER   = ["M | M", "M panc / F test", "F | F", "F panc / M test", "axis"]
+    LEGEND_QUADS = [q for q in QUAD_ORDER if q != "axis"]
+
+    XLIM       = 0.20
+    YLIM_LOW   = -0.125
+    YLIM_HIGH  = +0.15
+    plot_df = XT.copy()
+    plot_df["x_clip"] = plot_df["mean_delta_panc"].clip(-XLIM, +XLIM)
+    plot_df["y_clip"] = plot_df["mean_delta_test"].clip(YLIM_LOW, YLIM_HIGH)
+
+    for q in QUAD_ORDER:
+        sub = plot_df[plot_df["quadrant"] == q]
+        ax.scatter(sub["x_clip"], sub["y_clip"],
+                   s=5, c=QUAD_GRAY[q], alpha=0.6, linewidths=0,
+                   rasterized=True)
+
+    ax.plot([-XLIM, XLIM], [-XLIM, XLIM], color="#666666", linewidth=0.4,
+            linestyle="--", zorder=0)
+    ax.axhline(0, color="#666666", linewidth=0.4, zorder=0)
+    ax.axvline(0, color="#666666", linewidth=0.4, zorder=0)
+    ax.set_xlim(-XLIM, +XLIM); ax.set_ylim(YLIM_LOW, YLIM_HIGH)
+    # 5 ticks per axis, evenly spaced, formatted to 2 decimals.
+    ax.set_xticks(np.linspace(-XLIM, +XLIM, 5))
+    ax.set_yticks(np.linspace(YLIM_LOW, YLIM_HIGH, 5))
+    ax.xaxis.set_major_formatter(FormatStrFormatter("%.2f"))
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
+    ax.set_xlabel(r"mean $\Delta\alpha$  —  liver")
+    ax.set_ylabel(r"mean $\Delta\alpha$  —  testis")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+
+    # 3 labels per quadrant.  Pick genes that sit in each quadrant's
+    # 45°-diagonal wedge AND inside the visible window (so the dot the
+    # label points at isn't pinned to an axis edge by clipping).  Among
+    # those, take the diagonally farthest TOP_K candidates and randomly
+    # sample 3 — the random pick (with a fixed seed) keeps successive
+    # runs reproducible while still spreading the labels visually
+    # instead of always picking the 3 single most extreme points.
+    LBL_K = 3
+    TOP_K = 12
+    LABEL_RNG = _rnd.Random(42)
+    QUAD_DIRECTION = {  # unit vector pointing into each quadrant's 45° wedge
+        "M | M":            (-1.0, -1.0),
+        "M panc / F test":  (-1.0, +1.0),
+        "F | F":            (+1.0, +1.0),
+        "F panc / M test":  (+1.0, -1.0),
+    }
+    WEDGE_HALF_DEG = 30.0
+    texts = []
+    label_xs, label_ys = [], []
+    for q in LEGEND_QUADS:
+        sub = plot_df[plot_df["quadrant"] == q].copy()
+        if len(sub) == 0: continue
+        # Restrict to genes whose true coords are inside the visible
+        # window — boundary-clipped genes are misleading because the
+        # rendered dot no longer sits at the gene's actual Δα value.
+        in_view = (
+            (sub["mean_delta_panc"] >= -XLIM)   & (sub["mean_delta_panc"] <= +XLIM) &
+            (sub["mean_delta_test"] >= YLIM_LOW) & (sub["mean_delta_test"] <= YLIM_HIGH)
+        )
+        sub = sub.loc[in_view].copy()
+        if len(sub) == 0: continue
+
+        ux, uy = QUAD_DIRECTION[q]
+        norm = (ux ** 2 + uy ** 2) ** 0.5
+        ux, uy = ux / norm, uy / norm
+        proj = sub["mean_delta_panc"].values * ux + sub["mean_delta_test"].values * uy
+        perp = np.abs(sub["mean_delta_panc"].values * (-uy)
+                       + sub["mean_delta_test"].values * (+ux))
+        dist = np.sqrt(sub["mean_delta_panc"].values ** 2
+                        + sub["mean_delta_test"].values ** 2)
+        tol = np.tan(np.deg2rad(WEDGE_HALF_DEG)) * dist
+        in_wedge = (perp <= tol) & (proj > 0)
+        sub = sub.loc[in_wedge].copy()
+        if len(sub) == 0: continue
+        sub["proj"] = proj[in_wedge]
+
+        # Top diagonally-farthest TOP_K candidates, then pick LBL_K randomly.
+        pool = (sub.sort_values("proj", ascending=False)
+                    .head(min(TOP_K, len(sub)))
+                    .reset_index(drop=False))
+        if len(pool) > LBL_K:
+            chosen_idx = sorted(LABEL_RNG.sample(range(len(pool)), LBL_K))
+        else:
+            chosen_idx = list(range(len(pool)))
+        chosen = pool.iloc[chosen_idx]
+
+        for _, r in chosen.iterrows():
+            sym = str(r["symbol"]) if pd.notna(r["symbol"]) else ""
+            if not sym or sym.lower() == "nan":
+                continue
+            texts.append(ax.text(r["x_clip"], r["y_clip"], sym[:14],
+                                  fontsize=6.5, ha="center", va="center",
+                                  color="#444444", fontweight="bold"))
+            label_xs.append(r["x_clip"])
+            label_ys.append(r["y_clip"])
+
+    if texts:
+        adjust_text(texts,
+                    x=label_xs, y=label_ys, ax=ax,
+                    expand=(1.4, 1.6),
+                    arrowprops=dict(arrowstyle="-", color="#888888",
+                                    lw=0.4, shrinkA=2, shrinkB=2))
+
+    legend_handles = [
+        Line2D([0], [0], marker="o", linestyle="none",
+               markerfacecolor=QUAD_GRAY[q], markeredgecolor="none",
+               markersize=6, alpha=1.0,
+               label=f"{QUAD_DISPLAY[q]}  (n={(plot_df['quadrant'] == q).sum()})")
+        for q in LEGEND_QUADS
+    ]
+    ax.legend(handles=legend_handles, loc="lower right",
+              frameon=False, fontsize=6.5, handletextpad=0.4,
+              borderpad=0.2, labelspacing=0.3)
+    fd.save_figure(fig, "I3c_cross_tissue_disagreement_portrait_grayscale")
+    plt.show()
+"""))
+
+
 # §I.4 — Per-tissue paralog forest (side-by-side)
 cells.append(md(r"""
     ## §I.4 — Per-tissue paralog-family enrichment — side-by-side forest
