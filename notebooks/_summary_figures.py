@@ -569,6 +569,118 @@ def render_B2_pooled_vs_pergene_diagnostic(
     return df
 
 
+def render_B2_pooled_vs_pergene_diagnostic_v2(
+    *,
+    summary_contrasts: pd.DataFrame,
+    save_figure: Callable,
+    save_name: str = "fig_B2_pooled_vs_pergene_diagnostic_v2",
+) -> pd.DataFrame:
+    """Compact, ``adjustText``-laid-out variant of B2.
+
+    Same statistical content as :func:`render_B2_pooled_vs_pergene_diagnostic`;
+    smaller footprint, two-line axis labels, and ``adjustText`` for label
+    placement so significant-point labels never overlap each other or the
+    scatter markers.
+    """
+    from adjustText import adjust_text
+
+    df = summary_contrasts.copy()
+    df["log_mwu"] = -np.log10(df["mwu_p"].clip(lower=1e-300))
+    df["log_pg"]  = -np.log10(df["pg_p"].fillna(1.0).clip(lower=1e-300))
+    df["panel"]   = df["panel"].astype(str)
+
+    sqrt = lambda v: np.sqrt(np.clip(v, 0, None))
+    df["sx"] = sqrt(df["log_mwu"])
+    df["sy"] = sqrt(df["log_pg"])
+
+    fig, ax = plt.subplots(figsize=(3.6, 3.2), constrained_layout=True)
+    sig_mask = df["pg_p"].fillna(1.0).lt(0.05).values
+
+    ax.scatter(df.loc[sig_mask, "sx"], df.loc[sig_mask, "sy"],
+               marker="o", facecolor=FILL, edgecolor=INK,
+               s=26, linewidths=0.6, zorder=3)
+    ax.scatter(df.loc[~sig_mask, "sx"], df.loc[~sig_mask, "sy"],
+               marker="s", facecolor="white", edgecolor=INK,
+               s=26, linewidths=0.6, zorder=3)
+
+    lim_x = float(df["sx"].max()) * 1.08
+    lim_y = float(df["sy"].max()) * 1.10
+    lim   = max(lim_x, lim_y)
+    diag_xs = np.linspace(0, lim, 80)
+    ax.plot(diag_xs, diag_xs, color=DARK, linewidth=0.6, linestyle="--",
+            zorder=1, label="pooled = per-gene")
+    p05_sqrt = sqrt(np.array([-np.log10(0.05)]))[0]
+    ax.axhline(p05_sqrt, color=MID, linewidth=0.4, linestyle=":", zorder=1)
+    ax.axvline(p05_sqrt, color=MID, linewidth=0.4, linestyle=":", zorder=1)
+
+    x_orig = [0, 0.5, 1, 2, 5, 10, 30, 60]
+    x_orig = [v for v in x_orig if v <= lim_x ** 2 + 1]
+    ax.set_xticks([sqrt(np.array([v]))[0] for v in x_orig])
+    ax.set_xticklabels([str(v) for v in x_orig], fontsize=7)
+    y_orig = [0, 0.5, 1, 2, 3, 4]
+    y_orig = [v for v in y_orig if v <= lim_y ** 2 + 1]
+    ax.set_yticks([sqrt(np.array([v]))[0] for v in y_orig])
+    ax.set_yticklabels([str(v) for v in y_orig], fontsize=7)
+
+    ax.set_xlim(-0.1, lim_x)
+    ax.set_ylim(-0.05, lim_y)
+    ax.set_xlabel(r"$-\log_{10}(p)$ pooled Mann-Whitney U" "\n"
+                  "(square-root scale)", fontsize=8)
+    ax.set_ylabel(r"$-\log_{10}(p)$ per-gene paired Wilcoxon" "\n"
+                  "(square-root scale)", fontsize=8)
+    _despine(ax)
+
+    # Threshold-line callouts: place horizontal $p=0.05$ at the upper-LEFT
+    # (above the line, in the cleared corner) and vertical $p=0.05$ along
+    # the bottom-LEFT just right of the line — both spots are point-free
+    # for the entire 20-contrast set, so they never collide with labels
+    # or scatter markers regardless of which contrasts happen to land where.
+    ax.text(lim_x * 0.015, p05_sqrt + 0.04, r"$p=0.05$",
+            ha="left", va="bottom", fontsize=6.5, color=MID,
+            zorder=4,
+            bbox=dict(facecolor="white", edgecolor="none",
+                      boxstyle="round,pad=0.08", alpha=0.85))
+    ax.text(p05_sqrt + 0.04, 0.04, r"$p=0.05$",
+            ha="left", va="bottom", fontsize=6.5, color=MID, rotation=90,
+            zorder=4,
+            bbox=dict(facecolor="white", edgecolor="none",
+                      boxstyle="round,pad=0.08", alpha=0.85))
+
+    label_subset = df[sig_mask].reset_index(drop=True)
+    texts = [
+        ax.text(r["sx"], r["sy"], f"{r['panel']}: {r['label']}",
+                fontsize=6, color=INK, zorder=4)
+        for _, r in label_subset.iterrows()
+    ]
+    if texts:
+        adjust_text(
+            texts,
+            x=df["sx"].values, y=df["sy"].values,
+            ax=ax,
+            arrowprops=dict(arrowstyle="-", color=MID, lw=0.4,
+                            shrinkA=2, shrinkB=2),
+            expand=(1.3, 1.5),
+            min_arrow_len=3,
+            force_text=(0.5, 0.7),
+            force_static=(0.25, 0.4),
+        )
+
+    leg_handles = [
+        Line2D([0], [0], marker="o", color="none", markerfacecolor=FILL,
+               markeredgecolor=INK, markersize=4.5,
+               label="real effect (per-gene $p<0.05$)"),
+        Line2D([0], [0], marker="s", color="none", markerfacecolor="white",
+               markeredgecolor=INK, markersize=4.5,
+               label="pooled-only (composition artefact)"),
+    ]
+    ax.legend(handles=leg_handles, loc="lower right", frameon=False,
+              fontsize=6, handlelength=0.8, handletextpad=0.3,
+              borderpad=0.2)
+    save_figure(fig, save_name)
+    plt.show()
+    return df
+
+
 def render_B3_per_gene_forest_chemistry(
     *,
     residue_table: pd.DataFrame,
@@ -988,39 +1100,61 @@ def render_D3_direction_attention_distribution(
     Tests whether reference-class housekeeping genes have systematically
     larger residue-level attention magnitudes — a result the §L analysis
     flagged but no panel currently shows in pure form.
+
+    Design matches :func:`render_D1_direction_chemistry`: same footprint
+    (4.6 × 2.4 in), horizontal orientation with M / F / ref on the y-axis
+    and the metric on the x-axis, pairwise stats annotated above the
+    panel.  All boxes share a single lightgray fill (no per-direction
+    coloring) so the figure reads strictly monochrome.
     """
     df = da_df.copy()
     order = ["M", "F", "ref"]
-    fig, ax = plt.subplots(figsize=(3.6, 2.6), constrained_layout=True)
+
+    fig, ax = plt.subplots(figsize=(4.6, 2.4), constrained_layout=True)
     data = [df.loc[df["direction"] == d, "mean_abs_attn"].values for d in order]
-    bp = ax.boxplot(data, positions=np.arange(len(order)), widths=0.55,
-                    showfliers=False, patch_artist=True,
-                    medianprops=dict(color="white", linewidth=1.0),
-                    whiskerprops=dict(color=INK, linewidth=0.6),
-                    capprops=dict(color=INK, linewidth=0.6),
-                    boxprops=dict(linewidth=0.0))
-    for patch, d in zip(bp["boxes"], order):
-        patch.set_facecolor(DIRECTION_GRAY[d])
+    y_pos = np.arange(len(order))
+
+    bp = ax.boxplot(
+        data, positions=y_pos, widths=0.55,
+        vert=False, showfliers=False, patch_artist=True,
+        medianprops=dict(color=INK, linewidth=0.9),
+        whiskerprops=dict(color=INK, linewidth=0.6),
+        capprops=dict(color=INK, linewidth=0.6),
+        boxprops=dict(linewidth=0.4),
+    )
+    for patch in bp["boxes"]:
+        patch.set_facecolor(LITE)
         patch.set_edgecolor(INK)
         patch.set_linewidth(0.4)
-    # Strip overlay
+
     rng = np.random.default_rng(0)
     for i, d in enumerate(order):
         sub = df[df["direction"] == d]
-        x = i + (rng.random(len(sub)) - 0.5) * 0.16
-        ax.scatter(x, sub["mean_abs_attn"].values,
+        y = i + (rng.random(len(sub)) - 0.5) * 0.20
+        ax.scatter(sub["mean_abs_attn"].values, y,
                    s=8, marker="o", facecolor=DARK, edgecolor="none",
                    alpha=0.55, zorder=4)
-    ax.set_xticks(np.arange(len(order)))
-    ax.set_xticklabels([f"{d}-flag\n$n_g$={int((df['direction']==d).sum())}"
-                        for d in order], fontsize=7)
-    ax.set_ylabel(r"mean per-gene $|$attention$|$", fontsize=8)
-    _despine(ax); ax.tick_params(axis="y", labelsize=7)
-    # Pairwise MWU
+
+    label_str = []
+    for d in order:
+        sub = df[df["direction"] == d]
+        n_g = int(len(sub))
+        med = float(np.median(sub["mean_abs_attn"])) if n_g else float("nan")
+        label_str.append(
+            f"{d}-flag\n"
+            f"$n_g$={n_g}\n"
+            f"median={med:.4f}"
+        )
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(label_str, fontsize=7)
+    ax.invert_yaxis()
+    ax.set_xlabel(r"mean per-gene $|$attention$|$", fontsize=8)
+    _despine(ax)
+    ax.tick_params(axis="x", labelsize=7)
+
     from scipy.stats import mannwhitneyu
     rows = []
-    pairs = [("M", "F"), ("M", "ref"), ("F", "ref")]
-    for a, b in pairs:
+    for a, b in [("M", "F"), ("M", "ref"), ("F", "ref")]:
         a_v = df.loc[df["direction"] == a, "mean_abs_attn"].values
         b_v = df.loc[df["direction"] == b, "mean_abs_attn"].values
         if len(a_v) >= 3 and len(b_v) >= 3:
@@ -1032,11 +1166,14 @@ def render_D3_direction_attention_distribution(
                          "median_a": float(np.median(a_v)),
                          "median_b": float(np.median(b_v))})
     pdf = pd.DataFrame(rows)
-    ax.text(0.98, 1.02,
-            "  ·  ".join(f"{r['a']}/{r['b']}: {_fmt_p(r['p'])} {_stars(r['p'])}"
-                          for _, r in pdf.iterrows()),
-            transform=ax.transAxes, ha="right", va="bottom",
-            fontsize=6.5, color=DARK)
+    if len(pdf):
+        ax.text(0.5, 1.05,
+                "pairwise MWU   " +
+                "   ·   ".join(
+                    f"{r['a']}/{r['b']}: $p$={_fmt_p(r['p'])} {_stars(r['p'])}"
+                    for _, r in pdf.iterrows()),
+                transform=ax.transAxes, ha="center", va="bottom",
+                fontsize=8, color=INK)
     save_figure(fig, save_name)
     plt.show()
     return pdf

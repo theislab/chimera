@@ -1920,6 +1920,93 @@ cells.append(code(r"""
 """))
 
 
+# §I.3b — Compact, axis-fixed companion to §I.3 (no marginals, adjustText labels)
+cells.append(md(r"""
+    ### §I.3b — Compact companion (axis-fixed, adjusted labels)
+
+    Same data as §I.3, but rendered as a single panel with fixed
+    `[-0.2, +0.2]` axes, no marginal histograms, and at most **4**
+    extreme-gene labels per quadrant placed by ``adjustText`` so
+    annotations never collapse onto each other or onto scatter
+    points.  Use this version when the figure needs to drop into a
+    paper column at small size; use §I.3 when the marginal
+    distributions matter.
+"""))
+cells.append(code(r"""
+    from adjustText import adjust_text
+    from matplotlib.lines import Line2D
+
+    fig, ax = fd.make_axes(figsize=(3.6, 3.6))
+    QUAD_COLOR = {"M | M": M_COLOR, "F | F": F_COLOR,
+                  "M panc / F test": "#6a3d9a", "F panc / M test": "#33a02c",
+                  "axis": "#cccccc"}
+    QUAD_ORDER = ["M | M", "F | F", "M panc / F test", "F panc / M test", "axis"]
+    LEGEND_QUADS = [q for q in QUAD_ORDER if q != "axis"]
+
+    LIM = 0.2
+    plot_df = XT.copy()
+    plot_df["x_clip"] = plot_df["mean_delta_panc"].clip(-LIM, +LIM)
+    plot_df["y_clip"] = plot_df["mean_delta_test"].clip(-LIM, +LIM)
+
+    for q in QUAD_ORDER:
+        sub = plot_df[plot_df["quadrant"] == q]
+        ax.scatter(sub["x_clip"], sub["y_clip"],
+                   s=4, c=QUAD_COLOR[q], alpha=0.55, linewidths=0,
+                   rasterized=True)
+
+    ax.plot([-LIM, LIM], [-LIM, LIM], color="#444444", linewidth=0.4,
+            linestyle="--", zorder=0)
+    ax.axhline(0, color="#444444", linewidth=0.4, zorder=0)
+    ax.axvline(0, color="#444444", linewidth=0.4, zorder=0)
+    ax.set_xlim(-LIM, +LIM); ax.set_ylim(-LIM, +LIM)
+    ax.set_xlabel(r"mean $\Delta\alpha$  —  pancreas")
+    ax.set_ylabel(r"mean $\Delta\alpha$  —  testis")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+
+    # ≤ 4 extreme-gene labels per quadrant; placed inside the [-0.2, +0.2]
+    # window using the clipped coords so any off-panel point still gets a tag
+    # at the edge.
+    LBL_K = 4
+    texts = []
+    label_xs, label_ys = [], []
+    for q in ["M | M", "F | F", "M panc / F test", "F panc / M test"]:
+        sub = plot_df[plot_df["quadrant"] == q].copy()
+        if len(sub) == 0: continue
+        sub["dist"] = np.sqrt(sub["mean_delta_panc"] ** 2
+                                + sub["mean_delta_test"] ** 2)
+        top = sub.nlargest(LBL_K, "dist")
+        for _, r in top.iterrows():
+            sym = str(r["symbol"]) if pd.notna(r["symbol"]) else ""
+            if not sym or sym.lower() == "nan" or sym == r.name: continue
+            texts.append(ax.text(r["x_clip"], r["y_clip"], sym[:14],
+                                  fontsize=6.5, ha="center", va="center",
+                                  color=QUAD_COLOR[q], fontweight="bold"))
+            label_xs.append(r["x_clip"])
+            label_ys.append(r["y_clip"])
+
+    # Repel labels off each other and off the scatter; thin gray leader lines.
+    if texts:
+        adjust_text(texts,
+                    x=label_xs, y=label_ys, ax=ax,
+                    expand=(1.4, 1.6),
+                    arrowprops=dict(arrowstyle="-", color="#888888",
+                                    lw=0.4, shrinkA=2, shrinkB=2))
+
+    legend_handles = [
+        Line2D([0], [0], marker="o", linestyle="none",
+               markerfacecolor=QUAD_COLOR[q], markeredgecolor="none",
+               markersize=6, alpha=1.0,
+               label=f"{q}  (n={(plot_df['quadrant'] == q).sum()})")
+        for q in LEGEND_QUADS
+    ]
+    ax.legend(handles=legend_handles, loc="lower right",
+              frameon=False, fontsize=6.5, handletextpad=0.4,
+              borderpad=0.2, labelspacing=0.3)
+    fd.save_figure(fig, "I3b_cross_tissue_disagreement_portrait_compact")
+    plt.show()
+"""))
+
+
 # §I.4 — Per-tissue paralog forest (side-by-side)
 cells.append(md(r"""
     ## §I.4 — Per-tissue paralog-family enrichment — side-by-side forest

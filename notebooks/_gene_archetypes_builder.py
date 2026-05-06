@@ -400,21 +400,21 @@ cells.append(code(r"""
 
 
 cells.append(code(r"""
-    fig, ax = fd.make_axes(figsize=(4.6, 3.2))
+    fig, ax = fd.make_axes(figsize=(3.4, 3.0))
     ks  = K_RANGE
     sils = [sil_per_k[k] for k in ks]
     aris = [ari_per_k[k] for k in ks]
     ax.plot(ks, sils, color="#222222", marker="o", linewidth=1.2,
-            label="silhouette")
+            label="Silhouette score")
     ax2 = ax.twinx()
     ax2.spines["top"].set_visible(False)
-    ax2.plot(ks, aris, color="#0072B2", marker="s", linewidth=1.2,
-             label="mean cross-seed ARI")
-    ax.set_xlabel("k (number of archetypes)")
-    ax.set_ylabel("silhouette score", color="#222222")
-    ax2.set_ylabel("mean cross-seed ARI", color="#0072B2")
+    ax2.plot(ks, aris, color="#888888", marker="s", linewidth=1.2,
+             label="Cross-seed ARI")
+    ax.set_xlabel("Number of archetypes ($k$)")
+    ax.set_ylabel("Silhouette score", color="#222222")
+    ax2.set_ylabel("Mean cross-seed ARI", color="#888888")
     ax.tick_params(axis="y", colors="#222222")
-    ax2.tick_params(axis="y", colors="#0072B2")
+    ax2.tick_params(axis="y", colors="#888888")
     ax.set_xticks(ks)
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
@@ -622,30 +622,30 @@ cells.append(md("""
 """))
 
 
-# B.1 — α / Δα / S_g / correction violin per archetype
+# B.1 — α / Δα / S_g / correction boxplot per archetype (grayscale)
 cells.append(code(r"""
-    def archetype_violin(values: np.ndarray, *, ylabel: str, save_name: str,
-                         title: str, ylim: tuple[float, float] | None = None,
-                         hline_zero: bool = False) -> None:
-        '''Single-panel violin: distribution of `values` per archetype.'''
-        fig, ax = fd.make_axes(figsize=(4.8, 3.0))
+    def archetype_box(values: np.ndarray, *, ylabel: str, save_name: str,
+                      title: str, ylim: tuple[float, float] | None = None,
+                      hline_zero: bool = False) -> None:
+        '''Single-panel grayscale boxplot: distribution of `values` per archetype.'''
+        fig, ax = fd.make_axes(figsize=(2.2, 2.6))
         data = [values[archetype == a] for a in range(K_FINAL)]
-        parts = ax.violinplot(data, showmeans=False, showextrema=False,
-                              showmedians=True, widths=0.85)
-        for i, body in enumerate(parts["bodies"]):
-            body.set_facecolor(ARCH_COLOR[i])
-            body.set_edgecolor("#222222")
-            body.set_alpha(0.75)
-            body.set_linewidth(0.6)
-        # Median tick styling
-        if "cmedians" in parts:
-            parts["cmedians"].set_color("#222222")
-            parts["cmedians"].set_linewidth(1.2)
+        bp = ax.boxplot(
+            data,
+            widths=0.55,
+            patch_artist=True,
+            showfliers=False,
+            medianprops=dict(color="#222222", linewidth=1.0),
+            whiskerprops=dict(color="#444444", linewidth=0.8),
+            capprops=dict(color="#444444", linewidth=0.8),
+            boxprops=dict(facecolor="#cccccc", edgecolor="#444444",
+                          linewidth=0.6),
+        )
         if hline_zero:
             ax.axhline(0, color="#888888", linewidth=0.5, linestyle="--")
         ax.set_xticks(np.arange(1, K_FINAL + 1))
         ax.set_xticklabels([f"A{a}" for a in range(K_FINAL)], fontsize=8)
-        ax.set_xlabel("archetype")
+        ax.set_xlabel("Archetype")
         ax.set_ylabel(ylabel)
         if ylim is not None:
             ax.set_ylim(*ylim)
@@ -654,22 +654,22 @@ cells.append(code(r"""
         plt.show()
 
 
-    archetype_violin(alpha, ylabel=fd.LABEL["alpha"],
-                     save_name="B1_archetype_alpha",
-                     title=f"{LABEL}  ·  α per archetype",
-                     ylim=(0, 1))
-    archetype_violin(delta_alpha, ylabel=fd.LABEL["delta_alpha"],
-                     save_name="B1_archetype_delta_alpha",
-                     title=f"{LABEL}  ·  Δα per archetype",
-                     ylim=fd.DELTA_ALPHA_RANGE, hline_zero=True)
-    archetype_violin(S_g_ema, ylabel=fd.LABEL["S_g_ema"],
-                     save_name="B1_archetype_S_g_ema",
-                     title=f"{LABEL}  ·  S_g (EMA) per archetype",
-                     hline_zero=True)
-    archetype_violin(correction, ylabel=fd.LABEL["correction"],
-                     save_name="B1_archetype_correction",
-                     title=f"{LABEL}  ·  GIN correction per archetype",
-                     hline_zero=True)
+    archetype_box(alpha, ylabel=fd.LABEL["alpha"],
+                  save_name="B1_archetype_alpha",
+                  title=f"{LABEL}  ·  α per archetype",
+                  ylim=(0, 1))
+    archetype_box(delta_alpha, ylabel=fd.LABEL["delta_alpha"],
+                  save_name="B1_archetype_delta_alpha",
+                  title=f"{LABEL}  ·  Δα per archetype",
+                  ylim=fd.DELTA_ALPHA_RANGE, hline_zero=True)
+    archetype_box(S_g_ema, ylabel=fd.LABEL["S_g_ema"],
+                  save_name="B1_archetype_S_g_ema",
+                  title=f"{LABEL}  ·  S_g (EMA) per archetype",
+                  hline_zero=True)
+    archetype_box(correction, ylabel=fd.LABEL["correction"],
+                  save_name="B1_archetype_correction",
+                  title=f"{LABEL}  ·  GIN correction per archetype",
+                  hline_zero=True)
 """))
 
 
@@ -687,7 +687,7 @@ cells.append(code(r"""
         # within feature is approximately equivalent to the raw value.
     # Show signed value relative to dataset mean (which is ~0 for StandardScaled).
 
-    fig, ax = fd.make_axes(figsize=(5.0, 3.2))
+    fig, ax = fd.make_axes(figsize=(3.6, 3.2))
     vmax = float(np.abs(H_means).max() * 1.05 + 1e-6)
     im = ax.imshow(H_means.T, aspect="auto", cmap="RdBu_r",
                    vmin=-vmax, vmax=+vmax)
@@ -1053,10 +1053,10 @@ cells.append(code(r"""
 
 
 cells.append(code(r"""
-    archetype_violin(cross_sp_std,
-                     ylabel="cross-species log-CPM std (over species means)",
-                     save_name="D1_archetype_cross_species_std",
-                     title=f"{LABEL}  ·  cross-species expression divergence per archetype")
+    archetype_box(cross_sp_std,
+                  ylabel="cross-species log-CPM std (over species means)",
+                  save_name="D1_archetype_cross_species_std",
+                  title=f"{LABEL}  ·  cross-species expression divergence per archetype")
 """))
 
 
@@ -1175,22 +1175,21 @@ cells.append(code(r"""
 
 
 cells.append(code(r"""
-    fig, ax = fd.make_axes(figsize=(4.4, 3.0))
+    fig, ax = fd.make_axes(figsize=(3.2, 3.0))
     y = np.arange(K_FINAL)
     excess_vals = purity_df["purity_excess"].values
     colors = [ARCH_COLOR[a] for a in range(K_FINAL)]
     ax.barh(y, excess_vals, color=colors, edgecolor="none")
-    ax.axvline(0, color="#888888", linewidth=0.5, linestyle="--")
     for yi, v, n in zip(y, excess_vals, purity_df["n"].values):
-        ax.text(v, yi, f"  Δ={v:+.2f}  (n{n})", va="center",
-                ha="left" if v >= 0 else "right",
+        ax.text(v, yi, f"  $n$ = {n}", va="center", ha="left",
                 fontsize=7, color="#444444")
     ax.set_yticks(y); ax.set_yticklabels([f"A{a}" for a in range(K_FINAL)],
                                           fontsize=8)
     ax.invert_yaxis()
-    ax.set_xlabel("kNN purity excess over per-archetype frequency baseline")
-    rng = float(np.abs(excess_vals).max() * 1.6 + 0.05)
-    ax.set_xlim(-rng, rng)
+    ax.set_xlabel(r"$k$NN purity excess over baseline,  $\Delta\!P$")
+    # All values are positive in practice; pad right for the inline label.
+    x_max = float(excess_vals.max() * 1.6 + 0.05)
+    ax.set_xlim(0, x_max)
     ax.set_title(f"{LABEL}  ·  archetype spatial coherence on ESM-2 UMAP (kNN purity excess)",
                  loc="left", fontsize=8, color="#444444", pad=8)
     fd.save_figure(fig, "E2_archetype_knn_purity_on_esm2")
@@ -1244,12 +1243,16 @@ cells.append(code(r"""
 
 
 cells.append(code(r"""
-    fig, ax = fd.make_axes(figsize=(5.2, 3.4))
+    EPOCH_CUTOFF = 100
+    keep = epochs <= EPOCH_CUTOFF
+
+    fig, ax = fd.make_axes(figsize=(3.6, 3.0))
     for a in range(K_FINAL):
-        ax.plot(epochs, arch_traj[:, a],
-                color=ARCH_COLOR[a], linewidth=1.2, marker="o",
-                markersize=2.5, label=f"A{a}")
+        ax.plot(epochs[keep], arch_traj[keep, a],
+                color=ARCH_COLOR[a], linewidth=1.0, marker="o",
+                markersize=1.2, label=f"A{a}")
     ax.axhline(0, color="#888888", linewidth=0.5, linestyle="--")
+    ax.set_xlim(0, EPOCH_CUTOFF)
     ax.set_xlabel(fd.LABEL["epoch"])
     ax.set_ylabel("mean Δα (within archetype)")
     fd.thin_legend(ax, loc="best")
@@ -1337,9 +1340,11 @@ cells.append(code(r"""
     means       = [r[1] for r in rows]
     stds        = [r[2] if r[2] is not None else 0.0 for r in rows]
     y = np.arange(len(names_disp))
-    colors = ["#bbbbbb", "#0072B2", "#222222"]
+    # Grayscale ramp: chance = lightest, log_mean_expr = mid, all-72 = dark
+    # but no pure black (which would dominate the panel visually).
+    colors = ["#dddddd", "#aaaaaa", "#666666"]
     ax.barh(y, means, xerr=stds, color=colors, edgecolor="none",
-            error_kw=dict(ecolor="#444444", capsize=2, capthick=0.6, lw=0.6))
+            error_kw=dict(ecolor="#666666", capsize=2, capthick=0.6, lw=0.6))
     for yi, m, std in zip(y, means, stds):
         suffix = "" if std == 0 else f" ± {std:.3f}"
         ax.text(m + 0.01, yi, f"{m:.3f}{suffix}", va="center", ha="left",
