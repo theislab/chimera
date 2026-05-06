@@ -1002,9 +1002,10 @@ def render_D1_direction_chemistry(
 ) -> pd.DataFrame:
     """Cliff δ per direction class for hydrophobic vs polar + LRT annotation.
 
-    Three rows: M / F / ref.  Solid INK when per-gene paired Wilcoxon
-    survives at p < 0.05; hollow (white) otherwise.  Direction shading
-    is encoded by the y-axis position, not by color.
+    Three rows: M / F / ref.  Bars share a single lightgray fill — the
+    significance flag (per-gene paired Wilcoxon $p<0.05$) lives entirely
+    in the y-tick label text and the row's stars, so the figure reads
+    strictly monochrome and matches D3's box fill exactly.
     """
     db = direction_breakdown.copy()
     db["dir_idx"] = db["direction"].map({"M": 0, "F": 1, "ref": 2})
@@ -1012,10 +1013,8 @@ def render_D1_direction_chemistry(
 
     fig, ax = plt.subplots(figsize=(4.6, 2.4), constrained_layout=True)
     y = np.arange(len(db))
-    sig = (db["per_gene_p"] < 0.05).fillna(False)
-    fcs = [FILL if s else "white" for s in sig]
-    ax.barh(y, db["cliffs_d"].values, color=fcs, edgecolor=INK,
-            linewidth=0.7, height=0.55, zorder=2)
+    ax.barh(y, db["cliffs_d"].values, color=LITE, edgecolor=INK,
+            linewidth=0.4, height=0.55, zorder=2)
     for i, (lo, hi) in enumerate(zip(db["ci_lo"], db["ci_hi"])):
         if np.isfinite(lo) and np.isfinite(hi):
             ax.plot([lo, hi], [i, i], color=INK, linewidth=0.7, zorder=3)
