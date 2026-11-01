@@ -2,7 +2,7 @@
 
 H-D4 (Family 2), per DE-able type:
   * universe: genes tested in the human T2D vs ND fit and, through an Ensembl Compara 110
-    ``ortholog_one2one`` pair, in the mouse primary (joint) fit; human symbols;
+    ``ortholog_one2one`` pair (both dumps), in the mouse primary (joint) fit; human symbols;
   * preranked GSEA on apeglm log2FC, weighted KS (p = 1), 10,000 random gene sets of the same
     size per set size (gene-set permutation), NES = ES / mean |null ES| of the same sign;
   * sets: MSigDB Hallmark 2020 and Reactome 2024 (Enrichr GMT files), 15-500 genes in universe;
@@ -21,7 +21,6 @@ Both are also reported for every DE-able type and for the per-model mouse fits.
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
 import sys
 from concurrent.futures import ProcessPoolExecutor
@@ -40,7 +39,9 @@ OUT = RES / "hd4"
 FUNC = ROOT / "data" / "revision" / "functional"
 SETS = {"hallmark": FUNC / "Enrichr.MSigDB_Hallmark_2020.server_response.txt",
         "reactome": FUNC / "Enrichr.Reactome_Pathways_2024.server_response.txt"}
-COMPARA = ROOT / "data" / "revision" / "ensembl110" / "Compara.110.protein_default.homologies.tsv.gz"
+COMPARA = [ROOT / "data" / "revision" / "ensembl110" / "Compara.110.protein_default.homologies.tsv.gz",
+           ROOT / "data" / "revision" / "bone_marrow" / "ensembl110"
+           / "Compara.110.protein_default.homologies.mus_musculus.tsv.gz"]
 TABLE = ROOT / "data" / "processed" / "ortholog_table_testis.csv"
 MIN_SIZE, MAX_SIZE = 15, 500
 SEED = 20261101
@@ -57,16 +58,24 @@ def read_gmt(path) -> dict:
 
 
 def one2one() -> pd.DataFrame:
-    rows = []
-    with gzip.open(COMPARA, "rt") as f:
-        next(f)
-        for line in f:
-            if not line.startswith("ENSG"):
-                continue
-            p = line.split("\t", 9)
-            if p[4] == "ortholog_one2one" and p[7] == "mus_musculus":
-                rows.append((p[0], p[5]))
-    return pd.DataFrame(rows, columns=["human_id", "mouse_id"]).drop_duplicates()
+    """Human-mouse ortholog_one2one pairs from both Compara dumps, each read in both orientations.
+
+    A pair sits in only one dump depending on the dump layout, so the human dump alone loses about
+    a third of the pairs (as ``P13_kidney/build_orthologs.py``).
+    """
+    cols = ["gene_stable_id", "species", "homology_type", "homology_gene_stable_id", "homology_species"]
+    out = []
+    for path in COMPARA:
+        df = pd.read_csv(path, sep="\t", usecols=cols, dtype=str)
+        df = df[df["homology_type"] == "ortholog_one2one"]
+        fwd = df[(df["species"] == "homo_sapiens") & (df["homology_species"] == "mus_musculus")]
+        rev = df[(df["species"] == "mus_musculus") & (df["homology_species"] == "homo_sapiens")]
+        out.append(pd.DataFrame({"human_id": fwd["gene_stable_id"], "mouse_id": fwd["homology_gene_stable_id"]}))
+        out.append(pd.DataFrame({"human_id": rev["homology_gene_stable_id"], "mouse_id": rev["gene_stable_id"]}))
+    pairs = pd.concat(out, ignore_index=True).drop_duplicates()
+    if pairs["human_id"].duplicated().any() or pairs["mouse_id"].duplicated().any():
+        raise ValueError("one2one pairs are not one to one")
+    return pairs
 
 
 def es_matrix(r_sorted: np.ndarray, pos: np.ndarray) -> np.ndarray:

@@ -8,8 +8,10 @@ disease concordance and no Chimera readout is computed here.
 
 Steps (section 8b):
 
-1. ``_validate_raw_counts``, ``_standardize_obs_columns`` (batch = library) and ``_qc_filter``
-   (>= 200 genes, mitochondrial fraction < 20%) from ``chimera._data_utils``.
+1. ``_validate_raw_counts``, ``_standardize_obs_columns`` and ``_qc_filter``
+   (>= 200 genes, mitochondrial fraction < 20%) from ``chimera._data_utils``. ``obs['batch']`` of
+   the healthy object is the technical source dataset (``technical_batch``); donors and libraries
+   are in ``obs['sample_batch']``.
 2. ``cell_ontology_class`` from the author labels through ``celltype_map.tsv`` (human
    ``Annotated_Clusters``, mouse ``cell_type_reannotatedIntegrated``; Hrovatin ``low_q`` cells
    are unresolved). Coarse marker check per author label, reported only.
