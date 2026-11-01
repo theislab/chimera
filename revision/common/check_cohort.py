@@ -5,8 +5,8 @@ Usage: python -m revision.common.check_cohort <h5ad> [--batch-key species] [--ce
 Fails (exit 1) unless:
 * X holds raw non-negative integer counts and ``layers`` is empty (Chimera reads X as counts);
 * ``obs`` has ``species``, the batch key and the cell-type key; every batch maps to one species;
-* the batch key gives at most 2 batches per species: canonical recipes use batch == species, and
-  several batches per species is a documented failure (iter94, ``training/workflow.md``);
+* the batch key gives at most 3 batches per species: batch is the technical source dataset within
+  a species, never the donor, which is a documented failure (iter94, ``training/workflow.md``);
 * ``var['conservation_prior']`` is finite in [0, 1]; ``varm['gene_features']`` has 72 finite columns;
 * ``uns['p_null']`` has shape (n_species, n_genes), non-negative, rows summing to about 1.
 """
@@ -39,9 +39,9 @@ def check(path: str, batch_key: str = "species", celltype_key: str | None = "cel
         if (per != 1).any():
             errs.append(f"batches spanning several species: {per[per != 1].index.tolist()[:5]}")
         nb = a.obs.groupby("species", observed=True)[batch_key].nunique()
-        if (nb > 2).any():
-            errs.append(f"more than 2 batches per species with batch_key={batch_key!r}: {nb.to_dict()} "
-                        "(multi-batch-per-species fails, iter94; train with --batch-key species)")
+        if (nb > 3).any():
+            errs.append(f"more than 3 batches per species with batch_key={batch_key!r}: {nb.to_dict()} "
+                        "(donor-level batches fail, iter94; batch must be the source dataset within species)")
     pr = np.asarray(a.var.get("conservation_prior", np.array([np.nan])), dtype=float)
     if not (np.isfinite(pr).all() and pr.min() >= 0 and pr.max() <= 1):
         errs.append("var['conservation_prior'] missing or outside [0, 1]")
