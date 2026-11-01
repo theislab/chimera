@@ -71,3 +71,12 @@ arguments as `rev-vz-s<seed>` (`revision/tasks/T11_3_vz_seeds/`, written by
 
 Disclosure: rows 1-6 are label-informed alignment (conditional MMD on harmonised cell
 classes), as on testis. The grid is reported in Methods.
+
+## Per-run report (`run_profile.py`, not part of selection)
+
+Runs only after selection is complete and is never an input to it. For each grid and seed
+run it reports the Delta-alpha sign profile against the training prior and the raw prior
+(fractions positive and negative, beyond +0.05 and -0.05, SD, median), knn_mixing_entropy,
+final adversary accuracy and Gate G-V. A seed with knn_mixing_entropy below 0.5 times the
+selected run's is flagged poorly mixed and reported separately; the primary D stays the
+mean over seeds (section 2 of the pre-specified plan).
