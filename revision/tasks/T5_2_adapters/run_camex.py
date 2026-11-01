@@ -58,12 +58,12 @@ def main(argv=None):
     p.add_argument("--epochs", type=int, default=None, help="smoke only; default = authors' epoch_integration")
     a = p.parse_args(argv)
 
-    inputs = Path(a.inputs) if a.inputs else C.INPUTS / a.stem / "camex"
-    work = Path(a.work)
+    inputs = (Path(a.inputs) if a.inputs else C.INPUTS / a.stem / "camex").resolve()
+    work = Path(a.work).resolve()
     if (work / "gene_integration_hidden.h5ad").exists():
         raise SystemExit(f"refusing to overwrite {work}")
     work.mkdir(parents=True, exist_ok=True)
-    dest = Path(a.dest) if a.dest else work / "final"
+    dest = (Path(a.dest) if a.dest else work / "final").resolve()
     tissue = C.COHORTS[a.stem][1]
     smap = C.species_map(a.stem)
 
@@ -102,7 +102,7 @@ def main(argv=None):
     emb = np.asarray(adata.obsm["X_CAMEX_Integration"])
     names = pd.Index(adata.obs_names.astype(str))
     obs, n_vars = C.processed_obs(a.stem)
-    if inputs != C.INPUTS / a.stem / "camex":
+    if inputs != (C.INPUTS / a.stem / "camex").resolve():
         man = json.loads((inputs / "manifest.json").read_text())
         import anndata as ad
         keep = []

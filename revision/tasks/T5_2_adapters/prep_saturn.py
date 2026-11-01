@@ -51,7 +51,7 @@ def main(argv=None):
         rng = np.random.default_rng(0)
         keep = rng.choice(len(obs), size=a.subsample, replace=False)
         obs = obs.iloc[np.sort(keep)]
-    out = Path(a.out_root) / a.stem / "saturn"
+    out = (Path(a.out_root) / a.stem / "saturn").resolve()
     out.mkdir(parents=True, exist_ok=True)
 
     rows, man = [], {"stem": a.stem, "n_obs": int(len(obs)), "subsample": a.subsample, "species": {}}

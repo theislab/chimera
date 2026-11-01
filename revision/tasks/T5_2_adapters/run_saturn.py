@@ -53,13 +53,13 @@ def main(argv=None):
     p.add_argument("--method-name", default=None)
     a = p.parse_args(argv)
 
-    inputs = Path(a.inputs) if a.inputs else C.INPUTS / a.stem / "saturn"
-    work = Path(a.work)
+    inputs = (Path(a.inputs) if a.inputs else C.INPUTS / a.stem / "saturn").resolve()
+    work = Path(a.work).resolve()
     if (work / "saturn_results").exists():
         raise SystemExit(f"refusing to overwrite {work}/saturn_results")
     work.mkdir(parents=True, exist_ok=True)
-    dest = Path(a.dest) if a.dest else work / "final"
-    centroids = Path(a.centroids) if a.centroids else work / f"centroids_s{a.seed}.pkl"
+    dest = (Path(a.dest) if a.dest else work / "final").resolve()
+    centroids = (Path(a.centroids) if a.centroids else work / f"centroids_s{a.seed}.pkl").resolve()
     method = a.method_name or ("saturn" if a.labels == "cell_type" else "saturn_leiden")
 
     cli = [
@@ -103,7 +103,7 @@ def main(argv=None):
         raise SystemExit(f"expected one final h5ad, found {finals}")
     out = ad.read_h5ad(finals[0])
     obs, n_vars = C.processed_obs(a.stem)
-    if inputs != C.INPUTS / a.stem / "saturn":  # subsample (smoke): restrict to input cells
+    if inputs != (C.INPUTS / a.stem / "saturn").resolve():  # subsample (smoke): restrict to input cells
         keep = []
         for f in pd.read_csv(inputs / "run.csv")["path"]:
             keep += list(ad.read_h5ad(f, backed="r").obs_names)
