@@ -197,6 +197,8 @@ def main():
     tmp = a.outdir / "seed_pooling.json.tmp"
     tmp.write_text(json.dumps(pools, indent=2))
     tmp.replace(a.outdir / "seed_pooling.json")
+    if set(a.cohorts) == set(MPS):
+        (a.outdir / "DONE").write_text("all cohorts\n")
 
 
 if __name__ == "__main__":
