@@ -10,6 +10,8 @@ block, so the result equals a whole-file run:
 
 1. ``_validate_raw_counts``, ``_standardize_obs_columns`` (batch = unit) and ``_qc_filter``
    (>= 200 genes, mitochondrial fraction < 20%) from ``chimera._data_utils``.
+   The human matrix has no MT- genes, so for human the 20% threshold is applied to the
+   authors' ``percent.mt`` (as T7.2 did).
 2. ``cell_ontology_class`` from ``SubclassLevel1`` through ``celltype_map.tsv``.
 3. Per-unit pseudobulks per class for every unit (summed counts, ``layers['n_detected']``),
    all QC-passed nuclei, no caps, native gene space; per unit x class x ``CellStateLevel2``
@@ -80,7 +82,7 @@ DE_TYPES = ["pt", "tal", "dct", "pc", "ic", "ec", "fib", "myeloid", "lymphoid"]
 MIN_H_CTRL, MIN_H_AKI, MIN_M_SHAM, MIN_M_IRI, MIN_DEABLE = 6, 10, 3, 4, 4
 BLOCK = 100_000  # physical rows of raw/X per read
 MULTIOME = "10x multiome"
-OBS_COLS = {"Human": ["donor_id", "assay", "SubclassLevel1", "CellStateLevel2", "region"],
+OBS_COLS = {"Human": ["donor_id", "assay", "SubclassLevel1", "CellStateLevel2", "region", "percent.mt"],
             "Mouse": ["donor_id", "experiment", "source", "assay", "SubclassLevel1", "CellStateLevel2"]}
 UNIT_KEYS = ["unit", "donor", "species", "role", "condition", "assay", "source", "collection", "sex", "age",
              "stage", "time", "subtype"]
@@ -143,6 +145,12 @@ def stream(path: Path, species: str, obs: pd.DataFrame, var: pd.DataFrame, roles
             a = _standardize_obs_columns(a)
             n_before = a.obs["unit"].value_counts()
             a = _qc_filter(a, min_genes=MIN_GENES, max_mt_pct=MAX_MT)
+            if species == "Human":
+                # The human matrix carries no MT- genes (removed by the authors), so _qc_filter
+                # cannot see mitochondrial reads; the same 20% threshold is applied to the
+                # authors' percent.mt, as T7.2 did for GSE202379.
+                pmt = pd.to_numeric(a.obs["percent.mt"], errors="coerce").fillna(0.0)
+                a = a[(pmt < MAX_MT).to_numpy()].copy()
             qc_parts.append(pd.DataFrame({"before": n_before, "after": a.obs["unit"].value_counts()}).fillna(0))
             cls = a.obs["SubclassLevel1"].map(ctmap)
             if cls.isna().any():
