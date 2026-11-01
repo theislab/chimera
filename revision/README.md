@@ -21,3 +21,4 @@ Analyses added for the Cell Systems revision. Nothing here changes the `chimera`
 | T2.5 | `tasks/T2_5_celltype_margin/run.py` (needs `chimera_env`) | `results/revision/T2_5/<run>__{S_gsk,C_gk,genes}.parquet`, acceptance, figures |
 | T2.6 | `tasks/T2_6_matched/run.py` | `results/revision/T2_6/category_matched.csv`, random sets, mtDNA detection check |
 | T2.7 | `tasks/T2_7_consistency/run.py` | `results/revision/T2_7/consistency_values.csv` |
+| T4.2 | `tasks/T4_2_gene_baselines/run.py` (needs `chimera_env`) | `results/revision/T4_2/baselines__<cohort>.csv` (B1b, B1c, B1z, B2b, B3a, B3b per ENSG), pseudobulk units, summaries, marker check |
