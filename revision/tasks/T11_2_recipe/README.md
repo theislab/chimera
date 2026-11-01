@@ -37,7 +37,7 @@ Rows 1-6 add `--celltype-conditional-mmd --celltype-key cell_ontology_class --pr
 
 Rows 2-5 change one K-dependent weight of the base at a time. Row 7 is the former fallback.
 
-## Selection rule (`select.py`)
+## Selection rule (`select_recipe.py`)
 
 Only s42 grid runs are used. No Delta-alpha statistic beyond the gate's tail check, no
 glaucoma gene and no biology readout enters selection.
@@ -62,7 +62,7 @@ glaucoma gene and no biology readout enters selection.
 
 The selected run's s42 counts as `rev-vz-s42`. T11.3 trains seeds 43-46 with the same
 arguments as `rev-vz-s<seed>` (`revision/tasks/T11_3_vz_seeds/`, written by
-`select.py --write-t113-manifest`).
+`select_recipe.py --write-t113-manifest`).
 
 Disclosure: rows 1-6 are label-informed alignment (conditional MMD on harmonised cell
 classes), as on testis. The grid is reported in Methods.

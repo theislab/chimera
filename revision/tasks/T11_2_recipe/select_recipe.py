@@ -12,7 +12,7 @@
 No Delta-alpha statistic beyond the gate's tail check, no glaucoma gene and no biology
 readout is read here.
 
-    python revision/tasks/T11_2_recipe/select.py [--write-t113-manifest]
+    python revision/tasks/T11_2_recipe/select_recipe.py [--write-t113-manifest]
 """
 
 from __future__ import annotations
