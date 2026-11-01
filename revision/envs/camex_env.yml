@@ -1,0 +1,17 @@
+name: camex_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cpu
+      - torch==1.13.1+cpu
+      - dgl==0.9.1
+      - numpy==1.23.5
+      - pandas==1.5.3
+      - scanpy[leiden]==1.9.3
+      - anndata==0.9.2
+      - numba==0.56.4
+      - harmonypy==0.0.9
+      - scikit-learn==1.2.2
