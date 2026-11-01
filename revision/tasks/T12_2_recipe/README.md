@@ -34,7 +34,15 @@ K-dependent weights at K = 3, from `chimera-manuscript/tables/k_scaling_laws.tex
 | 7 | 100 | 0.001 | 50 | 1.0 | same | testis 3-sp row unchanged |
 | 8 | 200 | 0.001 | 100 | 1.0 | none / none | liver 4-sp row (other base) |
 
-All: `--config A --max-epochs 200 --accelerator cpu`, `cpu_p` / `cpu_normal`, 16 CPUs, 64G.
+All: `--config A --max-epochs 200 --accelerator cpu --batch-key species`, `cpu_p` / `cpu_normal`,
+16 CPUs, 64G.
+
+batch_key = species, as in all canonical recipes (multi-batch-per-species fails, iter94:
+`training/workflow.md`, z contracted 4x with donor batches). `obs['batch']` in the h5ad stays at
+species|donor|tissue level (47 values) and is not used by training; it remains available for
+donor-level analyses (DE, pseudobulk). The first submission (array 42408922) used the default
+`--batch-key batch` and was cancelled after 56 min, before any output was read; its run
+directories are in `training/runs/_failed/rev-bm-grid<k>-s42_42408922`.
 
 ## Selection (`select_recipe.py`)
 
