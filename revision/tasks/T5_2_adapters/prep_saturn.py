@@ -3,8 +3,10 @@
 For one cohort, per species: read the raw CAMEX h5ad, keep exactly the cells of
 the processed cohort (processed order), copy `cell_type`, `species`,
 `cell_ontology_class` from the processed obs, keep raw counts and native gene
-symbols, drop duplicate symbols (first kept) and genes with zero counts in these
-cells, and add `leiden_within` (within-species Leiden: normalize_total 1e4,
+symbols, drop duplicate symbols (first kept) and genes detected in fewer than 3 of these cells
+(sc.pp.filter_genes min_cells=3: without it, SATURN's seurat_v3 HVG loess fit
+fails on liver zebrafish with 'near singularities'; applied to every species
+and cohort), and add `leiden_within` (within-species Leiden: normalize_total 1e4,
 log1p, 2000 HVG, PCA 50, k=15, resolution 1.0, random_state 0).
 
 Writes <inputs>/<stem>/saturn/{<species>.h5ad, run.csv, manifest.json}.
@@ -26,6 +28,8 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import scanpy as sc  # noqa: E402
 import scipy.sparse as sp  # noqa: E402
+
+MIN_CELLS = 3
 
 
 def leiden_within(a: ad.AnnData) -> pd.Series:
@@ -69,7 +73,7 @@ def main(argv=None):
         X = sp.csr_matrix(r.X, dtype=np.float32)
         if not np.allclose(X.data, np.round(X.data)):
             raise SystemExit(f"{raw_path} is not integer counts")
-        nz = np.asarray((X > 0).sum(axis=0)).ravel() > 0
+        nz = np.asarray((X > 0).sum(axis=0)).ravel() >= MIN_CELLS
         x = ad.AnnData(X=X[:, nz], obs=pd.DataFrame(index=r.obs_names.astype(str)),
                        var=pd.DataFrame(index=r.var_names[nz]))
         x.obs["cell_type"] = o["cell_type"].values
@@ -82,7 +86,7 @@ def main(argv=None):
         rows.append({"path": str(f), "species": sat_sp, "embedding_path": str(emb)})
         man["species"][sat_sp] = {
             "species_processed": sp_proc, "n_cells": int(x.n_obs), "n_genes": int(x.n_vars),
-            "dropped_duplicate_symbols": n_dup, "dropped_zero_genes": int((~nz).sum()),
+            "dropped_duplicate_symbols": n_dup, "min_cells": MIN_CELLS, "dropped_genes_below_min_cells": int((~nz).sum()),
             "n_cell_type": int(x.obs["cell_type"].nunique()),
             "n_leiden_within": int(x.obs["leiden_within"].nunique()),
             "raw_file": str(raw_path), "raw_sha256": C.sha256(raw_path),
