@@ -36,26 +36,6 @@ def string_gene_map(aliases: Path, prefix: str) -> dict[str, str]:
     return {k: next(iter(v)) for k, v in m.items() if len(v) == 1}
 
 
-def read_xlsx_sheet(path: Path, index: int) -> list[list[str]]:
-    """Rows of one worksheet, standard library only (no Excel reader in the environment)."""
-    import xml.etree.ElementTree as ET
-
-    ns = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
-    z = zipfile.ZipFile(path)
-    ss = []
-    if "xl/sharedStrings.xml" in z.namelist():
-        for si in ET.fromstring(z.read("xl/sharedStrings.xml")).iter(f"{ns}si"):
-            ss.append("".join(t.text or "" for t in si.iter(f"{ns}t")))
-    rows = []
-    for r in ET.fromstring(z.read(f"xl/worksheets/sheet{index}.xml")).iter(f"{ns}row"):
-        vals = []
-        for c in r.iter(f"{ns}c"):
-            v = c.find(f"{ns}v")
-            vals.append("" if v is None else (ss[int(v.text)] if c.get("t") == "s" else v.text))
-        rows.append(vals)
-    return rows
-
-
 def edges_in(edges: pd.DataFrame, voc: set[str]) -> tuple[int, int]:
     e = edges[edges.a.isin(voc) & edges.b.isin(voc) & (edges.a != edges.b)]
     key = pd.Series([tuple(sorted(x)) for x in zip(e.a, e.b)]).drop_duplicates() if len(e) else pd.Series([], dtype=object)
@@ -67,6 +47,9 @@ def main(repo: Path, out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
     sys.path.insert(0, str(repo / "revision" / "tasks" / "T4_1_gold"))
     from gold_checks import SymbolMapper, gtf_gene_names  # noqa: E402
+
+    sys.path.insert(0, str(repo / "revision" / "tasks" / "T6_1_functional"))
+    from xlsx_min import read_sheet  # noqa: E402
 
     F = repo / "data/revision/functional"
     P = repo / "data/processed"
@@ -123,7 +106,7 @@ def main(repo: Path, out: Path) -> None:
     add("CollecTRI_human", "single-gene TFs in vocabulary with >=10 targets in vocabulary",
         int((tf_in["liver"] >= 10).sum()), int((tf_in["testis"] >= 10).sum()))
     # Skinnider 2021 mouse tissue interactomes (mmc2, legend "Table S3"), mouse symbols
-    sk = read_xlsx_sheet(F / "skinnider2021/Skinnider2021_mmc2.xlsx", 1)
+    sk = read_sheet(F / "skinnider2021/Skinnider2021_mmc2.xlsx", "Table S3")
     sk = pd.DataFrame(sk[1:], columns=sk[0])
     log("Skinnider rows", len(sk), "tissues", sk.Tissue.value_counts().to_dict())
     msym = {}

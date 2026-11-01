@@ -1,0 +1,533 @@
+gene	source	hsapiens_gene_id	id_route	in_van_zyl_vocab	in_van_zyl_vocab_by_symbol	gharahkhani_evidence	gharahkhani_n_evidence	gharahkhani_loci	nearest_gene_at_loci	mapped
+ANGPT1	vanzyl_mendelian;gharahkhani	ENSG00000154188	approved	True	True	chromatin_interaction,eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl,significant_pathways	6	rs2514879	rs2514879	True
+ANGPT2	vanzyl_mendelian;gharahkhani	ENSG00000091879	approved	True	True	ld_protein_altering,significant_pathways	2	rs2515437	rs2515437	True
+CPAMD8	vanzyl_mendelian	ENSG00000160111	approved	False	False		0			True
+CYP1B1	vanzyl_mendelian	ENSG00000138061	approved	True	True		0			True
+FOXC1	vanzyl_mendelian	ENSG00000054598	approved	False	False		0			True
+LOXL1	vanzyl_mendelian;gharahkhani	ENSG00000129038	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,ld_protein_altering,paintor_eqtl_sqtl,significant_pathways	6	rs1550437	rs1550437	True
+LTBP2	vanzyl_mendelian;gharahkhani	ENSG00000119681	approved	True	True	eqtl_any,genebased_magma	2	rs754458	rs754458	True
+MYOC	vanzyl_mendelian;gharahkhani	ENSG00000034971	approved	True	True	protein_altering	1	rs74315329	rs74315329	True
+OPTN	vanzyl_mendelian	ENSG00000123240	approved	True	True		0			True
+PITX2	vanzyl_mendelian;gharahkhani	ENSG00000164093	approved	False	False	significant_pathways	1	rs17527016	rs17527016	True
+TEK	vanzyl_mendelian	ENSG00000120156	approved	True	True		0			True
+TBK1	vanzyl_mendelian	ENSG00000183735	approved	True	True		0			True
+TMCO1	vanzyl_gwas;gharahkhani	ENSG00000143183	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs2790053	rs2790053	True
+TXNRD2	vanzyl_gwas;gharahkhani	ENSG00000184470	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs8141610	rs8141610	True
+CAV1	vanzyl_gwas;gharahkhani	ENSG00000105974	approved	True	True	genebased_magma,significant_pathways	2	rs10257125	rs10257125	True
+CAV2	vanzyl_gwas;gharahkhani	ENSG00000105971	approved	True	True	eqtl_any,genebased_magma,paintor_eqtl_sqtl,significant_pathways	4	rs10257125		True
+ARHGEF12	vanzyl_gwas;gharahkhani	ENSG00000196914	approved	True	True	genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	3	rs1893261		True
+ATXN2	vanzyl_gwas	ENSG00000204842	approved	True	True		0		rs7137828	True
+EFEMP1	vanzyl_text;gharahkhani	ENSG00000115380	approved	True	True	eqtl_any,significant_pathways	2	rs2627761	rs2627761	True
+GAS7	vanzyl_text;gharahkhani	ENSG00000007237	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	5	rs9913911	rs9913911	True
+KALRN	vanzyl_text	ENSG00000160145	approved	False	False		0			True
+PRSS23	vanzyl_text;gharahkhani	ENSG00000150687	approved	True	True	chromatin_interaction,genebased_eqtl_integration,genebased_magma,significant_pathways	4	rs10792871		True
+SIX6	vanzyl_text;gharahkhani	ENSG00000184302	approved	True	True	genebased_eqtl_integration,genebased_magma,protein_altering	3	rs33912345	rs33912345	True
+POU6F2	vanzyl_text	ENSG00000106536	approved	True	True		0		rs10248136	True
+CACNA1A	vanzyl_text	ENSG00000141837	approved	True	True		0			True
+ABCA1	gharahkhani	ENSG00000165029	approved	True	True	genebased_eqtl_integration,genebased_magma,significant_pathways	3	rs2472494	rs2472494	True
+ABLIM2	gharahkhani	ENSG00000163995	approved	True	True	genebased_magma	1	rs938604		True
+ABO	gharahkhani	ENSG00000175164	approved	False	False	eqtl_any,ld_protein_altering	2	rs8176749	rs8176749	True
+AC000003.2	gharahkhani		unmapped	False	False	genebased_magma	1	rs9913911		False
+AC002066.1	gharahkhani	ENSG00000237813	alias	False	False	chromatin_interaction	1	rs12699251		True
+AC003035.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs66819623		False
+AC005105.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2191828		False
+AC005291.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs9913911		False
+AC006960.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6957752		False
+AC006960.4	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6957752		False
+AC007568.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10230941		False
+AC007849.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs4361323		False
+AC007956.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs754458		False
+AC009970.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6713914		False
+AC012066.1	gharahkhani		unmapped	False	False	chromatin_interaction,eqtl_any,paintor_eqtl_sqtl	3	rs1579050		False
+AC012358.8	gharahkhani		unmapped	False	False	paintor_eqtl_sqtl	1	rs2627761		False
+AC013471.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs12623251		False
+AC022431.2	gharahkhani		unmapped	False	False	genebased_magma	1	rs112142644		False
+AC073130.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10257125		False
+AC074043.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6437582		False
+AC079112.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs4414666		False
+AC079414.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs280875		False
+AC079610.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs200621439		False
+AC079799.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs7805468		False
+AC083795.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs17527016		False
+AC089998.4	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs324788		False
+AC090193.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs62521288		False
+AC092964.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs62283813		False
+AC092964.2	gharahkhani		unmapped	False	False	genebased_magma	1	rs62283813		False
+AC093166.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs9308689		False
+AC093536.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs12447201		False
+AC093690.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs17006576		False
+AC097381.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs938604		False
+AC105384.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10517281		False
+AC105384.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10517281		False
+AC116533.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs4141194		False
+AC130689.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs216197		False
+ACAD10	gharahkhani	ENSG00000111271	approved	False	False	chromatin_interaction	1	rs7137828		True
+ACOD1	gharahkhani	ENSG00000102794	approved	True	True	chromatin_interaction	1	rs9544024		True
+ACOXL	gharahkhani	ENSG00000153093	approved	False	False	genebased_magma	1	rs9308689	rs9308689	True
+ACP2	gharahkhani	ENSG00000134575	approved	False	False	eqtl_retina,genebased_eqtl_integration,genebased_magma	3	rs7111873		True
+ADAM1A	gharahkhani	ENSG00000229186	approved	False	False	eqtl_retina	1	rs7137828		True
+ADAMTS8	gharahkhani	ENSG00000134917	approved	True	True	genebased_magma	1	rs2875238	rs2875238	True
+ADPRHL2	gharahkhani	ENSG00000116863	previous	True	False	genebased_magma	1	rs4652902		True
+ADRB1	gharahkhani	ENSG00000043591	approved	False	False	chromatin_interaction	1	rs72837408		True
+AF064858.11	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs13050568		False
+AFAP1	gharahkhani	ENSG00000196526	approved	True	True	chromatin_interaction,eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	5	rs938604	rs938604	True
+AFAP1-AS1	gharahkhani	ENSG00000272620	approved	False	False	genebased_eqtl_integration	1	rs938604		True
+AGBL2	gharahkhani	ENSG00000165923	approved	True	True	genebased_eqtl_integration	1	rs7111873		True
+AGPAT5	gharahkhani	ENSG00000155189	approved	True	True	chromatin_interaction	1	rs2515437		True
+AL031768.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2745572		False
+AL034370.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs17146835		False
+AL078605.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2935057		False
+AL109618.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2326788		False
+AL118523.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6101546		False
+AL133319.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs4612174		False
+AL136369.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs6602453		False
+AL138479.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs12433661		False
+AL162414.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs61751937		False
+AL358115.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2790053		False
+ALCAM	gharahkhani	ENSG00000170017	approved	True	True	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs6437582	rs6437582	True
+ALDH2	gharahkhani	ENSG00000111275	approved	False	False	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs7137828		True
+ALDH9A1	gharahkhani	ENSG00000143149	approved	False	False	genebased_magma	1	rs2790053		True
+ANGPTL2	gharahkhani	ENSG00000136859	approved	True	True	genebased_magma,significant_pathways	2	rs3829849		True
+ANKH	gharahkhani	ENSG00000154122	approved	True	True	chromatin_interaction,eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	5	rs31916	rs31916	True
+ANKRD54	gharahkhani	ENSG00000100124	approved	True	True	genebased_magma	1	rs5750494		True
+ANTXR1	gharahkhani	ENSG00000169604	approved	True	True	significant_pathways	1	rs6732795	rs6732795	True
+AP000462.3	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10444329		False
+AP000679.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs1893261		False
+AP000758.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs1893261		False
+AP000769.1	gharahkhani		unmapped	False	False	genebased_eqtl_integration,genebased_magma	2	rs1346		False
+AP000942.2	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs7120067		False
+AP000974.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs10792871		False
+AP001362.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs1346		False
+AP002348.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs1893261		False
+AP003486.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs2875238		False
+AP1B1	gharahkhani	ENSG00000100280	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+APP	gharahkhani	ENSG00000142192	approved	True	True	chromatin_interaction,significant_pathways	2	rs13049669	rs13049669	True
+APR2	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs242559		False
+AREL1	gharahkhani	ENSG00000119682	approved	False	False	genebased_magma	1	rs754458	rs754458	True
+ARFGAP2	gharahkhani	ENSG00000149182	approved	True	True	genebased_magma	1	rs7111873		True
+ARHGAP27	gharahkhani	ENSG00000159314	approved	True	True	eqtl_retina,genebased_eqtl_integration	2	rs242559		True
+ARHGEF3	gharahkhani	ENSG00000163947	approved	True	True	genebased_eqtl_integration	1	rs1500708	rs1500708	True
+ARHGEF3-AS1	gharahkhani	ENSG00000240198	approved	False	False	chromatin_interaction,genebased_eqtl_integration	2	rs1500708		True
+ARL17B	gharahkhani	ENSG00000228696	approved	False	False	eqtl_retina,genebased_eqtl_integration	2	rs242559		True
+ARL2	gharahkhani	ENSG00000213465	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+BCAS3	gharahkhani	ENSG00000141376	approved	True	True	genebased_magma,significant_pathways	2	rs11868441	rs11868441	True
+BICC1	gharahkhani	ENSG00000122870	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs1658436	rs1658436	True
+BMP2	gharahkhani	ENSG00000125845	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs2326788		True
+BRAP	gharahkhani	ENSG00000089234	approved	True	True	chromatin_interaction	1	rs7137828		True
+BX093900	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs7344		False
+C1QTNF4	gharahkhani	ENSG00000172247	approved	False	False	genebased_magma	1	rs7111873		True
+CACNA2D1	gharahkhani	ENSG00000153956	approved	True	True	genebased_eqtl_integration	1	rs59101260		True
+CADM1	gharahkhani	ENSG00000182985	approved	True	True	eqtl_any	1	rs10444329	rs10444329	True
+CADM2	gharahkhani	ENSG00000175161	approved	True	True	chromatin_interaction,eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	5	rs13101042	rs13101042	True
+CADM2-AS1	gharahkhani	ENSG00000239519	approved	False	False	genebased_eqtl_integration	1	rs13101042		True
+CADM2-AS2	gharahkhani	ENSG00000241648	approved	False	False	genebased_eqtl_integration	1	rs13101042		True
+CALD1	gharahkhani	ENSG00000122786	approved	True	True	chromatin_interaction,eqtl_any,paintor_eqtl_sqtl,significant_pathways	4	rs10237321	rs10237321	True
+CAPN1	gharahkhani	ENSG00000014216	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+CAPZA1	gharahkhani	ENSG00000116489	approved	False	False	genebased_magma	1	rs1106287		True
+CASP7	gharahkhani	ENSG00000165806	approved	True	True	paintor_eqtl_sqtl	1	rs72837408		True
+CCDC104	gharahkhani	ENSG00000163001	previous	True	False	genebased_magma	1	rs2627761		True
+CCDC83	gharahkhani	ENSG00000150676	approved	True	True	genebased_magma	1	rs10792871		True
+CCDC91	gharahkhani	ENSG00000123106	approved	True	True	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs7972874	rs7972874	True
+CDC7	gharahkhani	ENSG00000097046	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs1192415	rs1192415	True
+CDCA8	gharahkhani	ENSG00000134690	approved	True	True	chromatin_interaction	1	rs10908363		True
+CDH11	gharahkhani	ENSG00000140937	approved	True	True	eqtl_retina,genebased_eqtl_integration,genebased_magma,ld_protein_altering,significant_pathways	5	rs12447201	rs12447201	True
+CDKN2A	gharahkhani	ENSG00000147889	approved	False	False	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl,significant_pathways	5	rs944801		True
+CDKN2B	gharahkhani	ENSG00000147883	approved	False	False	genebased_magma,significant_pathways	2	rs944801		True
+CDKN2B-AS1	gharahkhani	ENSG00000240498	approved	False	False	significant_pathways	1	rs944801	rs944801	True
+CELF1	gharahkhani	ENSG00000149187	approved	True	True	genebased_magma	1	rs7111873		True
+CHEK2	gharahkhani	ENSG00000183765	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs5752776	rs5752776	True
+CHRDL1	gharahkhani	ENSG00000101938	approved	True	True	significant_pathways	1	rs12013156	rs12013156	True
+CISD1	gharahkhani	ENSG00000122873	approved	False	False	genebased_eqtl_integration	1	rs1658436		True
+CKAP5	gharahkhani	ENSG00000175216	approved	True	True	genebased_magma	1	rs7111873		True
+CLIC5	gharahkhani	ENSG00000112782	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration,paintor_eqtl_sqtl	4	rs3777588	rs3777588	True
+CMB9-22P13.1	gharahkhani		unmapped	False	False	paintor_eqtl_sqtl	1	rs1346		False
+COL11A1	gharahkhani	ENSG00000060718	approved	True	True	genebased_magma,ld_protein_altering,protein_altering,significant_pathways	4	rs3753841	rs3753841	True
+COL4A1	gharahkhani	ENSG00000187498	approved	True	True	genebased_magma,significant_pathways	2	rs2218471	rs2218471	True
+COL8A2	gharahkhani	ENSG00000171812	approved	True	True	eqtl_retina,genebased_eqtl_integration,genebased_magma,significant_pathways	4	rs4652902		True
+COMMD6	gharahkhani	ENSG00000188243	approved	False	False	genebased_eqtl_integration	1	rs9544024		True
+CRHR1	gharahkhani	ENSG00000120088	approved	True	True	eqtl_retina,genebased_eqtl_integration,ld_protein_altering	3	rs242559		True
+CRHR1-IT1	gharahkhani		ambiguous_shared_ensg	False	False	genebased_eqtl_integration	1	rs242559		False
+CRYGS	gharahkhani	ENSG00000213139	approved	True	True	genebased_magma	1	rs56233426		True
+CSF2RB	gharahkhani	ENSG00000100368	approved	False	False	genebased_eqtl_integration	1	rs5750494		True
+CTBP2P8	gharahkhani	ENSG00000234383	approved	False	False	chromatin_interaction	1	rs4076000		True
+CTC-236F12.4	gharahkhani		unmapped	False	False	genebased_eqtl_integration,genebased_magma	2	rs112142644		False
+CTTNBP2	gharahkhani	ENSG00000077063	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs10230941	rs10230941	True
+CTTNBP2NL	gharahkhani	ENSG00000143079	approved	True	True	chromatin_interaction	1	rs1106287		True
+CYP26A1	gharahkhani	ENSG00000095596	approved	True	True	genebased_eqtl_integration	1	rs10882167	rs10882167	True
+DCLRE1A	gharahkhani	ENSG00000198924	approved	True	True	genebased_magma	1	rs72837408		True
+DCTN6	gharahkhani	ENSG00000104671	approved	True	True	chromatin_interaction	1	rs35740987		True
+DDB2	gharahkhani	ENSG00000134574	approved	False	False	genebased_eqtl_integration,genebased_magma	2	rs7111873		True
+DDR2	gharahkhani	ENSG00000162733	approved	True	True	chromatin_interaction,eqtl_any,significant_pathways	3	rs4542196	rs4542196	True
+DDX31	gharahkhani	ENSG00000125485	approved	True	True	chromatin_interaction	1	rs8176749		True
+DDX39BP2	gharahkhani	ENSG00000238024	approved	False	False	chromatin_interaction	1	rs407238		True
+DGKG	gharahkhani	ENSG00000058866	approved	True	True	chromatin_interaction,genebased_magma	2	rs56233426		True
+DHRS7	gharahkhani	ENSG00000100612	approved	False	False	genebased_eqtl_integration	1	rs33912345		True
+DHX35	gharahkhani	ENSG00000101452	approved	True	True	eqtl_any	1	rs6101546		True
+DHX9P1	gharahkhani	ENSG00000228002	approved	False	False	chromatin_interaction	1	rs9544024		True
+DNALI1	gharahkhani	ENSG00000163879	approved	True	True	eqtl_retina,genebased_magma	2	rs10908363		True
+DQ577523	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs1348518145		False
+DYNLT1	gharahkhani	ENSG00000146425	approved	False	False	genebased_eqtl_integration,paintor_eqtl_sqtl	2	rs13194719		True
+DYSF	gharahkhani	ENSG00000135636	approved	True	True	eqtl_retina	1	rs12613800		True
+ECHDC3	gharahkhani	ENSG00000134463	approved	True	True	genebased_eqtl_integration	1	rs6602453		True
+EFEMP2	gharahkhani	ENSG00000172638	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+EHBP1L1	gharahkhani	ENSG00000173442	approved	False	False	genebased_magma	1	rs1346		True
+EIF3L	gharahkhani	ENSG00000100129	approved	True	True	genebased_magma	1	rs5750494		True
+EMID1	gharahkhani	ENSG00000186998	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+ENPP6	gharahkhani	ENSG00000164303	approved	True	True	chromatin_interaction	1	rs6552711		True
+ENSG00000266481	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs10248136		False
+ENSG00000270160	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs7924522		False
+ETF1P1	gharahkhani	ENSG00000232757	approved	False	False	chromatin_interaction	1	rs407238		True
+ETF1P2	gharahkhani	ENSG00000240132	approved	False	False	chromatin_interaction	1	rs62478245		True
+ETS1	gharahkhani	ENSG00000134954	approved	True	True	genebased_magma,significant_pathways	2	rs7924522	rs7924522	True
+ETV7	gharahkhani	ENSG00000010030	approved	False	False	eqtl_any,genebased_magma,paintor_eqtl_sqtl	3	rs7344		True
+EWSR1	gharahkhani	ENSG00000182944	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+EXOC2	gharahkhani	ENSG00000112685	approved	True	True	genebased_magma	1	rs2745572		True
+F2	gharahkhani	ENSG00000180210	approved	True	True	genebased_magma	1	rs7111873		True
+FAM120B	gharahkhani	ENSG00000112584	approved	True	True	chromatin_interaction	1	rs2935057		True
+FAM125B	gharahkhani		ambiguous_shared_ensg	False	False	genebased_eqtl_integration	1	rs3829849		False
+FAM13A	gharahkhani	ENSG00000138640	approved	True	True	chromatin_interaction,eqtl_any,paintor_eqtl_sqtl	3	rs57400569	rs57400569	True
+FAM180B	gharahkhani	ENSG00000196666	approved	False	False	genebased_magma	1	rs7111873		True
+FAM183B	gharahkhani	ENSG00000164556	previous	False	False	genebased_eqtl_integration	1	rs10248136		True
+FAM19A3	gharahkhani	ENSG00000184599	previous	True	False	genebased_magma	1	rs1106287		True
+FAM53B	gharahkhani	ENSG00000189319	approved	True	True	chromatin_interaction,genebased_magma	2	rs10430737		True
+FAM83A-AS1	gharahkhani	ENSG00000204949	previous	False	False	paintor_eqtl_sqtl	1	rs62521288		True
+FAM89B	gharahkhani	ENSG00000176973	approved	True	True	genebased_magma,significant_pathways	2	rs1346		True
+FBXO32	gharahkhani	ENSG00000156804	approved	True	True	eqtl_any,genebased_magma	2	rs62521288	rs62521288	True
+FHL3	gharahkhani	ENSG00000183386	approved	True	True	genebased_eqtl_integration	1	rs10908363		True
+FIBP	gharahkhani	ENSG00000172500	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+FIP1L1	gharahkhani	ENSG00000145216	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs10517281		True
+FKTN	gharahkhani	ENSG00000106692	approved	True	True	genebased_eqtl_integration	1	rs2472494		True
+FLVCR2	gharahkhani	ENSG00000119686	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs4903352		True
+FMNL2	gharahkhani	ENSG00000157827	approved	True	True	genebased_magma,significant_pathways	2	rs1579050	rs1579050	True
+FNDC3B	gharahkhani	ENSG00000075420	approved	True	True	genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl,significant_pathways	4	rs62283813	rs62283813	True
+FOXQ1	gharahkhani	ENSG00000164379	approved	True	True	genebased_eqtl_integration	1	rs2745572		True
+FRMD8	gharahkhani	ENSG00000126391	approved	False	False	genebased_magma	1	rs1346		True
+FSD1L	gharahkhani	ENSG00000106701	approved	True	True	chromatin_interaction	1	rs2472494		True
+GALR3	gharahkhani	ENSG00000128310	approved	False	False	genebased_eqtl_integration,genebased_magma	2	rs5750494		True
+GARNL3	gharahkhani	ENSG00000136895	approved	True	True	genebased_eqtl_integration	1	rs3829849		True
+GCAT	gharahkhani	ENSG00000100116	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs5750494		True
+GEMIN8	gharahkhani	ENSG00000046647	approved	True	True	eqtl_any	1	rs66819623		True
+GFPT1	gharahkhani	ENSG00000198380	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs6732795		True
+GJA1	gharahkhani	ENSG00000152661	approved	True	True	significant_pathways	1	rs7760346	rs7760346	True
+GLIS1	gharahkhani	ENSG00000174332	approved	True	True	eqtl_any,genebased_magma,paintor_eqtl_sqtl	3	rs941125	rs941125	True
+GLP2R	gharahkhani	ENSG00000065325	approved	True	True	genebased_eqtl_integration	1	rs9913911		True
+GLRX5	gharahkhani	ENSG00000182512	approved	True	True	chromatin_interaction	1	rs72692789		True
+GMDS	gharahkhani	ENSG00000112699	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs2745572		True
+GMDS-AS1	gharahkhani	ENSG00000250903	previous	False	False	genebased_eqtl_integration	1	rs2745572		True
+GNB1L	gharahkhani	ENSG00000185838	approved	False	False	genebased_magma	1	rs8141610		True
+GNL2	gharahkhani	ENSG00000134697	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs10908363		True
+GNPNAT1	gharahkhani	ENSG00000100522	approved	True	True	genebased_eqtl_integration	1	rs12433661		True
+GPM6B	gharahkhani	ENSG00000046653	approved	True	True	paintor_eqtl_sqtl	1	rs66819623	rs66819623	True
+GPR88	gharahkhani	ENSG00000181656	approved	False	False	genebased_magma	1	rs12566440	rs12566440	True
+GTF2E2	gharahkhani	ENSG00000197265	approved	True	True	eqtl_any,genebased_magma,paintor_eqtl_sqtl	3	rs35740987	rs35740987	True
+GTF3C4	gharahkhani	ENSG00000125484	approved	True	True	chromatin_interaction	1	rs8176749		True
+H1F0	gharahkhani	ENSG00000189060	previous	False	False	genebased_eqtl_integration,genebased_magma	2	rs5750494		True
+HIKESHI	gharahkhani	ENSG00000149196	approved	True	True	genebased_eqtl_integration	1	rs10792871		True
+HLA-G	gharahkhani	ENSG00000204632	approved	False	False	genebased_eqtl_integration	1	rs407238	rs407238	True
+HLA-J	gharahkhani	ENSG00000204622	approved	False	False	chromatin_interaction	1	rs407238		True
+HSD17B7	gharahkhani	ENSG00000132196	approved	True	True	paintor_eqtl_sqtl	1	rs4542196		True
+HSF2	gharahkhani	ENSG00000025156	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs7760346	rs7760346	True
+HSP90B3P	gharahkhani	ENSG00000203914	approved	False	False	chromatin_interaction	1	rs1192415		True
+HUS1B	gharahkhani	ENSG00000188996	approved	False	False	genebased_magma	1	rs2745572		True
+IFT43	gharahkhani	ENSG00000119650	approved	True	True	genebased_magma	1	rs4903352		True
+IKZF2	gharahkhani	ENSG00000030419	approved	True	True	chromatin_interaction	1	rs200621439		True
+IL6ST	gharahkhani	ENSG00000134352	approved	False	False	genebased_eqtl_integration	1	rs112142644		True
+JAZF1	gharahkhani	ENSG00000153814	approved	True	True	eqtl_any	1	rs2191828		True
+JAZF1-AS1	gharahkhani	ENSG00000234336	approved	False	False	paintor_eqtl_sqtl	1	rs2191828		True
+JOSD1	gharahkhani	ENSG00000100221	approved	True	True	genebased_eqtl_integration	1	rs5750494		True
+KANSL1	gharahkhani	ENSG00000120071	approved	True	True	ld_protein_altering	1	rs242559		True
+KANSL1-AS1	gharahkhani	ENSG00000214401	approved	False	False	eqtl_retina	1	rs242559		True
+KBTBD4	gharahkhani	ENSG00000123444	approved	True	True	genebased_magma	1	rs7111873		True
+KCNJ1	gharahkhani	ENSG00000151704	approved	True	True	genebased_eqtl_integration	1	rs7924522		True
+KCNK7	gharahkhani	ENSG00000173338	approved	True	True	genebased_magma	1	rs1346		True
+KCTD20	gharahkhani	ENSG00000112078	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs7344		True
+KLF5	gharahkhani	ENSG00000102554	approved	False	False	eqtl_any,paintor_eqtl_sqtl,significant_pathways	3	rs9530143	rs9530143	True
+KPNB1	gharahkhani	ENSG00000108424	approved	True	True	chromatin_interaction,genebased_magma	2	rs1348518145		True
+KREMEN1	gharahkhani	ENSG00000183762	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+KRT8P22	gharahkhani	ENSG00000260731	approved	False	False	chromatin_interaction	1	rs280875		True
+LGALS1	gharahkhani	ENSG00000100097	approved	False	False	genebased_magma,significant_pathways	2	rs5750494		True
+LHPP	gharahkhani	ENSG00000107902	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs10430737	rs10430737	True
+LINC00926	gharahkhani	ENSG00000247982	approved	False	False	chromatin_interaction,eqtl_any,eqtl_retina,paintor_eqtl_sqtl	4	rs2431023		True
+LINC01571	gharahkhani	ENSG00000260057	approved	False	False	chromatin_interaction	1	rs114367221	rs114367221	True
+LINC01820	gharahkhani	ENSG00000228100	approved	False	False	chromatin_interaction	1	rs687914		True
+LINC01948	gharahkhani	ENSG00000248727	approved	False	False	genebased_eqtl_integration	1	rs112142644		True
+LINC01953	gharahkhani	ENSG00000236193	approved	False	False	chromatin_interaction	1	rs200621439		True
+LINC02210	gharahkhani	ENSG00000293460	approved	False	False	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs242559		True
+LINC02210-CRHR1	gharahkhani	ENSG00000263715	approved	False	False	ld_protein_altering	1	rs242559		True
+LINC02322	gharahkhani	ENSG00000258556	approved	False	False	chromatin_interaction	1	rs33912345		True
+LINC02551	gharahkhani	ENSG00000254842	approved	False	False	chromatin_interaction	1	rs2875238		True
+LMO4	gharahkhani	ENSG00000143013	approved	True	True	paintor_eqtl_sqtl	1	rs12139208		True
+LMO7	gharahkhani	ENSG00000136153	approved	True	True	significant_pathways	1	rs9544024	rs9544024	True
+LMO7-AS1	gharahkhani	ENSG00000261105	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs9544024		True
+LMX1B	gharahkhani	ENSG00000136944	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs3829849	rs3829849	True
+LOC389199	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs938604		False
+LOC644297	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs242559		False
+LOXL1-AS1	gharahkhani	ENSG00000261801	approved	False	False	genebased_eqtl_integration,significant_pathways	2	rs1550437		True
+LPP	gharahkhani	ENSG00000145012	approved	True	True	eqtl_any,genebased_eqtl_integration,paintor_eqtl_sqtl,significant_pathways	4	rs6787621	rs6787621	True
+LPP-AS1	gharahkhani	ENSG00000224563	approved	False	False	genebased_eqtl_integration,significant_pathways	2	rs6787621		True
+LPP-AS2	gharahkhani	ENSG00000270959	approved	False	False	genebased_eqtl_integration,significant_pathways	2	rs6787621		True
+LRMDA	gharahkhani	ENSG00000148655	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs2637250	rs2637250	True
+LRP4	gharahkhani	ENSG00000134569	approved	True	True	genebased_eqtl_integration,genebased_magma,significant_pathways	3	rs7111873		True
+LRP4-AS1	gharahkhani	ENSG00000247675	approved	False	False	genebased_eqtl_integration,significant_pathways	2	rs7111873		True
+LRRC37A	gharahkhani	ENSG00000176681	approved	False	False	eqtl_retina,genebased_eqtl_integration	2	rs242559		True
+LRRC37A2	gharahkhani	ENSG00000238083	approved	False	False	eqtl_retina,genebased_eqtl_integration	2	rs242559		True
+LRRC37A4P	gharahkhani	ENSG00000214425	approved	False	False	eqtl_retina	1	rs242559		True
+LRRC52	gharahkhani	ENSG00000162763	approved	True	True	genebased_magma	1	rs2790053		True
+LTBP3	gharahkhani	ENSG00000168056	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,significant_pathways	4	rs1346		True
+LYPLAL1	gharahkhani	ENSG00000143353	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs6667536		True
+MADD	gharahkhani	ENSG00000110514	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs7111873		True
+MAP3K1	gharahkhani	ENSG00000095015	approved	True	True	chromatin_interaction	1	rs112142644		True
+MAP3K11	gharahkhani	ENSG00000173327	approved	True	True	genebased_magma	1	rs1346		True
+MAP3K5	gharahkhani	ENSG00000197442	approved	True	True	genebased_eqtl_integration	1	rs4612174		True
+MAP7	gharahkhani	ENSG00000135525	approved	True	True	eqtl_any	1	rs4612174		True
+MAP7D1	gharahkhani	ENSG00000116871	approved	False	False	eqtl_any,genebased_magma,paintor_eqtl_sqtl	3	rs4652902		True
+MAPK8IP1P2	gharahkhani	ENSG00000263503	approved	False	False	eqtl_retina	1	rs242559		True
+MAPKAP1	gharahkhani	ENSG00000119487	approved	True	True	genebased_eqtl_integration	1	rs3829849		True
+MAPT	gharahkhani	ENSG00000186868	approved	True	True	chromatin_interaction,ld_protein_altering,significant_pathways	3	rs242559	rs242559	True
+MAPT-AS1	gharahkhani	ENSG00000264589	approved	False	False	chromatin_interaction,eqtl_retina,significant_pathways	3	rs242559		True
+MAPT-IT1	gharahkhani	ENSG00000279685	approved	False	False	eqtl_retina	1	rs242559		True
+MARK2P12	gharahkhani	ENSG00000229708	approved	False	False	chromatin_interaction	1	rs9530143		True
+MBOAT4	gharahkhani	ENSG00000177669	approved	True	True	chromatin_interaction	1	rs35740987		True
+MCCD1P2	gharahkhani	ENSG00000224312	approved	False	False	chromatin_interaction	1	rs407238		True
+MCM3	gharahkhani	ENSG00000112118	approved	True	True	genebased_eqtl_integration	1	rs72904286		True
+MCPH1-AS1	gharahkhani	ENSG00000249898	approved	False	False	chromatin_interaction	1	rs2515437		True
+ME3	gharahkhani	ENSG00000151376	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs10792871	rs10792871	True
+MEAF6	gharahkhani	ENSG00000163875	approved	False	False	eqtl_retina,genebased_eqtl_integration,genebased_magma	3	rs10908363		True
+MECOM	gharahkhani	ENSG00000085276	approved	True	True	genebased_magma,significant_pathways	2	rs4361323	rs4361323	True
+MEIS1	gharahkhani	ENSG00000143995	approved	True	True	significant_pathways	1	rs4414666		True
+MEIS1-AS2	gharahkhani	ENSG00000230749	approved	False	False	significant_pathways	1	rs4414666		True
+MEIS1-AS3	gharahkhani	ENSG00000226819	approved	False	False	eqtl_any,significant_pathways	2	rs4414666		True
+MET	gharahkhani	ENSG00000105976	approved	True	True	genebased_eqtl_integration	1	rs10257125		True
+METTL10	gharahkhani	ENSG00000203791	previous	True	False	genebased_eqtl_integration	1	rs10430737		True
+MGST3	gharahkhani	ENSG00000143198	approved	True	True	genebased_magma	1	rs2790053		True
+MICALL1	gharahkhani	ENSG00000100139	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs5750494		True
+MIR1302-7	gharahkhani	ENSG00000221768	approved	False	False	chromatin_interaction	1	rs3829849		True
+MIR216A	gharahkhani	ENSG00000207798	approved	True	True	chromatin_interaction	1	rs2627761		True
+MIR216B	gharahkhani	ENSG00000211520	approved	False	False	chromatin_interaction	1	rs2627761		True
+MIR217	gharahkhani	ENSG00000207548	approved	False	False	chromatin_interaction	1	rs2627761		True
+MIR3126	gharahkhani	ENSG00000266649	approved	False	False	chromatin_interaction	1	rs6732795		True
+MIR3199-1	gharahkhani	ENSG00000264073	approved	False	False	chromatin_interaction	1	rs5752776		True
+MIR3616	gharahkhani	ENSG00000264901	approved	False	False	chromatin_interaction	1	rs6124885		True
+MIR4487	gharahkhani	ENSG00000264583	approved	False	False	chromatin_interaction	1	rs7111873		True
+MIR4642	gharahkhani	ENSG00000266619	approved	False	False	chromatin_interaction	1	rs3777588		True
+MIR606	gharahkhani	ENSG00000207583	approved	False	False	chromatin_interaction	1	rs2637250		True
+MNAT1	gharahkhani	ENSG00000020426	approved	False	False	genebased_magma	1	rs33912345		True
+MNS1	gharahkhani	ENSG00000138587	approved	True	True	genebased_eqtl_integration	1	rs2431023		True
+MOV10	gharahkhani	ENSG00000155363	approved	True	True	eqtl_retina,genebased_magma,ld_protein_altering	3	rs1106287	rs1106287	True
+MRPL39	gharahkhani	ENSG00000154719	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs13049669		True
+MTAP	gharahkhani	ENSG00000099810	approved	False	False	chromatin_interaction,genebased_magma	2	rs944801		True
+MTCH2	gharahkhani	ENSG00000109919	approved	False	False	eqtl_retina,genebased_eqtl_integration,genebased_magma	3	rs7111873		True
+MTND3P1	gharahkhani	ENSG00000226118	approved	False	False	chromatin_interaction	1	rs4769194		True
+MVB12B	gharahkhani	ENSG00000196814	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs3829849		True
+MXRA5	gharahkhani	ENSG00000101825	approved	False	False	chromatin_interaction,eqtl_any,genebased_magma,paintor_eqtl_sqtl,significant_pathways	5	rs12846405	rs12846405	True
+MYBPC3	gharahkhani	ENSG00000134571	approved	True	True	genebased_magma	1	rs7111873		True
+MYL4	gharahkhani	ENSG00000198336	approved	False	False	genebased_magma	1	rs1348518145		True
+MYLK4	gharahkhani	ENSG00000145949	approved	True	True	genebased_eqtl_integration	1	rs2745572		True
+MYOF	gharahkhani	ENSG00000138119	approved	True	True	significant_pathways	1	rs10882167	rs10882167	True
+NAA38	gharahkhani	ENSG00000183011	approved	True	True	genebased_eqtl_integration	1	rs10230941		True
+NDP	gharahkhani	ENSG00000124479	approved	True	True	significant_pathways	1	rs17146835	rs17146835	True
+NDP-AS1	gharahkhani	ENSG00000236276	approved	False	False	significant_pathways	1	rs17146835		True
+NDUFS3	gharahkhani	ENSG00000213619	approved	True	True	genebased_magma	1	rs7111873		True
+NEFH	gharahkhani	ENSG00000100285	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+NEO1	gharahkhani	ENSG00000067141	approved	True	True	genebased_eqtl_integration	1	rs1550437		True
+NF2	gharahkhani	ENSG00000186575	approved	True	True	genebased_eqtl_integration	1	rs5752776		True
+NIP7P1	gharahkhani	ENSG00000232805	approved	False	False	chromatin_interaction	1	rs10882167		True
+NIPSNAP3A	gharahkhani	ENSG00000136783	approved	False	False	genebased_eqtl_integration	1	rs2472494		True
+NOC3L	gharahkhani	ENSG00000173145	approved	True	True	eqtl_retina	1	rs57866767		True
+NOL12	gharahkhani	ENSG00000273899	approved	True	True	genebased_magma	1	rs5750494		True
+NPAS4	gharahkhani	ENSG00000174576	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+NPC2	gharahkhani	ENSG00000119655	approved	True	True	eqtl_retina	1	rs754458		True
+NPEPPS	gharahkhani	ENSG00000141279	approved	True	True	genebased_magma,ld_protein_altering	2	rs1348518145	rs1348518145	True
+NPTN	gharahkhani	ENSG00000156642	approved	True	True	genebased_eqtl_integration,significant_pathways	2	rs1550437		True
+NR1H3	gharahkhani	ENSG00000025434	approved	True	True	genebased_eqtl_integration,genebased_magma,significant_pathways	3	rs7111873		True
+NSF	gharahkhani	ENSG00000073969	approved	True	True	genebased_magma	1	rs242559		True
+NSFP1	gharahkhani	ENSG00000260075	approved	False	False	eqtl_retina	1	rs242559		True
+NUDT7	gharahkhani	ENSG00000140876	approved	True	True	eqtl_any,genebased_eqtl_integration,paintor_eqtl_sqtl	3	rs280875	rs280875	True
+NUP160	gharahkhani	ENSG00000030066	approved	True	True	genebased_eqtl_integration	1	rs7111873		True
+OR7E14P	gharahkhani	ENSG00000184669	approved	False	False	eqtl_retina	1	rs4141194		True
+OXSM	gharahkhani	ENSG00000151093	approved	True	True	genebased_eqtl_integration	1	rs1286770		True
+PACSIN3	gharahkhani	ENSG00000165912	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs7111873		True
+PAQR8	gharahkhani	ENSG00000170915	approved	True	True	eqtl_any,genebased_eqtl_integration	2	rs72904286		True
+PCNXL3	gharahkhani	ENSG00000197136	previous	True	False	genebased_eqtl_integration,genebased_magma	2	rs1346		True
+PDE7B	gharahkhani	ENSG00000171408	approved	True	True	genebased_magma	1	rs4612174	rs4612174	True
+PHYHIPL	gharahkhani	ENSG00000165443	approved	True	True	chromatin_interaction	1	rs1658436		True
+PICK1	gharahkhani	ENSG00000100151	approved	True	True	genebased_eqtl_integration	1	rs5750494		True
+PIGC	gharahkhani	ENSG00000135845	approved	True	True	paintor_eqtl_sqtl	1	rs74315329		True
+PITPNB	gharahkhani	ENSG00000180957	approved	True	True	chromatin_interaction	1	rs5752776		True
+PKHD1	gharahkhani	ENSG00000170927	approved	True	True	genebased_magma	1	rs72904286	rs72904286	True
+PKN2	gharahkhani	ENSG00000065243	approved	True	True	genebased_eqtl_integration	1	rs12139208		True
+PLCE1	gharahkhani	ENSG00000138193	approved	True	True	genebased_eqtl_integration,ld_protein_altering	2	rs57866767	rs57866767	True
+PLCE1-AS1	gharahkhani	ENSG00000268894	approved	False	False	chromatin_interaction,eqtl_any,genebased_eqtl_integration,paintor_eqtl_sqtl	4	rs57866767		True
+PLD1	gharahkhani	ENSG00000075651	approved	True	True	chromatin_interaction	1	rs62283813		True
+PLEKHA7	gharahkhani	ENSG00000166689	approved	True	True	eqtl_retina	1	rs4141194	rs4141194	True
+PLEKHM1	gharahkhani	ENSG00000225190	approved	True	True	eqtl_retina,genebased_eqtl_integration	2	rs242559		True
+PLEKHS1	gharahkhani	ENSG00000148735	approved	True	True	genebased_magma	1	rs72837408	rs72837408	True
+PNPT1	gharahkhani	ENSG00000138035	approved	True	True	genebased_magma	1	rs2627761	rs2627761	True
+POLR2F	gharahkhani	ENSG00000100142	approved	True	True	genebased_magma	1	rs5750494		True
+POU2F3	gharahkhani	ENSG00000137709	approved	True	True	genebased_magma	1	rs1893261		True
+PPIL1	gharahkhani	ENSG00000137168	approved	True	True	genebased_eqtl_integration	1	rs7344		True
+PPM1A	gharahkhani	ENSG00000100614	approved	True	True	genebased_magma,significant_pathways	2	rs33912345		True
+PPM1J	gharahkhani	ENSG00000155367	approved	False	False	genebased_magma	1	rs1106287		True
+PRKAG2	gharahkhani	ENSG00000106617	approved	True	True	significant_pathways	1	rs62478245	rs62478245	True
+PRKAG2-AS1	gharahkhani	ENSG00000239911	approved	False	False	significant_pathways	1	rs62478245		True
+PRKCE	gharahkhani	ENSG00000171132	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs687914	rs687914	True
+PRKX	gharahkhani	ENSG00000183943	approved	False	False	significant_pathways	1	rs12846405	rs12846405	True
+PRKX-AS1	gharahkhani	ENSG00000236188	approved	False	False	significant_pathways	1	rs12846405		True
+PSMC3	gharahkhani	ENSG00000165916	approved	True	True	eqtl_retina,genebased_eqtl_integration,genebased_magma	3	rs7111873		True
+PTHLH	gharahkhani	ENSG00000087494	approved	True	True	chromatin_interaction	1	rs7972874	rs7972874	True
+PTPMT1	gharahkhani	ENSG00000110536	approved	True	True	genebased_magma	1	rs7111873		True
+PXT1	gharahkhani	ENSG00000179165	approved	False	False	genebased_eqtl_integration,genebased_magma	2	rs7344		True
+RALGPS1	gharahkhani	ENSG00000136828	approved	True	True	genebased_magma	1	rs3829849		True
+RAPSN	gharahkhani	ENSG00000165917	approved	False	False	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs7111873	rs7111873	True
+RARB	gharahkhani	ENSG00000077092	approved	True	True	chromatin_interaction	1	rs1286770	rs1286770	True
+RELA	gharahkhani	ENSG00000173039	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+RELN	gharahkhani	ENSG00000189056	approved	True	True	genebased_magma	1	rs12667675	rs12667675	True
+RERE	gharahkhani	ENSG00000142599	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration,paintor_eqtl_sqtl	4	rs172531	rs172531	True
+RFX4	gharahkhani	ENSG00000111783	approved	False	False	genebased_magma	1	rs1037013		True
+RHOC	gharahkhani	ENSG00000155366	approved	False	False	genebased_magma	1	rs1106287		True
+RIC8B	gharahkhani	ENSG00000111785	approved	True	True	chromatin_interaction,genebased_magma	2	rs1037013	rs1037013	True
+RN7SKP86	gharahkhani	ENSG00000222386	approved	False	False	chromatin_interaction	1	rs12667675		True
+RN7SL748P	gharahkhani	ENSG00000239964	approved	False	False	chromatin_interaction	1	rs7344		True
+RN7SL76P	gharahkhani	ENSG00000241959	approved	False	False	chromatin_interaction	1	rs62478245		True
+RNF26	gharahkhani	ENSG00000173456	approved	False	False	genebased_eqtl_integration	1	rs1893261		True
+RNPC3	gharahkhani	ENSG00000185946	approved	False	False	genebased_eqtl_integration	1	rs3753841		True
+RNU6-105P	gharahkhani	ENSG00000200779	approved	False	False	chromatin_interaction	1	rs12613800		True
+RNU6-1286P	gharahkhani	ENSG00000206598	approved	False	False	chromatin_interaction	1	rs7760346		True
+RORA	gharahkhani	ENSG00000069667	approved	True	True	significant_pathways	1	rs12438742	rs12438742	True
+RP1-239B22.5	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs4141194		False
+RP11-1042B17.3	gharahkhani		unmapped	False	False	eqtl_retina	1	rs33912345		False
+RP11-121M22.1	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs2875238		False
+RP11-12J10.3	gharahkhani		unmapped	False	False	genebased_magma	1	rs10430737		False
+RP11-136H19.1	gharahkhani		unmapped	False	False	eqtl_any	1	rs11868441		False
+RP11-144F15.1	gharahkhani		unmapped	False	False	genebased_magma	1	rs1037013		False
+RP11-145E5.5	gharahkhani		unmapped	False	False	genebased_magma	1	rs944801		False
+RP11-157J24.2	gharahkhani		unmapped	False	False	eqtl_any	1	rs2745572		False
+RP11-211N11.5	gharahkhani		unmapped	False	False	eqtl_any	1	rs72837408		False
+RP11-217B7.2	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs2472494		False
+RP11-229O3.1	gharahkhani		unmapped	False	False	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs12447201		False
+RP11-302L19.3	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs2935057		False
+RP11-379H18.1	gharahkhani		unmapped	False	False	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs6957752		False
+RP11-412D9.4	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs1037013		False
+RP11-426L16.10	gharahkhani		unmapped	False	False	genebased_magma	1	rs1106287		False
+RP11-466F5.8	gharahkhani		unmapped	False	False	eqtl_any,eqtl_retina,paintor_eqtl_sqtl	3	rs2790053		False
+RP11-507B12.2	gharahkhani		unmapped	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs12438742		False
+RP11-798G7.6	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs242559		False
+RP11-867G23.8	gharahkhani		unmapped	False	False	genebased_eqtl_integration	1	rs1346		False
+RP13-452N2.1	gharahkhani		unmapped	False	False	paintor_eqtl_sqtl	1	rs62478245		False
+RP3-425C14.4	gharahkhani		unmapped	False	False	eqtl_retina	1	rs7760346		False
+RP5-1027O11.1	gharahkhani		unmapped	False	False	chromatin_interaction	1	rs12139208		False
+RP6-218J18.2	gharahkhani		unmapped	False	False	eqtl_any	1	rs17146835		False
+RPL23AP34	gharahkhani	ENSG00000225991	approved	False	False	chromatin_interaction	1	rs17006576		True
+RPL23AP74	gharahkhani	ENSG00000227694	approved	False	False	chromatin_interaction	1	rs11868441		True
+RPL31P20	gharahkhani	ENSG00000229756	approved	False	False	chromatin_interaction	1	rs9852634		True
+RPL7P11	gharahkhani	ENSG00000234619	approved	False	False	chromatin_interaction	1	rs172531		True
+RPL7P44	gharahkhani	ENSG00000233873	approved	False	False	chromatin_interaction	1	rs9544024		True
+RPS27AP1	gharahkhani	ENSG00000242692	approved	False	False	chromatin_interaction	1	rs9913911		True
+RPS29P31	gharahkhani	ENSG00000224279	approved	False	False	chromatin_interaction	1	rs5750494		True
+RPS6KL1	gharahkhani	ENSG00000198208	approved	True	True	paintor_eqtl_sqtl	1	rs754458		True
+RPSAP19	gharahkhani	ENSG00000183298	approved	False	False	chromatin_interaction	1	rs3753841		True
+RPSAP64	gharahkhani	ENSG00000227721	approved	False	False	chromatin_interaction	1	rs13050568		True
+RSPO1	gharahkhani	ENSG00000169218	approved	True	True	genebased_magma	1	rs10908363	rs10908363	True
+RSPO2	gharahkhani	ENSG00000147655	approved	True	True	genebased_eqtl_integration	1	rs2514879		True
+RTL10	gharahkhani	ENSG00000215012	approved	False	False	genebased_eqtl_integration	1	rs8141610		True
+SALL1	gharahkhani	ENSG00000103449	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs114367221	rs114367221	True
+SALL4P7	gharahkhani	ENSG00000258692	approved	False	False	genebased_eqtl_integration	1	rs33912345		True
+SCARNA13	gharahkhani	ENSG00000252481	approved	False	False	chromatin_interaction	1	rs72692789		True
+SCFD2	gharahkhani	ENSG00000184178	approved	True	True	genebased_eqtl_integration	1	rs10517281	rs10517281	True
+SCYL1	gharahkhani	ENSG00000142186	approved	True	True	chromatin_interaction,genebased_magma	2	rs1346		True
+SEC62	gharahkhani	ENSG00000008952	approved	True	True	genebased_eqtl_integration	1	rs4361323		True
+SEC62-AS1	gharahkhani	ENSG00000240373	approved	False	False	genebased_eqtl_integration	1	rs4361323		True
+SEMA3A	gharahkhani	ENSG00000075213	approved	True	True	genebased_eqtl_integration	1	rs7805468		True
+SEMA3C	gharahkhani	ENSG00000075223	approved	True	True	chromatin_interaction,significant_pathways	2	rs59101260	rs59101260	True
+SEMA3E	gharahkhani	ENSG00000170381	approved	True	True	genebased_eqtl_integration,genebased_magma,significant_pathways	3	rs7805468	rs7805468	True
+SERINC1	gharahkhani	ENSG00000111897	approved	True	True	eqtl_retina	1	rs7760346		True
+SFTA1P	gharahkhani	ENSG00000225383	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs6602453		True
+SH2B3	gharahkhani	ENSG00000111252	approved	True	True	eqtl_retina,ld_protein_altering	2	rs7137828		True
+SH3TC1	gharahkhani	ENSG00000125089	approved	True	True	genebased_eqtl_integration	1	rs938604		True
+SIX1	gharahkhani	ENSG00000126778	approved	True	True	genebased_magma,significant_pathways	2	rs33912345		True
+SIX4	gharahkhani	ENSG00000100625	approved	True	True	genebased_magma	1	rs33912345		True
+SLC25A3P1	gharahkhani	ENSG00000236253	approved	False	False	chromatin_interaction	1	rs941125		True
+SLC2A12	gharahkhani	ENSG00000146411	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration	3	rs2811688	rs2811688	True
+SLC2A8	gharahkhani	ENSG00000136856	approved	True	True	genebased_eqtl_integration	1	rs3829849		True
+SLC35D3	gharahkhani	ENSG00000182747	approved	True	True	genebased_eqtl_integration	1	rs4612174		True
+SLC38A6	gharahkhani	ENSG00000139974	approved	True	True	genebased_magma	1	rs33912345		True
+SLC39A13	gharahkhani	ENSG00000165915	approved	True	True	chromatin_interaction,genebased_magma	2	rs7111873		True
+SLCO3A1	gharahkhani	ENSG00000176463	approved	True	True	chromatin_interaction	1	rs8038628	rs8038628	True
+SMAD6	gharahkhani	ENSG00000137834	approved	False	False	eqtl_any,genebased_magma,paintor_eqtl_sqtl,significant_pathways	4	rs2439386	rs2439386	True
+SMEK2	gharahkhani	ENSG00000275052	previous	True	False	genebased_magma	1	rs2627761		True
+SMG6	gharahkhani	ENSG00000070366	approved	True	True	genebased_magma	1	rs216197	rs216197	True
+SMIM18	gharahkhani	ENSG00000253457	approved	False	False	genebased_magma	1	rs35740987		True
+SNHG10	gharahkhani	ENSG00000247092	approved	False	False	chromatin_interaction	1	rs72692789	rs72692789	True
+SNIP1	gharahkhani	ENSG00000163877	approved	True	True	genebased_magma	1	rs10908363		True
+SNORD13D	gharahkhani	ENSG00000239035	approved	False	False	chromatin_interaction	1	rs2431023		True
+SNX15	gharahkhani	ENSG00000110025	approved	True	True	genebased_eqtl_integration	1	rs1346		True
+SNX17	gharahkhani	ENSG00000115234	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs17006576		True
+SNX32	gharahkhani	ENSG00000172803	approved	True	True	eqtl_retina,genebased_eqtl_integration	2	rs1346		True
+SORCS2	gharahkhani	ENSG00000184985	approved	False	False	genebased_magma	1	rs938604		True
+SOX10	gharahkhani	ENSG00000100146	approved	True	True	genebased_magma	1	rs5750494		True
+SPI1	gharahkhani	ENSG00000066336	approved	False	False	genebased_magma,significant_pathways	2	rs7111873		True
+SPPL2C	gharahkhani	ENSG00000185294	approved	True	True	ld_protein_altering	1	rs242559		True
+SRP72P2	gharahkhani	ENSG00000188451	approved	False	False	chromatin_interaction	1	rs13194719		True
+SRR	gharahkhani	ENSG00000167720	approved	True	True	eqtl_any,eqtl_retina,genebased_magma,paintor_eqtl_sqtl	4	rs216197		True
+SRSF3	gharahkhani	ENSG00000112081	approved	False	False	genebased_eqtl_integration,genebased_magma	2	rs7344	rs7344	True
+SSSCA1	gharahkhani	ENSG00000173465	previous	True	False	genebased_magma	1	rs1346	rs1346	True
+ST7L	gharahkhani	ENSG00000007341	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs1106287		True
+STAM2	gharahkhani	ENSG00000115145	approved	True	True	genebased_eqtl_integration	1	rs1579050		True
+STK38	gharahkhani	ENSG00000112079	approved	True	True	chromatin_interaction,genebased_magma	2	rs7344		True
+STOML1	gharahkhani	ENSG00000067221	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs1550437		True
+STOX2	gharahkhani	ENSG00000173320	approved	True	True	eqtl_any	1	rs6552711	rs6552711	True
+SURF1	gharahkhani	ENSG00000148290	approved	True	True	eqtl_retina	1	rs8176749		True
+SVEP1	gharahkhani	ENSG00000165124	approved	True	True	protein_altering	1	rs61751937	rs61751937	True
+SYTL2	gharahkhani	ENSG00000137501	approved	True	True	genebased_eqtl_integration	1	rs10792871		True
+TBC1D21	gharahkhani	ENSG00000167139	approved	True	True	chromatin_interaction,genebased_magma	2	rs1550437		True
+TBC1D32	gharahkhani	ENSG00000146350	approved	True	True	chromatin_interaction	1	rs7760346		True
+TBKBP1	gharahkhani	ENSG00000198933	approved	True	True	eqtl_any,ld_protein_altering,paintor_eqtl_sqtl	3	rs1348518145		True
+TBPL1	gharahkhani	ENSG00000028839	approved	True	True	chromatin_interaction	1	rs2811688		True
+TBX1	gharahkhani	ENSG00000184058	approved	True	True	chromatin_interaction	1	rs8141610		True
+TCF12	gharahkhani	ENSG00000140262	approved	True	True	genebased_magma,significant_pathways	2	rs2431023	rs2431023	True
+TEKT2	gharahkhani	ENSG00000092850	approved	True	True	genebased_magma	1	rs4652902		True
+TES	gharahkhani	ENSG00000135269	approved	False	False	genebased_magma,significant_pathways	2	rs10257125		True
+TFAM	gharahkhani	ENSG00000108064	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs1658436		True
+TFAP2B	gharahkhani	ENSG00000008196	approved	True	True	significant_pathways	1	rs72904286	rs72904286	True
+TFAP2D	gharahkhani	ENSG00000008197	approved	True	True	chromatin_interaction	1	rs72904286		True
+TFEC	gharahkhani	ENSG00000105967	approved	True	True	genebased_magma	1	rs10257125		True
+TGFB2	gharahkhani	ENSG00000092969	approved	True	True	chromatin_interaction	1	rs6667536		True
+TGFB3	gharahkhani	ENSG00000119699	approved	True	True	genebased_magma,significant_pathways	2	rs4903352		True
+TGFB3-AS1	gharahkhani	ENSG00000258876	approved	False	False	chromatin_interaction	1	rs4903352		True
+TGFBR3	gharahkhani	ENSG00000069702	approved	True	True	significant_pathways	1	rs1192415	rs1192415	True
+THRAP3	gharahkhani	ENSG00000054118	approved	True	True	chromatin_interaction	1	rs4652902		True
+THSD7A	gharahkhani	ENSG00000005108	approved	True	True	eqtl_any,genebased_magma,paintor_eqtl_sqtl,significant_pathways	4	rs12699251	rs12699251	True
+TIGD2	gharahkhani	ENSG00000180346	approved	True	True	chromatin_interaction	1	rs57400569		True
+TLCD5	gharahkhani	ENSG00000181264	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs1893261	rs1893261	True
+TMEM106B	gharahkhani	ENSG00000106460	approved	True	True	genebased_eqtl_integration	1	rs12699251		True
+TMEM135	gharahkhani	ENSG00000166575	approved	True	True	genebased_eqtl_integration	1	rs10792871		True
+TMEM136	gharahkhani		ambiguous_shared_ensg	False	False	eqtl_any,genebased_eqtl_integration,genebased_magma	3	rs1893261		False
+TMEM181	gharahkhani	ENSG00000146433	approved	True	True	eqtl_any,genebased_magma	2	rs13194719	rs13194719	True
+TPRG1	gharahkhani	ENSG00000188001	approved	False	False	chromatin_interaction	1	rs6787621		True
+TPRG1-AS1	gharahkhani	ENSG00000234076	approved	False	False	chromatin_interaction	1	rs6787621		True
+TRAPPC3	gharahkhani	ENSG00000054116	approved	True	True	genebased_magma	1	rs4652902	rs4652902	True
+TRIB2	gharahkhani	ENSG00000071575	approved	True	True	eqtl_any,genebased_eqtl_integration,genebased_magma,paintor_eqtl_sqtl	4	rs12623251	rs12623251	True
+TRIM31	gharahkhani	ENSG00000204616	approved	False	False	genebased_magma	1	rs407238		True
+TRIOBP	gharahkhani	ENSG00000100106	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration,genebased_magma,ld_protein_altering,paintor_eqtl_sqtl	6	rs5750494	rs5750494	True
+TSC22D2	gharahkhani	ENSG00000196428	approved	True	True	chromatin_interaction,eqtl_any,paintor_eqtl_sqtl,significant_pathways	4	rs11710845	rs11710845	True
+TSR1	gharahkhani	ENSG00000167721	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs216197		True
+TTC28-AS1	gharahkhani	ENSG00000235954	approved	False	False	chromatin_interaction	1	rs5752776		True
+TTLL5	gharahkhani	ENSG00000119685	approved	False	False	genebased_eqtl_integration	1	rs4903352	rs4903352	True
+TUBB3P2	gharahkhani	ENSG00000230101	approved	False	False	chromatin_interaction	1	rs10237321		True
+TUBB8P1	gharahkhani	ENSG00000229298	approved	False	False	chromatin_interaction	1	rs944801		True
+UBE2V2P4	gharahkhani	ENSG00000231849	approved	False	False	chromatin_interaction	1	rs4652902		True
+UCK2	gharahkhani	ENSG00000143179	approved	True	True	genebased_magma	1	rs2790053		True
+VAMP4	gharahkhani	ENSG00000117533	approved	True	True	chromatin_interaction	1	rs74315329		True
+VARS2	gharahkhani	ENSG00000137411	approved	True	True	genebased_eqtl_integration	1	rs407238		True
+VCAM1	gharahkhani	ENSG00000162692	approved	True	True	chromatin_interaction,eqtl_any,eqtl_retina,paintor_eqtl_sqtl	4	rs12566440		True
+WDYHV1	gharahkhani	ENSG00000156795	previous	True	False	genebased_magma	1	rs62521288		True
+WLS	gharahkhani	ENSG00000116729	approved	True	True	eqtl_any,paintor_eqtl_sqtl	2	rs4076000		True
+WNT3	gharahkhani	ENSG00000108379	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs242559		True
+WNT9B	gharahkhani	ENSG00000158955	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs242559		True
+XRCC6P1	gharahkhani	ENSG00000237417	approved	False	False	eqtl_any,paintor_eqtl_sqtl	2	rs10882167		True
+YAP1	gharahkhani	ENSG00000137693	approved	True	True	eqtl_any,genebased_magma,paintor_eqtl_sqtl,significant_pathways	4	rs7120067	rs7120067	True
+ZBTB34	gharahkhani	ENSG00000177125	approved	True	True	genebased_magma	1	rs3829849		True
+ZMAT5	gharahkhani	ENSG00000100319	approved	False	False	genebased_eqtl_integration	1	rs5752776		True
+ZNF280D	gharahkhani	ENSG00000137871	approved	True	True	genebased_magma	1	rs2431023		True
+ZNF408	gharahkhani	ENSG00000175213	approved	True	True	genebased_eqtl_integration,genebased_magma	2	rs7111873		True
+ZNF638	gharahkhani	ENSG00000075292	approved	True	True	eqtl_any,eqtl_retina,genebased_eqtl_integration,genebased_magma,ld_protein_altering,paintor_eqtl_sqtl	6	rs12613800	rs12613800	True
