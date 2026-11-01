@@ -1,0 +1,71 @@
+species	unit	study	role	condition	disease	sex	assay	age	strain	geo	design	n_cells
+Human	HP-20152-01	human48	de_control	control	normal	male	10x 3' v3					5298
+Human	HP18304	human48	de_control	control	normal	male	10x 3' v2					3620
+Human	HP19047-01	human48	de_control	control	normal	female	10x 3' v3					7353
+Human	SAMN09370567	human48	de_control	control	normal	male	10x 3' v2					5655
+Human	SAMN11523048	human48	de_control	control	normal	female	10x 3' v3					10163
+Human	SAMN11633049	human48	de_control	control	normal	male	10x 3' v3					4735
+Human	SAMN12500521	human48	de_control	control	normal	male	10x 3' v3					4977
+Human	SAMN13108021	human48	de_control	control	normal	male	10x 3' v3					2820
+Human	SAMN16547514	human48	de_control	control	normal	female	10x 3' v3					4982
+Human	HP17117-01 T2D	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v2					3625
+Human	HP1720901T2D	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v2					5728
+Human	HP17225-01T2D	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v2					5112
+Human	HP17300-01T2D	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v2					3081
+Human	HP18320-01T2D	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v2					3910
+Human	HP19044-01T2D	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v3					6212
+Human	SAMN08769026	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v2					4857
+Human	SAMN10372788	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v2					3292
+Human	SAMN10832912	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					4763
+Human	SAMN11157311	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v3					5385
+Human	SAMN11642375	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					6699
+Human	SAMN12634037	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					2354
+Human	SAMN13320559	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					4088
+Human	SAMN13901790	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					4823
+Human	SAMN16365027	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v3					4616
+Human	SAMN17209843	human48	de_disease	disease	type 2 diabetes mellitus	female	10x 3' v3					6159
+Human	SAMN17831932	human48	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3					3078
+Human	SAMN10439569	human48	sensitivity_prediabetes	disease	prediabetes syndrome	female	10x 3' v2					4450
+Human	SAMN11008921	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					3954
+Human	SAMN11373103	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					4464
+Human	SAMN11476721	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					6715
+Human	SAMN11483342	human48	sensitivity_prediabetes	disease	prediabetes syndrome	female	10x 3' v3					7423
+Human	SAMN11522709	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					12906
+Human	SAMN11867362	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					5549
+Human	SAMN12022246	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					4680
+Human	SAMN12633894	human48	sensitivity_prediabetes	disease	prediabetes syndrome	female	10x 3' v3					3494
+Human	SAMN13319813	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					6197
+Human	SAMN13866285	human48	sensitivity_prediabetes	disease	prediabetes syndrome	female	10x 3' v3					5574
+Human	SAMN14255441	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					4888
+Human	SAMN16373925	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					2712
+Human	SAMN17528599	human48	sensitivity_prediabetes	disease	prediabetes syndrome	male	10x 3' v3					6569
+Human	HP18054-01	human48	train_healthy	control	normal	male	10x 3' v2					5244
+Human	SAMN08768799	human48	train_healthy	control	normal	male	10x 3' v2					3828
+Human	SAMN10737781	human48	train_healthy	control	normal	male	10x 3' v3					4004
+Human	SAMN10873960	human48	train_healthy	control	normal	female	10x 3' v3					6757
+Human	SAMN11380903	human48	train_healthy	control	normal	male	10x 3' v3					5587
+Human	SAMN11864195	human48	train_healthy	control	normal	female	10x 3' v3					5588
+Human	SAMN12673306	human48	train_healthy	control	normal	male	10x 3' v3					3442
+Human	SAMN15337453	human48	train_healthy	control	normal	male	10x 3' v3					4468
+Mouse	db/db__chow_WT__MUC13633	db/db	de_control	control	normal	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;WT	GSE174194	chow_WT	5522
+Mouse	db/db__chow_WT__MUC13634	db/db	de_control	control	normal	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;WT	GSE174194	chow_WT	5633
+Mouse	mSTZ__control__G1	mSTZ	de_control	control	normal	male	10x 3' v2	182 d	C57BL/6J	GSE128565	control	8388
+Mouse	db/db__sham_Lepr-/-__MUC13639	db/db	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	sham_Lepr-/-	9442
+Mouse	db/db__sham_Lepr-/-__MUC13641	db/db	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	sham_Lepr-/-	8788
+Mouse	mSTZ__STZ__G2	mSTZ	de_disease	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ	9184
+Mouse	db/db__PF_Lepr-/-__MUC13631	db/db	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	PF_Lepr-/-	3211
+Mouse	db/db__PF_Lepr-/-__MUC13632	db/db	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	PF_Lepr-/-	19923
+Mouse	db/db__VSG_Lepr-/-__MUC13640	db/db	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	VSG_Lepr-/-	8787
+Mouse	db/db__VSG_Lepr-/-__MUC13642	db/db	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v3	16-18 w	BKSCg-Dock7m+/+Leprdb/J;db/db	GSE174194	VSG_Lepr-/-	8439
+Mouse	mSTZ__STZ_GLP-1__G4	mSTZ	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ_GLP-1	6292
+Mouse	mSTZ__STZ_GLP-1_estrogen+insulin__G8	mSTZ	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ_GLP-1_estrogen+insulin	4303
+Mouse	mSTZ__STZ_GLP-1_estrogen__G6	mSTZ	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ_GLP-1_estrogen	9863
+Mouse	mSTZ__STZ_estrogen__G5	mSTZ	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ_estrogen	7280
+Mouse	mSTZ__STZ_insulin__G3	mSTZ	sensitivity_treated	disease	type 2 diabetes mellitus	male	10x 3' v2	182 d	C57BL/6J	GSE128565	STZ_insulin	4235
+Mouse	4m__head_Fltp+__mouse2	4m	train_healthy	control	normal	male	10x 3' v2	4 m	C57BL/6J; Fltp ZV (Het)	GSE211796	head_Fltp+	4664
+Mouse	4m__head_Fltp-__mouse1	4m	train_healthy	control	normal	male	10x 3' v2	4 m	C57BL/6J; Fltp ZV (Het)	GSE211796	head_Fltp-	4094
+Mouse	4m__tail_Fltp+__mouse4	4m	train_healthy	control	normal	male	10x 3' v2	4 m	C57BL/6J; Fltp ZV (Het)	GSE211796	tail_Fltp+	5359
+Mouse	4m__tail_Fltp-__mouse3	4m	train_healthy	control	normal	male	10x 3' v2	4 m	C57BL/6J; Fltp ZV (Het)	GSE211796	tail_Fltp-	3236
+Mouse	aged__mGFP__MUC13976	aged	train_healthy	control	normal	female,male	10x 3' v3	2 y	C57BL/6J; Fltp iCre; mTmG	GSE211795	mGFP	6081
+Mouse	aged__mRFP__MUC13974	aged	train_healthy	control	normal	female,male	10x 3' v3	2 y	C57BL/6J; Fltp iCre; mTmG	GSE211795	mRFP	7534
+Mouse	aged__mTmG__MUC13975	aged	train_healthy	control	normal	female,male	10x 3' v3	2 y	C57BL/6J; Fltp iCre; mTmG	GSE211795	mTmG	3746
