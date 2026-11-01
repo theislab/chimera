@@ -232,6 +232,19 @@ def gate_gd1b(cells: pd.DataFrame, roles: pd.DataFrame):
 # --------------------------------------------------------------------------- healthy object
 
 
+def technical_batch(obs: pd.DataFrame) -> pd.Series:
+    """``obs['batch']``: the technical source dataset within a species, as in the canonical cohorts.
+
+    Species + source study, plus chemistry where it differs within a study. Donors and libraries
+    never enter it (iter94); they stay in ``obs['sample_batch']`` for DE and pseudobulks.
+    """
+    chem = obs["assay"].astype(str).str.extract(r"(v\d)$")[0]
+    study = obs["study"].astype(str)
+    multi = chem.groupby(study).transform("nunique") > 1
+    out = obs["species"].astype(str) + "_" + study
+    return out.where(~multi, out + "_" + chem)
+
+
 def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list) -> tuple[ad.AnnData, dict]:
     obs_cols = ["sample", "donor", "species", "study", "condition", "cell_ontology_class", "role", "sex", "assay",
                 "age", "author_label"]
@@ -273,9 +286,10 @@ def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list)
     feats, scaler = assemble_gin_features(esm_pca, esm_var, table, stats)
     unified.varm["gene_features"] = feats
     unified.uns["p_null"] = precompute_p_null(unified)
-    unified.obs["batch"] = unified.obs["sample"].astype(str)
+    unified.obs["sample_batch"] = unified.obs["sample"].astype(str)
+    unified.obs["batch"] = technical_batch(unified.obs).to_numpy()
     unified.obs["cell_type"] = unified.obs["cell_ontology_class"].astype(str)  # same labels, standard name
-    for c in ("species", "batch", "cell_type", "cell_ontology_class", "condition", "donor", "role", "sex", "assay", "study",
+    for c in ("species", "batch", "sample_batch", "cell_type", "cell_ontology_class", "condition", "donor", "role", "sex", "assay", "study",
               "sample", "age", "author_label"):
         unified.obs[c] = unified.obs[c].astype(str).astype("category")
 

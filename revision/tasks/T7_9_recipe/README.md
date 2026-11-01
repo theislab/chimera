@@ -11,8 +11,10 @@ frac(π ≥ 0.95) on the built object = 33.1% (14,017 genes, 17,238 cells; `resu
 least 20%, so the base is the testis H+Mouse row (iter111): conditional MMD on `cell_ontology_class`,
 prior clamp 0.85, adv 200, λ_anc 0.003, λ_mmd 50 (module default), free bits 1.0, 200 epochs. The other
 base row, liver H+Mouse (iter90, unclamped, no conditional MMD, 150 epochs), is configuration 8, the T7.4
-fallback. Every row passes `--batch-key species` (T7.4: `batch = sample` is the iter94 failure);
-`obs["batch"]` (library) is kept in the object.
+fallback. Every row passes `--batch-key batch`, with `obs["batch"]` the technical source dataset
+within a species, as in the canonical cohorts: `Human_human48_v2`, `Human_human48_v3`, `Mouse_4m`,
+`Mouse_aged` (species + study, plus chemistry where it differs within a study). Donors and libraries
+stay in `obs["sample_batch"]`; a donor-level batch is the iter94 failure.
 
 ## Grid (`grid.tsv`, 8 configurations, seed 42, names `rev-isl-grid<k>-s42`)
 
@@ -27,7 +29,7 @@ fallback. Every row passes `--batch-key species` (T7.4: `batch = sample` is the 
 | 7 | 200 | 0.003 | 50 | 1.0 | none / cell_ontology_class | 200 | base unclamped |
 | 8 | 200 | 0.003 | 50 | 1.0 | none / none | 150 | liver H+Mouse row (other base) |
 
-All: `--config A --accelerator cpu --batch-key species`, `cpu_p` / `cpu_normal`, 16 CPUs, 64G, 23:50,
+All: `--config A --accelerator cpu --batch-key batch`, `cpu_p` / `cpu_normal`, 16 CPUs, 64G, 23:50,
 array of 8 over `manifest.tsv` with `revision/slurm/array.sbatch`.
 
 ## Selection (`select_recipe.py`)
