@@ -1,8 +1,9 @@
 """Gene identity for every Chimera cohort. The only gene-identity helper in revision code.
 
-``ortho_N`` numbers are table-local: the liver, testis and Van Zyl ortholog tables assign
-them independently, so the same ID names different genes in different tables. Every lookup
-must therefore state its cohort, and joins across tissues must use ``hsapiens_gene_id``.
+``ortho_N`` numbers are table-local: the liver, testis, Van Zyl and bone-marrow ortholog
+tables assign them independently, so the same ID names different genes in different tables.
+Every lookup must therefore state its cohort, and joins across tissues must use
+``hsapiens_gene_id``.
 """
 
 from __future__ import annotations
@@ -17,6 +18,9 @@ DATA_PROCESSED = REPO_ROOT / "data" / "processed"
 _LIVER = "ortholog_table.csv"
 _TESTIS = "ortholog_table_testis.csv"
 _VAN_ZYL = "ortholog_table_van_zyl.csv"
+# Tables built during the revision live outside data/processed/; an absolute path here is
+# kept as is by ``DATA_PROCESSED / name``.
+_BONE_MARROW = str(REPO_ROOT / "data" / "revision" / "bone_marrow" / "ortholog_table_bone_marrow.csv")
 
 TABLES = {
     "liver": _LIVER,
@@ -29,6 +33,7 @@ TABLES = {
     "test_hmouse": _TESTIS,
     "test_3sp": _TESTIS,
     "van_zyl": _VAN_ZYL,
+    "bone_marrow": _BONE_MARROW,
 }
 
 H5ADS = {
@@ -45,6 +50,7 @@ H5ADS = {
 # that iterates H5ADS under DATA_PROCESSED never reads the superseded processed object.
 REVISION_H5ADS = {
     "van_zyl": REPO_ROOT / "data" / "revision" / "van_zyl" / "van_zyl_unified.h5ad",
+    "bone_marrow": REPO_ROOT / "data" / "revision" / "bone_marrow" / "bone_marrow_unified.h5ad",
 }
 
 

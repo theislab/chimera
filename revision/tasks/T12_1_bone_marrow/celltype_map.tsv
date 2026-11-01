@@ -1,0 +1,85 @@
+species	source_label	cell_type_harmonised	note
+human	hematopoietic stem cell	HSPC	
+human	common myeloid progenitor	HSPC	
+human	hematopoietic precursor cell	HSPC	
+human	neutrophil	neutrophil	
+human	granulocyte	neutrophil	
+human	monocyte	monocyte	
+human	classical monocyte	monocyte	
+human	non-classical monocyte	monocyte	
+human	intermediate monocyte	monocyte	
+human	macrophage	macrophage	
+human	B cell	B	
+human	plasma cell	plasma	
+human	T cell	T	
+human	CD4-positive, alpha-beta T cell	T	
+human	CD8-positive, alpha-beta T cell	T	
+human	regulatory T cell	T	
+human	naive thymus-derived CD4-positive, alpha-beta T cell	T	
+human	naive thymus-derived CD8-positive, alpha-beta T cell	T	
+human	natural killer cell	NK	
+human	erythroid progenitor cell	erythroid	
+human	erythrocyte	erythroid	
+human	basophil	DROP	granulocyte other than neutrophil; not one of the 9 types
+human	mature NK T cell	DROP	NKT: ambiguous between T and NK
+human	innate lymphoid cell	DROP	ILC: not one of the 9 types
+human	myeloid dendritic cell	DROP	dendritic cell: not one of the 9 types (no mouse bone-marrow partner)
+human	plasmacytoid dendritic cell	DROP	dendritic cell: not one of the 9 types (no mouse bone-marrow partner)
+human	fibroblast	DROP	non-haematopoietic or contaminant
+human	endothelial cell	DROP	non-haematopoietic or contaminant
+human	platelet	DROP	non-haematopoietic or contaminant
+mouse_lemur	hematopoietic precursor cell	HSPC	
+mouse_lemur	granulocyte monocyte progenitor cell	HSPC	
+mouse_lemur	megakaryocyte progenitor cell	HSPC	
+mouse_lemur	neutrophil	neutrophil	
+mouse_lemur	monocyte	monocyte	
+mouse_lemur	macrophage	macrophage	
+mouse_lemur	B cell	B	
+mouse_lemur	plasma cell	plasma	
+mouse_lemur	T cell	T	
+mouse_lemur	CD4-positive, alpha-beta T cell	T	
+mouse_lemur	CD8-positive, alpha-beta T cell	T	
+mouse_lemur	natural killer cell	NK	
+mouse_lemur	erythroid progenitor cell	erythroid	
+mouse_lemur	erythroid lineage cell	erythroid	
+mouse_lemur	basophil	DROP	granulocyte other than neutrophil; not one of the 9 types
+mouse_lemur	eosinophil	DROP	granulocyte other than neutrophil; not one of the 9 types
+mouse_lemur	mature NK T cell	DROP	NKT: ambiguous between T and NK
+mouse_lemur	dendritic cell	DROP	dendritic cell: not one of the 9 types (no mouse bone-marrow partner)
+mouse_lemur	conventional dendritic cell	DROP	dendritic cell: not one of the 9 types (no mouse bone-marrow partner)
+mouse_lemur	plasmacytoid dendritic cell	DROP	dendritic cell: not one of the 9 types (no mouse bone-marrow partner)
+mouse_lemur	lymphocyte	DROP	unresolved lymphocyte
+mouse_lemur	myeloid cell	DROP	unresolved myeloid cell
+mouse_lemur	unknown	DROP	unannotated
+mouse_lemur	fibroblast	DROP	non-haematopoietic or contaminant
+mouse_lemur	osteoblast	DROP	non-haematopoietic or contaminant
+mouse_lemur	preosteoblast	DROP	non-haematopoietic or contaminant
+mouse_lemur	adipocyte	DROP	non-haematopoietic or contaminant
+mouse_lemur	endothelial cell of sinusoid	DROP	non-haematopoietic or contaminant
+mouse_lemur	endothelial cell	DROP	non-haematopoietic or contaminant
+mouse_lemur	mesothelial cell	DROP	non-haematopoietic or contaminant
+mouse_lemur	platelet	DROP	non-haematopoietic or contaminant
+mouse_lemur	pulmonary alveolar type 2 cell	DROP	non-haematopoietic or contaminant
+mouse	hematopoietic precursor cell	HSPC	
+mouse	megakaryocyte-erythroid progenitor cell	HSPC	
+mouse	granulocyte	neutrophil	
+mouse	granulocytopoietic cell	neutrophil	
+mouse	monocyte	monocyte	
+mouse	promonocyte	monocyte	
+mouse	macrophage	macrophage	
+mouse	B cell	B	
+mouse	naive B cell	B	
+mouse	immature B cell	B	
+mouse	precursor B cell	B	
+mouse	late pro-B cell	B	
+mouse	plasma cell	plasma	
+mouse	T cell	T	
+mouse	naive T cell	T	
+mouse	natural killer cell	NK	
+mouse	proerythroblast	erythroid	
+mouse	erythroblast	erythroid	
+mouse	erythroid progenitor cell, mammalian	erythroid	
+mouse	basophil	DROP	granulocyte other than neutrophil; not one of the 9 types
+mouse	mature NK T cell	DROP	NKT: ambiguous between T and NK
+mouse	immature NK T cell	DROP	NKT: ambiguous between T and NK
+mouse	macrophage dendritic cell progenitor	DROP	DC-lineage progenitor; DC is not one of the 9 types

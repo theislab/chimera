@@ -1,0 +1,62 @@
+species	geo_series	cell_type	lineage
+human	GSE24759	Hematopoietic stem cell_CD133+ CD34dim	HSPC
+human	GSE24759	Hematopoietic stem cell_CD38- CD34+	HSPC
+human	GSE24759	Common myeloid progenitor	HSPC
+human	GSE24759	Granulocyte/monocyte progenitor	HSPC
+human	GSE24759	Megakaryocyte/ erythroid progenitor	HSPC
+human	GSE24759	Granulocyte (Neutrophil)	GN
+human	GSE24759	Monocyte	MO
+human	GSE24759	Myeloid Dendritic Cell	DC
+human	GSE24759	Plasmacytoid Dendritic Cell	DC
+human	GSE24759	Mature NK cell_CD56- CD16+ CD3-	NK
+human	GSE24759	Mature NK cell_CD56+ CD16+ CD3-	NK
+human	GSE24759	Mature NK cell_CD56- CD16- CD3-	NK
+human	GSE24759	Naive CD4+ T-cell	T
+human	GSE24759	Naive CD8+ T-cell	T
+human	GSE24759	CD4+ Central Memory	T
+human	GSE24759	CD4+ Effector Memory	T
+human	GSE24759	CD8+ Central Memory	T
+human	GSE24759	CD8+ Effector Memory	T
+human	GSE24759	CD8+ Effector Memory RA	T
+human	GSE24759	Naïve B-cells	B
+human	GSE24759	Mature B-cells	B
+human	GSE24759	Mature B-cell class able to switch	B
+human	GSE24759	Mature B-cell class switched	B
+mouse	GSE15907	SC.LT34F.BM	HSPC
+mouse	GSE15907	SC.ST34F.BM	HSPC
+mouse	GSE15907	SC.MPP34F.BM	HSPC
+mouse	GSE15907	SC.STSL.BM	HSPC
+mouse	GSE15907	SC.CMP.BM.DR	HSPC
+mouse	GSE15907	SC.GMP.BM	HSPC
+mouse	GSE15907	SC.MEP.BM	HSPC
+mouse	GSE15907	GN.BM	GN
+mouse	GSE15907	GN.Bl	GN
+mouse	GSE15907	Mo.6C+II-.BM	MO
+mouse	GSE15907	Mo.6C-II-.BM	MO
+mouse	GSE15907	Mo.6C+II-.Bl	MO
+mouse	GSE15907	Mo.6C-II-.Bl	MO
+mouse	GSE15907	DC.4+.Sp.ST	DC
+mouse	GSE15907	DC.8+.Sp.ST	DC
+mouse	GSE15907	DC.8-4-11b+.Sp	DC
+mouse	GSE15907	DC.8-4-11b-.Sp	DC
+mouse	GSE15907	DC.pDC.8+.Sp	DC
+mouse	GSE15907	DC.pDC.8-.Sp	DC
+mouse	GSE15907	NK.Sp	NK
+mouse	GSE15907	NK.49CI+.Sp	NK
+mouse	GSE15907	NK.49CI-.Sp	NK
+mouse	GSE15907	NK.49H+.Sp	NK
+mouse	GSE15907	NK.49H-.Sp	NK
+mouse	GSE15907	T.4Nve.Sp	T
+mouse	GSE15907	T.8Nve.Sp	T
+mouse	GSE15907	T.4Nve.LN	T
+mouse	GSE15907	T.8Nve.LN	T
+mouse	GSE15907	T.4Mem.Sp	T
+mouse	GSE15907	T.8Mem.Sp	T
+mouse	GSE15907	T.4Mem.LN	T
+mouse	GSE15907	T.8Mem.LN	T
+mouse	GSE15907	T.4Mem44h62l.Sp	T
+mouse	GSE15907	T.4Mem44h62l.LN	T
+mouse	GSE15907	B.Fo.Sp	B
+mouse	GSE15907	B.Fo.LN	B
+mouse	GSE15907	B.Fo.MLN	B
+mouse	GSE15907	B.MZ.Sp	B
