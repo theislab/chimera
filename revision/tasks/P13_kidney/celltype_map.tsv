@@ -1,0 +1,19 @@
+author_label	cell_ontology_class	note
+PT	pt	proximal tubule (DE primary)
+TAL	tal	thick ascending limb (DE)
+DCT	dct	distal convoluted tubule (DE)
+PC	pc	principal cell (DE)
+IC	ic	intercalated cell (DE)
+EC	ec	endothelial (DE)
+FIB	fib	fibroblast (DE)
+Myeloid	myeloid	myeloid immune (DE)
+Lymphoid	lymphoid	lymphoid immune (DE)
+CNT	cnt	connecting tubule
+DTL	dtl	descending thin limb
+ATL	atl	ascending thin limb
+POD	pod	podocyte
+PEC	pec	parietal epithelial cell
+PapE	pape	papillary epithelium
+VSM/P	vsm_p	vascular smooth muscle / pericyte
+NEU	neu	neural
+Ad	adipocyte	adipocyte

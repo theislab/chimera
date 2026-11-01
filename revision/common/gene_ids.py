@@ -1,6 +1,6 @@
 """Gene identity for every Chimera cohort. The only gene-identity helper in revision code.
 
-``ortho_N`` numbers are table-local: the liver, testis, Van Zyl and bone-marrow ortholog
+``ortho_N`` numbers are table-local: the liver, testis, Van Zyl, bone-marrow and kidney ortholog
 tables assign them independently, so the same ID names different genes in different tables.
 Every lookup must therefore state its cohort, and joins across tissues must use
 ``hsapiens_gene_id``.
@@ -21,6 +21,8 @@ _VAN_ZYL = "ortholog_table_van_zyl.csv"
 # Tables built during the revision live outside data/processed/; an absolute path here is
 # kept as is by ``DATA_PROCESSED / name``.
 _BONE_MARROW = str(REPO_ROOT / "data" / "revision" / "bone_marrow" / "ortholog_table_bone_marrow.csv")
+# Kidney AKI case (plan section 8c): human-mouse 1:1, P13_kidney/build_orthologs.py.
+_KIDNEY = str(REPO_ROOT / "data" / "revision" / "disease_kidney" / "ortholog_table_kidney.csv")
 
 TABLES = {
     "liver": _LIVER,
@@ -34,6 +36,7 @@ TABLES = {
     "test_3sp": _TESTIS,
     "van_zyl": _VAN_ZYL,
     "bone_marrow": _BONE_MARROW,
+    "kidney": _KIDNEY,
 }
 
 H5ADS = {
@@ -51,6 +54,7 @@ H5ADS = {
 REVISION_H5ADS = {
     "van_zyl": REPO_ROOT / "data" / "revision" / "van_zyl" / "van_zyl_unified.h5ad",
     "bone_marrow": REPO_ROOT / "data" / "revision" / "bone_marrow" / "bone_marrow_unified.h5ad",
+    "kidney": REPO_ROOT / "data" / "revision" / "disease_kidney" / "kidney_healthy_train.h5ad",
 }
 
 

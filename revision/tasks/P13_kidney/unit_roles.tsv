@@ -1,0 +1,162 @@
+species	unit	donor	role	condition	assay	source	collection	tissue_collection	sex	age	stage	time	subtype	n_libraries	n_nuclei
+Human	164-10|10x 3' v3	164-10	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	3606
+Human	164-10|10x multiome	164-10	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	9067
+Human	164-17|10x multiome	164-17	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4238
+Human	164-1|10x 3' v3	164-1	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	50-59	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4620
+Human	164-20|10x multiome	164-20	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	959
+Human	164-3|10x 3' v3	164-3	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	20-29	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4409
+Human	164-5|10x 3' v3	164-5	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4103
+Human	164-6|10x 3' v3	164-6	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4891
+Human	164-7|10x 3' v3	164-7	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	2936
+Human	164-8|10x 3' v3	164-8	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	1158
+Human	165-10|10x 3' v3	165-10	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	50-59	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	5794
+Human	165-11|10x multiome	165-11	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4469
+Human	165-14|10x multiome	165-14	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	1307
+Human	165-15|10x multiome	165-15	de_control	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	815
+Human	165-7|10x 3' v3	165-7	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	50-59	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4094
+Human	165-9|10x 3' v3	165-9	de_control	control	10x 3' v3	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4271
+Human	3490|10x 3' v3	3490	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	10-19	NA	NA	Healthy Reference Tissue	1	2109
+Human	3499|10x 3' v3	3499	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	1372
+Human	3504|10x 3' v3	3504	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	40-49	NA	NA	Healthy Reference Tissue	1	3008
+Human	3579|10x 3' v3	3579	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	2	2797
+Human	3593|10x 3' v3	3593	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	9	50290
+Human	3611|10x 3' v3	3611	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	1546
+Human	3613|10x 3' v3	3613	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	5984
+Human	3619|10x 3' v3	3619	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	70-79	NA	NA	Healthy Reference Tissue	1	2747
+Human	3620|10x 3' v3	3620	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Healthy Reference Tissue	1	2252
+Human	3621|10x 3' v3	3621	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	40-49	NA	NA	Healthy Reference Tissue	1	3197
+Human	3622|10x 3' v3	3622	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Healthy Reference Tissue	1	4494
+Human	3623|10x 3' v3	3623	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	40-49	NA	NA	Healthy Reference Tissue	1	824
+Human	3625|10x 3' v3	3625	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	60-69	NA	NA	Healthy Reference Tissue	1	3039
+Human	3626|10x 3' v3	3626	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	40-49	NA	NA	Healthy Reference Tissue	1	3608
+Human	3627|10x 3' v3	3627	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	30-39	NA	NA	Healthy Reference Tissue	1	4631
+Human	3630|10x 3' v3	3630	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Healthy Reference Tissue	1	4357
+Human	3630|10x multiome	3630	de_control	control	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Healthy Reference Tissue	1	3298
+Human	3631|10x 3' v3	3631	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	40-49	NA	NA	Healthy Reference Tissue	1	3036
+Human	3632|10x 3' v3	3632	de_control	control	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Healthy Reference Tissue	1	5634
+Human	3675|10x 3' v3	3675	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	1	487
+Human	3691|10x 3' v3	3691	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	1	6147
+Human	3691|10x multiome	3691	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	1	2048
+Human	3693|10x 3' v3	3693	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	60-69	NA	NA	Healthy Reference Tissue	1	8046
+Human	3704|10x multiome	3704	de_control	control	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	3	32996
+Human	3715|10x 3' v3	3715	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	7592
+Human	3728|10x 3' v3	3728	de_control	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	17768
+Human	3778|10x 3' v3	3778	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	40-49	NA	NA	Healthy Reference Tissue	2	7674
+Human	3778|10x multiome	3778	de_control	control	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	40-49	NA	NA	Healthy Reference Tissue	4	38597
+Human	3781|10x multiome	3781	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	5	23627
+Human	3800|10x multiome	3800	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	40-49	NA	NA	Healthy Reference Tissue	2	15660
+Human	3824|10x multiome	3824	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	2	13403
+Human	3825|10x multiome	3825	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	female	70-79	NA	NA	Healthy Reference Tissue	3	20803
+Human	3898|10x multiome	3898	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	female	20-29	NA	NA	Healthy Reference Tissue	1	2312
+Human	3900|10x multiome	3900	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	90-99	NA	NA	Healthy Reference Tissue	3	27105
+Human	3907|10x multiome	3907	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	90-99	NA	NA	Healthy Reference Tissue	3	20982
+Human	3918|10x multiome	3918	de_control	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	1	10272
+Human	3965|10x 3' v3	3965	de_control	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	female	60-69	NA	NA	Healthy Reference Tissue	1	13108
+Human	30-10018|10x 3' v3	30-10018	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	1893
+Human	30-10034|10x 3' v3	30-10034	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	70-79	NA	NA	Acute Kidney Injury	1	4847
+Human	30-10044|10x 3' v3	30-10044	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	30-39	NA	NA	Acute Kidney Injury	1	2386
+Human	30-10125|10x multiome	30-10125	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	2678
+Human	30-10631|10x 3' v3	30-10631	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	5614
+Human	30-10631|10x multiome	30-10631	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	3891
+Human	30-10868|10x multiome	30-10868	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	3987
+Human	30-10929|10x 3' v3	30-10929	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	3400
+Human	30-11051|10x multiome	30-11051	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	20-29	NA	NA	Acute Kidney Injury	1	943
+Human	30-11080|10x multiome	30-11080	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	1792
+Human	30-11081|10x multiome	30-11081	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	70-79	NA	NA	Acute Kidney Injury	1	2206
+Human	30-11084|10x multiome	30-11084	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Acute Kidney Injury	1	4961
+Human	32-10003|10x 3' v3	32-10003	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	6143
+Human	32-10034|10x 3' v3	32-10034	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	60-69	NA	NA	Acute Kidney Injury	1	3410
+Human	32-10074|10x multiome	32-10074	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	70-79	NA	NA	Acute Kidney Injury	1	540
+Human	32-10205|10x 3' v3	32-10205	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	60-69	NA	NA	Acute Kidney Injury	1	4362
+Human	32-10333|10x 3' v3	32-10333	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	40-49	NA	NA	Acute Kidney Injury	1	1317
+Human	32-10346|10x multiome	32-10346	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	40-49	NA	NA	Acute Kidney Injury	1	131
+Human	32-10419|10x multiome	32-10419	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	40-49	NA	NA	Acute Kidney Injury	1	2178
+Human	32-10456|10x multiome	32-10456	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	1630
+Human	32-10458|10x multiome	32-10458	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Acute Kidney Injury	1	5302
+Human	32-2|10x 3' v3	32-2	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	60-69	NA	NA	Acute Kidney Injury	1	902
+Human	33-10005|10x 3' v3	33-10005	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	60-69	NA	NA	Acute Kidney Injury	1	3689
+Human	33-10006|10x 3' v3	33-10006	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	20-29	NA	NA	Acute Kidney Injury	1	4484
+Human	33-10331|10x multiome	33-10331	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	30-39	NA	NA	Acute Kidney Injury	1	3628
+Human	33-10376|10x multiome	33-10376	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	70-79	NA	NA	Acute Kidney Injury	1	2154
+Human	34-10050|10x 3' v3	34-10050	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	60-69	NA	NA	Acute Kidney Injury	1	735
+Human	34-10184|10x 3' v3	34-10184	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Acute Kidney Injury	1	5038
+Human	34-10187|10x 3' v3	34-10187	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	20-29	NA	NA	Acute Kidney Injury	1	3660
+Human	34-10209|10x 3' v3	34-10209	de_disease	disease	10x 3' v3	KPMP	biopsy	Percutaneous Needle Biopsy	male	50-59	NA	NA	Acute Kidney Injury	1	2510
+Human	34-10240|10x multiome	34-10240	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	50-59	NA	NA	Acute Kidney Injury	1	1232
+Human	34-10306|10x multiome	34-10306	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	5508
+Human	34-10331|10x multiome	34-10331	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	344
+Human	34-10393|10x multiome	34-10393	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	male	30-39	NA	NA	Acute Kidney Injury	1	5280
+Human	34-10579|10x multiome	34-10579	de_disease	disease	10x multiome	KPMP	biopsy	Percutaneous Needle Biopsy	female	60-69	NA	NA	Acute Kidney Injury	1	622
+Human	3673|10x multiome	3673	de_disease	disease	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	50-59	NA	NA	Acute Kidney Injury	1	2304
+Human	3782|10x multiome	3782	de_disease	disease	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	20-29	NA	NA	Acute Kidney Injury	3	21487
+Human	164-11|10x multiome	164-11	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	50-59	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	6332
+Human	164-12|10x multiome	164-12	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	30-39	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	6635
+Human	164-13|10x multiome	164-13	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	5800
+Human	164-14|10x multiome	164-14	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	4973
+Human	164-15|10x multiome	164-15	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	8144
+Human	164-18|10x multiome	164-18	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	male	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	7768
+Human	165-13|10x multiome	165-13	train_healthy	control	10x multiome	KPMP	biopsy	Transplant Pre-perfusion Biopsy	female	40-49	NA	NA	Living Donor Healthy Reference Tissue (KPMP)	1	2946
+Human	3510|10x multiome	3510	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	1	10010
+Human	3535|10x multiome	3535	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	70-79	NA	NA	Healthy Reference Tissue	1	1228
+Human	3711|10x multiome	3711	train_healthy	control	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	60-69	NA	NA	Healthy Reference Tissue	3	25885
+Human	3712|10x 3' v3	3712	train_healthy	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	1	11646
+Human	3712|10x multiome	3712	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	4	25324
+Human	3723|10x 3' v3	3723	train_healthy	control	10x 3' v3	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	2	26137
+Human	3723|10x multiome	3723	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	4	20543
+Human	3775|10x multiome	3775	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	male	40-49	NA	NA	Healthy Reference Tissue	1	4087
+Human	3830|10x multiome	3830	train_healthy	control	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	1	2158
+Human	3893|10x multiome	3893	train_healthy	control	10x multiome	KPMP	nephrectomy	Nephrectomy	female	50-59	NA	NA	Healthy Reference Tissue	1	3236
+Human	3948|10x 3' v3	3948	train_healthy	control	10x 3' v3	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	1	1021
+Human	3948|10x multiome	3948	train_healthy	control	10x multiome	KPMP	nephrectomy	Deceased Donor Nephrectomy	male	50-59	NA	NA	Healthy Reference Tissue	6	48186
+Mouse	K20.11	K20.11	de_control	control	10x multiome	current study	NA	NA	male	7-month-old stage	late	Sham_20wk	Sham	1	3559
+Mouse	K20.12	K20.12	de_control	control	10x multiome	current study	NA	NA	male	7-month-old stage	late	Sham_20wk	Sham	1	1507
+Mouse	K20.13	K20.13	de_control	control	10x multiome	current study	NA	NA	male	7-month-old stage	late	Sham_20wk	Sham	1	4083
+Mouse	K20.14	K20.14	de_control	control	10x multiome	current study	NA	NA	male	7-month-old stage	late	Sham_20wk	Sham	1	3761
+Mouse	K38.5	K38.5	de_control	control	10x multiome	current study	NA	NA	male	2-month-old stage	acute	Sham_2d	Sham	1	2453
+Mouse	K38.6	K38.6	de_control	control	10x multiome	current study	NA	NA	male	2-month-old stage	acute	Sham_2d	Sham	1	4384
+Mouse	K19.13	K19.13	de_disease	disease	10x multiome	current study	NA	NA	male	7-month-old stage	late	20-24wk	AKI	1	1704
+Mouse	K19.24	K19.24	de_disease	disease	10x multiome	current study	NA	NA	male	7-month-old stage	late	20-24wk	AKI	1	4444
+Mouse	K19.5	K19.5	de_disease	disease	10x multiome	current study	NA	NA	male	7-month-old stage	late	20-24wk	AKI	1	2595
+Mouse	K19.8	K19.8	de_disease	disease	10x multiome	current study	NA	NA	male	7-month-old stage	late	20-24wk	AKI	1	2352
+Mouse	K27.13	K27.13	de_disease	disease	10x multiome	current study	NA	NA	male	3-month-old stage	late	4-6wk	AKI	1	445
+Mouse	K27.14	K27.14	de_disease	disease	10x multiome	current study	NA	NA	male	3-month-old stage	late	4-6wk	AKI	1	3952
+Mouse	K27.15	K27.15	de_disease	disease	10x multiome	current study	NA	NA	male	3-month-old stage	late	4-6wk	AKI	1	4998
+Mouse	K38.1	K38.1	de_disease	disease	10x multiome	current study	NA	NA	male	2-month-old stage	acute	2d	AKI	1	1539
+Mouse	K38.2	K38.2	de_disease	disease	10x multiome	current study	NA	NA	male	2-month-old stage	acute	2d	AKI	1	3046
+Mouse	K38.4	K38.4	de_disease	disease	10x multiome	current study	NA	NA	male	2-month-old stage	acute	2d	AKI	1	2400
+Mouse	IRIsham1	IRIsham1	sens_control	control	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	Sham	Sham	2	15238
+Mouse	IRIsham2	IRIsham2	sens_control	control	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	Sham	Sham	1	5534
+Mouse	IRIsham3	IRIsham3	sens_control	control	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	Sham	Sham	1	5281
+Mouse	IRI12h1	IRI12h1	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	12hrs	AKI	2	10774
+Mouse	IRI12h2	IRI12h2	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	12hrs	AKI	1	4563
+Mouse	IRI12h3	IRI12h3	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	12hrs	AKI	1	4370
+Mouse	IRI14d1	IRI14d1	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	2wk	AKI	2	15887
+Mouse	IRI14d2	IRI14d2	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	2wk	AKI	1	2240
+Mouse	IRI14d3	IRI14d3	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	2wk	AKI	1	2048
+Mouse	IRI2d1	IRI2d1	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	2d	AKI	2	14120
+Mouse	IRI2d2	IRI2d2	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	2d	AKI	2	4422
+Mouse	IRI2d3	IRI2d3	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	2d	AKI	1	1902
+Mouse	IRI4h1	IRI4h1	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	4hrs	AKI	1	6761
+Mouse	IRI4h2	IRI4h2	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	4hrs	AKI	1	1848
+Mouse	IRI4h3	IRI4h3	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	acute	4hrs	AKI	1	5229
+Mouse	IRI6w1	IRI6w1	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	4-6wk	AKI	2	15747
+Mouse	IRI6w2	IRI6w2	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	4-6wk	AKI	1	2147
+Mouse	IRI6w3	IRI6w3	sens_disease	disease	10x 3' v2	Kirita2020	NA	NA	male	2-month-old stage	late	4-6wk	AKI	1	5037
+Mouse	SDKZ0004	SDKZ0004	train_healthy	control	10x multiome	current study	NA	NA	male	4-month-old stage	NA	Ref	Ref	1	2743
+Mouse	SDKZ0005	SDKZ0005	train_healthy	control	10x multiome	current study	NA	NA	male	4-month-old stage	NA	Ref	Ref	1	1301
+Mouse	SDKZ0006	SDKZ0006	train_healthy	control	10x multiome	current study	NA	NA	male	4-month-old stage	NA	Ref	Ref	1	2172
+Mouse	SDKZ0008	SDKZ0008	train_healthy	control	10x multiome	current study	NA	NA	male	12-month-old stage	NA	Ref	Ref	1	3261
+Mouse	SDKZ0009	SDKZ0009	train_healthy	control	10x multiome	current study	NA	NA	male	12-month-old stage	NA	Ref	Ref	1	2716
+Mouse	SDKZ0010	SDKZ0010	train_healthy	control	10x multiome	current study	NA	NA	male	12-month-old stage	NA	Ref	Ref	1	3270
+Mouse	SDKZ0011	SDKZ0011	train_healthy	control	10x multiome	current study	NA	NA	male	20-month-old stage	NA	Ref	Ref	1	2787
+Mouse	SDKZ0012	SDKZ0012	train_healthy	control	10x multiome	current study	NA	NA	male	20-month-old stage	NA	Ref	Ref	1	2656
+Mouse	SDKZ0013	SDKZ0013	train_healthy	control	10x multiome	current study	NA	NA	male	20-month-old stage	NA	Ref	Ref	1	2714
+Mouse	SDKZ0014	SDKZ0014	train_healthy	control	10x multiome	current study	NA	NA	female	4-month-old stage	NA	Ref	Ref	1	2779
+Mouse	SDKZ0015	SDKZ0015	train_healthy	control	10x multiome	current study	NA	NA	female	4-month-old stage	NA	Ref	Ref	1	2478
+Mouse	SDKZ0016	SDKZ0016	train_healthy	control	10x multiome	current study	NA	NA	female	4-month-old stage	NA	Ref	Ref	1	1970
+Mouse	SDKZ0017	SDKZ0017	train_healthy	control	10x multiome	current study	NA	NA	female	12-month-old stage	NA	Ref	Ref	1	2818
+Mouse	SDKZ0018	SDKZ0018	train_healthy	control	10x multiome	current study	NA	NA	female	12-month-old stage	NA	Ref	Ref	1	2659
+Mouse	SDKZ0019	SDKZ0019	train_healthy	control	10x multiome	current study	NA	NA	female	12-month-old stage	NA	Ref	Ref	1	1546
+Mouse	SDKZ0020	SDKZ0020	train_healthy	control	10x multiome	current study	NA	NA	female	20-month-old stage	NA	Ref	Ref	1	1444
+Mouse	SDKZ0021	SDKZ0021	train_healthy	control	10x multiome	current study	NA	NA	female	20-month-old stage	NA	Ref	Ref	1	2727
+Mouse	SDKZ0022	SDKZ0022	train_healthy	control	10x multiome	current study	NA	NA	female	20-month-old stage	NA	Ref	Ref	1	1887
