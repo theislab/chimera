@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import gc
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -29,7 +30,7 @@ from pathlib import Path
 import numpy as np
 
 NB_DIR = Path(__file__).resolve().parent
-REPO_ROOT = NB_DIR.parent
+REPO_ROOT = Path(os.environ.get("CHIMERA_ROOT") or NB_DIR.parent)
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(NB_DIR) not in sys.path:

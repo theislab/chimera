@@ -120,8 +120,12 @@ cells.append(code(r"""
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    NB_DIR = Path.cwd() if (Path.cwd() / "_figure_design.py").exists() \
-             else Path("/Users/kemalinecik/git_nosync/master_chimera/chimera/notebooks")
+    # Notebook folder: $CHIMERA_ROOT/notebooks if set, else located from the working directory.
+    import os
+    NB_DIR = (Path(os.environ["CHIMERA_ROOT"]) / "notebooks" if os.environ.get("CHIMERA_ROOT")
+              else Path.cwd() if (Path.cwd() / "_figure_design.py").exists()
+              else Path.cwd() / "notebooks")
+    assert (NB_DIR / "_figure_design.py").exists(), f"no notebooks folder at {NB_DIR}; set CHIMERA_ROOT"
     if str(NB_DIR) not in sys.path:
         sys.path.insert(0, str(NB_DIR))
 

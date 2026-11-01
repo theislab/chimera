@@ -18,6 +18,7 @@ Usage (from a notebook cell)::
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -25,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(os.environ.get("CHIMERA_ROOT") or Path(__file__).resolve().parents[1])
 RUNS_ROOT = REPO_ROOT / "training" / "runs"
 DATA_PROCESSED = REPO_ROOT / "data" / "processed"
 
