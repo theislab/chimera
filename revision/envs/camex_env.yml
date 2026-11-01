@@ -15,3 +15,5 @@ dependencies:
       - numba==0.56.4
       - harmonypy==0.0.9
       - scikit-learn==1.2.2
+      - pynndescent==0.5.8      # 0.5.9+ fails to compile under numba 0.56.4 (parfors)
+      - umap-learn==0.5.3
