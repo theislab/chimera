@@ -1,0 +1,35 @@
+species	author_label	cell_ontology_class
+Human	Beta	beta
+Human	Alpha	alpha
+Human	Delta	delta
+Human	Gamma	pp
+Human	Epsilon	epsilon
+Human	Ductal	ductal
+Human	Acinar	acinar
+Human	Endothelial	endothelial
+Human	Stellate	stellate
+Human	Activated_Stellate	stellate
+Human	Immune	immune
+Human	Mast	immune
+Human	Schwann	schwann
+Human	Proliferating_Alpha	unresolved
+Mouse	beta	beta
+Mouse	alpha	alpha
+Mouse	delta	delta
+Mouse	gamma	pp
+Mouse	ductal	ductal
+Mouse	acinar	acinar
+Mouse	endothelial	endothelial
+Mouse	stellate a.	stellate
+Mouse	stellate q.	stellate
+Mouse	immune	immune
+Mouse	schwann	schwann
+Mouse	endo. prolif.	unresolved
+Mouse	alpha+beta	unresolved
+Mouse	alpha+delta	unresolved
+Mouse	beta+delta	unresolved
+Mouse	beta+gamma	unresolved
+Mouse	delta+gamma	unresolved
+Mouse	lowQ	unresolved
+Mouse	E endo.	unresolved
+Mouse	E non-endo.	unresolved
