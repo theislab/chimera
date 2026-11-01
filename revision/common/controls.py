@@ -98,12 +98,17 @@ def ns_basis(x: np.ndarray, df: int = 4) -> np.ndarray:
     """Natural cubic spline basis (no intercept), ``df`` columns, interior knots at quantiles.
 
     Truncated-power form (Hastie, Tibshirani and Friedman, eq. 5.4-5.5): boundary knots at
-    min and max, ``df - 1`` interior knots at the quantiles 1/df, ..., (df-1)/df.
+    min and max, ``df - 1`` interior knots at the quantiles 1/df, ..., (df-1)/df. Knots that
+    coincide with a boundary or with each other (heavy ties, e.g. the testis raw prior with a
+    third of genes at its 0.95 cap) are dropped, which lowers the column count for that covariate.
     """
     x = np.asarray(x, dtype=float)
-    inner = np.quantile(x, np.arange(1, df) / df)
+    inner = np.unique(np.quantile(x, np.arange(1, df) / df))
+    inner = inner[(inner > x.min()) & (inner < x.max())]
     knots = np.r_[x.min(), inner, x.max()]
     K = len(knots)
+    if K < 3:
+        return ((x - x.mean()) / (x.std() + 1e-12))[:, None]
 
     def d(k):
         num = np.maximum(x - knots[k], 0) ** 3 - np.maximum(x - knots[K - 1], 0) ** 3
