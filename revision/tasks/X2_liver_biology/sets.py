@@ -28,8 +28,30 @@ region) are never formed or tested in X2.
 from __future__ import annotations
 
 # ---- zonation (literature-defined; fixed before D was read) --------------------------------
+# Amendment 1 (before any D was read): six of the eight scoring landmarks (GLUL, CYP2E1,
+# CYP1A2, ASS1, ALB, CYP2F1) are absent from the 1:1 four-species liver vocabulary, so
+# hepatocytes are placed on the porto-central axis from the raw CAMEX full-transcriptome
+# objects (data/raw/camex/1liver/dataset/raw-liver-*.h5ad, same cells), with species-native
+# symbols. Only landmarks OUTSIDE the vocabulary are used for the score, so no gene tested
+# below also defines the zones. Zebrafish has no albumin, ASS1 or CYP2F ortholog in its raw
+# object; its score is pericentral-only (glula, glulb). Secondary score adds the canonical
+# review markers outside the vocabulary (PC LECT2; PP SDS, G6PC).
 ZONE_SCORE_PC = ["GLUL", "CYP2E1", "CYP1A2"]
-ZONE_SCORE_PP = ["ASS1", "ASL", "ALB", "CYP2F1", "PCK1"]
+ZONE_SCORE_PP = ["ASS1", "ALB", "CYP2F1"]
+ZONE_SCORE_NATIVE = {
+    "Human": {"PC": ["GLUL", "CYP2E1", "CYP1A2"], "PP": ["ALB", "ASS1", "CYP2F1"]},
+    "Monkey": {"PC": ["GLUL", "CYP2E1", "CYP1A2"], "PP": ["ALB", "ASS1", "CYP2F1"]},
+    "Mouse": {"PC": ["Glul", "Cyp2e1", "Cyp1a2"], "PP": ["Alb", "Ass1", "Cyp2f2"]},
+    "Zebrafish": {"PC": ["glula", "glulb"], "PP": []},
+}
+ZONE_SCORE_NATIVE_EXTRA = {
+    "Human": {"PC": ["LECT2"], "PP": ["SDS", "G6PC"]},
+    "Monkey": {"PC": ["LECT2"], "PP": ["SDS", "G6PC"]},
+    "Mouse": {"PC": ["Lect2"], "PP": ["Sds", "G6pc"]},
+    "Zebrafish": {"PC": [], "PP": []},
+}
+RAW_LIVER = {"Human": "raw-liver-human-Martin.h5ad", "Monkey": "raw-liver-monkey-Martin.h5ad",
+             "Mouse": "raw-liver-mouse-Martin.h5ad", "Zebrafish": "raw-liver-zebrafish-ggj5.h5ad"}
 
 ZONATION_SETS = {
     # Halpern 2017 + Aizarani 2019 named genes
