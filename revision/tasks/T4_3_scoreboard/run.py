@@ -66,6 +66,7 @@ SET_COHORT = {"liver": "liv_hmouse", "testis": "test_hmouse"}
 DRIVER_TYPES = {"Hepatocytes": "hepatocyte", "Endothelial": "endothelial", "fibroblasts": "stellate",
                 "Kupffer cells": "macrophage"}
 CORE = [42, 43, 44, 45, 46]
+INTEGRATED_SEEDS = {"liv_hmouse": [42, 43, 44, 47, 48, 51]}  # amendment log 2026-11-02, Family 3 only
 N_DRAWS = 10_000
 N_PERM = 10_000
 N_BOOT_SETS = 2_000
@@ -146,6 +147,10 @@ def prepare(mode: str, null_seed: int) -> None:
             d["M"] = d["M"][p]
             if cgk is not None:
                 cgk = pd.DataFrame(cgk.to_numpy()[p], index=cgk.index, columns=cgk.columns)
+        if cohort in INTEGRATED_SEEDS:  # after any null permutation, so M and D stay aligned
+            sd = sorted(d["meta"]["seeds"])
+            mi = d["M"][:, [sd.index(s) for s in INTEGRATED_SEEDS[cohort]]].mean(1)
+            tab["D_int"] = mi - np.median(mi)
         tab["B3b"] = I.b3b(F72, tab["D"].to_numpy())
         ref = RES / f"T4_3/baselines_consensusD/baselines__{cohort}.csv"
         if mode == "real" and ref.exists():  # same code path as T4.2 run.py --delta-alpha <consensus>
@@ -459,6 +464,8 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
                       subset="low_detection"))
         U.append(unit(f"{h}:alpha_minus_pi_raw", "F3", "alpha_minus_pi_raw", h, c, g, cov, ["D_raw"]))
         U.append(unit(f"{h}:S_ema", "F3", "S_ema_beside_D", h, c, g, cov, ["S_ema"]))
+        if c in INTEGRATED_SEEDS:
+            U.append(unit(f"{h}:integrated_seeds", "F3", "integrated_seeds_only", h, c, g, cov, ["D_int"], perm="one"))
         U.append(unit(f"{h}:common4", "F1_common", "common_universe_of_four_golds", h, c, g, cov, ["D"],
                       subset="common4", perm="one"))
         if v["tissue"] == "testis":
@@ -493,6 +500,9 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
                           strata="pi_expr", direction=d, perm=True))
             U.append(dict(kind="set", id=f"set:{tis}:{s}:D:absolute_bg", family="F3", tissue=tis, cohort=c, set=s,
                           score="D", strata="pi_expr", direction=d, perm=True, bg_rule="absolute"))
+            if c in INTEGRATED_SEEDS:
+                U.append(dict(kind="set", id=f"set:{tis}:{s}:D_int", family="F3", tissue=tis, cohort=c, set=s,
+                              score="D_int", strata="pi_expr", direction=d, perm=True))
             U.append(dict(kind="set", id=f"set:{tis}:{s}:pi_raw", family="F3", tissue=tis, cohort=c, set=s,
                           score="prior_raw", strata="expr", direction=d))
             for b in J + ["B3b"]:
