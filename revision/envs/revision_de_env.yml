@@ -13,5 +13,10 @@ dependencies:
   - pyarrow
   - statsmodels
   - matplotlib
+  - scikit-learn
+  - scanpy
+  - python-igraph
+  - leidenalg
+  - patsy
   - pip:
       - pydeseq2==0.5.2
