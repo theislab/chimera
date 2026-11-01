@@ -5,6 +5,9 @@ Analyses added for the Cell Systems revision. Nothing here changes the `chimera`
 | Path | Holds |
 |---|---|
 | `common/gene_ids.py` | The only gene-identity helper. `ortho_N` IDs are table-local, so lookups need a cohort |
+| `common/cohorts.py` | Canonical runs, `final_state.npz` readout, raw prior, per-gene covariates |
+| `common/cds.py` | Human CDS length and GC from the Ensembl 110 GTF and CDS FASTA |
+| `common/outputs.py` | Atomic task outputs (`*.tmp` then rename), provenance, `DONE` last |
 | `envs/` | Extra environment definitions and the `chimera_env` lock file |
 | `slurm/` | CPU job templates, single and array |
 | `tasks/T<major>_<minor>_<slug>/` | One folder per task; outputs go to `results/revision/T<major>_<minor>/` |
@@ -13,3 +16,8 @@ Analyses added for the Cell Systems revision. Nothing here changes the `chimera`
 
 | Task | Script | Output |
 |---|---|---|
+| T2.3 | `tasks/T2_3_tissue/run.py` | `results/revision/T2_3/` tissue comparison, program means, reproduction check |
+| T2.4 | `tasks/T2_4_covariates/run.py` | `results/revision/T2_4/` covariate table, CV R², projection, masking, figure |
+| T2.5 | `tasks/T2_5_celltype_margin/run.py` (needs `chimera_env`) | `results/revision/T2_5/<run>__{S_gsk,C_gk,genes}.parquet`, acceptance, figures |
+| T2.6 | `tasks/T2_6_matched/run.py` | `results/revision/T2_6/category_matched.csv`, random sets, mtDNA detection check |
+| T2.7 | `tasks/T2_7_consistency/run.py` | `results/revision/T2_7/consistency_values.csv` |
