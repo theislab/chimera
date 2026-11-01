@@ -7,7 +7,7 @@ any disease contrast. The grid and this rule are committed before any islet run 
 
 ## Base recipe (section 8 rule, T7.4)
 
-frac(π ≥ 0.95) on the built object = 33.1% (14,017 genes, 17,238 cells; `results/revision/T7_9/healthy_summary.json`; 31.1% on the table), which is at
+frac(π ≥ 0.95) on the built object = 33.1% (14,002 genes, 17,238 cells; `results/revision/T7_9/healthy_summary.json`; 31.1% on the table), which is at
 least 20%, so the base is the testis H+Mouse row (iter111): conditional MMD on `cell_ontology_class`,
 prior clamp 0.85, adv 200, λ_anc 0.003, λ_mmd 50 (module default), free bits 1.0, 200 epochs. The other
 base row, liver H+Mouse (iter90, unclamped, no conditional MMD, 150 epochs), is configuration 8, the T7.4
