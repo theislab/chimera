@@ -1,0 +1,13 @@
+control	cohort	arm	perm_seed	train_seed
+liv_hmouse_permB_p1	liv_hmouse	b	351001	42
+liv_hmouse_permB_p2	liv_hmouse	b	351002	43
+liv_hmouse_permB_p3	liv_hmouse	b	351003	44
+liv_hmouse_permB_p4	liv_hmouse	b	351004	45
+liv_hmouse_permB_p5	liv_hmouse	b	351005	46
+liv_hmouse_permC_p1	liv_hmouse	c	352001	42
+liv_hmouse_permC_p2	liv_hmouse	c	352002	43
+liv_hmouse_permC_p3	liv_hmouse	c	352003	44
+liv_hmouse_permC_p4	liv_hmouse	c	352004	45
+liv_hmouse_permC_p5	liv_hmouse	c	352005	46
+test_hmouse_permC_p1	test_hmouse	c	353001	42
+liv_4sp_permA_p1	liv_4sp	a	354001	42
