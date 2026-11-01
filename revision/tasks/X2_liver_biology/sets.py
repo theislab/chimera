@@ -88,3 +88,12 @@ EXTRA_NAMED = ["ASS1", "NAGS", "ALB", "APOA1"]
 # (T2.5 flag); sign of (alpha - prior) negative in every seed of the consensus.
 DIVCONS_PRIOR_Q = 2 / 3
 DIVCONS_D_Q = 0.05
+
+# ---- data-defined zonated genes (rule fixed before D was read) ------------------------------
+# In ONE reference species' hepatocytes (no cross-species information): zonation slope =
+# log2(1 + CPM) of the pericentral tertile minus the periportal tertile (zones from the
+# out-of-vocabulary landmark score). Zonated-PC: slope >= +ZONE_SLOPE and detection >= ZONE_DET
+# in that species' hepatocytes; zonated-PP: slope <= -ZONE_SLOPE, same detection. Reference
+# species: Human (primary) and Mouse (the Halpern 2017 species).
+ZONE_SLOPE = 1.0
+ZONE_DET = 0.10
