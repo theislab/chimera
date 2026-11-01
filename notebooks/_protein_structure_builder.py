@@ -1,6 +1,6 @@
 """Build ``09_protein_structure_visualization.ipynb`` from a single Python source.
 
-Per CLAUDE.md, all dependencies are in ``chimera/pyproject.toml`` ``[protein]``
+All dependencies are in ``chimera/pyproject.toml`` ``[protein]``
 extra (``biopython``, ``py3Dmol``) and already installed in ``chimera_env``;
 no env edits are needed for this notebook.  Network access is required on
 first run only — every fetched resource is cached on disk under

@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use Chimera, please cite it as below."
+title: "Chimera: Cross-Species Single-Cell Generative Modeling of Expression Deployment Relative to Protein Conservation"
+type: software
+authors:
+  - family-names: Inecik
+    given-names: Kemal
+    affiliation: "Institute of Computational Biology, Helmholtz Munich"
+  - family-names: Sevinc
+    given-names: Eylul Sevinc
+    affiliation: "Institute of Computational Biology, Helmholtz Munich"
+  - family-names: Erken
+    given-names: Erkmen
+    affiliation: "Institute of Computational Biology, Helmholtz Munich"
+  - family-names: Theis
+    given-names: Fabian J.
+    affiliation: "Institute of Computational Biology, Helmholtz Munich"
+repository-code: "https://github.com/theislab/chimera"
+license: BSD-3-Clause
+version: 0.1.0
+# The archive DOI and the release date are added when the release is tagged.
+keywords:
+  - single-cell
+  - cross-species integration
+  - orthologs
+  - variational autoencoder

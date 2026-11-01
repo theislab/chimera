@@ -105,7 +105,8 @@ class DatasetSpec:
 #   - labels_col=cell_type for every dataset (auto-fallback to
 #     cell_ontology_class is in the runner; populated explicitly here
 #     because every adata in scope has cell_type populated).
-#   - Skipped: van_zyl_unified.h5ad — refinement.md flags it as not ready.
+#   - Not included: van_zyl_unified.h5ad. The processed object exists but no
+#     Chimera recipe was evaluated on it, so it is not part of this matrix.
 # ----------------------------------------------------------------------
 DATASETS: List[DatasetSpec] = [
     # Pancreas (priority — do these first per the prompt).
@@ -266,8 +267,8 @@ def _python_prefix() -> List[str]:
       `sys.executable` directly. Skipping the wrapper avoids ~1s of
       mamba startup overhead per invocation, which compounds across
       the matrix.
-    - Otherwise we wrap with `mamba run -n chimera_env python` per
-      CLAUDE.md so the runner still hits the right env.
+    - Otherwise we wrap with `mamba run -n chimera_env python` so the
+      runner still hits the right env.
 
     Override with the `CHIMERA_BASELINE_PYTHON` env var (e.g. tests
     that want to use `sys.executable` deterministically, or a remote

@@ -8,27 +8,27 @@
 
 Every tool for integrating single-cell RNA-seq data across species treats species as a batch effect — a uniform technical artifact to be erased. But species divergence is not uniform. It is per-gene. Histone H3 is 98% identical between human and zebrafish; 500 million years of evolution barely touched it. Some immune receptors share less than 30% sequence identity across the same species pair. When a model is told "species = batch," it applies the same correction everywhere: it overcorrects the immune receptors, forcing alignment where biology says there should be none, and undercorrects the histones, failing to exploit a near-perfect conservation signal that evolution has handed to it for free.
 
-The deeper problem is not that current tools integrate poorly — at the cell level, they often integrate well enough. The problem is that after integration, you cannot ask the question that matters most to evolutionary biology: *which genes drove the alignment, and which were dragged along against their biology?* scVI, Harmony, and SysVI produce integrated cell embeddings with no per-gene accounting. SATURN, which was a genuine advance in using protein language models to create shared gene representations, still treats all genes uniformly during integration — there is no mechanism to modulate integration strength per gene, and no per-gene score comes out the other end. CAMEX builds elegant heterogeneous graphs that handle many-to-many orthologs, but it too produces cell embeddings without per-gene confidence. Every method in the current landscape answers "where do these cells belong together?" but none answers "which genes justified putting them there?"
+The deeper problem is not that current tools integrate poorly — at the cell level, they often integrate well enough. The problem is that after integration, you cannot ask the question that matters most to evolutionary biology: *which genes drove the alignment, and which were dragged along against their biology?* scVI, Harmony, and SysVI produce integrated cell embeddings with no per-gene accounting. SATURN learns macrogenes from protein language model embeddings, and CAMEX builds heterogeneous graphs that handle many-to-many orthologs; their macrogene weights and gene modules are genuine gene-level evidence. What they do not give is one signed number per one-to-one ortholog that is itself the gate of the integration and is read against a protein-identity prior. Chimera provides that number, and gives up cell-type resolution and many-to-many homology to do so.
 
-That is the question Chimera was built to answer.
+That per-gene number is what Chimera was built to provide.
 
 ## What Chimera is
 
 Chimera is a variational autoencoder built on scvi-tools that integrates multi-species scRNA-seq data while simultaneously learning a **per-gene integration coefficient — alpha — that is both the mechanism of integration and a readable scientific output.** Alpha is not a post-hoc diagnostic computed after the model finishes. It is the gate through which evolutionary information enters the decoder during training: for each gene, alpha controls how much species-specific correction is applied on top of a species-agnostic shared prediction. When training is done, the same alpha that controlled the integration is directly readable as a per-gene statement about how much cross-species alignment that gene needed.
 
-What makes alpha scientifically useful rather than just mechanistically convenient is that it is **bidirectional around the conservation prior.** Each gene enters training with an alpha initialized from its protein sequence conservation — an 85%-conserved gene starts at 0.85, a 40%-conserved gene at 0.40. During training, expression data pushes alpha above or below that prior. A gene whose alpha settles above its prior is one whose expression behavior is *more conserved across species than its protein sequence alone would predict* — functional conservation beyond what evolution left in the amino acids. A gene whose alpha settles below its prior is one whose expression is *more species-specific than its sequence would predict* — regulatory divergence despite structural similarity. The delta between alpha and the prior is a new kind of biological measurement: not sequence conservation, not expression correlation, but the discrepancy between the two as adjudicated by a model that had to put its money where its mouth is during reconstruction.
+What makes alpha scientifically useful rather than just mechanistically convenient is that it is **bidirectional around the conservation prior.** Each gene enters training with an alpha initialized from its protein sequence conservation — an 85%-conserved gene starts at 0.85, a 40%-conserved gene at 0.40. During training, expression data pushes alpha above or below that prior. A gene whose alpha settles above its prior is one whose expression behavior is *more conserved across species than its protein sequence alone would predict* — functional conservation beyond what evolution left in the amino acids. A gene whose alpha settles below its prior is one whose expression is *more species-specific than its sequence would predict* — regulatory divergence despite structural similarity. The delta between alpha and the prior is the model's per-gene readout: not sequence conservation, not expression correlation, but the discrepancy between the two as estimated by a model that must reconstruct the data with it.
 
 ## What you can do with the outputs
 
-Chimera produces integrated cell embeddings for the usual tasks — clustering, visualization, cross-species label transfer — but the per-gene outputs open analyses that no other integration tool can perform:
+Chimera produces integrated cell embeddings for the usual tasks — clustering, visualization, cross-species label transfer — and its per-gene outputs support analyses such as:
 
-- **Discover functional conservation that sequence misses.** Genes with `delta_alpha > 0` are conserved in expression beyond what their protein identity predicts. These are candidates for conserved regulatory programs that have been maintained by selection even as the underlying sequence drifted — the kind of finding that evolutionary biologists care about deeply but have had no systematic way to detect from expression data alone.
+- **Discover functional conservation that sequence misses.** Genes with `delta_alpha > 0` are conserved in expression beyond what their protein identity predicts. These are candidates for expression programs that are more conserved than sequence identity alone predicts. Such calls are hypotheses to test against independent data, not evidence of selection.
 
-- **Flag regulatory divergence in structurally similar genes.** Genes with `delta_alpha < 0` have species-specific expression patterns despite high sequence conservation. These are candidates for cis-regulatory divergence — same protein, different deployment — and they are invisible to any method that uses only sequence or structure to assess conservation.
+- **Flag regulatory divergence in structurally similar genes.** Genes with `delta_alpha < 0` have species-specific expression patterns despite high sequence conservation. These are candidates for species-specific deployment (same protein, different expression), which sequence-based conservation scores do not show.
 
-- **Audit ortholog annotations.** A gene pair annotated as orthologs but assigned a very low alpha despite high sequence conservation may be a misannotation, a gene duplication masquerading as a one-to-one ortholog, or a case where the ortholog relationship is real but the regulatory context has diverged so far that treating them as equivalent is misleading. Alpha provides a data-driven check on database annotations that currently go unquestioned.
+- **Prioritise ortholog pairs for inspection.** A pair annotated as one-to-one orthologs that gets a low alpha despite high sequence conservation may reflect a misannotation, an unresolved duplication, or diverged regulation. Alpha flags such pairs; it does not decide between these explanations.
 
-- **Benchmark ortholog databases against each other.** Run Chimera with ortholog tables from Ensembl, OMA, and OrthoDB; compare the delta-alpha distributions. Systematic differences reveal where the databases disagree in ways that matter for expression-level analysis.
+- **Compare ortholog resources.** The ortholog table is an input. Running Chimera with tables from different resources would show where they disagree in ways that matter for expression; this repository uses Ensembl release 110 only.
 
 - **Identify which genes are safe to transfer across species.** For any downstream analysis that assumes cross-species equivalence — differential expression between human and mouse cell types, gene regulatory network inference from a joint atlas, imputation of missing species — alpha tells you, per gene, how much the model trusted that equivalence. Filter to high-alpha genes and you are working with the subset that the data, not just the annotation, says are comparable.
 
@@ -46,9 +46,9 @@ Before training, Chimera assembles a 72-dimensional feature vector for each gene
 | Expression level and variance | How highly expressed the gene is on average and how much it discriminates between cell types |
 | Detection rate | How sparse the gene is across cells |
 
-The ESM-2 inter-species variance deserves emphasis because it closes a specific gap. SATURN uses ESM-2 embeddings to place genes in a shared space, which captures what each protein looks like individually. But ESM-2 processes one sequence at a time — it produces a vector for human TP53 and a separate vector for mouse Trp53 without any concept of how those two vectors relate. Chimera runs ESM-2 on each species' protein sequence for a given gene, then computes the variance of the resulting embeddings across species. Two proteins can share only 60% amino acid identity but fold into nearly the same structure — low ESM-2 variance despite moderate sequence divergence. Conversely, a few key mutations can alter structure substantially even at high sequence identity. The variance captures what raw identity percentage cannot: whether the proteins are functionally similar *as proteins*, not just similar *as strings*.
+The ESM-2 inter-species variance deserves emphasis because it closes a specific gap. SATURN uses ESM-2 embeddings to place genes in a shared space, which captures what each protein looks like individually. But ESM-2 processes one sequence at a time — it produces a vector for human TP53 and a separate vector for mouse Trp53 without any concept of how those two vectors relate. Chimera takes precomputed ESM-2 embeddings of each species' protein (the SATURN release, `esm2_t48_15B_UR50D`) and computes, per gene, the mean pairwise cosine distance between the species' embeddings. Two proteins can share only 60% amino acid identity but fold into nearly the same structure — low ESM-2 variance despite moderate sequence divergence. Conversely, a few key mutations can alter structure substantially even at high sequence identity. The variance captures what raw identity percentage cannot: whether the proteins are functionally similar *as proteins*, not just similar *as strings*.
 
-The Gene Integration Network (GIN) is a small neural network (~2,400 parameters in a model with ~8 million) that takes this feature vector and computes alpha through a prior-plus-correction architecture: `alpha = sigmoid(logit(conservation_prior) + MLP(features))`. The logit of the conservation prior is the anchor — before the model sees expression data, alpha matches the gene's protein conservation. The MLP correction starts near zero and learns to adjust alpha based on what the expression data reveals. After training, the correction *is* the delta-alpha: the discrepancy between what evolution wrote in the sequence and what the cells actually do.
+The Gene Integration Network (GIN) is a small neural network (a few thousand parameters, in a model of several million) that takes this feature vector and computes alpha through a prior-plus-correction architecture: `alpha = sigmoid(logit(conservation_prior) + MLP(features))`. The logit of the conservation prior is the anchor — before the model sees expression data, alpha matches the gene's protein conservation. The MLP correction starts near zero and learns to adjust alpha based on what the expression data reveals. After training, the correction *is* the delta-alpha: the discrepancy between what evolution wrote in the sequence and what the cells actually do.
 
 ### The residual decoder
 
@@ -80,13 +80,56 @@ Because the shared decoder does not receive a species label, the encoder has no 
 
 ## Datasets
 
-Chimera operates on multi-species scRNA-seq count matrices linked by one-to-one ortholog mappings from Ensembl BioMart, typically yielding 12,000–15,000 shared genes across mammalian species. Each cell carries a species label and a batch label (donor, sample, or sequencing run). Cell-type annotations are used for downstream evaluation but are not required for training.
+Chimera operates on multi-species scRNA-seq count matrices linked by one-to-one ortholog mappings from Ensembl BioMart, which gives 7,998–8,879 shared genes for the liver cohorts used here and 14,640–15,732 for the testis cohorts. Each cell carries a species label and a batch label (donor, sample, or sequencing run). Cell-type annotations are used for downstream evaluation but are not required for training.
 
 ## Installation
 
+Python 3.12 is used for all results. The supported route is the environment notebook
+[`notebooks/00_environment.ipynb`](notebooks/00_environment.ipynb), which creates the
+`chimera_env` mamba environment, installs PyTorch for the platform (CPU, CUDA or Apple MPS)
+and then this package in editable mode with its extras. Manually:
+
 ```bash
-pip install -e ".[dev]"
+mamba create -n chimera_env python=3.12 pip
+mamba activate chimera_env
+pip install torch==2.11.0
+pip install -e ".[dev,graph,attributions,protein,evolution,data,baselines]"
+pytest -q
 ```
+
+Versions of the core dependencies are pinned in [`pyproject.toml`](pyproject.toml) to those
+the checkpoints were trained with. Training defaults to `--accelerator mps`; on Linux pass
+`--accelerator cpu` or `--accelerator gpu`.
+
+## Data
+
+All analysed data are public; no new data were generated.
+
+| Data | Source |
+|---|---|
+| Liver, human, macaque, mouse | Guilliams et al. 2022, *Cell* 185:379, GEO GSE192742 |
+| Liver, zebrafish | Wang et al. 2023, *Nucleic Acids Res.*, doi:10.1093/nar/gkac633, GEO GSE198832 |
+| Testis, human, macaque, mouse | Murat et al. 2023, *Nature*, doi:10.1038/s41586-022-05547-7, E-MTAB-11063, E-MTAB-11068, E-MTAB-11071 |
+| Processed CAMEX bundle (raw counts of the above) | Guo, Huang and Zhang 2026, *Nat. Commun.* 17:3017, figshare doi:10.6084/m9.figshare.31131808.v1 |
+| ESM-2 protein embeddings (`esm2_t48_15B_UR50D`) | SATURN, Rosen et al. 2024, *Nat. Methods* |
+| Ortholog tables | Ensembl BioMart, release 110 |
+
+The processed AnnData files, ortholog tables, trained checkpoints and per-gene outputs used in
+the paper are archived at [DOI]. See [`REPRODUCE.md`](REPRODUCE.md) for the expected layout.
+The `panc_*` and `pancreas_*` names in code and file names refer to the **liver** cohorts.
+
+## Reproducing the results
+
+[`REPRODUCE.md`](REPRODUCE.md) describes how to regenerate every analysis from the archived
+artefacts. The canonical training recipes are listed in
+[`configs/canonical_recipes.tsv`](configs/canonical_recipes.tsv), and
+[`revision/reproduce_smoke.sh`](revision/reproduce_smoke.sh) checks a checkout against the
+archived runs.
+
+## Citation
+
+If you use Chimera, please cite the paper (reference added on publication) and the software;
+see [`CITATION.cff`](CITATION.cff).
 
 ## Built on scvi-tools
 
@@ -94,4 +137,4 @@ Chimera is built on top of [scvi-tools](https://scvi-tools.org/) and follows its
 
 ## License
 
-See [LICENSE](LICENSE).
+BSD 3-Clause; see [LICENSE](LICENSE).

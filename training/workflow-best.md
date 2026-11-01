@@ -151,7 +151,7 @@ Updated atomically with every promotion — if this file, the model defaults in
 | Testis H+Mac (close, 2-sp) | `--adv-weight 100 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_type --prior-clamp-max 0.85 --max-epochs 200` | **30/33 + 6/6 E8** (iter109; **E3.2 cured: 0.06% sat**, E9.2 upward PASS 8.2%, downward still 0.01% — GIN ceiling. E1.5 marginal FAIL std=0.0499. LT-acc 0.899 > iter98 0.880; star NOT restored until E9.2 downward passes.) |
 | Testis H+Mouse (mid, 2-sp) | `--adv-weight 200 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --max-epochs 200` | **28/33 + 6/6 E8** (iter111; **E3.2 saturation cured: 35% → 0.231%**, E6.1 newly passes, kNN-sp 0.991→**0.813** (BELOW scVI 0.986!), LT-acc 0.863→**0.993** (+0.097 BEATS scVI). E1.5/E3.2/E3.4 marginal FAIL on α.std=0.0495 (clamp narrowing). E9.2 push<-0.05=0% architectural. ★ NOT restored until E9.2 down passes.) |
 | Testis unified (3-sp) | `--adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --max-epochs 100` | **30/33 + 6/6 E8 vs scVI(donor) + 6/6 E8 vs scVI(species)** (iter115; **E3.2 HARD FAIL CURED 29.06% → 1.32%**, E9.2 down 1.57% close to 2% PASS, LT-acc 0.992 BEATS scVI(species) 0.901 by +0.092, UMAP aspect 0.91, Δα bidirectional 41%/11%). E9.2 down still architectural at 2% threshold; 200ep schedule reaches 2.43% PASS. Best-known with E9.2 down arch ceiling, same status as iter109 H+Mac and iter111 H+Mouse. |
-| van Zyl (2-organism) | *not yet evaluated* | No processed data; prep needed |
+| van Zyl (5-species, aqueous humor) | *not yet evaluated* | Processed object exists (`data/processed/van_zyl_unified.h5ad`); no recipe evaluated |
 
 ---
 
@@ -355,11 +355,13 @@ get meaningful Δα. With default anchor, Δα collapses to <10% on both sides.
 
 ---
 
-### 5. van Zyl — 2-organism (aqueous humor)
+### 5. van Zyl — 5-species (aqueous humor)
 
-**Not yet evaluated.** No processed `.h5ad` for van Zyl exists in
-`data/processed/`. Data prep via `01_data_preparation.ipynb` +
-`build_subset.py` is needed before this scenario can be tested.
+**Not yet evaluated.** A processed object exists:
+`data/processed/van_zyl_unified.h5ad` (50,112 cells × 13,636 genes; human,
+*Macaca fascicularis*, *Macaca mulatta*, pig, mouse), built against
+`ortholog_table_van_zyl.csv` with `gin_scaler_van_zyl.pkl`. No run with a
+recorded recipe uses it, so no row in the table above is canonical.
 
 Expected recipe: start from H+Mo defaults (no overrides) and evaluate.
 

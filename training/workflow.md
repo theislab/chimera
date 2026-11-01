@@ -874,7 +874,7 @@ Then stop. Do not start another iteration. Do not summarize-and-wait.
 
 ### workflow.md hygiene
 
-This file is the loop's control plane AND institutional memory. Pruning rule: when resolving a hypothesis or finishing an iteration, **distill** its full body into a one-paragraph Lessons entry naming what was tried, **how exactly it failed** (the metric that moved wrong, the module that regressed, the mechanism that didn't engage), and the design implication. A future agent reading workflow.md should be able to answer "what has been tried on this expectation, how did it fail, and what should I try next?" from this file alone.
+This file is the loop's control plane AND institutional memory. Pruning rule: when resolving a hypothesis or finishing an iteration, **distill** its full body into a one-paragraph Lessons entry naming what was tried, **how exactly it failed** (the metric that moved wrong, the module that regressed, the mechanism that didn't engage), and the design implication. A future reader of workflow.md should be able to answer "what has been tried on this expectation, how did it fail, and what should I try next?" from this file alone.
 
 ---
 
@@ -1113,7 +1113,7 @@ The full run-by-run history is preserved in `iteration_log.md`. Below is a compa
 
 ---
 
-## Notes for the next agent
+## Notes for the next iteration
 
 1. **Read this file end-to-end AND [workflow-best.md](workflow-best.md)** before doing anything. Both are authoritative; if a config you intend to use is not the documented current best, reconcile (update registry or update plan) before running.
 

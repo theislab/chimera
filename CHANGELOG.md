@@ -297,7 +297,7 @@ every other documented property of the GIN.
 ## 2026-04-16 — Run 7: Rigor Audit + Diagnostics Fix
 
 ### What was done
-- **Full rigor audit** of the implementation against the round2 specification using 3 parallel audit agents (module forward pass, training plan wiring, loss math). **All 16 spec checkpoints verified correct:**
+- **Full rigor audit** of the implementation against the round2 specification in three parallel audits (module forward pass, training plan wiring, loss math). **All 16 spec checkpoints verified correct:**
   - Dual-h computation (z.detach for shared path)
   - Three-mu predictions (mu_full/mu_shared_only/mu_shared_cellstate with correct h variants)
   - theta.detach() in L_shared_aux and FQR but not L_recon
@@ -462,7 +462,7 @@ every other documented property of the GIN.
 - **DataLoader key mismatch**: scvi-tools DataLoader produces `"labels"` (from `REGISTRY_KEYS.LABELS_KEY`) for species, not `"species"`. Module and training plan now handle both formats.
 
 ### What was verified
-- 59/59 tests pass (32 original + 19 agent-added + 8 integration)
+- 59/59 tests pass (32 original + 19 added + 8 integration)
 - Full training loop: AnnData → setup_anndata → ChimeraModel → train(1 epoch) → get_latent_representation → get_alpha succeeds end-to-end
 - Multi-epoch training (10 epochs): loss finite, alpha differentiates from prior
 - All 20 diagnostics importable

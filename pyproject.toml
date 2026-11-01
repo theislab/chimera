@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Cross-species scRNA-seq integration with learnable per-gene evolutionary gating"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = {text = "BSD-3-Clause"}
 
 dependencies = [
     # Core scvi-tools ecosystem
