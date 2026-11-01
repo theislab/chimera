@@ -1,0 +1,17 @@
+name: revision_de_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - pip
+  - pandas=2.3
+  - numpy
+  - scipy
+  - h5py
+  - anndata
+  - pyarrow
+  - statsmodels
+  - matplotlib
+  - pip:
+      - pydeseq2==0.5.2
