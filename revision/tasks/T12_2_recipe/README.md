@@ -36,7 +36,7 @@ K-dependent weights at K = 3, from `chimera-manuscript/tables/k_scaling_laws.tex
 
 All: `--config A --max-epochs 200 --accelerator cpu`, `cpu_p` / `cpu_normal`, 16 CPUs, 64G.
 
-## Selection (`select.py`)
+## Selection (`select_recipe.py`)
 
 1. Gate G-V per finished run: no NaN (and no E2.1 failure); saturation ≤ 5% in each α tail
    (α > 0.95, α < 0.05); 10/10 active z dims (Var(z_mean) ≥ 0.01); both tails of α − π present
@@ -49,7 +49,7 @@ All: `--config A --max-epochs 200 --accelerator cpu`, `cpu_p` / `cpu_normal`, 16
 3. No Δα statistic beyond the gate's tail check, no COE, no baseline and no biology readout
    enters the selection.
 4. The selected configuration is trained at seeds 43-46 (`rev-bm-s<seed>`, from
-   `seeds_manifest.tsv`, written by `select.py --write-seed-manifest`); its grid run is the
+   `seeds_manifest.tsv`, written by `select_recipe.py --write-seed-manifest`); its grid run is the
    s42 member (`seed_map.tsv`). If no configuration passes G-V, P12 training stops and the
    result is reported as such.
 

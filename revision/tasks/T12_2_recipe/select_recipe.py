@@ -12,7 +12,7 @@
 No Delta-alpha statistic beyond the gate's tail check, no COE, no baseline and no biology
 readout is read here.
 
-    python revision/tasks/T12_2_recipe/select.py [--write-seed-manifest [--all-jobs-ended]]
+    python -I revision/tasks/T12_2_recipe/select_recipe.py [--write-seed-manifest [--all-jobs-ended]]
 """
 
 from __future__ import annotations
