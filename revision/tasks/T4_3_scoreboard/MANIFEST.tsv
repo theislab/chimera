@@ -30,3 +30,6 @@ step	golds	python -m revision.tasks.T4_3_scoreboard.golds	gold tables and split 
 step	baseline_splits	python -m revision.tasks.T4_3_scoreboard.baseline_splits --cohorts liv_hmouse,test_hmouse	cell-half baselines -> results/revision/T4_3/baseline_splits/
 step	b3b_consensus	python revision/tasks/T4_2_gene_baselines/run.py --cohorts liv_hmouse,test_hmouse,liv_4sp,test_3sp --delta-alpha results/revision/T3_3/{cohort}__consensus.csv --delta-column D --force --outdir results/revision/T4_3/baselines_consensusD	B3b on the consensus D (T4.2 code; run.py checks its in-process B3b against it)
 step	scoreboard	python -m revision.tasks.T4_3_scoreboard.run --mode real	all tests, decide.py (row.json), figures.py; DONE last
+step	verify_primary	python -m revision.tasks.T4_3_scoreboard.verify_primary	post-run check: H1-H4 recomputed without stats.py or controls.py; covariate decomposition (exploratory)
+step	calibration_dominant	python -m revision.tasks.T4_3_scoreboard.calibration_dominant	post-run check: set test on random sets from cell-type-dominated gene pools
+step	dominance_exploratory	python -m revision.tasks.T4_3_scoreboard.dominance_exploratory	exploratory, post hoc: Family 2 and H1-H4 with dominance added; enters no status, row or modifier
