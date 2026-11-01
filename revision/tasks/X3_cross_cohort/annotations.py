@@ -41,8 +41,10 @@ UniProt keywords closest to them are excluded from every program list: ribosomal
 ribonucleoprotein, proteasome, spliceosome, mRNA splicing, mRNA processing, secreted,
 extracellular matrix, collagen, immunity, innate immunity, adaptive immunity, inflammatory
 response, antiviral defense, detoxification, bile acid catabolism. Housekeeping lists are not
-read. The protein classes above do not overlap these sets by construction (they are broad
-molecular-function classes); this is stated, not tested.
+read. Signal peptide (KW-0732) was added to the exclusions before any program was reported.
+UniProt families with at least half of their genes carrying an excluded keyword are dropped
+from family analyses. The protein classes above do not overlap these sets by construction
+(they are broad molecular-function classes); this is stated, not tested.
 """
 
 from __future__ import annotations
@@ -63,6 +65,9 @@ RESERVED_KW = {
     "KW-0391": "Immunity", "KW-0399": "Innate immunity", "KW-1064": "Adaptive immunity",
     "KW-0395": "Inflammatory response", "KW-0051": "Antiviral defense",
     "KW-0216": "Detoxification", "KW-1281": "Bile acid catabolism",
+    # amendment (before any program or family was reported): signal peptide overlaps the
+    # reserved GO extracellular-region set too closely to be used as a program
+    "KW-0732": "Signal",
 }
 PROGRAM_CATEGORIES = {"Biological process", "Molecular function", "Cellular component", "Domain"}
 CLASS_ORDER = ["TF", "TF_C2H2_ZF", "TF_homeodomain", "TF_bHLH", "TF_bZIP", "TF_nuclear_rec",
@@ -176,6 +181,12 @@ def gene_classes(genes: pd.Index) -> pd.DataFrame:
     out["tf_dbd"] = tf["tf_dbd"]
     out["annotated_uniprot"] = up["kw"].notna().to_numpy()
     return out[CLASS_ORDER + ["family", "tf_dbd", "annotated_uniprot"]]
+
+
+def reserved_share(genes: pd.Index) -> pd.Series:
+    """Per gene, True if it carries any reserved-adjacent keyword (used to drop families)."""
+    up = uniprot_by_gene().reindex(pd.Index(genes))
+    return pd.Series([isinstance(k, set) and bool(k & set(RESERVED_KW)) for k in up["kw"]], index=up.index)
 
 
 def program_sets(genes: pd.Index, min_size: int = MIN_PROGRAM) -> dict[str, set]:
