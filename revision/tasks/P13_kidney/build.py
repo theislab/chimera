@@ -323,10 +323,13 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
     feats, scaler = assemble_gin_features(esm_pca, esm_var, table, stats)
     unified.varm["gene_features"] = feats
     unified.uns["p_null"] = precompute_p_null(unified)
-    # One batch per species (iter94 failure with batch = sample; every canonical recipe has
-    # batch == species and training passes --batch-key species). The unit stays in sample_batch.
+    # batch = technical source within a species (canonical builder: source dataset; donors
+    # live in sample_batch, never in batch; donor-level batch is the iter94 failure). The
+    # training object holds one source per species (human KPMP multiome, mouse KPMP multiome
+    # Ref), so batch is one value per species, the same partition as species.
     unified.obs["sample_batch"] = unified.obs["sample"].astype(str)
-    unified.obs["batch"] = unified.obs["species"].astype(str)
+    unified.obs["batch"] = (unified.obs["species"].astype(str) + "|" + unified.obs["source"].astype(str)
+                            + "|" + unified.obs["assay"].astype(str))
     unified.obs["cell_type"] = unified.obs["cell_ontology_class"].astype(str)
     for c in ("species", "batch", "sample_batch", "cell_type", *obs_cols):
         unified.obs[c] = unified.obs[c].astype(str).astype("category")
@@ -354,7 +357,8 @@ def object_checks(obj: ad.AnnData) -> dict:
         x_integer=bool(len(d) == 0 or np.allclose(d, np.round(d))), x_nonnegative=bool(len(d) == 0 or d.min() >= 0),
         x_max=float(d.max()) if len(d) else 0.0, layers_empty=len(obj.layers) == 0,
         obs_columns_present=all(k in obj.obs for k in ("species", "cell_type", "cell_ontology_class", "batch")),
-        batch_equals_species=bool((obj.obs["batch"].astype(str) == obj.obs["species"].astype(str)).all()),
+        one_batch_per_species=bool((obj.obs.groupby("species", observed=True)["batch"].nunique() == 1).all()
+                                   and (obj.obs.groupby("batch", observed=True)["species"].nunique() == 1).all()),
         n_batches=int(obj.obs["batch"].nunique()), n_sample_batches=int(obj.obs["sample_batch"].nunique()),
         p_null_shape=list(np.asarray(obj.uns["p_null"]).shape),
         p_null_ok=list(np.asarray(obj.uns["p_null"]).shape) == [n_sp, obj.n_vars],
@@ -415,6 +419,13 @@ def main() -> int:
         raise AssertionError(f"healthy object checks failed: {checks}")
     path = gene_ids.h5ad_path("kidney")
     t72._write_h5ad(obj, path)
+    from revision.common.check_cohort import check as check_cohort
+
+    checks["check_cohort_batch"] = check_cohort(str(path), batch_key="batch", celltype_key="cell_ontology_class")
+    checks["check_cohort_species"] = check_cohort(str(path), batch_key="species", celltype_key="cell_ontology_class")
+    res.json(checks, "object_checks.json")
+    if checks["check_cohort_batch"] or checks["check_cohort_species"]:
+        raise AssertionError(f"check_cohort failed: {checks}")
     res.csv(obj.obs.groupby(["species", "cell_ontology_class"], observed=True).size().rename("n_nuclei").reset_index(),
             "counts_healthy_object.csv")
     res.csv(obj.obs.groupby(["species", "sample"], observed=True).size().rename("n_nuclei").reset_index(),
