@@ -274,7 +274,8 @@ def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list)
     unified.varm["gene_features"] = feats
     unified.uns["p_null"] = precompute_p_null(unified)
     unified.obs["batch"] = unified.obs["sample"].astype(str)
-    for c in ("species", "batch", "cell_ontology_class", "condition", "donor", "role", "sex", "assay", "study",
+    unified.obs["cell_type"] = unified.obs["cell_ontology_class"].astype(str)  # same labels, standard name
+    for c in ("species", "batch", "cell_type", "cell_ontology_class", "condition", "donor", "role", "sex", "assay", "study",
               "sample", "age", "author_label"):
         unified.obs[c] = unified.obs[c].astype(str).astype("category")
 
