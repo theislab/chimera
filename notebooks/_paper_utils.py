@@ -92,30 +92,80 @@ def load_adata_for_run(run: dict[str, Any]):
     return ad.read_h5ad(REPO_ROOT / adata_rel)
 
 
-def load_ortholog_table() -> pd.DataFrame:
-    """Load the ortholog table with gene names (hsapiens_gene_name etc.).
+# ---------------------------------------------------------------------------
+# Gene identity
+#
+# ``ortho_N`` numbers are table-local: the liver, testis and van Zyl ortholog
+# tables number their rows independently, so the same ``ortho_N`` names
+# different genes in different tables. Every lookup therefore states its
+# cohort, and genes from different tables are joined on ``hsapiens_gene_id``.
+# All lookups delegate to ``revision/common/gene_ids.py``.
+# ---------------------------------------------------------------------------
 
-    Rows are indexed by ortholog_group_id to match adata.var_names 'ortho_X'.
+def _gene_ids():
+    import sys
+    if str(REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(REPO_ROOT))
+    from revision.common import gene_ids
+    return gene_ids
+
+
+def cohort_for(name: str) -> str:
+    """Ortholog-table cohort for a cohort name, a tissue, or a notebook registry key.
+
+    ``pancreas``/``panc_*``/``pancreas_*`` are the legacy names of the liver
+    cohorts. Unknown names raise, so no lookup silently falls back to a table.
     """
-    p = DATA_PROCESSED / "ortholog_table.csv"
-    df = pd.read_csv(p)
-    df = df.set_index("ortholog_group_id")
-    return df
+    gi = _gene_ids()
+    n = str(name)
+    if n in gi.TABLES:
+        return n
+    if n == "pancreas" or n.startswith(("panc_", "pancreas_", "liver_", "liv_")):
+        return "liver"
+    if n.startswith(("test_", "testis_")):
+        return "testis"
+    if n.startswith("van_zyl"):
+        return "van_zyl"
+    raise KeyError(f"no ortholog table for {name!r}; expected one of {sorted(gi.TABLES)}, "
+                   "a tissue (liver/pancreas/testis) or a panc_*/test_* registry key")
 
 
-def annotate_genes_with_names(var_names: Iterable[str]) -> pd.Series:
-    """Map adata.var_names like 'ortho_42' to the human gene symbol.
+def load_ortholog_table(cohort: str) -> pd.DataFrame:
+    """The ortholog table that built ``cohort``, indexed by ortholog_group_id."""
+    return _gene_ids().load_table(cohort_for(cohort)).copy()
+
+
+def annotate_genes_with_names(var_names: Iterable[str], cohort: str) -> pd.Series:
+    """Map adata.var_names like 'ortho_42' to the human gene symbol in ``cohort``'s table.
 
     Returns a pd.Series indexed by var_names with values = human gene name
-    (fallback: the var name itself if lookup fails).
+    (fallback: the var name itself if the table has no symbol).
     """
-    ot = load_ortholog_table()
-    idx = pd.Index(list(var_names))
-    og_ids = idx.str.extract(r"ortho_(\d+)")[0]
-    og_ids = og_ids.astype("float").astype("Int64")
-    names = og_ids.map(ot["hsapiens_gene_name"])
-    out = pd.Series(names.values, index=idx, dtype=object).fillna(pd.Series(idx.tolist(), index=idx))
-    return out
+    sym = _gene_ids().symbols(cohort_for(cohort), var_names)
+    idx = sym.index
+    return pd.Series(np.where(sym.isna(), idx.to_numpy(dtype=object), sym.to_numpy(dtype=object)),
+                     index=idx, dtype=object)
+
+
+def ensembl_ids(var_names: Iterable[str], cohort: str) -> pd.Series:
+    """Human Ensembl gene ID per var_name in ``cohort``'s table: the cross-tissue join key."""
+    return _gene_ids().ensembl(cohort_for(cohort), var_names)
+
+
+def shared_genes(var_names_a: Iterable[str], cohort_a: str,
+                 var_names_b: Iterable[str], cohort_b: str) -> tuple[np.ndarray, np.ndarray]:
+    """Positions ``(ia, ib)`` of the genes two runs share, joined on hsapiens_gene_id.
+
+    Valid within and across ortholog tables; never join runs on var_names
+    across tissues. The order follows run A.
+    """
+    ea = ensembl_ids(var_names_a, cohort_a).to_numpy(dtype=object)
+    eb = pd.Index(ensembl_ids(var_names_b, cohort_b).to_numpy(dtype=object))
+    if pd.Index(ea).has_duplicates or eb.has_duplicates:
+        raise ValueError("duplicated hsapiens_gene_id within a cohort; join is ambiguous")
+    ib = eb.get_indexer(ea)
+    ia = np.flatnonzero((ib >= 0) & pd.notna(ea))
+    return ia, ib[ia]
 
 
 # ---------------------------------------------------------------------------
@@ -594,10 +644,10 @@ CATEGORY_ORDER = (
 )
 
 
-def annotate_gene_categories(var_names: Iterable[str]) -> pd.DataFrame:
+def annotate_gene_categories(var_names: Iterable[str], cohort: str) -> pd.DataFrame:
     """Build a DataFrame with columns [var_name, symbol, category]."""
     var_names = pd.Index(list(var_names))
-    sym = annotate_genes_with_names(var_names)
+    sym = annotate_genes_with_names(var_names, cohort)
     cats = sym.map(classify_gene_category)
     return pd.DataFrame({"var_name": var_names, "symbol": sym.values, "category": cats.values},
                         index=var_names)

@@ -457,7 +457,7 @@ cells.append(md("""
     ## §A.2 — Chimera signal lookup
 """))
 cells.append(code(r"""
-    ORTHO = pu.load_ortholog_table()
+    ORTHO = pu.load_ortholog_table("liver")  # every dataset here is a liver cohort
     # Cache adata read per dataset (avoid re-opening for every candidate)
     import anndata as ad
     _DSCACHE: dict[str, dict] = {}

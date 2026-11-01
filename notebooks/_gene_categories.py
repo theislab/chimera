@@ -425,10 +425,10 @@ def annotate_extended(var_names: Iterable[str],
     """Build a [var_name, symbol, category] DataFrame using extended categories.
 
     `symbol_lookup` can be either a callable ``var_name -> symbol`` or a
-    pandas Series/dict-like indexed by var_name. The Chimera workspace's
-    ortholog table maps ``ortho_X`` -> human gene symbol; pass
-    ``_paper_utils.annotate_genes_with_names(var_names)`` and we will
-    handle the Series case.
+    pandas Series/dict-like indexed by var_name. Each cohort's ortholog
+    table maps its own ``ortho_X`` -> human gene symbol; pass
+    ``_paper_utils.annotate_genes_with_names(var_names, cohort)`` and we
+    will handle the Series case.
     """
     var_names = pd.Index(list(var_names))
     if hasattr(symbol_lookup, "loc"):

@@ -62,7 +62,7 @@ def step_pca(force: bool = False) -> dict:
 
     print(f"[pca] fitting 4-species PCA (5120 -> 64)…")
     from sklearn.decomposition import PCA
-    ortho = pu.load_ortholog_table()
+    ortho = pu.load_ortholog_table("liver")  # DATASETS are liver cohorts
     t0 = time.time()
     consensus, _ = download_and_process_esm2(ortho, PCA_4SP_SPECIES)
     print(f"[pca] consensus shape {consensus.shape}  in {time.time()-t0:.1f}s")
@@ -87,7 +87,7 @@ def step_bridges(pca_data: dict, force: bool = False, sample_n: int = 200,
                  alpha: float = 1.0) -> None:
     from sklearn.linear_model import Ridge
 
-    ortho = pu.load_ortholog_table()
+    ortho = pu.load_ortholog_table("liver")  # DATASETS are liver cohorts
     V = pca_data["V"]; mu = pca_data["mean"]
 
     # Decide which datasets need a refit

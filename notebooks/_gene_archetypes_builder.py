@@ -331,7 +331,7 @@ cells.append(code(r"""
     }
     GROUP_ORDER = list(GROUP_INDEX)
 
-    sym_series = pu.annotate_genes_with_names(var_names)         # ortho_X → human gene symbol
+    sym_series = pu.annotate_genes_with_names(var_names, "liver")  # ortho_X → human gene symbol
     cat_df     = gc.annotate_extended(var_names, sym_series)     # 43 narrow categories
     cat_broad  = gcb.annotate_broad(var_names, sym_series)       # 10 broad umbrellas
 

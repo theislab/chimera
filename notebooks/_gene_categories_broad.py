@@ -162,8 +162,8 @@ def annotate_broad(var_names: Iterable[str], symbol_lookup) -> pd.DataFrame:
 
     Same calling convention as `_gene_categories.annotate_extended` —
     `symbol_lookup` may be a callable, a Series, or a dict-like; the
-    Chimera workspace's ortholog table maps `ortho_X` → human gene
-    symbol (use ``_paper_utils.annotate_genes_with_names``).
+    cohort's ortholog table maps its own `ortho_X` → human gene
+    symbol (use ``_paper_utils.annotate_genes_with_names(var_names, cohort)``).
     """
     var_names = pd.Index(list(var_names))
     if hasattr(symbol_lookup, "loc"):

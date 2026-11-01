@@ -220,7 +220,7 @@ cells.append(code(r"""
         assert len(var_names) == fs["alpha"].shape[0], \
             f"{key}: adata.n_vars vs alpha mismatch"
 
-        sym = pu.annotate_genes_with_names(var_names)
+        sym = pu.annotate_genes_with_names(var_names, info["tissue"])
         cat_df = gc.annotate_extended(var_names, sym)
 
         # UMAP cache
@@ -986,10 +986,10 @@ cells.append(code(r"""
 cells.append(md("""
     ## §C.2 — Cross-tissue Δα flip on shared-gene ESM-2 UMAP
 
-    For genes shared between `panc_4sp` and `test_3sp` (≈ 7.5 K
-    `ortho_X` IDs), build a fresh ESM-2 UMAP from the *intersection*
-    (using panc_4sp's gene_features as the anchor — protein sequence
-    is the same for the same `ortho_X`). Then color the same UMAP
+    For genes shared between `panc_4sp` and `test_3sp` (joined on
+    `hsapiens_gene_id`; `ortho_X` numbers differ between the two
+    tables), build a fresh ESM-2 UMAP from the *intersection*
+    (using panc_4sp's gene_features as the anchor). Then color the same UMAP
     three ways:
 
     - Δα_liver (RdBu_r centered on 0)
@@ -1006,13 +1006,13 @@ cells.append(code(r"""
     panc = DATA["panc_4sp"]
     test = DATA["test_3sp"]
     panc_idx = pd.Index(panc["var_names"])
-    test_idx = pd.Index(test["var_names"])
-    shared = panc_idx.intersection(test_idx)
-    print(f"shared genes (panc_4sp ∩ test_3sp): {len(shared)}")
+    # Join on hsapiens_gene_id: ortho_X numbers are table-local (liver vs testis table).
+    p_pos, t_pos = pu.shared_genes(panc["var_names"], panc["tissue"],
+                                   test["var_names"], test["tissue"])
+    shared = panc_idx[p_pos]
+    print(f"shared genes (panc_4sp ∩ test_3sp, by hsapiens_gene_id): {len(shared)}")
 
-    p_pos = panc_idx.get_indexer(shared)
-    t_pos = test_idx.get_indexer(shared)
-    esm_shared = panc["esm2"][p_pos]    # protein seq is the same for the same ortho_X
+    esm_shared = panc["esm2"][p_pos]    # liver-side ESM-2 features of the shared genes
     da_panc    = panc["delta_alpha"][p_pos]
     da_test    = test["delta_alpha"][t_pos]
     da_diff    = da_panc - da_test

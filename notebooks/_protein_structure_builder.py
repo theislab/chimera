@@ -379,7 +379,7 @@ cells.append(code(r"""
         }
 
 
-    ORTHO = pu.load_ortholog_table()
+    ORTHO = pu.load_ortholog_table("liver")  # every dataset here is a liver cohort
     rows = []
     for g, dirn, ds, note in CANDIDATE_GENES:
         sig = chimera_signal(g, ds)

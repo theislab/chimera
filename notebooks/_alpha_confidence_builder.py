@@ -267,7 +267,7 @@ cells.append(code(r"""
         a = ad.read_h5ad(adata_path)
 
         var_names = np.asarray(a.var_names)
-        symbols   = pu.annotate_genes_with_names(var_names).astype(object).values
+        symbols   = pu.annotate_genes_with_names(var_names, info["tissue"]).astype(object).values
         prior     = fs["prior"].astype(float)
         alpha     = fs["alpha"].astype(float)
 
@@ -290,6 +290,8 @@ cells.append(code(r"""
         if cache_path.exists():
             det = pd.read_csv(cache_path)
             df = det.copy()
+            assert (df["var_name"].astype(str).values == var_names.astype(str)).all()
+            df["symbol"] = symbols  # labels always come from this cohort's table
         else:
             X = a.X
             cols = {
@@ -315,6 +317,8 @@ cells.append(code(r"""
             df = pd.DataFrame(cols)
             df.to_csv(cache_path, index=False)
             print(f"  cached {ds_key}: {len(df)} genes × ({len(species_unique)} species × {len(shared_cts)} shared CTs)")
+        # Cross-tissue key: ortho_X numbers are table-local.
+        df["hsapiens_gene_id"] = pu.ensembl_ids(var_names, info["tissue"]).values
         return df
 
 
@@ -938,23 +942,24 @@ cells.append(md("""
     `notebooks/cache/alpha_confidence/stable_high_confidence_genes.csv`.
 """))
 cells.append(code(r"""
-    # Build long-format (symbol × dataset) α table, indexed by var_name (ortho_X).
+    # Build long-format (symbol × dataset) α table, indexed by hsapiens_gene_id:
+    # ortho_X numbers are table-local, so liver and testis rows join on the Ensembl ID.
     rows = []
     for k in DATASET_ORDER:
-        df = GENE_TABLES[k][["var_name", "symbol", "alpha"]].copy()
+        df = GENE_TABLES[k][["hsapiens_gene_id", "symbol", "alpha"]].copy()
         df["dataset"] = k
         rows.append(df)
     LONG_ALPHA = pd.concat(rows, ignore_index=True)
 
-    # Pivot to (var_name × dataset) on alpha — fill missing with NaN
-    pivot = LONG_ALPHA.pivot_table(index="var_name", columns="dataset",
+    # Pivot to (hsapiens_gene_id × dataset) on alpha — fill missing with NaN
+    pivot = LONG_ALPHA.pivot_table(index="hsapiens_gene_id", columns="dataset",
                                     values="alpha", aggfunc="max")
     pivot = pivot.reindex(columns=DATASET_ORDER)
 
-    # Pick a representative symbol per var_name (first non-null one)
+    # Pick a representative symbol per gene (first non-null one)
     sym_map = (LONG_ALPHA.dropna(subset=["symbol"])
-                          .drop_duplicates("var_name")
-                          .set_index("var_name")["symbol"])
+                          .drop_duplicates("hsapiens_gene_id")
+                          .set_index("hsapiens_gene_id")["symbol"])
 
     # Stable high-confidence
     n_high_per_gene = (pivot > TIER_HIGH).sum(axis=1)

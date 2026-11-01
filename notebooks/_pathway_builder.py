@@ -238,13 +238,18 @@ cells.append(code(r"""
         a.file.close()
         delta = (fs["alpha"] - fs["prior"]).astype(float)
         prior = fs["prior"].astype(float)
-        sym = pu.annotate_genes_with_names(var_names).astype(object)
+        sym = pu.annotate_genes_with_names(var_names, info["tissue"]).astype(object)
         df = pd.DataFrame({
             "symbol": sym.values,
             "delta": delta,
             "prior": prior,
             "abs_delta": np.abs(delta),
         })
+        # Per-gene Δα keyed by hsapiens_gene_id, for the cross-tissue contrast (§D).
+        DELTA_BY_ENSG[key] = pd.DataFrame(
+            {"symbol": sym.values, "delta": delta},
+            index=pd.Index(pu.ensembl_ids(var_names, info["tissue"]).values,
+                           name="hsapiens_gene_id"))
         df = df[df["symbol"].apply(lambda s: isinstance(s, str) and len(s) > 0)]
         df["symbol"] = df["symbol"].str.upper()
         df = (df.sort_values("abs_delta", ascending=False)
@@ -255,6 +260,7 @@ cells.append(code(r"""
 
     RNK_DELTA: dict[str, pd.Series] = {}
     RNK_PRIOR: dict[str, pd.Series] = {}
+    DELTA_BY_ENSG: dict[str, pd.DataFrame] = {}
     for k in DATASET_ORDER:
         RNK_DELTA[k], RNK_PRIOR[k] = _make_rnk_pair(k)
 
@@ -325,10 +331,18 @@ cells.append(code(r"""
                       / "cache" / f"gsea_crosstissue__{library}.csv")
         if cache_path.exists() and not recompute:
             return pd.read_csv(cache_path)
-        a = RNK_DELTA["panc_4sp"]
-        b = RNK_DELTA["test_3sp"]
+        # Join on hsapiens_gene_id (ortho_X is table-local), then rank by the liver
+        # symbol; paralog collisions keep the largest |difference|, as in _make_rnk_pair.
+        a = DELTA_BY_ENSG["panc_4sp"]
+        b = DELTA_BY_ENSG["test_3sp"]
         shared = a.index.intersection(b.index)
-        diff = (a.loc[shared] - b.loc[shared]).sort_values(ascending=False)
+        d = pd.DataFrame({"symbol": a.loc[shared, "symbol"].values,
+                          "diff": (a.loc[shared, "delta"] - b.loc[shared, "delta"]).values})
+        d = d[d["symbol"].apply(lambda s: isinstance(s, str) and len(s) > 0)]
+        d["symbol"] = d["symbol"].str.upper()
+        diff = (d.assign(_abs=d["diff"].abs()).sort_values("_abs", ascending=False)
+                 .drop_duplicates(subset="symbol", keep="first")
+                 .set_index("symbol")["diff"].sort_values(ascending=False))
         t0 = time.time()
         df = _run_prerank(diff, library)
         cache_path.parent.mkdir(parents=True, exist_ok=True)

@@ -218,14 +218,17 @@ cells.append(md(r"""
       whichever are relevant to the dataset's species set).
 """))
 cells.append(code(r"""
-    ORTHO = pu.load_ortholog_table()
-    print(f"ortholog table: {len(ORTHO)} groups, columns: {list(ORTHO.columns)}")
+    # One ortholog table per tissue: ortho_X numbers are table-local.
+    ORTHO_BY_TISSUE = {t: pu.load_ortholog_table(t) for t in ("pancreas", "testis")}
+    for t, tab in ORTHO_BY_TISSUE.items():
+        print(f"ortholog table ({t}): {len(tab)} groups, columns: {list(tab.columns)}")
 
     SPECIES_IDENTITY_COLS = ["mmulatta_identity", "mmusculus_identity",
                               "drerio_identity"]
 
     def load_table(key: str) -> pd.DataFrame:
         info = DATASETS[key]
+        ORTHO = ORTHO_BY_TISSUE[info["tissue"]]
         rundir = RUNS_ROOT / info["name"]
         fs = dict(np.load(rundir / "final_state.npz", allow_pickle=False))
 
@@ -233,7 +236,7 @@ cells.append(code(r"""
         var_names = np.asarray(a.var_names)
         a.file.close()
 
-        sym = pu.annotate_genes_with_names(var_names)
+        sym = pu.annotate_genes_with_names(var_names, info["tissue"])
         cat_df = gc.annotate_extended(var_names, sym)
 
         # Map var_name → ortholog_group_id and pull per-species identity columns
@@ -248,6 +251,7 @@ cells.append(code(r"""
 
         df = pd.DataFrame({
             "var_name":     var_names,
+            "hsapiens_gene_id": pu.ensembl_ids(var_names, info["tissue"]).values,
             "symbol":       cat_df["symbol"].values,
             "category":     cat_df["category"].values,
             "prior":        fs["prior"].astype(float),
@@ -983,12 +987,13 @@ cells.append(md("""
        again from a different angle.
 """))
 cells.append(code(r"""
+    # Keyed by hsapiens_gene_id: ortho_X numbers differ between the liver and testis tables.
     direction_per_dataset = {}
     for k in DATASET_ORDER:
         d = FLAGGED[k]
-        for ix in d.index[d["flag_M"]]:
+        for ix in d.loc[d["flag_M"], "hsapiens_gene_id"]:
             direction_per_dataset.setdefault(ix, []).append((DATASETS[k]['tissue'], "M"))
-        for ix in d.index[d["flag_F"]]:
+        for ix in d.loc[d["flag_F"], "hsapiens_gene_id"]:
             direction_per_dataset.setdefault(ix, []).append((DATASETS[k]['tissue'], "F"))
 
     rows = []
@@ -996,12 +1001,12 @@ cells.append(code(r"""
         panc_dirs = {d for t, d in calls if t == "pancreas"}
         test_dirs = {d for t, d in calls if t == "testis"}
         if panc_dirs and test_dirs:
-            sym = LONG.loc[LONG["var_name"] == ix, "symbol"].iloc[0] \
-                  if (LONG["var_name"] == ix).any() else ix
-            cat = LONG.loc[LONG["var_name"] == ix, "category"].iloc[0] \
-                  if (LONG["var_name"] == ix).any() else "?"
+            sym = LONG.loc[LONG["hsapiens_gene_id"] == ix, "symbol"].iloc[0] \
+                  if (LONG["hsapiens_gene_id"] == ix).any() else ix
+            cat = LONG.loc[LONG["hsapiens_gene_id"] == ix, "category"].iloc[0] \
+                  if (LONG["hsapiens_gene_id"] == ix).any() else "?"
             rows.append({
-                "var_name": ix, "symbol": sym, "category": cat,
+                "hsapiens_gene_id": ix, "symbol": sym, "category": cat,
                 "panc_dirs": ",".join(sorted(panc_dirs)),
                 "test_dirs": ",".join(sorted(test_dirs)),
                 "consistent": panc_dirs == test_dirs,
@@ -1637,7 +1642,7 @@ cells.append(code(r"""
     # §I figure that aggregates within a tissue.
     panc_rows = []
     for k in PANC_DATASETS:
-        d = FLAGGED[k][["var_name","symbol","category","prior","alpha",
+        d = FLAGGED[k][["var_name","hsapiens_gene_id","symbol","category","prior","alpha",
                           "delta_alpha","S_g_ema","flag_M","flag_F",
                           "severity_M","severity_F"]].copy()
         d["dataset"] = k
@@ -1648,7 +1653,7 @@ cells.append(code(r"""
 
     test_rows = []
     for k in TEST_DATASETS:
-        d = FLAGGED[k][["var_name","symbol","category","prior","alpha",
+        d = FLAGGED[k][["var_name","hsapiens_gene_id","symbol","category","prior","alpha",
                           "delta_alpha","S_g_ema","flag_M","flag_F",
                           "severity_M","severity_F"]].copy()
         d["dataset"] = k
@@ -1831,14 +1836,15 @@ cells.append(md(r"""
     (pancreas Δα = testis Δα).
 """))
 cells.append(code(r"""
-    # Build per-gene mean Δα per tissue, on shared ortho_X
-    panc_mean = (PANC_POOL.groupby("var_name")
+    # Build per-gene mean Δα per tissue, joined across tissues on hsapiens_gene_id
+    # (ortho_X numbers are table-local).
+    panc_mean = (PANC_POOL.groupby("hsapiens_gene_id")
                           .agg(symbol=("symbol", "first"),
                                 category=("category", "first"),
                                 mean_delta_panc=("delta_alpha", "mean"),
                                 n_panc_M=("flag_M", "sum"),
                                 n_panc_F=("flag_F", "sum")))
-    test_mean = (TEST_POOL.groupby("var_name")
+    test_mean = (TEST_POOL.groupby("hsapiens_gene_id")
                           .agg(mean_delta_test=("delta_alpha", "mean"),
                                 n_test_M=("flag_M", "sum"),
                                 n_test_F=("flag_F", "sum")))

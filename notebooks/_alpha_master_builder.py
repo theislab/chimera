@@ -290,12 +290,12 @@ cells.append(code(r"""
 
 
     def aligned(rA: dict, rB: dict, key: str = "alpha"):
-        '''Inner-join two runs on var_names; return (genes, vA, vB).'''
+        '''Inner-join two runs on hsapiens_gene_id; return (run A var_names, vA, vB).'''
+        iA, iB = shared_index(rA, rB)
         vnA = var_names_for_run(rA)
-        vnB = var_names_for_run(rB)
-        common = pd.Index(vnA).intersection(pd.Index(vnB)).sort_values()
-        iA = pd.Index(vnA).get_indexer(common)
-        iB = pd.Index(vnB).get_indexer(common)
+        order = np.argsort(vnA[iA], kind="stable")  # sorted by run A's var_names, as before
+        iA, iB = iA[order], iB[order]
+        common = vnA[iA]
         return np.asarray(common), rA["fs"][key][iA], rB["fs"][key][iB]
 
 
@@ -309,6 +309,20 @@ cells.append(code(r"""
         a.file.close()
         _VARNAMES_CACHE[adata_file] = v
         return v
+
+
+    def cohort_of(r: dict) -> str:
+        '''Ortholog-table cohort of a run (liver or testis).'''
+        return pu.cohort_for(r["info"]["tissue"])
+
+
+    def shared_index(rA: dict, rB: dict) -> tuple[np.ndarray, np.ndarray]:
+        '''Positions of the genes two runs share, joined on hsapiens_gene_id.
+
+        `ortho_N` numbers are table-local (the liver and testis tables differ),
+        so runs are never joined on var_names.'''
+        return pu.shared_genes(var_names_for_run(rA), cohort_of(rA),
+                               var_names_for_run(rB), cohort_of(rB))
 
 
     def delta_alpha(r: dict) -> np.ndarray:
@@ -329,21 +343,18 @@ cells.append(code(r"""
 
         `valuesA`, `valuesB` are per-gene arrays already in each run's own
         gene order (length = G_A and G_B). Genes are inner-joined on
-        `var_names`; categories are taken from the shared subset; categories
+        `hsapiens_gene_id`; categories are taken from the shared subset; categories
         with < `min_per_cat` shared genes are dropped, and "other" is
         dropped by default (it is heterogeneous, not a gene program).
 
         Returns (cats, mean_A, mean_B, n_per_cat).
         '''
-        vnA = var_names_for_run(rA)
-        vnB = var_names_for_run(rB)
-        common = pd.Index(vnA).intersection(pd.Index(vnB))
-        iA = pd.Index(vnA).get_indexer(common)
-        iB = pd.Index(vnB).get_indexer(common)
+        iA, iB = shared_index(rA, rB)
+        common = var_names_for_run(rA)[iA]
         vA = np.asarray(valuesA)[iA]
         vB = np.asarray(valuesB)[iB]
-        # Categorize on the shared genes — symbol → extended category.
-        sym = pu.annotate_genes_with_names(np.asarray(common))
+        # Categorize on the shared genes — symbol (run A's table) → extended category.
+        sym = pu.annotate_genes_with_names(np.asarray(common), cohort_of(rA))
         cats = gc.annotate_extended(np.asarray(common), sym)["category"].values
         df = pd.DataFrame({"cat": cats, "vA": vA, "vB": vB})
         order = [c for c in gc.CATEGORY_ORDER_EXTENDED
@@ -1249,9 +1260,9 @@ cells.append(md("""
     panel answers a distinct "is the *learned correction* stable
     when the species set changes?" question.
 
-    Genes are aligned by inner-join on `var_names` (every Camex
-    dataset uses `ortho_X` IDs, so the join is exact and biologically
-    meaningful).
+    Genes are aligned by inner-join on `hsapiens_gene_id` (all liver
+    datasets share one ortholog table, so this equals the `ortho_X`
+    join).
 """))
 cells.append(code(r"""
     panc_pairs = ["pancreas_hmonkey_s42", "pancreas_hmouse_s42", "pancreas_hzeb_s42"]
@@ -1274,10 +1285,8 @@ cells.append(code(r"""
         (defaults to the package-level cross-organism range).
         '''
         rA, rB = load_run(keyA), load_run(keyB)
-        vnA, vnB = var_names_for_run(rA), var_names_for_run(rB)
-        common = pd.Index(vnA).intersection(pd.Index(vnB))
-        iA = pd.Index(vnA).get_indexer(common)
-        iB = pd.Index(vnB).get_indexer(common)
+        iA, iB = shared_index(rA, rB)
+        common = var_names_for_run(rA)[iA]
 
         if quantity == "alpha":
             xA, xB = rA["fs"]["alpha"][iA], rB["fs"]["alpha"][iB]
@@ -1411,7 +1420,8 @@ cells.append(md("""
     purpose — see the §B intro). The follow-up panel below
     plots Δα against the *raw* (unclamped) testis prior to
     decouple the clamp confound from the GIN signal. Genes are
-    inner-joined on `var_names` (`ortho_*`).
+    inner-joined on the human Ensembl gene ID (`hsapiens_gene_id`):
+    `ortho_*` numbers are table-local and differ between the tissues.
 """))
 cells.append(code(r"""
     cross_tissue_pairs = [
@@ -1423,10 +1433,8 @@ cells.append(code(r"""
 
     for kP, kT, lP, lT, tag in cross_tissue_pairs:
         rP, rT = load_run(kP), load_run(kT)
-        vP, vT = var_names_for_run(rP), var_names_for_run(rT)
-        common = pd.Index(vP).intersection(pd.Index(vT))
-        iP = pd.Index(vP).get_indexer(common)
-        iT = pd.Index(vT).get_indexer(common)
+        iP, iT = shared_index(rP, rT)  # hsapiens_gene_id join: ortho_N differs between tables
+        common = var_names_for_run(rP)[iP]
 
         # Δα only — α omitted on purpose (see §B intro)
         xP = (rP["fs"]["alpha"] - rP["fs"]["prior"])[iP]
@@ -1492,10 +1500,8 @@ cells.append(code(r"""
     # signal, so the cross-tissue agreement reflects biology, not architecture.
     for kP, kT, lP, lT, tag in cross_tissue_pairs:
         rP, rT = load_run(kP), load_run(kT)
-        vP, vT = var_names_for_run(rP), var_names_for_run(rT)
-        common = pd.Index(vP).intersection(pd.Index(vT))
-        iP = pd.Index(vP).get_indexer(common)
-        iT = pd.Index(vT).get_indexer(common)
+        iP, iT = shared_index(rP, rT)  # hsapiens_gene_id join: ortho_N differs between tables
+        common = var_names_for_run(rP)[iP]
 
         # Liver Δα uses its in-memory prior (liver runs are unclamped).
         dP = (rP["fs"]["alpha"] - rP["fs"]["prior"])[iP]
@@ -1586,7 +1592,7 @@ cells.append(md("""
 """))
 cells.append(code(r"""
     a = load_adata(DEFAULT)
-    cats_df = pu.annotate_gene_categories(a.var_names)
+    cats_df = pu.annotate_gene_categories(a.var_names, RUNS[DEFAULT]["tissue"])
     alpha = r["fs"]["alpha"]
     cat = cats_df["category"].values
     assert len(cat) == len(alpha)

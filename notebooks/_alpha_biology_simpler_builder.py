@@ -197,7 +197,8 @@ cells.append(md("""
     For each dataset we build a tidy DataFrame with one row per gene:
 
     - `var_name` (the model's `ortho_X` ID)
-    - `symbol` (human ortholog gene symbol from `data/processed/ortholog_table.csv`)
+    - `symbol` (human ortholog gene symbol from the cohort's own table:
+      `ortholog_table.csv` for liver, `ortholog_table_testis.csv` for testis)
     - `category` (broad category from `_gene_categories_broad.classify_broad`)
     - `prior`, `alpha`, `delta_alpha`, `correction`, `S_g_ema`,
       `residual_mean_abs`, `residual_rms` (per-gene scalars from
@@ -226,7 +227,7 @@ cells.append(code(r"""
         )
 
         # Map ortho_X -> human gene symbol via the ortholog table
-        sym = pu.annotate_genes_with_names(var_names)
+        sym = pu.annotate_genes_with_names(var_names, info["tissue"])
         cat_df = gc.annotate_broad(var_names, sym)
 
         df = pd.DataFrame({
