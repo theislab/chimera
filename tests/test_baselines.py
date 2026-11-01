@@ -365,9 +365,9 @@ def test_force_flag(mock_h5ad: Path, tmp_path: Path, monkeypatch: pytest.MonkeyP
     _invoke_runner(["--adata", str(mock_h5ad), "--method", "pca", "--seed", "42"])
     z_path_1 = (tmp_path / "runs" / "baselines_pca" / mock_h5ad.stem / "z_mean.npy")
     mtime_1 = z_path_1.stat().st_mtime
-    # Sleep to ensure mtime ticks over.
+    # Sleep to ensure mtime ticks over (some filesystems store whole seconds).
     import time as _time
-    _time.sleep(0.05)
+    _time.sleep(1.1)
 
     _invoke_runner(
         ["--adata", str(mock_h5ad), "--method", "pca", "--seed", "42", "--force"]
