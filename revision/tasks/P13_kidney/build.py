@@ -9,9 +9,11 @@ The human file (1.39 M nuclei) is streamed in row blocks of ``raw/X``; per-cell 
 block, so the result equals a whole-file run:
 
 1. ``_validate_raw_counts``, ``_standardize_obs_columns`` (batch = unit) and ``_qc_filter``
-   (>= 200 genes, mitochondrial fraction < 20%) from ``chimera._data_utils``.
-   The human matrix has no MT- genes, so for human the 20% threshold is applied to the
-   authors' ``percent.mt`` (as T7.2 did).
+   (>= 200 genes) from ``chimera._data_utils``. No mitochondrial filter in any species (plan
+   amendment after section 8c): it cannot act evenly. The human matrix has no MT- genes, mouse
+   has 11, the authors' ``percent.mt`` is missing for all Kirita nuclei and disagrees with the
+   matrix-based fraction in mouse, and in human it would remove AKI nuclei preferentially. What
+   the 20% rule would have removed is written to ``mt_filter_not_applied.csv``.
 2. ``cell_ontology_class`` from ``SubclassLevel1`` through ``celltype_map.tsv``.
 3. Per-unit pseudobulks per class for every unit (summed counts, ``layers['n_detected']``),
    all QC-passed nuclei, no caps, native gene space; per unit x class x ``CellStateLevel2``
@@ -76,14 +78,14 @@ ESM2 = ROOT / "data" / "raw" / "saturn_esm2" / "protein_embeddings_export" / "ES
 ESM2_LINKS = {"human_embedding.torch": "human_embedding.torch", "mouse_embedding.torch": "mouse_embedding.torch"}
 
 SEED = 20261101
-MIN_GENES, MAX_MT = 200, 20.0
+MIN_GENES, MT_RULE = 200, 20.0  # MT_RULE: reported only, not applied
 MIN_CELLS_UNIT, MIN_CELLS_MODEL = 20, 50
 DE_TYPES = ["pt", "tal", "dct", "pc", "ic", "ec", "fib", "myeloid", "lymphoid"]
 MIN_H_CTRL, MIN_H_AKI, MIN_M_SHAM, MIN_M_IRI, MIN_DEABLE = 6, 10, 3, 4, 4
 BLOCK = 100_000  # physical rows of raw/X per read
 MULTIOME = "10x multiome"
 OBS_COLS = {"Human": ["donor_id", "assay", "SubclassLevel1", "CellStateLevel2", "region", "percent.mt"],
-            "Mouse": ["donor_id", "experiment", "source", "assay", "SubclassLevel1", "CellStateLevel2"]}
+            "Mouse": ["donor_id", "experiment", "source", "assay", "SubclassLevel1", "CellStateLevel2", "percent.mt"]}
 UNIT_KEYS = ["unit", "donor", "species", "role", "condition", "assay", "source", "collection", "sex", "age",
              "stage", "time", "subtype"]
 
@@ -122,7 +124,7 @@ def stream(path: Path, species: str, obs: pd.DataFrame, var: pd.DataFrame, roles
     groups: dict[str, int] = {}
     sums: list[np.ndarray] = []
     dets: list[np.ndarray] = []
-    qc_parts, state_parts, train_parts, max_val = [], [], [], 0.0
+    qc_parts, state_parts, train_parts, mt_rec, max_val = [], [], [], [], 0.0
     with h5py.File(path, "r") as f:
         g = f["raw"]["X"]
         indptr = g["indptr"][()]
@@ -144,13 +146,8 @@ def stream(path: Path, species: str, obs: pd.DataFrame, var: pd.DataFrame, roles
             a.obs["batch"] = a.obs["unit"]
             a = _standardize_obs_columns(a)
             n_before = a.obs["unit"].value_counts()
-            a = _qc_filter(a, min_genes=MIN_GENES, max_mt_pct=MAX_MT)
-            if species == "Human":
-                # The human matrix carries no MT- genes (removed by the authors), so _qc_filter
-                # cannot see mitochondrial reads; the same 20% threshold is applied to the
-                # authors' percent.mt, as T7.2 did for GSE202379.
-                pmt = pd.to_numeric(a.obs["percent.mt"], errors="coerce").fillna(0.0)
-                a = a[(pmt < MAX_MT).to_numpy()].copy()
+            mt_rec.append(mt_would_remove(a, species))
+            a = _qc_filter(a, min_genes=MIN_GENES, max_mt_pct=np.inf)  # no mitochondrial filter, see docstring
             qc_parts.append(pd.DataFrame({"before": n_before, "after": a.obs["unit"].value_counts()}).fillna(0))
             cls = a.obs["SubclassLevel1"].map(ctmap)
             if cls.isna().any():
@@ -192,7 +189,19 @@ def stream(path: Path, species: str, obs: pd.DataFrame, var: pd.DataFrame, roles
     order = np.lexsort((pb.obs["cell_ontology_class"].to_numpy(), pb.obs["unit"].to_numpy()))
     pb = pb[order].copy()
     train = ad.concat(train_parts, merge="same") if train_parts else None
-    return dict(pb=pb, qc=qc, states=states, train=train, max_val=max_val, n_rows=int(len(rows)))
+    mt = pd.concat(mt_rec).groupby(level=0).sum().astype(int)
+    return dict(pb=pb, qc=qc, states=states, train=train, max_val=max_val, n_rows=int(len(rows)), mt=mt)
+
+
+def mt_would_remove(a: ad.AnnData, species: str) -> pd.DataFrame:
+    """Per unit: nuclei the 20% rule would drop, by the authors' percent.mt and by the matrix."""
+    x = pd.to_numeric(a.obs["percent.mt"], errors="coerce")
+    mt = a.var_names.str.startswith(("MT-", "mt-"))
+    tot = np.asarray(a.X.sum(axis=1)).ravel()
+    pm = np.asarray(a.X[:, mt].sum(axis=1)).ravel() / np.maximum(tot, 1) * 100 if mt.any() else np.zeros(a.n_obs)
+    return pd.DataFrame({"n": 1, "author_nan": x.isna().astype(int).to_numpy(),
+                         "author_ge20": (x >= MT_RULE).astype(int).to_numpy(),
+                         "matrix_ge20": (pm >= MT_RULE).astype(int)}, index=a.obs["unit"].to_numpy()).groupby(level=0).sum()
 
 
 def keep_train_human(o: pd.DataFrame, r: pd.DataFrame) -> np.ndarray:
@@ -274,7 +283,8 @@ def link_esm() -> Path:
     return d.parent
 
 
-def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd.DataFrame, filt: list):
+def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd.DataFrame, filt: list,
+                  observed: dict[str, set]):
     for a, s in ((th, "Human"), (tm, "Mouse")):
         r = roles[roles.species == s].set_index("unit")
         a.obs["species"] = s
@@ -333,14 +343,27 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
     unified.obs["cell_type"] = unified.obs["cell_ontology_class"].astype(str)
     for c in ("species", "batch", "sample_batch", "cell_type", *obs_cols):
         unified.obs[c] = unified.obs[c].astype(str).astype("category")
+    # A group stays only if both genes were observed (count > 0) in their species' listed units:
+    # a feature-listed gene never seen in a species is a structural zero, not an expression value.
+    seen = (table["hsapiens_gene_id"].isin(observed["Human"]) & table["mmusculus_gene_id"].isin(observed["Mouse"])).to_numpy()
     nnz = np.asarray((unified.X != 0).sum(axis=0)).ravel()
-    gene_mask = nnz >= 3
+    gene_mask = seen & (nnz >= 3)
     t72._write_h5ad(unified, OUT / "kidney_healthy_train_full_vocab.h5ad")
     obj = unified[:, gene_mask].copy()
     obj.uns["p_null"] = precompute_p_null(obj, species_key="species")
     with open(OUT / "kidney_healthy_train_gin_scaler.pkl", "wb") as f:
         pickle.dump(scaler, f)
-    info = dict(classes=classes, n_genes_table=G, n_genes_lt3_nuclei=int((~gene_mask).sum()),
+    Xc = obj.X.tocsc()
+    zero_nuclei, in_shared = {}, {}
+    ct = pd.crosstab(obj.obs["cell_ontology_class"].astype(str), obj.obs["species"].astype(str))
+    shared = (ct > 0).all(axis=1)
+    for s_ in ("Human", "Mouse"):
+        m_ = (obj.obs["species"].astype(str) == s_).to_numpy()
+        zero_nuclei[s_] = int((np.asarray((Xc[m_] > 0).sum(axis=0)).ravel() == 0).sum())
+        in_shared[s_] = float(ct.loc[shared, s_].sum() / ct[s_].sum())
+    info = dict(classes=classes, n_genes_table=G, n_genes_never_observed_in_a_species=int((~seen).sum()),
+                n_genes_lt3_nuclei_among_observed=int((seen & (nnz < 3)).sum()),
+                n_object_genes_zero_training_nuclei=zero_nuclei, frac_cells_in_shared_class=in_shared,
                 n_genes=int(gene_mask.sum()), esm2_matched=esm_matched,
                 frac_prior_ge_095=float((obj.var["conservation_prior"] >= 0.95).mean()),
                 frac_table_identity_ge_95=float((table["mean_identity"] >= 95).mean()),
@@ -395,12 +418,13 @@ def main() -> int:
                 pb.obs[c] = pb.obs[c].astype(str)
         t72._write_h5ad(pb, OUT / f"kidney_pseudobulk_{s.lower()}.h5ad")
         res.csv(out[s]["qc"].rename_axis("unit").reset_index(), f"qc_{s.lower()}_per_unit.csv")
+        res.csv(out[s]["mt"].rename_axis("unit").reset_index(), f"mt_filter_not_applied_{s.lower()}.csv")
         res.csv(out[s]["states"].rename("n_nuclei").reset_index(), f"states_{s.lower()}_unit_type.csv")
         res.csv(pb.obs[["unit", "role", "condition", "assay", "cell_ontology_class", "n_nuclei"]],
                 f"counts_{s.lower()}_unit_type.csv")
     res.json({s: dict(n_rows_read=o["n_rows"], max_count=o["max_val"],
                       n_after_qc=int(o["qc"]["after"].sum()), n_before_qc=int(o["qc"]["before"].sum()))
-              for s, o in out.items()} | dict(min_genes=MIN_GENES, max_mt_pct=MAX_MT), "qc_summary.json")
+              for s, o in out.items()} | dict(min_genes=MIN_GENES, mitochondrial_filter="none"), "qc_summary.json")
 
     crit, types, units, filt = gate_gd1k(out["Human"]["pb"], out["Mouse"]["pb"], roles)
     res.csv(crit, "gd1k_criteria.csv")
@@ -409,7 +433,11 @@ def main() -> int:
     gd1k = bool(crit["passed"].all())
     log.info("G-D1k %s\n%s\n%s", "PASS" if gd1k else "FAIL", crit.to_string(), types.to_string())
 
-    obj, info, pre = build_healthy(out["Human"]["train"], out["Mouse"]["train"], roles, table, filt)
+    observed = {}
+    for s_, o_ in out.items():
+        tot = np.asarray(o_["pb"].X.sum(axis=0)).ravel()
+        observed[s_] = set(o_["pb"].var["gene_ids"].astype(str).to_numpy()[tot > 0])
+    obj, info, pre = build_healthy(out["Human"]["train"], out["Mouse"]["train"], roles, table, filt, observed)
     res.csv(pd.DataFrame(filt), "filters.csv")
     res.csv(pre.rename_axis("cell_ontology_class").reset_index(), "counts_training_before_caps.csv")
     rho = gene_ids.assert_table_matches(obj, gene_ids.load_table("kidney"))
