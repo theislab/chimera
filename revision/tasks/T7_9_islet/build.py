@@ -23,8 +23,12 @@ Steps (section 8b):
    species x class shared by donors (T7.2 water-filling, seed 20261101), testis table
    vocabulary, ``compute_conservation_prior``, ESM features as T7.2,
    ``construct_unified_adata``, ``compute_expression_stats`` and ``assemble_gin_features`` on
-   these cells, genes absent from either species' matrix or in < 3 cells dropped,
-   ``precompute_p_null``, ``assert_table_matches``.
+   these cells, ``precompute_p_null``, ``assert_table_matches``. Genes are dropped if absent from
+   either species' matrix, not measured in every mouse training study, or in < 3 cells (list and
+   reasons in ``filters_genes.csv``). The Hrovatin matrix is the union of its studies' references:
+   a gene missing from a study's reference is padded with zeros there (``var['present_*']``), so a
+   false zero that a check by gene ID cannot see. Mouse pseudobulks carry the same flags for the
+   DE studies (``var['measured_dbdb']``, ``var['measured_mstz']``).
 
     PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/build.py [--force] [--reannotate]
 """
@@ -76,6 +80,8 @@ MIN_CELLS_UNIT = 20
 MIN_CELLS_MODEL = 50
 DE_TYPES = ["beta", "alpha", "delta", "ductal", "endothelial", "stellate"]
 MIN_ND, MIN_T2D, MIN_MOUSE_CTRL, MIN_MOUSE_DIAB, MIN_DEABLE = 6, 12, 2, 2, 3
+# Study -> Hrovatin var flag: was the gene in that study's reference?
+MEASURED = {"4m": "present_Fltp_adult", "aged": "present_Fltp_2y", "db/db": "present_VSG", "mSTZ": "present_STZ"}
 
 HUMAN_OBS = ["donor_id", "disease", "sex", "assay", "Annotated_Clusters", "LibraryID", "BMI", "HbA1c",
              "development_stage", "Center"]
@@ -113,6 +119,14 @@ def _read(path, obs_cols, rows=None) -> ad.AnnData:
                                                    index=var["feature_name"].astype(str).to_numpy()))
     a.var_names_make_unique()
     return a
+
+
+def mouse_measured() -> pd.DataFrame:
+    """Per mouse study: was the gene in that study's reference (ENSMUSG index, one bool per study)."""
+    with h5py.File(MOUSE_H5AD, "r") as f:
+        var = read_elem(f["raw"]["var"])
+    return pd.DataFrame({k: var[c].astype(bool).to_numpy() for k, c in MEASURED.items()},
+                        index=var.index.astype(str))
 
 
 def load_human(roles: pd.DataFrame) -> ad.AnnData:
@@ -245,7 +259,8 @@ def technical_batch(obs: pd.DataFrame) -> pd.Series:
     return out.where(~multi, out + "_" + chem)
 
 
-def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list) -> tuple[ad.AnnData, dict]:
+def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list,
+                  res: TaskOutput) -> tuple[ad.AnnData, dict]:
     obs_cols = ["sample", "donor", "species", "study", "condition", "cell_ontology_class", "role", "sex", "assay",
                 "age", "author_label"]
     hs = h[(h.obs["role"] == "train_healthy").to_numpy()].copy()
@@ -302,12 +317,22 @@ def build_healthy(h: ad.AnnData, m: ad.AnnData, table: pd.DataFrame, filt: list)
     present = np.array([(hg in human_present) and (mg in mouse_present)
                         for hg, mg in zip(table["hsapiens_gene_id"], table["mmusculus_gene_id"])])
     nnz = np.asarray((unified.X != 0).sum(axis=0)).ravel()
-    gene_mask = present & (nnz >= 3)
+    flags = mouse_measured()
+    trained = set(flags.index[flags["4m"] & flags["aged"]])
+    measured = table["mmusculus_gene_id"].isin(trained).to_numpy()
+    gene_mask = present & measured & (nnz >= 3)
+    reason = np.select([~present, ~measured, nnz < 3],
+                       ["absent from a species matrix", "not measured in every mouse training study (padded zeros)",
+                        "in < 3 cells"], default="kept")
+    res.csv(table[["ortholog_group_id", "hsapiens_gene_id", "hsapiens_gene_name", "mmusculus_gene_id"]]
+            .assign(reason=reason).query("reason != 'kept'"), "filters_genes.csv")
     t72._write_h5ad(unified, OUT / "islet_healthy_train_full_vocab.h5ad")
     obj = unified[:, gene_mask].copy()
     obj.uns["p_null"] = precompute_p_null(obj, species_key="species")
     info = dict(classes=classes, n_genes_table=G, n_genes_absent_in_a_matrix=int((~present).sum()),
-                n_genes_lt3_cells_among_present=int((present & (nnz < 3)).sum()), n_genes=int(gene_mask.sum()),
+                n_genes_unmeasured_in_a_mouse_training_study=int((present & ~measured).sum()),
+                n_genes_lt3_cells_among_measured=int((present & measured & (nnz < 3)).sum()),
+                n_genes=int(gene_mask.sum()),
                 max_abs_diff_struct_features_vs_canonical_testis=max_diff,
                 frac_prior_ge_095=float((obj.var["conservation_prior"] >= 0.95).mean()),
                 frac_table_identity_ge_95=float((table["mean_identity"] >= 95).mean()))
@@ -366,6 +391,10 @@ def main() -> int:
         pb = t72.pseudobulk(x, keys)
         pb.var["gene_symbol"] = pb.var_names
         pb.var["gene_id"] = x.var["gene_ids"].reindex(pb.var_names).to_numpy()
+        if name == "mouse":
+            flags = mouse_measured().reindex(pb.var["gene_id"].astype(str).to_numpy())
+            pb.var["measured_dbdb"] = flags["db/db"].to_numpy(dtype=bool)
+            pb.var["measured_mstz"] = flags["mSTZ"].to_numpy(dtype=bool)
         for c in pb.obs.columns:
             if pb.obs[c].dtype == object:
                 pb.obs[c] = pb.obs[c].astype(str)
@@ -379,7 +408,7 @@ def main() -> int:
     gd1b = bool(crit["passed"].all())
     log.info("G-D1b %s\n%s\n%s", "PASS" if gd1b else "FAIL", crit.to_string(), types.to_string())
 
-    obj, info = build_healthy(h, m, table, filt)
+    obj, info = build_healthy(h, m, table, filt, res)
     res.csv(pd.DataFrame(filt), "filters.csv")
     rho = gene_ids.assert_table_matches(obj, gene_ids.load_table("testis"))
     paths["healthy"] = OUT / "islet_healthy_train.h5ad"

@@ -10,8 +10,10 @@ Per DE-able type t (``results/revision/T7_9/gd1b_types.csv``), on the DE units o
 * mouse, per model (Family 3): one factor ``group`` = study x condition, so dispersion is shared;
   db/db = dbdb_disease vs dbdb_control, mSTZ = mstz_disease vs mstz_control (1 vs 1, descriptive).
 
-Wald tests; apeglm shrinkage of the tested coefficient (``lfc_shrink``). Genes with < 10 counts
-summed over the units are not tested. ``det_frac`` = cells with count > 0 / cells, over the units
+Wald tests; apeglm shrinkage of the tested coefficient (``lfc_shrink``). Mouse fits use only genes
+measured in both DE studies (``var['measured_dbdb']`` and ``var['measured_mstz']``; elsewhere the
+atlas pads a gene missing from a study's reference with zeros). Genes with < 10 counts summed over
+the units are not tested. ``det_frac`` = cells with count > 0 / cells, over the units
 used, for section 8b's 5% detection rule.
 
     PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/de.py [--types beta,...] [--n-cpus 16]
@@ -100,6 +102,7 @@ def main() -> int:
         de_types = [t for t in de_types if t in a.types.split(",")]
     pb_h = ad.read_h5ad(DATA / "islet_pseudobulk_human.h5ad")
     pb_m = ad.read_h5ad(DATA / "islet_pseudobulk_mouse.h5ad")
+    pb_m = pb_m[:, (pb_m.var["measured_dbdb"] & pb_m.var["measured_mstz"]).to_numpy()].copy()
     pb_h.obs["chemistry"] = pb_h.obs["assay"].astype(str).map({"10x 3' v2": "v2", "10x 3' v3": "v3"})
     pb_m.obs["study"] = pb_m.obs["study"].astype(str).map(STUDY)
     pb_m.obs["group"] = pb_m.obs["study"] + "_" + pb_m.obs["condition"].astype(str)
