@@ -49,3 +49,11 @@ array of 8 over `manifest.tsv` with `revision/slurm/array.sbatch`.
    H-D4 stands.
 
 Selection runs once, after every grid array task has reached a terminal Slurm state.
+
+## Run report (`run_report.py`)
+
+Descriptive; it selects nothing and runs only after selection. For every grid and seed run: α − π sign
+profile against the anchored (clamped) and the raw prior, `knn_mixing_entropy`, `knn_species_purity`,
+final adversarial accuracy. Flag, fixed before any seed run: a seed with `knn_mixing_entropy` below
+0.75 × the selected grid run's is listed as poorly mixed and reported separately; the primary D stays
+the mean over seeds.
