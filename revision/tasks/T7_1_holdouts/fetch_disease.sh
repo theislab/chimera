@@ -7,6 +7,13 @@ get_series () { # gse relpath-under-suppl
     local gse="$1" stub="${1:0:${#1}-3}nnn"
     "$F" "$gse" "$GEO/series/$stub/$gse/suppl/$2" "$D/$gse/$2" "$M"
 }
+# Large files: NCBI drops long transfers and throttles (500, 403), so fetch in 32 MiB
+# range chunks with few parallel requests, then record the manifest row.
+get_series_ranged () {
+    local gse="$1" stub="${1:0:${#1}-3}nnn"
+    "$C/revision/tasks/T7_1_holdouts/fetch_ranged.sh" "$GEO/series/$stub/$gse/suppl/$2" "$D/$gse/$2" 32 2 \
+        && "$F" "$gse" "$GEO/series/$stub/$gse/suppl/$2" "$D/$gse/$2" "$M"
+}
 get_matrix () {
     local gse="$1" stub="${1:0:${#1}-3}nnn"
     "$F" "$gse" "$GEO/series/$stub/$gse/matrix/${gse}_series_matrix.txt.gz" "$D/$gse/${gse}_series_matrix.txt.gz" "$M"
@@ -36,10 +43,10 @@ GSM5764330 CS196
 GSM5764333 CS197
 LIST
 get_series GSE135251 GSE135251_RAW.tar
-get_series GSE129516 GSE129516_RAW.tar
-get_series GSE136103 GSE136103_RAW.tar
-get_series GSE202379 GSE202379_RAW.tar
-get_series GSE202379 GSE202379_SeuratObject_AllCells.rds.gz
+get_series_ranged GSE129516 GSE129516_RAW.tar
+get_series_ranged GSE136103 GSE136103_RAW.tar
+get_series_ranged GSE202379 GSE202379_RAW.tar
+get_series_ranged GSE202379 GSE202379_SeuratObject_AllCells.rds.gz
 # Hagai et al. 2018 Nature 563:197, Supplementary Table 4 (Nature ESM MOESM4; PMC6347972 lists it as
 # NIHMS79113-supplement-Supplementary_Table_4.xlsx). Sheets: fibroblasts_FC_divergence, phagocytes_FC_diveregnce.
 "$F" Hagai2018 "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-018-0657-2/MediaObjects/41586_2018_657_MOESM4_ESM.xlsx" "$D/Hagai2018/Hagai2018_Supplementary_Table_4.xlsx" "$M"
