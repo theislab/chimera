@@ -1,0 +1,3 @@
+run_name	args
+rev-calib-liv_4sp	--config A --max-epochs 5 --adata data/processed/camex_pancreas_unified.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-calib-test_3sp	--config A --max-epochs 5 --adata data/processed/camex_testis_unified.h5ad --seed 42 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

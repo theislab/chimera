@@ -1,0 +1,13 @@
+run_name	args
+rev-ctl-liv_hmouse-m-s42	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0
+rev-ctl-liv_hmouse-m-s45	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 45 --adv-weight 200 --free-bits 1.0
+rev-ctl-liv_hmouse-m-s46	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 46 --adv-weight 200 --free-bits 1.0
+rev-ctl-liv_hmouse-rand-s42	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --gin-feature-op random_all
+rev-ctl-liv_hmouse-rand-s45	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 45 --adv-weight 200 --free-bits 1.0 --gin-feature-op random_all
+rev-ctl-liv_hmouse-rand-s46	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 46 --adv-weight 200 --free-bits 1.0 --gin-feature-op random_all
+rev-ctl-liv_hmouse-zesm-s42	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --gin-feature-op zero_esm2
+rev-ctl-liv_hmouse-zexpr-s42	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --gin-feature-op zero_expr_stats
+rev-ctl-liv_4sp-rand-s42	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --gin-feature-op random_all
+rev-ctl-liv_4sp-zesm-s42	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --gin-feature-op zero_esm2
+rev-ctl-liv_4sp-zexpr-s42	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --gin-feature-op zero_expr_stats
+rev-ctl-test_hmouse-rand-s42	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --gin-feature-op random_all

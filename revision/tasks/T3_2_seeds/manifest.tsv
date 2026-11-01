@@ -1,0 +1,15 @@
+run_name	args
+rev-liv_hmouse-s45	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 45 --adv-weight 200 --free-bits 1.0
+rev-liv_hmouse-s46	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 46 --adv-weight 200 --free-bits 1.0
+rev-test_hmouse-s43	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 43 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s44	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 44 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s45	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 45 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s46	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 46 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-liv_4sp-s43	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 43 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-liv_4sp-s44	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 44 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-liv_4sp-s45	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 45 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-liv_4sp-s46	--config A --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --seed 46 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-test_3sp-s43	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 43 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_3sp-s44	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 44 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_3sp-s45	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 45 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_3sp-s46	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 46 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

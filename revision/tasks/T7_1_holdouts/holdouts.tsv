@@ -1,0 +1,13 @@
+gsm	shortfilename	diet	weeks	role	stratum_size	geo_number_of_cells	platform	title	seed
+GSM5764312	CS184	SD	24	holdout	4	793	10x Genomics – v3.1	Standard diet fed (24 weeks) Liver nuclei_Mouse_005_Sample_001	20261101
+GSM5764314	CS188	SD	24	training	4	681	10x Genomics – v3.1	Standard diet fed (24 weeks) Liver nuclei_Mouse_006_Sample_001	20261101
+GSM5764315	CS189	SD	24	training	4	1378	10x Genomics – v3.1	Standard diet fed (24 weeks) Liver nuclei_Mouse_007_Sample_001	20261101
+GSM5764316	CS190	SD	24	training	4	218	10x Genomics – v3.1	Standard diet fed (24 weeks) Liver nuclei_Mouse_008_Sample_001	20261101
+GSM5764313	CS185	WD	24	holdout	4	2775	10x Genomics – v3.1	Western diet fed (24 weeks) Liver nuclei_Mouse_005_Sample_001	20261101
+GSM5764317	CS191	WD	24	training	4	1916	10x Genomics – v3.1	Western diet fed (24 weeks) Liver nuclei_Mouse_006_Sample_001	20261101
+GSM5764318	CS192	WD	24	training	4	1532	10x Genomics – v3.1	Western diet fed (24 weeks) Liver nuclei_Mouse_007_Sample_001	20261101
+GSM5764320	CS193	WD	24	training	4	269	10x Genomics – v3.1	Western diet fed (24 weeks) Liver nuclei_Mouse_008_Sample_001	20261101
+GSM5764323	CS194	SD	36	training	2	11108	10x Genomics – v3.1	Standard diet fed (36 weeks) Liver nuclei_Mouse_003_Sample_001	20261101
+GSM5764327	CS195	SD	36	holdout	2	11354	10x Genomics – v3.1	Standard diet fed (36 weeks) Liver nuclei_Mouse_004_Sample_001	20261101
+GSM5764330	CS196	WD	36	holdout	2	7685	10x Genomics – v3.1	Western diet fed (36 weeks) Liver nuclei_Mouse_003_Sample_001	20261101
+GSM5764333	CS197	WD	36	training	2	9697	10x Genomics – v3.1	Western diet fed (36 weeks) Liver nuclei_Mouse_004_Sample_001	20261101
