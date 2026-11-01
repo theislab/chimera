@@ -315,8 +315,12 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
     feats, scaler = assemble_gin_features(esm_pca, esm_var, table, stats)
     unified.varm["gene_features"] = feats
     unified.uns["p_null"] = precompute_p_null(unified)
-    unified.obs["batch"] = unified.obs["sample"].astype(str)
-    for c in ("species", "batch", *obs_cols):
+    # One batch per species (iter94 failure with batch = sample; every canonical recipe has
+    # batch == species and training passes --batch-key species). The unit stays in sample_batch.
+    unified.obs["sample_batch"] = unified.obs["sample"].astype(str)
+    unified.obs["batch"] = unified.obs["species"].astype(str)
+    unified.obs["cell_type"] = unified.obs["cell_ontology_class"].astype(str)
+    for c in ("species", "batch", "sample_batch", "cell_type", *obs_cols):
         unified.obs[c] = unified.obs[c].astype(str).astype("category")
     nnz = np.asarray((unified.X != 0).sum(axis=0)).ravel()
     gene_mask = nnz >= 3
@@ -331,6 +335,29 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
                 frac_table_identity_ge_95=float((table["mean_identity"] >= 95).mean()),
                 n_constant_feature_columns=int((feats.std(axis=0) == 0).sum()))
     return obj, info, pre
+
+
+def object_checks(obj: ad.AnnData) -> dict:
+    """Training-object contract: raw integer counts in X, no layers, required obs/var/uns/varm."""
+    X = obj.X if sp.issparse(obj.X) else sp.csr_matrix(obj.X)
+    d = X.data
+    n_sp = obj.obs["species"].nunique()
+    c = dict(
+        x_integer=bool(len(d) == 0 or np.allclose(d, np.round(d))), x_nonnegative=bool(len(d) == 0 or d.min() >= 0),
+        x_max=float(d.max()) if len(d) else 0.0, layers_empty=len(obj.layers) == 0,
+        obs_columns_present=all(k in obj.obs for k in ("species", "cell_type", "cell_ontology_class", "batch")),
+        batch_equals_species=bool((obj.obs["batch"].astype(str) == obj.obs["species"].astype(str)).all()),
+        n_batches=int(obj.obs["batch"].nunique()), n_sample_batches=int(obj.obs["sample_batch"].nunique()),
+        p_null_shape=list(np.asarray(obj.uns["p_null"]).shape),
+        p_null_ok=list(np.asarray(obj.uns["p_null"]).shape) == [n_sp, obj.n_vars],
+        p_null_rows_sum_1=bool(np.allclose(np.asarray(obj.uns["p_null"]).sum(axis=1), 1.0)),
+        gene_features_shape=list(obj.varm["gene_features"].shape),
+        gene_features_ok=obj.varm["gene_features"].shape == (obj.n_vars, 72),
+        gene_features_finite=bool(np.isfinite(obj.varm["gene_features"]).all()),
+        conservation_prior_present="conservation_prior" in obj.var,
+    )
+    c["all_ok"] = all(v for k, v in c.items() if isinstance(v, bool))
+    return c
 
 
 # --------------------------------------------------------------------------- main
@@ -374,6 +401,10 @@ def main() -> int:
     res.csv(pd.DataFrame(filt), "filters.csv")
     res.csv(pre.rename_axis("cell_ontology_class").reset_index(), "counts_training_before_caps.csv")
     rho = gene_ids.assert_table_matches(obj, gene_ids.load_table("kidney"))
+    checks = object_checks(obj)
+    res.json(checks, "object_checks.json")
+    if not checks["all_ok"]:
+        raise AssertionError(f"healthy object checks failed: {checks}")
     path = gene_ids.h5ad_path("kidney")
     t72._write_h5ad(obj, path)
     res.csv(obj.obs.groupby(["species", "cell_ontology_class"], observed=True).size().rename("n_nuclei").reset_index(),
