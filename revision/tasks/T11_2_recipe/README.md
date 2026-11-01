@@ -22,8 +22,13 @@ anchor where a law saturates or K = 5 lies outside the calibrated K = 2-4 range:
 
 ## Grid (7 configurations, s42; `grid.tsv`, array manifest `manifest.tsv`)
 
-All rows: `--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 42 --accelerator cpu`.
+All rows: `--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 42 --batch-key species --accelerator cpu`.
 Rows 1-6 add `--celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85`.
+
+batch_key = species, as in all canonical recipes (multi-batch-per-species fails, iter94).
+`obs['batch']` keeps the 16 sample-level batches for reference; it is not used in training.
+A first submission of this grid used the default `--batch-key batch` (sample level) and was
+cancelled before any run finished; no result from it is used.
 
 | grid_id | run | adv-weight | lambda-anchor | lambda-mmd | free-bits | clamp | role |
 |---|---|---|---|---|---|---|---|
