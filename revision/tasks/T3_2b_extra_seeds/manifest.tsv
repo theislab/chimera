@@ -1,0 +1,11 @@
+run_name	args
+rev-liv_hmouse-s47	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 47 --adv-weight 200 --free-bits 1.0
+rev-liv_hmouse-s48	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 48 --adv-weight 200 --free-bits 1.0
+rev-liv_hmouse-s49	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 49 --adv-weight 200 --free-bits 1.0
+rev-liv_hmouse-s50	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 50 --adv-weight 200 --free-bits 1.0
+rev-liv_hmouse-s51	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 51 --adv-weight 200 --free-bits 1.0
+rev-test_hmouse-s47	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 47 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s48	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 48 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s49	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 49 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s50	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 50 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-test_hmouse-s51	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 51 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
