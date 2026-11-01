@@ -1,0 +1,82 @@
+species	source_label	cell_type_harmonised	cell_ontology_class	cell_class	match	evidence_van_zyl_2020
+human	BeamCella	Beam cell A	trabecular meshwork cell	conventional outflow	human_type	human Beam Cell A
+human	BeamCellb	Beam cell B	trabecular meshwork cell	conventional outflow	human_type	human C8; Beam Cell B
+human	CribiformJCT	JCT	trabecular meshwork cell	conventional outflow	human_type	human cribriform/JCT
+human	ScEndo	Schlemm canal endothelium	canal endothelial cell	conventional outflow	human_type	human C15
+human	CollectorChnlAqVein	Collector channel endothelium	canal endothelial cell	conventional outflow	human_type	human C18, collector channel/aqueous vein
+human	SchwalbeLine	Schwalbe line	corneal endothelial cell	conventional outflow	human_type	human C16
+human	Fibroblast	Fibroblast	fibroblast	conventional outflow	human_type	human C9
+human	CornealEpi	Corneal epithelium	corneal epithelial cell	conventional outflow	human_type	human C7
+human	CiliaryMuscle	Ciliary muscle	ciliary muscle cell	uveoscleral outflow	human_type	human C1
+human	VascularEndo	Vascular endothelium	vascular endothelial cell	uveoscleral outflow	human_type	human C12
+human	Pericyte	Pericyte	pericyte	uveoscleral outflow	human_type	human pericyte
+human	Melanocyte	Melanocyte	melanocyte	uveoscleral outflow	human_type	human C6
+human	SchwannCell-my	Myelinating Schwann cell	Schwann cell	uveoscleral outflow	human_type	human C17
+human	SchwannCell-nmy	Nonmyelinating Schwann cell	Schwann cell	uveoscleral outflow	human_type	human C2
+human	Neuron	Neuron	neuron	uveoscleral outflow	human_type	human C19
+human	Macrophage	Macrophage	macrophage	immune	human_type	human C4
+human	MastCell	Mast cell	mast cell	immune	human_type	human C13
+human	NKT	NK/T cell	NK/T cell	immune	human_type	human NK/T
+human	BCell	B cell	B cell	immune	human_type	human C14
+macaca_fascicularis	BeamA	Beam cell A	trabecular meshwork cell	conventional outflow	mapped	mfC2 mapped to human Beam Cell A
+macaca_fascicularis	JCT	JCT	trabecular meshwork cell	conventional outflow	mapped	mfC6 shares more genes with human JCT
+macaca_fascicularis	Beam X	Beam X	trabecular meshwork cell	conventional outflow	species_specific	mfC15 Beam Cell X, no single human cluster
+macaca_fascicularis	SChlemm's Canal	Schlemm canal endothelium	canal endothelial cell	conventional outflow	mapped	mfC19 SC endothelium
+macaca_fascicularis	Collector channel	Collector channel endothelium	canal endothelial cell	conventional outflow	mapped	mfC14 collector channels
+macaca_fascicularis	Vascular	Vascular endothelium	vascular endothelial cell	uveoscleral outflow	mapped	mfC11 human capillary endothelium
+macaca_fascicularis	Fibroblast	Fibroblast	fibroblast	conventional outflow	mapped	mfC7 matrix fibroblasts
+macaca_fascicularis	Corneal epithelium	Corneal epithelium	corneal epithelial cell	conventional outflow	mapped	mfC1, mfC9, mfC17, mfC18
+macaca_fascicularis	Ciliary muscle	Ciliary muscle	ciliary muscle cell	uveoscleral outflow	mapped	mfC4 CM
+macaca_fascicularis	Pericyte	Pericyte	pericyte	uveoscleral outflow	mapped	mfC13, mfC16 pericytes
+macaca_fascicularis	Melanocyte	Melanocyte	melanocyte	uveoscleral outflow	mapped	mfC8, mfC12 melanocytes
+macaca_fascicularis	Schwann cell	Schwann cell (unresolved)	Schwann cell	uveoscleral outflow	class_only	mfC5 Schwann cells, myelination state not resolved
+macaca_fascicularis	Macrophage	Macrophage	macrophage	immune	mapped	mfC3
+macaca_fascicularis	NK/T cell	NK/T cell	NK/T cell	immune	mapped	mfC10
+macaca_fascicularis	B cell	B cell	B cell	immune	mapped	mfC20
+macaca_mulatta	Beam A	Beam cell A	trabecular meshwork cell	conventional outflow	mapped	mmC4 human Beam Cell A
+macaca_mulatta	JCT	JCT	trabecular meshwork cell	conventional outflow	mapped	mmC10 human JCT
+macaca_mulatta	Beam X	Beam X	trabecular meshwork cell	conventional outflow	species_specific	mmC1 Beam Cell X, no single human cluster
+macaca_mulatta	SChlemm's Canal	Schlemm canal endothelium	canal endothelial cell	conventional outflow	mapped	mmC7 1:1 to human SC
+macaca_mulatta	Endothelium	Vascular endothelium	vascular endothelial cell	uveoscleral outflow	mapped	mmC8 1:1 to human vascular endothelium
+macaca_mulatta	Ciliary muscle	Ciliary muscle	ciliary muscle cell	uveoscleral outflow	mapped	mmC2 CM
+macaca_mulatta	Pericyte	Pericyte	pericyte	uveoscleral outflow	mapped	mmC11, mmC12 pericytes
+macaca_mulatta	Melanocyte	Melanocyte	melanocyte	uveoscleral outflow	mapped	mmC9
+macaca_mulatta	Myelinating schwann cell	Myelinating Schwann cell	Schwann cell	uveoscleral outflow	mapped	mmC14
+macaca_mulatta	Nonmyelinating schwann cell	Nonmyelinating Schwann cell	Schwann cell	uveoscleral outflow	mapped	mmC5
+macaca_mulatta	Macrophage	Macrophage	macrophage	immune	mapped	mmC3, mmC15
+macaca_mulatta	NK/T	NK/T cell	NK/T cell	immune	mapped	mmC6
+macaca_mulatta	NK/T cell	NK/T cell	NK/T cell	immune	mapped	mmC13
+mouse	Beam A	Beam cell A	trabecular meshwork cell	conventional outflow	mapped	mC14 preferentially human Beam Cell A
+mouse	JCT	JCT	trabecular meshwork cell	conventional outflow	mapped	mC6 preferentially human JCT
+mouse	Beam Y	Beam Y	trabecular meshwork cell	conventional outflow	species_specific	mC9 Beam Cell Y, related to mC14
+mouse	SChlemm's Canal	Schlemm canal endothelium	canal endothelial cell	conventional outflow	mapped	mC19 SC endothelium
+mouse	Vascular Endothelium	Vascular endothelium	vascular endothelial cell	uveoscleral outflow	mapped	mC10 vascular endothelium
+mouse	Corneal endothelium	Corneal endothelium	corneal endothelial cell	conventional outflow	class_only	mC12 corneal endothelium/Schwalbe line; mostly corneal endothelium
+mouse	Corneal epithelium	Corneal epithelium	corneal epithelial cell	conventional outflow	mapped	mC5
+mouse	Corneal	Corneal cell (unresolved)	corneal cell, unresolved	other	species_specific	mC13, not mapped in the paper
+mouse	Ciliary muscle	Ciliary muscle	ciliary muscle cell	uveoscleral outflow	mapped	mC17 smooth muscle
+mouse	Pericyte	Pericyte	pericyte	uveoscleral outflow	mapped	mC8
+mouse	Melanocyte	Melanocyte	melanocyte	uveoscleral outflow	mapped	mC2 uveal melanocytes
+mouse	Schwann cell	Schwann cell (unresolved)	Schwann cell	uveoscleral outflow	class_only	mC18 Schwann cells, myelination state not resolved
+mouse	Macrophage	Macrophage	macrophage	immune	mapped	mC4
+mouse	NK/T cell	NK/T cell	NK/T cell	immune	mapped	mC16
+mouse	B cell	B cell	B cell	immune	mapped	mC20
+mouse	Uveal	Uveal cell	uveal cell	other	species_specific	mC1, no human counterpart named
+mouse	Pigmented ciliary epithelium	Pigmented ciliary epithelium	ciliary body epithelial cell	other	species_specific	mC3
+mouse	Nonpigmented ciliary epithelium	Nonpigmented ciliary epithelium	ciliary body epithelial cell	other	species_specific	mC7 NPCE
+mouse	Pigmented epithelium	Pigmented epithelium	ciliary body epithelial cell	other	species_specific	mC11 PE
+mouse	Myoepithelium	Myoepithelium	myoepithelial cell	other	species_specific	mC15
+pig	Beam A	Beam cell A	trabecular meshwork cell	conventional outflow	mapped	ssC1 human Beam Cell A
+pig	JCT	JCT	trabecular meshwork cell	conventional outflow	mapped	ssC3 human JCT
+pig	SChlemm's Canal	Schlemm canal endothelium	canal endothelial cell	conventional outflow	mapped	ssC14 human SC
+pig	Collector channel	Collector channel endothelium	canal endothelial cell	conventional outflow	mapped	metafile label of cluster 12; the paper text calls ssC12 capillary endothelium
+pig	Corneal endothelium	Corneal endothelium	corneal endothelial cell	conventional outflow	class_only	ssC17 corneal endothelium, corresponds to human Schwalbe line
+pig	Fibroblast	Fibroblast	fibroblast	conventional outflow	mapped	ssC6
+pig	Corneal epithelium	Corneal epithelium	corneal epithelial cell	conventional outflow	mapped	ssC2, 5, 7-9 ocular surface epithelium
+pig	Ciliary muscle	Ciliary muscle	ciliary muscle cell	uveoscleral outflow	mapped	ssC16 CM
+pig	Pericyte	Pericyte	pericyte	uveoscleral outflow	mapped	ssC11
+pig	Melanocyte	Melanocyte	melanocyte	uveoscleral outflow	mapped	ssC15
+pig	Myelinating schwann cell	Myelinating Schwann cell	Schwann cell	uveoscleral outflow	mapped	ssC18
+pig	Nonmyelinating schwann cell	Nonmyelinating Schwann cell	Schwann cell	uveoscleral outflow	mapped	ssC13
+pig	Macrophage	Macrophage	macrophage	immune	mapped	ssC4
+pig	NK/T cell	NK/T cell	NK/T cell	immune	mapped	ssC10

@@ -41,6 +41,20 @@ H5ADS = {
     "test_3sp": "camex_testis_unified",
 }
 
+# Cohorts rebuilt during the revision live outside data/processed/; full paths, so code
+# that iterates H5ADS under DATA_PROCESSED never reads the superseded processed object.
+REVISION_H5ADS = {
+    "van_zyl": REPO_ROOT / "data" / "revision" / "van_zyl" / "van_zyl_unified.h5ad",
+}
+
+
+def h5ad_path(cohort: str) -> Path:
+    """Training h5ad for ``cohort``: the rebuilt object for revision cohorts, else data/processed/."""
+    if cohort in REVISION_H5ADS:
+        return REVISION_H5ADS[cohort]
+    return DATA_PROCESSED / f"{H5ADS[cohort]}.h5ad"
+
+
 _cache: dict = {}
 
 
