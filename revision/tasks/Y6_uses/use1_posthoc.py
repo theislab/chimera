@@ -137,13 +137,16 @@ def main():
                       T_retro_zero=x[zero].T_retro.mean(), T_retro_nonzero=x[~zero].T_retro.mean()))
     pd.DataFrame(z).to_csv(OUT / "posthoc_zero.csv", index=False)
     # Gold reading with and without the macaque zeros (testis H+Macaque; G_H4, C_pat + H4_nsp).
-    g = CM.load("test_hmac").copy() if (XR is not None and (RU.RES / "X4/genes/test_hmac.parquet").exists()) else None
     rr = []
+    base3 = pd.read_parquet(RU.RES / "X4/genes/test_3sp.parquet")
     for fit, lab in (("test_hmac", "Macaque"), ("test_3sp", "Macaque")):
-        path = RU.RES / f"X4/genes/{fit}.parquet"
-        if not path.exists():
-            continue
-        g = pd.read_parquet(path)
+        if fit == "test_3sp":
+            g = base3.copy()
+        else:
+            h = pd.read_parquet(RU.RES / "H1/genes/test_hmac.parquet")
+            h = h.assign(var_name=h.index).rename(columns={"S_ema": "S"})[["hsapiens_gene_id", "var_name", "S", "D"]]
+            keep = ["hsapiens_gene_id", "G_H4", "H4_nsp", "block"] + XR.C_PAT
+            g = h.merge(base3[keep], on="hsapiens_gene_id", how="inner")
         x = d[(d.fit == fit) & (d.species_label == lab)].set_index("var_name")
         g["mac_zero"] = g.var_name.map(x.det_s.eq(0))
         unmask = np.abs(g.S.to_numpy()) >= 1e-6
