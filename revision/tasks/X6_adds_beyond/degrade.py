@@ -113,23 +113,26 @@ def leiden_matched(X, spc: np.ndarray, lab_true: np.ndarray, c: str):
     A = (A - A.mean(1, keepdims=True)) / A.std(1, keepdims=True)
     B = (B - B.mean(1, keepdims=True)) / B.std(1, keepdims=True)
     R = A @ B.T / len(M)
-    pairs = []
-    for i in range(len(hn)):
-        j = int(R[i].argmax())
-        if int(R[:, j].argmax()) == i and R[i, j] >= P["r_min"]:
-            pairs.append((hn[i], mn[j], float(R[i, j])))
-    out = cl.copy()
-    for k, (h, m_, r) in enumerate(pairs):
-        out[cl == h] = f"P{k:02d}"
-        out[cl == m_] = f"P{k:02d}"
     inf = pd.DataFrame(info)
-    pair_of = {h: (f"P{k:02d}", r) for k, (h, m_, r) in enumerate(pairs)} | {m_: (f"P{k:02d}", r) for k, (h, m_, r) in enumerate(pairs)}
-    inf["pair"] = inf.cluster.map(lambda v: pair_of.get(v, (None, np.nan))[0])
-    inf["r"] = inf.cluster.map(lambda v: pair_of.get(v, (None, np.nan))[1])
     inf["best_r"] = [float(R[hn.index(v)].max()) if v in hn else float(R[:, mn.index(v)].max()) for v in inf.cluster]
     inf["n_markers_union"] = len(M)
     inf.insert(0, "cohort", c)
-    return out.astype(str), inf
+    outs = {}
+    for cond, r_min in RU.LEIDEN_RMIN.items():
+        pairs = []
+        for i in range(len(hn)):
+            j = int(R[i].argmax())
+            if int(R[:, j].argmax()) == i and R[i, j] >= r_min:
+                pairs.append((hn[i], mn[j], float(R[i, j])))
+        out = cl.copy()
+        for k, (h, m_, r) in enumerate(pairs):
+            out[cl == h] = f"P{k:02d}"
+            out[cl == m_] = f"P{k:02d}"
+        pair_of = {h: (f"P{k:02d}", r) for k, (h, m_, r) in enumerate(pairs)} | {m_: (f"P{k:02d}", r) for k, (h, m_, r) in enumerate(pairs)}
+        inf[f"pair_{cond}"] = inf.cluster.map(lambda v: pair_of.get(v, (None, np.nan))[0])
+        inf[f"r_{cond}"] = inf.cluster.map(lambda v: pair_of.get(v, (None, np.nan))[1])
+        outs[cond] = out.astype(str)
+    return outs, inf
 
 
 def specificity_cos(x: dict, f: dict, species: list[str], n: int) -> np.ndarray:
@@ -207,7 +210,8 @@ def run(c: str):
     lab0 = base_labels(c, a)
     labs = {"full": lab0, "coarse3": pd.Series(lab0).map(RU.COARSE3[c]).to_numpy()}
     assert not pd.isna(labs["coarse3"]).any()
-    labs["leiden"], match = leiden_matched(X, spc, lab0, c)
+    lm, match = leiden_matched(X, spc, lab0, c)
+    labs.update(lm)
     for k, q in RU.NOISE.items():
         for r in range(RU.NOISE_REPS):
             labs[f"{k}_r{r}"] = noisy(lab0, spc, q, useed(c, k, r))
@@ -219,7 +223,7 @@ def run(c: str):
     cols, metas = {}, []
     n = a.n_vars
     for cond in RU.conditions():
-        mc = RU.MIN_CELLS["noise" if cond.startswith("noise") else cond]
+        mc = RU.MIN_CELLS["noise" if cond.startswith("noise") else "leiden" if cond.startswith("leiden") else cond]
         sc_, meta = scores(X, spc, labs[cond], library, mc, n)
         metas.append(dict(cohort=c, condition=cond, min_cells=mc, **meta,
                           **{f"n_{k}": int(np.isfinite(v).sum()) for k, v in sc_.items()}))

@@ -56,6 +56,9 @@ groups, 20 for Leiden clusters (T4.2's cluster rule).
                replacement, gets a different label drawn from the other types present in that species
                with probability proportional to their abundance (exactly q wrong). Three replicates
                (r0, r1, r2). Testis noise acts on the coarse-map labels.
+    leiden_r02 : sensitivity, the same clusters and matching with r >= 0.2. Added 2026-11-02 after reading
+               the testis match table (spermatid and Sertoli clusters reached best r 0.19-0.30 and stayed
+               unmatched at 0.3) and before any degradation association was computed; no gold was read.
 Universe U_deg per gold: genes with gold, covariates, D, S, B1z_raw and every condition's B1b_raw,
 B1c_raw, B2b, Sdir defined. Own-universe values are a sensitivity analysis.
 Scores on U_deg: rho_p given C* (the head-to-head estimand) of D, S, B1z (label-free on liver; testis
@@ -93,6 +96,7 @@ COARSE3 = {
     "test_hmouse": {"SG": "germ_early", "SC": "germ_early", "rSD": "germ_late", "eSD": "germ_late",
                     "Sertoli": "somatic", "Other_somatic": "somatic"},
 }
+LEIDEN_RMIN = {"leiden": 0.3, "leiden_r02": 0.2}
 LEIDEN = dict(n_top_genes=2000, n_pcs=30, n_neighbors=15, resolution=1.0, seed=0, min_cells=20,
               n_markers=50, marker_det=0.10, r_min=0.3)
 NOISE = {"noise10": 0.10, "noise25": 0.25}
@@ -102,7 +106,7 @@ DEG_SCORES = ["B1b_raw", "B1c_raw", "B2b", "Sdir"]
 
 
 def conditions() -> list[str]:
-    out = ["full", "coarse3", "leiden"]
+    out = ["full", "coarse3", "leiden", "leiden_r02"]
     for k in NOISE:
         out += [f"{k}_r{r}" for r in range(NOISE_REPS)]
     return out
