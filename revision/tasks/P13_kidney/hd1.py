@@ -183,6 +183,8 @@ def main() -> int:
             loo = DE / "loo" / f"loo_{t}.tsv"
             if loo.exists():
                 for _, r in pd.read_csv(loo, sep="\t").iterrows():
+                    if not isinstance(r["file"], str) or not r["file"]:
+                        continue
                     f = DE / "loo" / r["file"]
                     if r["species"] == "human":
                         jobs.append((t, f"loo_human|{r['left_out']}", f, DE / f"mouse_primary_{t}.tsv"))

@@ -186,7 +186,13 @@ def run_loo(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int) -> None:
             if n.get("control", 0) < 2 or n.get("disease", 0) < 2:
                 continue
             safe = u.replace("|", "_").replace(" ", "").replace("'", "")
-            r, design = fit(s, covs, n_cpus, adaptive=False)
+            try:
+                r, design = fit(s, covs, n_cpus, adaptive=False)
+            except np.linalg.LinAlgError as e:  # leaving this unit out makes the design singular
+                rows.append(dict(cell_type=t, species=species, left_out=u, file="", design=f"failed: {e}",
+                                 n_units=int(s.n_obs)))
+                log.info("%s %s leave out %s: singular design, skipped", t, species, u)
+                continue
             r.to_csv(out / f"{species}_loo_{safe}_{t}.tsv", sep="\t", index=False)
             rows.append(dict(cell_type=t, species=species, left_out=u, file=f"{species}_loo_{safe}_{t}.tsv",
                              design=design, n_units=int(s.n_obs)))
