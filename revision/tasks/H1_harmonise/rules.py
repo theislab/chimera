@@ -16,8 +16,9 @@ Per-gene readouts, one schema (tables.py):
   S_ema       mean S_g_ema over kept seeds;
   count_support  |S_ema| >= 1e-6 (X4, Z1);
   strict_support count_support, |S_ema| >= cohort median over supported genes, sign(S_ema) = sign(D), sign of S_g_ema and of
-              alpha_seed - pi_clamped - seed median stable over every kept seed;  named genes need strict_support and no
-              saturated seed (alpha > 0.95 in any seed flags the gene);
+              alpha_seed - pi_clamped - seed median stable over every kept seed;  named genes need strict_support. Saturated genes (alpha > 0.95 in any
+              seed) are flagged and may be named. Amendment, after the first gene lists: the first rule also excluded saturated genes, which on clamped recipes removes the
+              whole upper tail near the ceiling (pi_clamped 0.85 + 0.10), including most lineage genes; their sign is backed by counts, only their rank among themselves is capped;
   expr, detection  species-balanced mean log1p CP10K and detection on the training object (cohorts.gene_covariates).
 
 Sign. Compared across cohorts only after centring, and in the set analysis only against genes matched on the prior and on
@@ -38,7 +39,11 @@ Readouts beside D: S_ema (count evidence, no features), B1 (pseudobulk profile c
 baseline). D_raw and all-gene universes are sensitivities. Because every fit's GIN reads the same ESM coordinates, recurrence on D may
 come from protein features; recurrence on S_ema does not. Both are reported.
 
-Separate axis (axis.py), per cohort: Spearman of D with pi_raw and with log10 dN/dS (Compara human-mouse, T4.3 gold table), on all genes
+Post hoc sensitivities, added after 48 of 72 sets recurred on D and the sequence baselines recurred about as often, which says the gene-level null is a low bar for coherent sets: (i) D_tau, S_tau: strata
+also on cell-type specificity tau (5 bins), since the margin rewards having a pattern; (ii) D_block, S_block: a null that keeps ESM-module structure (block_scores, 2,000 draws) on values centred within strata. The main-figure list
+is the primary rule; survival under (i) and (ii) is shown beside it.
+
+Separate axis (recurrence.axis_table), per cohort: Spearman of D with pi_raw and with log10 dN/dS (Compara human-mouse, T4.3 gold table), on all genes
 and on count-supported genes; the same for S_ema and D_raw; rho(pi_raw, dN/dS) as the reference; partial rho(D, dN/dS | pi_raw, expr, detection).
 
 Main thread. Human and mouse are in common in every tissue, so the six-tissue reading uses the H+Mouse fit of each tissue; bone marrow
@@ -50,11 +55,14 @@ looked at for "what the tissue adds", not which are significant. Only strict-sup
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 from revision.common import gene_ids
 
 REPO = gene_ids.REPO_ROOT
 RES = REPO / "results" / "revision"
-OUT = RES / "H1"
+OUT = Path(os.environ.get("H1_OUT", RES / "H1"))  # H1_OUT: dry runs only
 RUNS = REPO / "training" / "runs"
 SEED = 20261102
 MASK_EPS = 1e-6
@@ -148,11 +156,9 @@ LINEAGE = {
 
 def load_extra():
     """Register H+Pig and H+M. fascicularis seeds from extra_runs.tsv when present (cohort, seed, run)."""
-    from pathlib import Path
-
     import pandas as pd
 
-    f = Path(__file__).resolve().parent / "extra_runs.tsv"
+    f = Path(os.environ.get("H1_EXTRA", Path(__file__).resolve().parent / "extra_runs.tsv"))
     out = dict(COHORTS)
     if f.exists():
         t = pd.read_csv(f, sep="\t")

@@ -88,12 +88,35 @@ def inv_norm_rank(v: np.ndarray) -> np.ndarray:
     return norm.ppf((r - 0.5) / len(r))
 
 
-def strata(g: pd.DataFrame, with_pi: bool, pi_col: str = "pi_raw") -> np.ndarray:
+def strata(g: pd.DataFrame, with_pi: bool, pi_col: str = "pi_raw", with_tau: bool = False) -> np.ndarray:
     e = pd.qcut(g.expr.rank(method="first"), RU.EXPR_BINS, labels=False).to_numpy()
     if not with_pi:
         return e
     p = pd.Series(pd.qcut(g[pi_col].rank(method="average"), RU.PI_BINS, labels=False, duplicates="drop")).fillna(0).to_numpy().astype(int)
-    return e * 100 + p
+    out = e * 100 + p
+    if with_tau:  # post hoc sensitivity: also matched on cell-type specificity, because the margin rewards having a pattern
+        tq = pd.Series(pd.qcut(g.tau.fillna(g.tau.median()).rank(method="first"), RU.PI_BINS, labels=False)).to_numpy().astype(int)
+        out = out * 10 + tq
+    return out
+
+
+def block_scores(res: np.ndarray, blocks: np.ndarray, M: sp.csr_matrix, n: int, rng) -> np.ndarray:
+    """Post hoc null respecting protein neighbourhoods: genes ordered by ESM module, module order shuffled, values laid back over the same gene slots.
+    Keeps most of the within-module correlation that a gene-level permutation breaks. res = values minus their stratum mean."""
+    order = np.argsort(blocks, kind="stable")
+    b = blocks[order]
+    x = res[order]
+    starts = np.r_[0, np.flatnonzero(np.diff(b)) + 1]
+    ends = np.r_[starts[1:], len(b)]
+    sizes = np.asarray(M.sum(1)).ravel()
+    out = np.empty((n, M.shape[0]), dtype=np.float32)
+    for i in range(n):
+        pm = rng.permutation(len(starts))
+        y = np.concatenate([x[starts[j]:ends[j]] for j in pm])
+        val = np.empty(len(x), dtype=np.float32)
+        val[order] = y
+        out[i] = (M @ val) / np.maximum(sizes, 1)
+    return out
 
 
 def perm_scores(v: np.ndarray, st: np.ndarray, M: sp.csr_matrix, n: int, rng, batch: int = 200) -> np.ndarray:
@@ -121,7 +144,7 @@ def one(args):
     """Set z for one cohort x readout. Returns long table and the null z matrix (for the primaries)."""
     c, readout, membership, n_perm = args
     g = pd.read_parquet(OUT / "genes" / f"{c}.parquet").dropna(subset=["hsapiens_gene_id"]).drop_duplicates("hsapiens_gene_id")
-    col = {"D": "D", "D_allgenes": "D", "D_raw": "D_raw", "D_hmid": "D", "S": "S_ema", "B1": "B1", "pi": "pi_raw", "dNdS": "dNdS", "D_integrated": None}[readout]
+    col = {"D": "D", "D_allgenes": "D", "D_raw": "D_raw", "D_hmid": "D", "S": "S_ema", "B1": "B1", "pi": "pi_raw", "dNdS": "dNdS", "D_integrated": None, "D_tau": "D", "S_tau": "S_ema", "D_block": "D", "S_block": "S_ema"}[readout]
     if readout == "D_integrated":
         keep = [f"alpha_s{s}" for s in (42, 43, 44, 47, 48, 51) if f"alpha_s{s}" in g]
         x = g[keep].mean(1) - g["pi_clamped"]
@@ -133,7 +156,7 @@ def one(args):
     u = u.dropna(subset=[col, "expr"])
     if readout == "D_hmid":
         u = u.dropna(subset=["identity_human_mouse"])
-    st = strata(u, readout not in ("pi", "dNdS"), "identity_human_mouse" if readout == "D_hmid" else "pi_raw")
+    st = strata(u, readout not in ("pi", "dNdS"), "identity_human_mouse" if readout == "D_hmid" else "pi_raw", with_tau=readout.endswith("_tau"))
     v = inv_norm_rank(u[col].to_numpy(float))
     ix = pd.Index(u.hsapiens_gene_id)
     sets = sorted(membership.key.unique())
@@ -142,8 +165,17 @@ def one(args):
     M = sp.csr_matrix((np.ones(len(mm), np.float32), (mm.key.map(si).to_numpy(), ix.get_indexer(mm.hsapiens_gene_id))), shape=(len(sets), len(ix)))
     sizes = np.asarray(M.sum(1)).ravel()
     rng = np.random.default_rng([RU.SEED, sum(map(ord, c)) * 1000 + sum(map(ord, readout))])
-    obs = np.asarray(M @ v).ravel() / np.maximum(sizes, 1)
-    null = perm_scores(v.astype(np.float32), st, M, n_perm, rng)
+    if readout.endswith("_block"):
+        v = (v - pd.Series(v).groupby(st).transform("mean").to_numpy()).astype(np.float32)
+        tissue = RU.cohorts()[c]["tissue"].replace(" ", "_")
+        tb = pd.read_parquet(RU.RES / "Y1" / "cache" / f"tissue__{ {'eye': 'eye'}.get(tissue, tissue) }.parquet")
+        blk = pd.Series(tb.block.to_numpy(), index=tb.hsapiens_gene_id).groupby(level=0).first().reindex(ix)
+        codes = pd.factorize(blk.fillna(-1).astype(str))[0]
+        obs = np.asarray(M @ v).ravel() / np.maximum(sizes, 1)
+        null = block_scores(v, codes, M, n_perm, rng)
+    else:
+        obs = np.asarray(M @ v).ravel() / np.maximum(sizes, 1)
+        null = perm_scores(v.astype(np.float32), st, M, n_perm, rng)
     mu, sd = null.mean(0), null.std(0, ddof=1)
     sd = np.where(sd > 0, sd, np.nan)
     z = (obs - mu) / sd
@@ -252,6 +284,8 @@ def main() -> int:
     primary = [RU.PRIMARY[t] for t in RU.TISSUE_ORDER]
     jobs = [(c, r, mem, a.n_perm) for c in primary for r in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid")]
     jobs += [("liv_hmouse", "D_integrated", mem, a.n_perm)]
+    jobs += [(c, r, mem, a.n_perm) for c in primary for r in ("D_tau", "S_tau")]
+    jobs += [(c, r, mem, 2000) for c in primary for r in ("D_block", "S_block")]
     jobs += [(c, r, mem, 2000) for c in cohorts if c not in primary for r in ("D", "S")]
     with ProcessPoolExecutor(a.jobs) as ex:
         res = list(ex.map(one, jobs))
@@ -260,7 +294,7 @@ def main() -> int:
     idx = {(j[0], j[1]): i for i, j in enumerate(jobs)}
     fam = {k: k.split("|")[0] for k in mem.key.unique()}
     allrec, allts = [], []
-    tests = {"D": "D", "S": "S", "B1": "B1", "pi": "pi", "dNdS": "dNdS", "D_allgenes": "D_allgenes", "D_raw": "D_raw", "D_hmid": "D_hmid"}
+    tests = {k: k for k in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid", "D_tau", "S_tau", "D_block", "S_block")}
     sets_all = res[0][2]
     keep = [s for s in sets_all if not s.startswith("lineage|")]
     ki = [sets_all.index(s) for s in keep]
@@ -282,7 +316,13 @@ def main() -> int:
     lz = long[long.key.str.startswith("lineage|")].copy()
     lz.to_csv(OUT / "lineage_z.csv", index=False)
     axis_table(cohorts).to_csv(OUT / "axis.csv", index=False)
-    print(pd.concat(allrec).groupby("readout").recurrent.sum())
+    rec = pd.concat(allrec, ignore_index=True)
+    piv = rec.pivot(index="key", columns="readout", values="mean_z")
+    sa = [dict(a="D", b=b, spearman_over_sets=float(spearmanr(piv["D"], piv[b], nan_policy="omit")[0])) for b in ("S", "B1", "pi", "dNdS", "D_tau", "D_block", "D_raw", "D_allgenes", "D_hmid")]
+    sa += [dict(a="pi", b="dNdS", spearman_over_sets=float(spearmanr(piv["pi"], piv["dNdS"], nan_policy="omit")[0])), dict(a="S", b="B1", spearman_over_sets=float(spearmanr(piv["S"], piv["B1"], nan_policy="omit")[0]))]
+    pd.DataFrame(sa).to_csv(OUT / "set_axis.csv", index=False)
+    print(pd.DataFrame(sa).round(3).to_string())
+    print(rec.groupby("readout").recurrent.sum())
     return 0
 
 

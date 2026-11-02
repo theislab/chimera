@@ -303,6 +303,21 @@ def cross_table_identity(cohorts: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def within_tissue_agreement(cohorts: dict) -> pd.DataFrame:
+    """Species sets of one tissue on shared genes: agreement of D and of S_ema, Spearman."""
+    rows = []
+    tabs = {c: pd.read_parquet(GENES / f"{c}.parquet").dropna(subset=["hsapiens_gene_id"]).drop_duplicates("hsapiens_gene_id").set_index("hsapiens_gene_id") for c in cohorts}
+    for a_, b_ in itertools.combinations(cohorts, 2):
+        if cohorts[a_]["tissue"] != cohorts[b_]["tissue"]:
+            continue
+        A, B = tabs[a_], tabs[b_]
+        ix = A.index.intersection(B.index)
+        sup = A.loc[ix, "count_support"] & B.loc[ix, "count_support"]
+        rows.append(dict(tissue=cohorts[a_]["tissue"], a=a_, b=b_, n=len(ix), n_support_both=int(sup.sum()), rho_D=float(spearmanr(A.loc[ix, "D"], B.loc[ix, "D"])[0]),
+                         rho_D_support=float(spearmanr(A.loc[ix, "D"][sup], B.loc[ix, "D"][sup])[0]), rho_S_support=float(spearmanr(A.loc[ix, "S_ema"][sup], B.loc[ix, "S_ema"][sup])[0])))
+    return pd.DataFrame(rows)
+
+
 def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audit: pd.DataFrame, cohorts: dict) -> pd.DataFrame:
     rows = []
     for c, d in cohorts.items():
@@ -316,6 +331,7 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
         z, i = z1[z1.cohort == c], integ[integ.cohort == c]
         un = g.count_support.to_numpy()
         tail = g[g.delta_alpha.abs() > RU.TAIL]
+        ok = g.count_support & (np.sign(g.S_ema) == np.sign(g.delta_alpha)) & (g.S_ema.abs() >= np.median(g.S_ema.abs()[un]))
         rows.append(dict(
             cohort=c, tissue=d["tissue"], label=d["label"], role=d["role"], species=d["species"], n_species=int(aud.n_species), cells=int(aud.n_cells), genes=int(aud.n_genes),
             source_datasets=SOURCES[d["tissue"]], cell_types=int(aud.n_cell_types), cell_types_all_species=int(aud.n_cell_types_all_species), recipe_source=RECIPE_SOURCE[c],
@@ -327,6 +343,9 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
             tail_up_D=float((g.D > RU.TAIL).mean()), tail_dn_D=float((g.D < -RU.TAIL).mean()), tail_up_Draw=float((g.D_raw > RU.TAIL).mean()), tail_dn_Draw=float((g.D_raw < -RU.TAIL).mean()),
             tail_up_raw_uncentred=float(kept.tail_up_raw.mean()), tail_dn_raw_uncentred=float(kept.tail_dn_raw.mean()),
             tail_margin_support=float(((np.sign(tail.S_ema) == np.sign(tail.delta_alpha)) & (tail.S_ema.abs() >= np.median(g.S_ema.abs()[un])) & tail.count_support).mean()),
+            margin_support_up=float(ok[g.delta_alpha > RU.TAIL].mean()), margin_support_down=float(ok[g.delta_alpha < -RU.TAIL].mean()) if (g.delta_alpha < -RU.TAIL).any() else np.nan,
+            n_tail_up_anchored=int((g.delta_alpha > RU.TAIL).sum()), n_tail_down_anchored=int((g.delta_alpha < -RU.TAIL).sum()), frac_S_pos=float((g.S_ema[un] > 0).mean()),
+            frac_at_clamp=float((g.pi_raw >= g.pi_clamped.max() - 1e-6).mean()),
             rho_DS_z1=float(z.rho_DS.mean()), rho_DS_z1_min=float(z.rho_DS.min()), rho_DS_z1_max=float(z.rho_DS.max()), rho_DS_partial_z1=float(z.rho_DS_partial.mean()),
             rho_DS_consensus=float(spearmanr(g.D[un], g.S_ema[un])[0]),
             mixing_entropy=float(i.knn_mixing_entropy.mean()), mixing_entropy_random=ref["entropy_random"], mixing_ratio=float(i.knn_mixing_entropy.mean() / ref["entropy_random"]),
@@ -367,6 +386,7 @@ def main() -> int:
     z1 = z1_rows(kept)
     z1.to_csv(OUT / "z1_rows.csv", index=False)
     cross_table_identity(cohorts).to_csv(OUT / "identity_cross_cohort.csv", index=False)
+    within_tissue_agreement(cohorts).to_csv(OUT / "within_tissue_models.csv", index=False)
     t = cohort_table(runs, integ, z1, audit, cohorts)
     t.to_csv(OUT / "cohort_table.csv", index=False)
     all_g = pd.concat([pd.read_parquet(GENES / f"{c}.parquet").drop(columns=[k for k in pd.read_parquet(GENES / f"{c}.parquet").columns if k.startswith(("alpha_s", "detection_"))] ) for c in cohorts])
