@@ -68,7 +68,8 @@ def chimera_part(res, st, a, X, spc, library, run, cohort, setting, direct: bool
              sat_lo=float((st["alpha"] < 0.05).mean()), frac_S_zero=float((np.abs(st["S_g_ema"]) < 1e-6).mean()),
              rho_D_S=float(res["D"].corr(res["S_g"], method="spearman")),
              lib_median={s: float(np.median(np.asarray(X[spc == s].sum(1)).ravel())) for s in species}, n_cells=int(a.n_obs))
-    h.update(SR.species_mixing(z, spc))
+    if fin:
+        h.update(SR.species_mixing(z, spc))
     try:
         s = json.loads((run_dir / "summary.json").read_text())
         h["adv_acc_final"] = s["key_metrics"].get("adv_acc_final")
