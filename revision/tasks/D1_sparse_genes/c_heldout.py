@@ -86,6 +86,8 @@ def ceiling(c, t, rows):
 def score_set(c, fold, t, setn, rows, used):
     out = []
     preds = [k for k in ("D_P", "D_E", "D_E0", "Rh_D", "Rh_S", "Rh_Sdir", "Rh_B1", "kNNh_D", "kNNh_S", "kNNh_Sdir", "kNNh_B1", "Parah_S", "pi") if k in t]
+    if setn == "trained_unmasked":  # reference only: the same fit on genes it read
+        preds = [k for k in ("D_P", "D_E") if k in t]
     ref = "D_P" if "D_P" in t else "D_E"
     lab = dict(cohort=c, fold=fold, set=setn, n_seeds_P=sum(1 for u in used if "_P-" in u["run"]))
     tg = [(x, x, list(RU.COV_C), "measured") for x in TARGETS] + [(gold, gold, covs, kind) for kind, gold, covs in CM.golds(c)]
