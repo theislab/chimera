@@ -127,7 +127,8 @@ def queue(path):
     order = {"fit": 0, "CAMEX": 1, "GeneSpectra": 2, "CACIMAR": 3, "integration": 4, "SATURN": 5}
     t["o"] = t["kind"].map(order)
     t = t[t.line != ""].sort_values(["tier", "o"], kind="stable")
-    t = t[~t.output.map(lambda p: bool(p) and (RU.RES / p).exists())]
+    single = t["kind"].isin(["fit", "SATURN"])  # a bundle stays: it skips what exists
+    t = t[~(single & t.output.map(lambda p: bool(p) and (RU.RES / p).exists()))]
     pd.Series(t.line.drop_duplicates()).to_csv(path, index=False, header=False, quoting=3, sep="\t")
     print(t.groupby("tier").size().to_dict())
 
