@@ -88,14 +88,14 @@ def panel_trade():
     t = t[t.cohort == "liv_hmouse"]
     b = t[t.level == "base"].iloc[0]
     fig, axs = plt.subplots(1, 3, figsize=(5.2, 1.75), sharey=True)
-    for ax, x, xl in zip(axs, ["mix", "rho_DS", "rho_D_consensus"], ["Mixing entropy", r"$\rho(\Delta\alpha, S_{ema})$", r"$\rho(\Delta\alpha$, canonical consensus)"]):
+    for ax, x, xl in zip(axs, ["mixing", "rho_DS", "rho_D_consensus"], ["Mixing entropy", r"$\rho(\Delta\alpha, S_{ema})$", r"$\rho(\Delta\alpha$, canonical consensus)"]):
         ax.axvline(b[x], color=GRID, lw=0.7, zorder=0)
-        ax.axhline(b.rself, color=GRID, lw=0.7, zorder=0)
-        ax.scatter(b[x], b.rself, s=26, color=CH, marker="*", zorder=4, label="canonical recipe" if ax is axs[0] else None)
+        ax.axhline(b.hep_rho_self, color=GRID, lw=0.7, zorder=0)
+        ax.scatter(b[x], b.hep_rho_self, s=26, color=CH, marker="*", zorder=4, label="canonical recipe" if ax is axs[0] else None)
         for g, lv in GROUPS.items():
             q = t[t.level.isin(lv)]
             col, mk = GC[g]
-            ax.scatter(q[x], q.rself, s=11, color=col, marker=mk, edgecolor="white", linewidth=0.3, zorder=3, label=g if ax is axs[0] else None)
+            ax.scatter(q[x], q.hep_rho_self, s=11, color=col, marker=mk, edgecolor="white", linewidth=0.3, zorder=3, label=g if ax is axs[0] else None)
         ax.set_xlabel(xl)
     axs[0].set_ylabel(r"Hepatocyte zone $\rho_{self}$")
     axs[0].legend(loc="upper left", bbox_to_anchor=(0.0, 1.08), handletextpad=0.1, fontsize=5.5, labelspacing=0.25)

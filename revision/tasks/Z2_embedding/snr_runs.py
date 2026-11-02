@@ -12,7 +12,7 @@ fac = pd.read_csv(RU.REPO / "revision/tasks/Z2_embedding/factorial.tsv", sep="\t
 rows = old.to_dict("records")
 patched = None
 for r in fac.itertuples():
-    if r.run in set(old.run) or not (RU.RUNS / r.run / "summary.json").exists() :
+    if r.input != "raw" or r.run in set(old.run) or not (RU.RUNS / r.run / "summary.json").exists() :
         continue
     from revision.tasks.Z2_embedding.train_patched import apply_patch as _ap
     post = S.chimera_post(r.cohort, r.run)

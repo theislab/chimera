@@ -136,5 +136,91 @@ def main():
         print(t.sort_values(["level", "run"]).drop(columns=["run"]).round(3).to_string())
 
 
+
+
+def levels(c: str) -> pd.DataFrame:
+    """Level means over seeds that pass the Z1 health rule; unhealthy seeds counted and left out (discarded, amendment rule)."""
+    f = RU.OUT / f"factorial_seeds_{c}.csv"
+    t = pd.read_csv(f)
+    t["healthy"] = t.healthy.fillna(False).astype(bool)
+    num = [x for x in t.columns if x not in ("run", "level", "healthy") and t[x].dtype != object]
+    g = t[t.healthy].groupby("level")
+    out = g[num].mean()
+    out.insert(0, "n_healthy", g.size())
+    out.insert(1, "n_runs", t.groupby("level").size())
+    out = out.reindex(t.level.unique()).reset_index()
+    for k, m in (("rself_min", "hep_rho_self"), ("rself_max", "hep_rho_self"), ("held_min", "tms_auroc"), ("held_max", "tms_auroc")):
+        if m in t:
+            out[k] = out.level.map(getattr(t[t.healthy].groupby("level")[m], k.split("_")[1])())
+    out.insert(0, "cohort", c)
+    return out
+
+
+def decide() -> pd.DataFrame:
+    L = levels("liv_hmouse")
+    TH, loo = RU.THRESH, pd.read_csv(RU.OUT / "reading_loo.csv")
+    b = L[L.level == "base"].iloc[0]
+    med = loo[loo.cohort == "liv_hmouse"].rho_loo.median()
+    d = L.assign(p_healthy=L.n_healthy >= TH["min_healthy"], p_tms=L.tms_auroc >= b.tms_auroc + TH["gain_liver_tms_auroc"], p_self=L.hep_rho_self >= b.hep_rho_self + TH["gain_liver_rho_self"],
+                 p_mix=L.mixing >= TH["mix_ratio"] * b.mixing, p_lt=L.label_transfer >= b.label_transfer - TH["max_loss_label_transfer"], p_ds=L.rho_DS >= b.rho_DS - TH["max_loss_rho_DS"], p_dsp=L.rho_DS_partial >= b.rho_DS_partial - TH["max_loss_rho_DS"],
+                 p_cons=L.rho_D_consensus >= med - TH["max_loss_consensus"])
+    d["passes_liver"] = d[[x for x in d.columns if x.startswith("p_")]].all(axis=1)
+    return d
+
+
+def tidy() -> pd.DataFrame:
+    rows = []
+
+    def add(task, setting, method, metric, v, direction="higher"):
+        v = np.asarray(v, float)
+        v = v[np.isfinite(v)]
+        if len(v):
+            rows.append(dict(track="E", task=task, setting=setting, method=method, metric=metric, value=v.mean(), ci_lo=v.min() if len(v) > 1 else np.nan, ci_hi=v.max() if len(v) > 1 else np.nan, n=len(v), rank_direction=direction))
+    d = load_measure()
+    d = d[d.method.isin(["Chimera", "scVI", "scVI-library", "CAMEX", "sysVI", "PCA", "Harmony", "scANVI", "SATURN"])]
+    b = d[~d.task.isin(["labelfree", "global"]) & ~d.task.str.contains("__") & d.metric.isin(METRICS)]
+    for (c, t, k, m), g in b.groupby(["cohort", "task", "metric", "method"]):
+        add(f"within_label:{t}", f"cohort={c};mode=in_model", m, k, g.groupby("latent").value.mean())
+    lf = labelfree(d)
+    for (c, k, kd, m), g in lf[lf.metric == "within_var_r2"].groupby(["cohort", "metric", "kind", "method"]):
+        add("within_label:variance", f"cohort={c};mode=in_model;centring={kd}", m, k, g.value)
+    for (c, m), g in lf[lf.metric == "lib_r2"].groupby(["cohort", "method"]):
+        add("within_label:depth", f"cohort={c};mode=in_model", m, "lib_r2", g.value, "lower")
+    gm = glob_metrics(d)
+    for (c, k, m), g in gm[gm.metric.isin(["knn_mixing_entropy", "label_transfer_acc"])].groupby(["cohort", "metric", "method"]):
+        add("global", f"cohort={c};mode=in_model", m, k, g.value)
+    e = encoded()
+    e = e[~e.model.str.startswith("z2-")].assign(method=lambda x: x.model.str.startswith("scvi").map({True: "scVI", False: "Chimera"}))
+    for (c, st, k, dp, mk, m), g in e.groupby(["cohort", "set", "metric", "depth", "marker", "method"]):
+        if k != "z_scale_sd":
+            add(f"held_out:{st}", f"cohort={c};mode=encoder;input={dp};marker={mk}", m, k, g.value)
+    cap = pd.read_csv(RU.OUT / "capacity.csv")
+    for (c, m), g in cap.groupby(["cohort", "method"]):
+        add("latent", f"cohort={c};mode=in_model", m, "capacity_nats", g.capacity)
+        add("latent", f"cohort={c};mode=in_model", m, "effective_axes", g.axes)
+        add("latent", f"cohort={c};mode=in_model", m, "species_auroc_in_largest_label", g.sp_auc_biglabel, "lower")
+    dp = pd.read_csv(RU.OUT / "depth_axis.csv")
+    for (c, m), g in dp.groupby(["cohort", "method"]):
+        add("latent", f"cohort={c};mode=in_model", m, "z_within_label_variance_by_depth", g.within_z_var_by_lib, "lower")
+    for c in ("liv_hmouse", "test_hmouse"):
+        f = RU.OUT / f"factorial_seeds_{c}.csv"
+        if not f.exists():
+            continue
+        t = pd.read_csv(f)
+        t = t[t.healthy.fillna(False).astype(bool)]
+        for lv, g in t.groupby("level"):
+            for k in [x for x in g.columns if x not in ("run", "level", "healthy") and g[x].dtype != object]:
+                add("factorial", f"cohort={c};level={lv}", "Chimera", k, g[k], "lower" if k in ("lib_r2", "sat_hi") else "higher")
+    t = pd.DataFrame(rows, columns=["track", "task", "setting", "method", "metric", "value", "ci_lo", "ci_hi", "n", "rank_direction"])
+    t.to_csv(RU.OUT / "Z2_tidy.csv", index=False)
+    return t
+
+
 if __name__ == "__main__":
     main()
+    L = pd.concat(levels(c) for c in ("liv_hmouse", "test_hmouse") if (RU.OUT / f"factorial_seeds_{c}.csv").exists())
+    L.to_csv(RU.OUT / "factorial_levels.csv", index=False)
+    D = decide()
+    D.to_csv(RU.OUT / "decision.csv", index=False)
+    print(D[["level", "n_healthy", "n_runs", "hep_rho_self", "hep_rho_cross", "hep_auroc", "tms_auroc", "tms_auroc_depth", "mixing", "label_transfer", "within_var", "lib_r2", "rho_DS", "rho_DS_partial", "rho_D_consensus", "rho_S_consensus", "passes_liver"]].round(3).to_string())
+    print(tidy().shape)
