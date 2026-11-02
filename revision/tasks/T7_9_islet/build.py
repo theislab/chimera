@@ -8,8 +8,12 @@ disease concordance and no Chimera readout is computed here.
 
 Steps (section 8b):
 
-1. ``_validate_raw_counts``, ``_standardize_obs_columns`` and ``_qc_filter``
-   (>= 200 genes, mitochondrial fraction < 20%) from ``chimera._data_utils``. ``obs['batch']`` of
+1. ``_validate_raw_counts``, ``_standardize_obs_columns`` and ``_qc_filter`` from
+   ``chimera._data_utils`` with >= 200 genes and **no mitochondrial cut** (``MAX_MT_PCT = 100``,
+   amendment 2026-11-02). A 20% cut removed 14.6% of ND DE cells but 8.4% of T2D cells (and
+   10.6% of human against 0.04% of mouse), so it could bias the disease contrast; Van Zyl and
+   kidney drop it for the same reason. ``qc_by_group.csv`` reports, per species x role x
+   condition x chemistry, the cells removed and the share a 20% cut would have removed. ``obs['batch']`` of
    the healthy object is the technical source dataset (``technical_batch``); donors and libraries
    are in ``obs['sample_batch']``.
 2. ``cell_ontology_class`` from the author labels through ``celltype_map.tsv`` (human
@@ -22,7 +26,11 @@ Steps (section 8b):
    units remain. Every dropped unit-type pair and type is written to ``filters.csv``.
 5. Healthy islet object (training-half donors and training mice only): classes with >= 50
    training cells in each species (others filtered and logged), caps of 2,000 cells per
-   species x class shared by donors (T7.2 water-filling, seed 20261101), testis table
+   species x class shared by donors (T7.2 water-filling, seed 20261101; reason: islets are 60-80%
+   beta and alpha cells, so without a cap the decoder and the conditional MMD would see the
+   minority types only rarely; 2,000 is the liver T7.2 value and keeps the object near the size of
+   the canonical testis cohorts; a class below the cap keeps all its cells, so class sizes stay
+   unequal across species, e.g. mouse ductal), testis table
    vocabulary, ``compute_conservation_prior``, ESM features as T7.2,
    ``construct_unified_adata``, ``compute_expression_stats`` and ``assemble_gin_features`` on
    these cells, ``precompute_p_null``, ``assert_table_matches``. Genes are dropped if absent from
@@ -78,6 +86,8 @@ SATURN = t72.SATURN
 OUT = ROOT / "data" / "revision" / "disease_islet"
 
 SEED = 20261101
+MAX_MT_PCT = 100.0  # no mitochondrial cut (amendment 2026-11-02); 20.0 is reported, not applied
+MT_REPORT = 20.0
 MIN_CELLS_UNIT = 20
 MIN_CELLS_MODEL = 50
 DE_TYPES = ["beta", "alpha", "delta", "ductal", "endothelial", "stellate"]
@@ -195,6 +205,32 @@ def marker_check(a: ad.AnnData, species: str, table: pd.DataFrame, res: TaskOutp
     chk = t72.marker_class(sc_, a.obs["author_label"].astype(str))
     chk["n"] = a.obs["author_label"].value_counts()
     res.csv(chk.reset_index().rename(columns={"index": "author_label"}), f"marker_check_{species.lower()}.csv")
+
+
+def qc(a: ad.AnnData, name: str) -> tuple[ad.AnnData, dict]:
+    """T7.2's QC with no mitochondrial cut; the share a 20% cut would remove is reported per group."""
+    from chimera._data_utils import _qc_filter, _standardize_obs_columns, _validate_raw_counts
+
+    _validate_raw_counts(a, name)
+    a.obs["batch"] = a.obs["sample"]
+    a = _standardize_obs_columns(a)
+    n0 = a.n_obs
+    per0 = a.obs["sample"].value_counts()
+    grp0 = a.obs[["species", "role", "condition", "assay"]].astype(str).value_counts()
+    a = _qc_filter(a, min_genes=t72.MIN_GENES, max_mt_pct=MAX_MT_PCT)
+    per1 = a.obs["sample"].value_counts()
+    g = a.obs[["species", "role", "condition", "assay"]].astype(str).assign(
+        mt_ge_20=(a.obs["pct_counts_mt"] >= MT_REPORT).to_numpy())
+    by = g.groupby(["species", "role", "condition", "assay"]).agg(n_after=("mt_ge_20", "size"),
+                                                                  n_mt_ge_20=("mt_ge_20", "sum"))
+    by["n_before"] = grp0.reindex(by.index).to_numpy()
+    by["frac_removed_min_genes"] = 1 - by["n_after"] / by["n_before"]
+    by["frac_mt_ge_20_not_applied"] = by["n_mt_ge_20"] / by["n_after"]
+    info = dict(n_in=int(n0), n_after_qc_filter=int(a.n_obs), n_mt_genes=int(a.var["mt"].sum()),
+                max_mt_pct=MAX_MT_PCT, frac_mt_ge_20_not_applied=float((a.obs["pct_counts_mt"] >= MT_REPORT).mean()),
+                per_sample=pd.DataFrame({"before": per0, "after": per1}).fillna(0).astype(int), by_group=by.reset_index())
+    log.info("%s QC: %d -> %d cells", name, n0, a.n_obs)
+    return a, info
 
 
 # --------------------------------------------------------------------------- gate, filters
@@ -361,11 +397,12 @@ def main() -> int:
 
     ann_h, ann_m = OUT / "annotated_human.h5ad", OUT / "annotated_mouse.h5ad"
     if a.reannotate or not (ann_h.exists() and ann_m.exists()):
-        h, qh = t72.qc(load_human(roles), "human48")
-        m, qm = t72.qc(load_mouse(roles), "hrovatin")
+        h, qh = qc(load_human(roles), "human48")
+        m, qm = qc(load_mouse(roles), "hrovatin")
         res.csv(qh.pop("per_sample"), "qc_human_per_sample.csv", index=True)
         res.csv(qm.pop("per_sample"), "qc_mouse_per_sample.csv", index=True)
-        res.json(dict(human=qh, mouse=qm, min_genes=t72.MIN_GENES, max_mt_pct=t72.MAX_MT), "qc_summary.json")
+        res.csv(pd.concat([qh.pop("by_group"), qm.pop("by_group")]), "qc_by_group.csv")
+        res.json(dict(human=qh, mouse=qm, min_genes=t72.MIN_GENES, max_mt_pct=MAX_MT_PCT), "qc_summary.json")
         annotate(h, "Human", ctmap)
         annotate(m, "Mouse", ctmap)
         marker_check(h, "Human", table, res)
