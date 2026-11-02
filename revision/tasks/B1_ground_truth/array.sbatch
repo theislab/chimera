@@ -19,7 +19,7 @@ if [[ ! -f "$h5" ]]; then $PY -m revision.tasks.B1_ground_truth.step --manifest 
 args=$(python3 -c "import csv;r=list(csv.DictReader(open('$M'),delimiter='\t'));print(r[$I]['recipe'])")
 seed=$(python3 -c "import csv;r=list(csv.DictReader(open('$M'),delimiter='\t'));print(r[$I]['seed'])")
 set +e
-train_run "$run" $args --adata "$h5" --seed "$seed"
+( train_run "$run" $args --adata "$h5" --seed "$seed" ) || echo "fit did not finish: $run; direct readouts are scored all the same"
 set -e
 $PY -m revision.tasks.B1_ground_truth.score_run --manifest "$M" --index "$I" --h5ad "$h5"
 # keep the state and the summaries; drop what the scores no longer need

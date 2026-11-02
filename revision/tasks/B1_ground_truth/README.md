@@ -13,7 +13,7 @@ Submission order (`tier` in the grids, `make_queue.py`, `feeder.sh`): central se
 
 Chimera is retrained with the canonical recipe unchanged, no tuning on results. p_null and the three expression feature columns follow the data as in the pipeline; sequence features and π stay. An unaltered object gets exactly the canonical features, because the canonical liver and testis expression columns come from the larger multi-species object: only the change in the statistic is added.
 
-Discard rule, fixed now: non-finite α, z or S_g, or fewer than 10 active z dims. Mixing, tails and saturation are recorded for all fits and read as a sensitivity.
+Discard rule, fixed now: non-finite α, z or S_g, or fewer than 10 active z dims. A discarded fit removes only Chimera's row: the direct, sequence and tool readouts of that altered object are still scored. Mixing, tails and saturation are recorded for all fits and read as a sensitivity.
 
 ## Files
 | File | What |

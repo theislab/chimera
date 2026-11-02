@@ -11,6 +11,9 @@ comparator on level).
 Static: pi, dN/dS, LOEUF. Control: expr (post-alteration species-balanced log CP10K), random.
 All scores are oriented so that higher means more conserved (metrics.py negates dN/dS and LOEUF).
 
+A failed or non-finite fit leaves its Chimera columns NaN and is recorded as discarded; the direct, sequence and control readouts of that altered
+object are computed all the same, so a Chimera failure removes only Chimera's row.
+
 Also per run: health and mixing. Writes results/revision/B1/scores/<run>.parquet and health/<run>.json.
 """
 
@@ -85,6 +88,15 @@ def species_mixing(z: np.ndarray, spc: np.ndarray, k: int = 15, seed: int = 0) -
     return dict(mix_entropy=float(h.mean()), mix_purity=float(np.maximum(p, 1 - p).mean()))
 
 
+def load_fit(run: str) -> dict | None:
+    """Final state of a fit, or None if it has none or a non-finite alpha, z or S_g."""
+    if not (CO.RUNS_DIR / run / "final_state.npz").exists():
+        return None
+    st = CO.load_state(run)
+    ok = all(np.isfinite(st[k]).all() for k in ("alpha", "z_mean", "S_g_ema", "prior"))
+    return st if ok else None
+
+
 def score(row: dict, h5ad: str | None, force_keep_model: bool = False) -> None:
     run = row["run"]
     cohort = row["cohort"]
@@ -97,7 +109,7 @@ def score(row: dict, h5ad: str | None, force_keep_model: bool = False) -> None:
 
     a = ad.read_h5ad(h5ad or (RU.REPO / cfg_c["h5ad"]))
     run_dir = CO.RUNS_DIR / run
-    st = CO.load_state(run)
+    st = load_fit(run)
     X = A.csr(a.X).astype(np.float64)
     spc = a.obs["species"].astype(str).to_numpy()
     lab = A.labels(a, cohort)
@@ -109,13 +121,16 @@ def score(row: dict, h5ad: str | None, force_keep_model: bool = False) -> None:
 
     res = pd.DataFrame(index=pd.Index(a.var_names.astype(str), name="var_name"))
     res["hsapiens_gene_id"] = np.asarray(CO.gene_ids.ensembl(cfg_c["gene_table"], res.index))
-    res["alpha"], res["prior"] = st["alpha"].astype(float), st["prior"].astype(float)
     res["prior_raw"] = cov["prior_raw"].to_numpy()
-    res["S_g"] = st["S_g_ema"].astype(float)
-    da = res["alpha"] - res["prior"]
-    dr = res["alpha"] - res["prior_raw"]
-    res["D"], res["D_raw"] = da - da.median(), dr - dr.median()
-    res["correction"] = st["correction"].astype(float)
+    for c in ("alpha", "prior", "S_g", "D", "D_raw", "correction", "B1z_raw", "B1z", "S_fwd"):
+        res[c] = np.nan
+    if st is not None:
+        res["alpha"], res["prior"] = st["alpha"].astype(float), st["prior"].astype(float)
+        res["S_g"] = st["S_g_ema"].astype(float)
+        da = res["alpha"] - res["prior"]
+        dr = res["alpha"] - res["prior_raw"]
+        res["D"], res["D_raw"] = da - da.median(), dr - dr.median()
+        res["correction"] = st["correction"].astype(float)
     res["expr"] = cov["log_cp10k_spmean"].to_numpy()
     res["detection_spmean"] = cov["detection_spmean"].to_numpy()
     res["ppass"] = cov["ppass"].to_numpy()
@@ -139,45 +154,47 @@ def score(row: dict, h5ad: str | None, force_keep_model: bool = False) -> None:
     res["B3a"] = b3a
 
     # latent
-    z = np.asarray(st["z_mean"], dtype=np.float32)
-    cl = T42.leiden_clusters(z)
-    xz, fz, _ = T42.pseudobulk(X, spc, cl, library, T42.MIN_CELLS_CLUSTER)
-    Ez, _, _ = T42.pooled_E(xz, fz, species, G)
-    res["B1z_raw"] = Ez
-    res["B1z"] = T42.residualise(pd.Series(Ez, index=res.index), c3)
+    if st is not None:
+        z = np.asarray(st["z_mean"], dtype=np.float32)
+        cl = T42.leiden_clusters(z)
+        xz, fz, _ = T42.pseudobulk(X, spc, cl, library, T42.MIN_CELLS_CLUSTER)
+        Ez, _, _ = T42.pooled_E(xz, fz, species, G)
+        res["B1z_raw"] = Ez
+        res["B1z"] = T42.residualise(pd.Series(Ez, index=res.index), c3)
+        cfg_run = json.loads((run_dir / "config.json").read_text())
+        if (run_dir / "model").exists():
+            import torch
 
-    cfg_run = json.loads((run_dir / "config.json").read_text())
-    if (run_dir / "model").exists():
-        import torch
-
-        torch.set_num_threads(int(os.environ.get("SLURM_CPUS_PER_TASK", 4)))
-        res["S_fwd"] = forward_margin(run_dir, a, cfg_run)
-    else:
-        res["S_fwd"] = np.nan
+            torch.set_num_threads(int(os.environ.get("SLURM_CPUS_PER_TASK", 4)))
+            res["S_fwd"] = forward_margin(run_dir, a, cfg_run)
 
     rng = np.random.default_rng(RU.useed("random", run))
     res["random"] = rng.random(G)
 
     # health and mixing
-    vz = z.var(0)
-    fin = bool(np.isfinite(st["alpha"]).all() and np.isfinite(z).all() and np.isfinite(st["S_g_ema"]).all())
-    active = int((vz >= RU.ACTIVE_VAR).sum())
-    h = dict(run=run, cohort=cohort, finite=fin, active_dims=active, discard=not (fin and active >= RU.N_LATENT),
-             tail_pos=float((dr > 0.05).mean()), tail_neg=float((dr < -0.05).mean()),
-             sat_hi=float((st["alpha"] > 0.95).mean()), sat_lo=float((st["alpha"] < 0.05).mean()),
-             frac_S_zero=float((np.abs(st["S_g_ema"]) < 1e-6).mean()),
-             rho_D_S=float(pd.Series(res["D"]).corr(pd.Series(res["S_g"]), method="spearman")),
-             lib_median={s: float(np.median(np.asarray(X[spc == s].sum(1)).ravel())) for s in species},
-             k_shared=len(groups))
-    h.update(species_mixing(z, spc))
-    try:
-        s = json.loads((run_dir / "summary.json").read_text())
-        h["adv_acc_final"] = s["key_metrics"].get("adv_acc_final")
-        h["n_expect_fail"] = s["expectation_summary"]["fail"]
-        rs = json.loads((run_dir / "run_summary.json").read_text())
-        h["elapsed_s"] = rs.get("elapsed_seconds")
-    except Exception as exc:  # noqa: BLE001
-        h["summary_error"] = str(exc)
+    if st is None:
+        h = dict(run=run, cohort=cohort, finite=False, active_dims=0, discard=True, k_shared=len(groups),
+                 note="no finite final state: Chimera columns NaN, direct readouts scored")
+    else:
+        vz = z.var(0)
+        active = int((vz >= RU.ACTIVE_VAR).sum())
+        dr = res["D_raw"]
+        h = dict(run=run, cohort=cohort, finite=True, active_dims=active, discard=active < RU.N_LATENT,
+                 tail_pos=float(((res["alpha"] - res["prior_raw"]) > 0.05).mean()), tail_neg=float(((res["alpha"] - res["prior_raw"]) < -0.05).mean()),
+                 sat_hi=float((st["alpha"] > 0.95).mean()), sat_lo=float((st["alpha"] < 0.05).mean()),
+                 frac_S_zero=float((np.abs(st["S_g_ema"]) < 1e-6).mean()),
+                 rho_D_S=float(pd.Series(res["D"]).corr(pd.Series(res["S_g"]), method="spearman")),
+                 lib_median={s_: float(np.median(np.asarray(X[spc == s_].sum(1)).ravel())) for s_ in species},
+                 k_shared=len(groups))
+        h.update(species_mixing(z, spc))
+        try:
+            s_ = json.loads((run_dir / "summary.json").read_text())
+            h["adv_acc_final"] = s_["key_metrics"].get("adv_acc_final")
+            h["n_expect_fail"] = s_["expectation_summary"]["fail"]
+            rs = json.loads((run_dir / "run_summary.json").read_text())
+            h["elapsed_s"] = rs.get("elapsed_seconds")
+        except Exception as exc:  # noqa: BLE001
+            h["summary_error"] = str(exc)
     (RU.RES / "health").mkdir(parents=True, exist_ok=True)
     (RU.RES / "health" / f"{run}.json").write_text(json.dumps(h, indent=1))
     out.parent.mkdir(parents=True, exist_ok=True)

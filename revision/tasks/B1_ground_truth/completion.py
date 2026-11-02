@@ -1,7 +1,7 @@
 """Track A: runs tried and finished, per method and setting, in the way of B2_benchmark/completion.py. Failures stay out of the scores and are shown here.
 
 Chimera readouts (S_g, Delta_alpha, B1z): tried = a health record or a run folder for the grid row; finished = healthy under the discard rule of rules.py.
-Direct, sequence and control readouts are computed on the same altered object: tried = the row's score file exists; finished = the column has a finite value.
+Direct, sequence and control readouts are computed on the same altered object: scored on the object whether or not the Chimera fit finished; tried = the row's score file exists; finished = the column has a finite value.
 Tools: tried = a score file or a recorded attempt (results/revision/B1/attempts/<tool>/<run>.rc); finished = a score file with at least one finite score.
 Not counted as tried: a row still in the queue or not reached, and a job lost to a bad node (it stops before a run folder or an attempt record exists).
 

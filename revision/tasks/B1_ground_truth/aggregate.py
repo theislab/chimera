@@ -1,7 +1,7 @@
 """B1 tidy tables, in the schema of the benchmark overview: track, task, setting, method, metric, value, ci_lo, ci_hi, n, rank_direction.
 
 task: the alteration (pattern, level, loss) or null (sham_swap, thin_both, placebo). setting: 'cohort=..;effect=..;band=..;share=..;identity=..;fit=..',
-'all' where marginal. A value is the mean over the fits of the setting; the CI is the 2.5-97.5 percentile of the mean of the fits' pair-bootstrap
+'all' where marginal. A failed fit removes only Chimera rows. A value is the mean over the fits of the setting; the CI is the 2.5-97.5 percentile of the mean of the fits' pair-bootstrap
 draws (fit-wise draws share an index, independent across fits). n sums the altered genes. Discarded fits leave.
 rank_direction: higher for detection metrics on real alterations; closer_to_0.5 for AUROC and dir_acc on nulls; closer_to_0.05 for reject05 and power_05 on nulls.
 
@@ -49,10 +49,11 @@ def load_cells() -> tuple[pd.DataFrame, pd.DataFrame]:
             failed.append(dict(run=run, cohort=r["cohort"], reason="no output"))
             continue
         hh = json.loads(h.read_text())
-        if hh.get("discard", True):
+        t = pd.read_parquet(m)
+        if hh.get("discard", True):  # a failed fit removes Chimera's rows only; direct, sequence and tool readouts of the object stay
             failed.append(dict(run=run, cohort=r["cohort"], reason=f"finite={hh.get('finite')} active_dims={hh.get('active_dims')}"))
-            continue
-        rows.append(pd.read_parquet(m))
+            t = t[~t["group"].astype(str).str.startswith("chimera")]
+        rows.append(t)
     return pd.concat(rows, ignore_index=True), pd.DataFrame(failed, columns=["run", "cohort", "reason"])
 
 
