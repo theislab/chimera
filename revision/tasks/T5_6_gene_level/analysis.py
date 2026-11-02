@@ -24,7 +24,9 @@ observed), p_mixed = P(null mixed-sign >= observed).
 
 Native arm, descriptive. SATURN: per species and shared type, macrogene Wilcoxon test against the
 other cells of the species on the macrogene values (BH < 0.05, score > 0); conserved macrogene: up in
-both species for the type; divergent: up in one. Genes: top 10 by weight per macrogene and species.
+both species for the type; divergent: up in one; a macrogene in both unions over types leaves both
+lists. Genes: top 10 by weight per macrogene and species. Curated sets outside 15-500 genes in the
+universe are not tested by the GSEA (T7.9 machinery).
 Fisher ORA of the union lists on the curated sets of T4.3 (C1, C2, V1, V2, V3) and MSigDB Hallmark
 2020, background the arm's genes (human symbols), BH per list. CAMEX: Fisher ORA of each module at
 resolution 1.0 (10 or more genes), BH over modules x sets; a set is recovered if any module passes.
@@ -309,9 +311,15 @@ def native_arm(cohort: str, tab: pd.DataFrame, d3: np.ndarray, gold: pd.DataFram
 
 
 def main():
+    global DRAWS, PERMS, OUT
     ap = argparse.ArgumentParser()
     ap.add_argument("--cohorts", nargs="+", default=list(SC.STEMS))
+    ap.add_argument("--arms", nargs="+", default=list(ARMS), help="testing only")
+    ap.add_argument("--draws", type=int, default=DRAWS, help="testing only")
+    ap.add_argument("--perms", type=int, default=PERMS, help="testing only")
+    ap.add_argument("--outdir", type=Path, default=OUT, help="testing only")
     a = ap.parse_args()
+    DRAWS, PERMS, OUT = a.draws, a.perms, a.outdir
     OUT.mkdir(parents=True, exist_ok=True)
     gold = pd.read_csv(RES / "T4_3/golds/gold_table.csv", index_col=0)
     L1, REL, L2, NAT, LONG, META, PR = [], [], [], [], [], {}, []
@@ -325,7 +333,7 @@ def main():
         A = np.column_stack([K.read_run(run[s])["alpha"] for s in SEEDS]).mean(1)
         alpha = pd.Series(A, index=tab["var_name"])
         tools = tab[["hsapiens_gene_id"]].assign(cohort=cohort).copy()
-        for arm in ARMS:
+        for arm in a.arms:
             T = pd.read_csv(OUT / f"{cohort}__{arm}.csv")
             T = T.dropna(subset=C4)
             L1 += l1(cohort, arm, T, alpha.reindex(T["var_name"]).to_numpy(), REL)
@@ -336,20 +344,23 @@ def main():
             col = {"saturn_native": "S_deploy_native", "saturn_1to1": "S_deploy_1to1", "camex": "C_cos"}[arm]
             tools[col] = T.set_index("var_name")[p].reindex(tab["var_name"]).to_numpy()
         PR.append(tools)
-        t, extra = native_arm(cohort, tab, d3, gold)
-        NAT.append(t)
-        LONG.append(extra["L"])
-        META[cohort] = extra["meta"]
-        print(cohort, "native arm done", flush=True)
+        if set(a.arms) == set(ARMS):
+            t, extra = native_arm(cohort, tab, d3, gold)
+            NAT.append(t)
+            LONG.append(extra["L"])
+            META[cohort] = extra["meta"]
+            print(cohort, "native arm done", flush=True)
     l1df = pd.DataFrame(L1)
     l1df["q_bh"] = S.bh(l1df["p_perm"].tolist())
     l1df.to_csv(OUT / "summary.csv", index=False)
     pd.DataFrame(REL).to_csv(OUT / "reliability.csv", index=False)
     pd.DataFrame(L2).to_csv(OUT / "l2_modules.csv", index=False)
-    pd.concat(NAT, ignore_index=True).to_csv(OUT / "native_arm.csv", index=False)
-    pd.concat(LONG, ignore_index=True).to_csv(OUT / "native_arm_long.csv", index=False)
-    (OUT / "native_arm_meta.json").write_text(json.dumps(META, indent=2, default=str))
-    tp = pd.concat(PR, ignore_index=True).dropna(subset=["S_deploy_native", "S_deploy_1to1", "C_cos"], how="all")
+    if NAT:
+        pd.concat(NAT, ignore_index=True).to_csv(OUT / "native_arm.csv", index=False)
+        pd.concat(LONG, ignore_index=True).to_csv(OUT / "native_arm_long.csv", index=False)
+        (OUT / "native_arm_meta.json").write_text(json.dumps(META, indent=2, default=str))
+    tp = pd.concat(PR, ignore_index=True)
+    tp = tp.dropna(subset=[c for c in tp.columns if c not in ("hsapiens_gene_id", "cohort")], how="all")
     tp = tp.drop_duplicates(subset=["cohort", "hsapiens_gene_id"])
     tp.to_csv(OUT / "tools_primary.csv", index=False)
     print(l1df.round(3).to_string(), flush=True)
