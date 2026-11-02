@@ -193,7 +193,7 @@ def score_run(row: dict, truth: pd.DataFrame, scores: pd.DataFrame, ref: pd.Data
             n = res.pop("n")
             if name == "all":
                 sdr = np.nanstd(ra[mask]) if np.isfinite(ra[mask]).any() else np.nan
-                res["effect_sd"] = float(np.nanmean(diff) / sdr) if sdr and np.isfinite(sdr) and np.isfinite(diff).any() else np.nan
+                res["effect_sd"] = float(np.nanmean(diff) / sdr) if np.isfinite(sdr) and sdr > 1e-9 and np.isfinite(diff).any() else np.nan
                 res["AUPRC_genome"] = avg_prec(y_all.to_numpy(), -s.to_numpy())
                 res["topk_genome"] = topk(y_all.to_numpy(), -s.to_numpy(), len(a), rng)
                 res["topk_band"] = topk(y_all.to_numpy()[band_mask], -s.to_numpy()[band_mask],
