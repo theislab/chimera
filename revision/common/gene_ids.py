@@ -53,7 +53,8 @@ H5ADS = {
 # that iterates H5ADS under DATA_PROCESSED never reads the superseded processed object.
 REVISION_H5ADS = {
     "van_zyl": REPO_ROOT / "data" / "revision" / "van_zyl" / "van_zyl_unified.h5ad",
-    "bone_marrow": REPO_ROOT / "data" / "revision" / "bone_marrow" / "bone_marrow_unified.h5ad",
+    # build 2 (T12.2b: no mt filter, per-type cap at the testis 3-species size); build 1 in the parent folder
+    "bone_marrow": REPO_ROOT / "data" / "revision" / "bone_marrow" / "v2" / "bone_marrow_unified.h5ad",
     "kidney": REPO_ROOT / "data" / "revision" / "disease_kidney" / "kidney_healthy_train.h5ad",
 }
 

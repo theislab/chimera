@@ -13,6 +13,10 @@ Rules (``--rule``):
   the object differs from the parent only in size (hypothesis 1: dataset scale).
 * ``prop_libq``: as ``prop``, after removing, per species, cells whose total count is above
   the species' 99th percentile (hypothesis 2: extreme libraries).
+* ``prop_thin``: as ``prop``, then every count is binomially thinned with probability
+  ``--thin`` (numpy default_rng(--seed)), so every library shrinks by that factor and relative
+  depth across species is kept (hypothesis 2: absolute sequencing depth; 1/3 brings the human
+  median, 5,579, near the testis human median, 1,718).
 
     python revision/tasks/T12_2b_debug/make_debug_objects.py --rule prop --n 25000 \
         --out data/revision/bone_marrow/debug/bm_dbg_prop25k.h5ad
@@ -53,9 +57,10 @@ def proportional(obs: pd.DataFrame, eligible: np.ndarray, n: int, seed: int) -> 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--parent", type=Path, default=PARENT)
-    ap.add_argument("--rule", choices=["prop", "prop_libq"], required=True)
+    ap.add_argument("--rule", choices=["prop", "prop_libq", "prop_thin"], required=True)
     ap.add_argument("--n", type=int, default=25000)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--thin", type=float, default=1 / 3)
     ap.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
     import anndata as ad
@@ -77,6 +82,12 @@ def main() -> int:
         rec["removed_above_q99"] = int((~eligible).sum())
     keep = proportional(a.obs, eligible, args.n, args.seed)
     sub = a[keep].copy()
+    if args.rule == "prop_thin":
+        Xs = sp.csr_matrix(sub.X)
+        Xs.data = np.random.default_rng(args.seed).binomial(Xs.data.astype(np.int64), args.thin).astype(np.float32)
+        Xs.eliminate_zeros()
+        sub.X = Xs
+        rec["thin"] = args.thin
     sub.uns["p_null"] = precompute_p_null(sub, species_key="species")
     for c in sub.obs.columns:
         if isinstance(sub.obs[c].dtype, pd.CategoricalDtype):
