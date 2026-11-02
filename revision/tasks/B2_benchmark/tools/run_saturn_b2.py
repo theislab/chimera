@@ -36,16 +36,19 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--run", required=True)
     p.add_argument("--seed", type=int, required=True)
+    p.add_argument("--root", default=None, help="input folder; default data/revision/B2/tool_inputs/<run>")
+    p.add_argument("--label-col", default="cell_type")
+    p.add_argument("--latent-out", default=None, help="integration benchmark: write the latent there and stop; no gene score")
     a = p.parse_args()
-    root = C.REPO / "data/revision/B2/tool_inputs" / a.run
+    root = Path(a.root) if a.root else C.REPO / "data/revision/B2/tool_inputs" / a.run
     out = C.REPO / "results/revision/B2/tool_scores/SATURN" / f"{a.run}.csv"
-    if out.exists():
+    if out.exists() or (a.latent_out and (Path(a.latent_out) / "z_mean.npy").exists()):
         return
     work = C.REPO / "data/revision/B2/tool_work" / f"saturn_{a.run}"
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
-    cli = [f"--in_data={root / 'saturn/run.csv'}", "--in_label_col=cell_type", "--ref_label_col=cell_type", "--embedding_model=ESM2",
+    cli = [f"--in_data={root / 'saturn/run.csv'}", f"--in_label_col={a.label_col}", "--ref_label_col=cell_type", "--embedding_model=ESM2",
            f"--num_macrogenes={D['num_macrogenes']}", f"--hv_genes={D['hv_genes']}", f"--pe_sim_penalty={D['pe_sim_penalty']}", f"--model_dim={D['model_dim']}",
            f"--hidden_dim={D['hidden_dim']}", f"--pretrain_epochs={D['pretrain_epochs']}", f"--epochs={D['epochs']}", f"--polling_freq={max(D['epochs'], D['pretrain_epochs']) + 1}",
            f"--centroids_init_path={work / f'centroids_s{a.seed}.pkl'}", f"--work_dir={work}/", f"--seed={a.seed}", "--device=cpu", "--device_num=-1"]
@@ -62,6 +65,17 @@ def main():
     if len(f) != 1:
         raise SystemExit(f"expected one final h5ad, found {f}")
     A = ad.read_h5ad(f[0])
+    if a.latent_out:
+        d = Path(a.latent_out)
+        d.mkdir(parents=True, exist_ok=True)
+        X = np.asarray(A.X, dtype=np.float64)
+        np.save(d / "z_raw.npy", X)
+        pd.Series(np.asarray(A.obs_names).astype(str)).to_csv(d / "obs_names.csv", index=False, header=False)
+        np.save(d / "z_mean.npy", X / np.linalg.norm(X, axis=1, keepdims=True))  # T5.2: SATURN enters L2-normalised
+        (d / "config.json").write_text(json.dumps(dict(run=a.run, seed=a.seed, label_col=a.label_col, wall_s=time.time() - t0, peak_rss_gb=C.peak_rss_gb(),
+                                                       adapter="1:1 orthologs (T5.6 Adapter B)", tool_state=C.tool_state(C.SATURN_DIR)), indent=1))
+        shutil.rmtree(work)
+        return
     w = pickle.load(open(glob.glob(str(res / "*_genes_to_macrogenes.pkl"))[0], "rb"))
     gm = pd.read_csv(root / "gene_map.csv")
     kh, km = "human_" + gm.symbol_h.astype(str), "mouse_" + gm.symbol_m.astype(str)

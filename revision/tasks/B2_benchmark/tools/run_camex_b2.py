@@ -35,10 +35,12 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--run", required=True)
     p.add_argument("--seed", type=int, required=True)
+    p.add_argument("--root", default=None, help="input folder; default data/revision/B2/tool_inputs/<run>")
+    p.add_argument("--latent-out", default=None, help="integration benchmark: write the cell latent there and stop; no gene score")
     a = p.parse_args()
-    root = C.REPO / "data/revision/B2/tool_inputs" / a.run
+    root = Path(a.root) if a.root else C.REPO / "data/revision/B2/tool_inputs" / a.run
     out = C.REPO / "results/revision/B2/tool_scores/CAMEX" / f"{a.run}.csv"
-    if out.exists():
+    if out.exists() or (a.latent_out and (Path(a.latent_out) / "z_mean.npy").exists()):
         return
     work = C.REPO / "data/revision/B2/tool_work" / f"camex_{a.run}"
     if work.exists():
@@ -48,7 +50,8 @@ def main():
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     P = copy.deepcopy(m.PARAMS)
-    P["preprocess"]["dataset_file"] = pd.DataFrame([["raw-b2-human-x.h5ad", True, "gene_matches_human2mouse.csv", "raw-b2-mouse-x.h5ad", False]],
+    others = sorted(f.stem.split("-")[2] for f in (root / "camex").glob("raw-b2-*-x.h5ad") if "-human-" not in f.name)
+    P["preprocess"]["dataset_file"] = pd.DataFrame([["raw-b2-human-x.h5ad", True, f"gene_matches_human2{o}.csv", f"raw-b2-{o}-x.h5ad", False] for o in others],
                                                    columns=["source", "source label", "relationship", "destination", "destination label"])
     P["preprocess"]["path"] = str(root / "camex") + "/"
     P["train"]["device"] = "cpu"
@@ -63,6 +66,15 @@ def main():
     dataset = Dataset(**P["preprocess"])
     trainer = Trainer(dataset.adata_whole, dataset.dgl_data, **P["train"])
     trainer.integration()
+    if a.latent_out:
+        d = Path(a.latent_out)
+        d.mkdir(parents=True, exist_ok=True)
+        np.save(d / "z_mean.npy", np.asarray(dataset.adata_whole.obsm["X_CAMEX_Integration"]))
+        pd.Series(np.asarray(dataset.adata_whole.obs_names).astype(str)).to_csv(d / "obs_names.csv", index=False, header=False)
+        (d / "config.json").write_text(json.dumps(dict(run=a.run, seed=a.seed, wall_s=time.time() - t0, peak_rss_gb=C.peak_rss_gb(),
+                                                       adapter="1:1 orthologs, authors' liver parameters", tool_state=C.tool_state(C.CAMEX_DIR)), indent=1))
+        shutil.rmtree(work)
+        return
     g = ad.read_h5ad(work / "gene_integration_hidden.h5ad")
     g.obs_names = g.obs_names.astype(str)
     gene = np.asarray(g.obs_names)

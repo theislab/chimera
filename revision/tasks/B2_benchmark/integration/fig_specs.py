@@ -1,0 +1,5 @@
+"""Compose spec of Fig 3 with the added cohorts: python -m revision.tasks.F1_figures.compose --spec revision/tasks/B2_benchmark/integration/fig_specs.py fig3_ext"""
+
+from revision.tasks.F1_figures.compose import Col, Figure, Panel
+
+FIGS = {"fig3_ext": Figure(Col(Panel("fig3a_ext_integration_mixing", "a", ink=False), Panel("fig3b_ext_integration_biology", "b", ink=False), Panel("fig3c_ext_integration_composite", "c", ink=False)))}
