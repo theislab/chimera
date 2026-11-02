@@ -69,13 +69,18 @@ def panel_spectrum():
 
 
 def panel_seeds():
-    t = pd.read_csv(RU.OUT / "perseed_liver.csv")
+    q = pd.read_csv(RU.OUT / "quick.csv")
+    q = q[(q.cohort == "liv_hmouse") & ~q.level.str.startswith("log")]
+    p = pd.read_csv(RU.OUT / "perseed_liver.csv")
+    d = pd.read_csv(RU.OUT / "depth_axis.csv")
+    d = d[(d.cohort == "liv_hmouse") & (d.method == "Chimera")].assign(seed=lambda x: x.seed.astype(int)).merge(p[["seed", "rho_self"]], on="seed")
     fig, ax = plt.subplots(figsize=(1.75, 1.6))
-    ax.scatter(t.mixing, t.rho_self, s=12, color=CH, edgecolor="white", linewidth=0.3, zorder=3)
-    s51 = t[t.seed == 51].iloc[0]
-    ax.annotate("s51", (s51.mixing, s51.rho_self), xytext=(-9, 2), textcoords="offset points", fontsize=5.5, color=INK)
-    ax.set_xlabel("Mixing entropy")
+    f = q[q.level != "base"]
+    ax.scatter(f.within_z_var_by_lib, f.rself, s=10, color="#009E73", marker="^", edgecolor="white", linewidth=0.3, zorder=2, label="other settings")
+    ax.scatter(d.within_z_var_by_lib, d.rho_self, s=12, color=CH, edgecolor="white", linewidth=0.3, zorder=3, label="canonical seeds")
+    ax.set_xlabel("Share of within-label $z$\nvariance on depth")
     ax.set_ylabel(r"Hepatocyte zone $\rho_{self}$")
+    ax.legend(loc="upper right", handletextpad=0.1, fontsize=5.5, borderaxespad=0)
     fig.savefig(OUT / "z2_c.pdf", bbox_inches="tight")
 
 
