@@ -27,6 +27,7 @@ shrunk there. Written to ``de/perm/``.
 
     PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/de.py [--types beta,...] [--n-cpus 16]
         [--perm]
+    PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/de.py --loo <type index>   (loo_array.sbatch)
 """
 
 from __future__ import annotations
@@ -167,11 +168,54 @@ def run_perm(pb_h: ad.AnnData, pb_m: ad.AnnData, types: list, n_cpus: int) -> No
     (out / f"DONE_{'_'.join(types)}").write_text("ok\n")
 
 
+def run_loo(pb_h: ad.AnnData, pb_m: ad.AnnData, t: str, n_cpus: int) -> None:
+    """Leave-one-out primary fits for the H-D1 sensitivity (section 8b): each ND DE-half donor
+    (human, ``~ sex + chemistry + condition``) and each mouse DE library (``~ study + condition``;
+    ``~ condition`` when the remaining libraries come from one study). A fit needs >= 2 units per
+    arm. Human fits skip the adaptive prior (l^h is the MLE); mouse fits keep it (m is adaptive).
+    Output ``de/loo/{human,mouse}_loo_<unit>_<type>.tsv`` and the index ``de/loo/loo_<type>.tsv``.
+    """
+    out = OUT / "loo"
+    out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for species, base, key, design in (("human", units_for(pb_h, t), "donor", "~ sex + chemistry + condition"),
+                                       ("mouse", units_for(pb_m, t), "sample", "~ study + condition")):
+        units = base.obs[key].astype(str)
+        left = sorted(units[base.obs["condition"] == "control"].unique()) if species == "human" \
+            else sorted(units.unique())
+        for u in left:
+            sub = base[(units != u).to_numpy()].copy()
+            n = sub.obs["condition"].value_counts()
+            safe = u.replace("/", "").replace("|", "_").replace(" ", "")
+            row = dict(cell_type=t, species=species, left_out=u, file="", n_units=int(sub.n_obs),
+                       n_control=int(n.get("control", 0)), n_disease=int(n.get("disease", 0)))
+            if n.get("control", 0) < 2 or n.get("disease", 0) < 2:
+                rows.append({**row, "design": "skipped: < 2 units in an arm"})
+                continue
+            d = design
+            if species == "mouse" and sub.obs["study"].nunique() < 2:
+                d = "~ condition"
+            try:
+                r = fit(sub, d, "condition", "disease", "control", n_cpus, adaptive=(species == "mouse"))
+            except (np.linalg.LinAlgError, ValueError) as e:  # singular design after the removal
+                rows.append({**row, "design": f"failed: {e}"})
+                log.info("%s %s leave out %s: %s", t, species, u, e)
+                continue
+            f = f"{species}_loo_{safe}_{t}.tsv"
+            r.to_csv(out / f, sep="\t", index=False)
+            rows.append({**row, "file": f, "design": d})
+            pd.DataFrame(rows).to_csv(out / f"loo_{t}.tsv", sep="\t", index=False)
+            log.info("%s %s leave out %s done (%s)", t, species, u, d)
+    pd.DataFrame(rows).to_csv(out / f"loo_{t}.tsv", sep="\t", index=False)
+    (out / f"DONE_{t}").write_text("ok\n")
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--types", default=None)
     p.add_argument("--n-cpus", type=int, default=16)
     p.add_argument("--perm", action="store_true")
+    p.add_argument("--loo", type=int, default=None, help="index into the DE-able types: leave-one-out primary fits")
     a = p.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     types = pd.read_csv(RES / "gd1b_types.csv")
@@ -186,6 +230,9 @@ def main() -> int:
     pb_m.obs["group"] = pb_m.obs["study"] + "_" + pb_m.obs["condition"].astype(str)
     if a.perm:
         run_perm(pb_h, pb_m, de_types, a.n_cpus)
+        return 0
+    if a.loo is not None:
+        run_loo(pb_h, pb_m, de_types[a.loo], a.n_cpus)
         return 0
     summary = []
     for t in de_types:

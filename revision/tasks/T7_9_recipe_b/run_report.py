@@ -10,6 +10,9 @@ Flag, fixed before any seed run: a seed whose ``knn_mixing_entropy`` is below 0.
 selected grid run is listed as poorly mixed and reported separately; the primary D stays the mean
 over seeds (section 2 rule).
 
+Gate G-D2 (``select_recipe.gate``, thresholds unchanged) is applied to every run, the seeds
+included, for disclosure only: the gate selected the s42 grid run and selects nothing here.
+
     python -I revision/tasks/T7_9_recipe_b/run_report.py
 """
 
@@ -26,6 +29,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 
 from training.compare_vs_scvi import compute_integration_metrics  # noqa: E402
+from revision.tasks.T7_9_recipe_b.select_recipe import gate  # noqa: E402
 
 TASK = Path(__file__).resolve().parent
 RUNS = REPO / "training" / "runs"
@@ -57,8 +61,12 @@ def main() -> int:
             continue
         fs = np.load(p, allow_pickle=True)
         alpha, prior = np.asarray(fs["alpha"], float), np.asarray(fs["prior"], float)
+        gd2 = {f"gd2_{k}": v for k, v in gate(RUNS / name).items() if k != "finished"}
+        if not gd2.get("gd2_no_nan", False):
+            rows.append(dict(run_name=name, finished=True, **gd2))
+            continue
         m = compute_integration_metrics(np.asarray(fs["z_mean"]), species, labels, k=15, seed=42)["global"]
-        rows.append(dict(run_name=name, finished=True, **profile(alpha - prior, "clamped"),
+        rows.append(dict(run_name=name, finished=True, **gd2, **profile(alpha - prior, "clamped"),
                          **profile(alpha - raw, "raw"), knn_mixing_entropy=m["knn_mixing_entropy"],
                          knn_species_purity=m["knn_species_purity"],
                          adversarial_accuracy=float(fs["adversarial_accuracy_final"])))
