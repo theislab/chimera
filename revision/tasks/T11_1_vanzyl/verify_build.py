@@ -66,15 +66,14 @@ def main() -> int:
              "n_all_zero": int((obj_tot == 0).sum())}
         b = both[both["species"] == sp] if len(both) else both
         if len(b):
+            b = b[b["source_ortholog_group_id"].isin(src2new)]  # groups kept in the object
             ok = 0
             for _, x in b.iterrows():
-                j = src2new.get(x["source_ortholog_group_id"])
-                if j is None:
-                    continue
-                col = np.asarray(sub.X[:, int(j)].todense()).ravel()
+                col = np.asarray(sub.X[:, int(src2new[x["source_ortholog_group_id"]])].todense()).ravel()
                 ok += int(np.array_equal(col, csv.loc[x["id_row_used"]].to_numpy(dtype=col.dtype)))
-            r["n_symbol_and_id_groups"] = int(len(b))
+            r["n_symbol_and_id_groups_kept"] = int(len(b))
             r["n_equal_to_id_row_cell_by_cell"] = ok
+            r["genes"] = table.set_index("source_ortholog_group_id").loc[b["source_ortholog_group_id"], "hsapiens_gene_name"].tolist()
             bad += int(len(b) - ok)
         bad += mism + int(false_zero.sum())
         rep[sp] = r
