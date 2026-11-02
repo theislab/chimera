@@ -6,7 +6,11 @@ the integration composite (``compute_integration_metrics``, k=15, seed 42, label
 0.4 mixing + 0.6 biology). Ties go to the lower grid_id. The per-run report (Delta-alpha
 sign profile, mixing) runs only after every subset's selection is written.
 
-    python revision/tasks/T11_2b_vz_subsets/select_subsets.py select [--write-seed-manifest]
+    python revision/tasks/T11_2b_vz_subsets/select_subsets.py select [--subsets hmfas,hpig] [--write-seed-manifest]
+
+Grids end in waves (one array, per-user CPU cap), so ``--subsets`` restricts selection to
+subsets whose grid rows have all ended; seeds are written per subset (``seeds_<tag>.tsv``,
+``seed_map_<tag>.tsv``) and selection results per subset (``selection_<tag>.json``).
     python revision/tasks/T11_2b_vz_subsets/select_subsets.py profile
 """
 
@@ -40,11 +44,17 @@ def read_obs(args: str):
     return ad.read_h5ad(REPO / t[t.index("--adata") + 1], backed="r")
 
 
-def select(write_seeds: bool) -> int:
+def select(write_seeds: bool, only: list[str] | None) -> int:
     grid = pd.read_csv(TASK / "grid.tsv", sep="\t")
+    if only:
+        unknown = set(only) - set(grid["subset"])
+        if unknown:
+            raise SystemExit(f"unknown subsets {sorted(unknown)}")
+        grid = grid[grid["subset"].isin(only)]
     OUT.mkdir(parents=True, exist_ok=True)
-    result, tabs, seed_rows, seed_map = {}, [], [], []
+    result, tabs = {}, []
     for subset, g in grid.groupby("subset", sort=False):
+        seed_rows, seed_map = [], []
         a = read_obs(g["args"].iloc[0])
         species = a.obs["species"].astype(str).to_numpy()
         labels = a.obs[LABEL_KEY].astype(str).to_numpy()
@@ -77,23 +87,28 @@ def select(write_seeds: bool) -> int:
                 f"rev-vz-{subset}-s{s}\t{s}\ttraining/runs/rev-vz-{subset}-s{s}\n" for s in SEEDS]
         result[subset] = {"selected": sel, "n_finished": int(tab["finished"].sum()), "n_rows": len(tab)}
         tabs.append(tab)
-    if write_seeds:  # one array holds every subset's seeds
-        (TASK / "seeds_manifest.tsv").write_text("".join(["run_name\targs\n"] + seed_rows))
-        (TASK / "seed_map.tsv").write_text("".join(["run_name\tseed\tsource\n"] + seed_map))
+        tab.to_csv(OUT / f"selection_{subset}.tsv", sep="\t", index=False)
+        (OUT / f"selection_{subset}.json").write_text(json.dumps(result[subset], indent=2))
+        if write_seeds and sel is not None:
+            (TASK / f"seeds_{subset}.tsv").write_text("".join(["run_name\targs\n"] + seed_rows))
+            (TASK / f"seed_map_{subset}.tsv").write_text("".join(["run_name\tseed\tsource\n"] + seed_map))
     allt = pd.concat(tabs)
-    allt.to_csv(OUT / "selection.tsv", sep="\t", index=False)
-    (OUT / "selection.json").write_text(json.dumps(result, indent=2))
     with pd.option_context("display.width", 250, "display.max_columns", 40):
         print(allt.to_string(index=False))
     print(json.dumps(result, indent=2))
     return 0
 
 
-def profile() -> int:
+def profile(only: list[str] | None) -> int:
     grid = pd.read_csv(TASK / "grid.tsv", sep="\t")
-    sel = json.loads((OUT / "selection.json").read_text())
-    if any(v["n_finished"] != v["n_rows"] for v in sel.values()):
-        raise SystemExit("selection is not complete for every subset: the report runs after it")
+    if only:
+        grid = grid[grid["subset"].isin(only)]
+    sel = {}
+    for subset in grid["subset"].unique():
+        f = OUT / f"selection_{subset}.json"
+        if not f.exists():
+            raise SystemExit(f"no selection for {subset}: the report runs after it")
+        sel[subset] = json.loads(f.read_text())
     rows = []
     for subset, g in grid.groupby("subset", sort=False):
         a = read_obs(g["args"].iloc[0])
@@ -128,7 +143,7 @@ def profile() -> int:
         seeds = t.index[t["run_name"].str.fullmatch(rf"rev-vz-{subset}-s\d+")]
         if len(ref):
             tab.loc[seeds, "flag_poorly_mixed"] = tab.loc[seeds, "knn_mixing_entropy"] < FLAG_RATIO * float(ref.iloc[0])
-    tab.to_csv(OUT / "run_profile.tsv", sep="\t", index=False)
+    tab.to_csv(OUT / f"run_profile_{'_'.join(sorted(grid['subset'].unique()))}.tsv", sep="\t", index=False)
     with pd.option_context("display.width", 300, "display.max_columns", 50):
         print(tab.to_string(index=False))
     return 0
@@ -138,8 +153,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["select", "profile"])
     ap.add_argument("--write-seed-manifest", action="store_true")
+    ap.add_argument("--subsets", default=None, help="comma-separated subset tags (default: all)")
     a = ap.parse_args()
-    return select(a.write_seed_manifest) if a.mode == "select" else profile()
+    only = a.subsets.split(",") if a.subsets else None
+    return select(a.write_seed_manifest, only) if a.mode == "select" else profile(only)
 
 
 if __name__ == "__main__":

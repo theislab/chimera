@@ -77,8 +77,9 @@ gene and no biology readout enters selection.
 ## Seeds
 
 Seeds 42-44 per subset: `rev-vz-<tag>-s42` is the selected grid run; `rev-vz-<tag>-s43` and `-s44` are
-trained with its arguments. `select_subsets.py select --write-seed-manifest` writes one array manifest
-(`seeds_manifest.tsv`) and `seed_map.tsv`.
+trained with its arguments. `select_subsets.py select --subsets <tags> --write-seed-manifest` writes
+`seeds_<tag>.tsv` and `seed_map_<tag>.tsv` per subset; it is run for a subset only once all of that
+subset's grid rows have ended, since the grids end in waves.
 
 ## Per-run report (`select_subsets.py profile`, not part of selection)
 
