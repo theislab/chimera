@@ -180,12 +180,15 @@ def score(row: dict, h5ad: str | None) -> None:
         res["D"], res["D_raw"] = da - da.median(), dr - dr.median()
         res["correction"] = st["correction"].astype(float)
         z = np.asarray(st["z_mean"], dtype=np.float32)
-        cl = T42.leiden_clusters(z)
-        xz, fz, _, _ = pseudobulk_fb(X, spc, cl, library, RU.MIN_CELLS_CLUSTER, "all")
-        Ez, _, _ = T42.pooled_E(xz, fz, species, G)
-        res["B1z"] = Ez
+        if np.isfinite(z).all():
+            cl = T42.leiden_clusters(z)
+            xz, fz, _, _ = pseudobulk_fb(X, spc, cl, library, RU.MIN_CELLS_CLUSTER, "all")
+            Ez, _, _ = T42.pooled_E(xz, fz, species, G)
+            res["B1z"] = Ez
+        else:
+            res["B1z"] = np.nan  # a fit that went non-finite: discarded by the health rule, direct scores of the object still stand
         cfg_run = json.loads((run_dir / "config.json").read_text())
-        if (run_dir / "model").exists():
+        if (run_dir / "model").exists() and np.isfinite(z).all():
             import torch
 
             torch.set_num_threads(int(os.environ.get("SLURM_CPUS_PER_TASK", 4)))
@@ -201,7 +204,8 @@ def score(row: dict, h5ad: str | None) -> None:
                  frac_S_zero=float((np.abs(st["S_g_ema"]) < 1e-6).mean()),
                  rho_D_S=float(pd.Series(res["D"]).corr(pd.Series(res["S_g"]), method="spearman")),
                  lib_median={s: float(np.median(np.asarray(X[spc == s].sum(1)).ravel())) for s in species}, n_cells=int(a.n_obs))
-        h.update(species_mixing(z, spc))
+        if np.isfinite(z).all():
+            h.update(species_mixing(z, spc))
         try:
             s = json.loads((run_dir / "summary.json").read_text())
             h["adv_acc_final"] = s["key_metrics"].get("adv_acc_final")
