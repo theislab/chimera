@@ -51,7 +51,8 @@ def chimera_part(res, st, a, X, spc, library, run, cohort, setting, direct: bool
     res["correction"] = st["correction"].astype(float)
     z = np.asarray(st["z_mean"], dtype=np.float32)
     cfg_run = json.loads((run_dir / "config.json").read_text())
-    if direct:
+    fin0 = bool(np.isfinite(z).all() and np.isfinite(st["alpha"]).all())
+    if direct and fin0:
         cl = T42.leiden_clusters(z)
         xz, fz, _, _ = SR.pseudobulk_fb(X, spc, cl, library, RU.B2.MIN_CELLS_CLUSTER, "all")
         res["B1z"] = T42.pooled_E(xz, fz, species, X.shape[1])[0]
