@@ -201,7 +201,7 @@ def tidy() -> pd.DataFrame:
     cap = pd.read_csv(RU.OUT / "capacity.csv")
     for (c, m), g in cap.groupby(["cohort", "method"]):
         add("latent", f"cohort={c};mode=in_model", m, "capacity_nats", g.capacity)
-        add("latent", f"cohort={c};mode=in_model", m, "effective_axes", g.axes)
+        add("latent", f"cohort={c};mode=in_model", m, "effective_axes", g["axes"])
         add("latent", f"cohort={c};mode=in_model", m, "species_auroc_in_largest_label", g.sp_auc_biglabel, "lower")
     dp = pd.read_csv(RU.OUT / "depth_axis.csv")
     for (c, m), g in dp.groupby(["cohort", "method"]):
