@@ -5,6 +5,10 @@ value in the task. Aggregate of a track = mean of a method's within-task scaled 
 beside. A method applicable to a task but with no value (failed fit, tool that failed there) ranks last in it. Not applicable (static score on agreement; a tool not run on that setting) is left out and drawn
 hatched. A row of the tidy tables enters if rank_direction is 'higher' or 'lower'. Every task appears: page 1 groups tasks by track and family, page 2 draws every task as its own column.
 
+Undefined cells (amendment by the coordinator after the liver 1:20 reading, before the overview was first computed). A method with no value in a task that is applicable to it (for instance a profile score when one species keeps fewer than two shared types) is not a measured
+loss. The committed rule stays and is reported as `overall`: it ranks last. Beside it `overall_excl_undefined`: such cells are left out and each task ranked among the methods with a value. Both are written for every method, Chimera included; in the figures undefined cells are drawn NA,
+never as a low score. `undefined_cells.csv` lists every such cell, with the groups left in the setting where known; the text states their number.
+
 Track I (integration, added by the coordinator's instruction before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
 keeps its committed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
 
@@ -16,6 +20,7 @@ Re-runnable as B1, C1 and new cohorts add results. Outputs: results/revision/B2/
 from __future__ import annotations
 
 import glob
+import json
 from pathlib import Path
 
 import numpy as np
@@ -51,31 +56,40 @@ def applicable(track: str, task: str, method: str) -> bool:
     return True
 
 
-def rank_tasks(t: pd.DataFrame, tools_expected: dict[str, list[str]] | None = None) -> pd.DataFrame:
+def tool_ran(method: str, task: str) -> bool:
+    """A tool has output for this Track B setting, so a task with no value from it is undefined, not not-applicable."""
+    p = task.split("|")
+    return (RU.RES / "tool_scores" / method / f"{RU.run_name(p[3], p[2], 0)}.csv").exists()
+
+
+def rank_tasks(t: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for (track, task, metric), g in t.groupby(["track", "task", "metric"], sort=False):
         d = g.drop_duplicates("method").set_index("method")
         v = d["value"].astype(float) * (1 if (d["rank_direction"] == "higher").all() else -1)
         r = (-v).rank(method="average")
-        n = len(v)
-        # methods in the panel of this task with no value and not excused rank last
-        ran_any_tool = any(m in v.index for m in RU.TOOLS)
-        missing = [m for m in RU.CHIMERA + RU.DIRECT if m not in v.index and applicable(track, task, m)]
-        if missing and track in ("B",):
-            n = n + len(missing)
+        n_def = len(v)
+        missing = []
+        if track == "B":  # the committed rule acts where every method has a reading to give
+            missing = [m for m in RU.CHIMERA + RU.DIRECT if m not in v.index and applicable(track, task, m)]
+            missing += [m for m in RU.TOOLS if m not in v.index and tool_ran(m, task)]
+        n = n_def + len(missing)
         for m in v.index:
-            rows.append(dict(track=track, task=task, metric=metric, method=m, value=float(d.loc[m, "value"]), rank=float(r[m]), n_methods=n, scaled=(float(r[m]) - 1) / max(n - 1, 1), filled=False))
-        if track == "B":
-            for m in missing:
-                rows.append(dict(track=track, task=task, metric=metric, method=m, value=np.nan, rank=float(n), n_methods=n, scaled=1.0, filled=True))
+            rows.append(dict(track=track, task=task, metric=metric, method=m, value=float(d.loc[m, "value"]), rank=float(r[m]), n_methods=n, scaled=(float(r[m]) - 1) / max(n - 1, 1),
+                             scaled_excl=(float(r[m]) - 1) / (n_def - 1) if n_def > 1 else np.nan, undefined=False))
+        for m in missing:
+            rows.append(dict(track=track, task=task, metric=metric, method=m, value=np.nan, rank=float(n), n_methods=n, scaled=1.0, scaled_excl=np.nan, undefined=True))
     return pd.DataFrame(rows)
 
 
 def aggregate(R: pd.DataFrame) -> pd.DataFrame:
-    a = R.groupby(["track", "method"]).agg(mean_scaled=("scaled", "mean"), mean_rank=("rank", "mean"), n_tasks=("task", "nunique")).reset_index()
+    a = R.groupby(["track", "method"]).agg(mean_scaled=("scaled", "mean"), mean_scaled_excl=("scaled_excl", "mean"), mean_rank=("rank", "mean"), n_tasks=("task", "nunique"), n_undefined=("undefined", "sum")).reset_index()
     wide = a.pivot(index="method", columns="track", values="mean_scaled")
     gene = [c for c in wide.columns if c != "I"]
     wide["overall"] = wide[gene].mean(1, skipna=True)
+    ex = a.pivot(index="method", columns="track", values="mean_scaled_excl")
+    wide["overall_excl_undefined"] = ex[[c for c in gene if c in ex]].mean(1, skipna=True)
+    wide["n_undefined_cells"] = a[a.track != "I"].groupby("method").n_undefined.sum()
     wide["n_tracks"] = wide[gene].notna().sum(1)
     if "I" in wide:
         i = wide["I"].copy()
@@ -84,7 +98,7 @@ def aggregate(R: pd.DataFrame) -> pd.DataFrame:
                 wide.loc[tool, "overall_with_I"] = float(np.nanmean(list(wide.loc[tool, gene].astype(float)) + [i[f"I:{tool}"]]))
     un = a.pivot(index="method", columns="track", values="mean_rank").add_prefix("mean_rank_")
     nt = a.pivot(index="method", columns="track", values="n_tasks").add_prefix("n_tasks_")
-    return wide.join(un).join(nt).sort_values("overall")
+    return wide.join(un).join(nt).join(ex.add_prefix("excl_")).sort_values("overall")
 
 
 def family_of(task: str) -> str:
@@ -112,7 +126,7 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
         ag = R["metric"].eq("agreement_partial")
         R.loc[ag, "col"] = R.loc[ag, "track"] + "|" + R.loc[ag, "fam"] + " agree"
     cols = [c for tr in tracks for c in sorted(R.loc[R.track == tr, "col"].unique())]
-    M = R.groupby(["method", "col"]).scaled.mean().unstack().reindex(index=methods, columns=cols)
+    M = R[~R.undefined].groupby(["method", "col"]).scaled.mean().unstack().reindex(index=methods, columns=cols)
     N = R.groupby("col").task.nunique().reindex(cols)
     cmap = matplotlib.colors.LinearSegmentedColormap.from_list("rank", ["#1b4f8f", "#7fa8cf", "#e9e9e9"])
     with PdfPages(OUT / "overview.pdf") as pdf:
@@ -128,7 +142,7 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
                 else:
                     ax.scatter(j, i, s=30, facecolors="none", edgecolors="#bbbbbb", hatch="////", linewidths=0.3)
             ax.barh(i, (1 - A.loc[m, "overall"]) * 2.4, left=x_over, height=0.62, color="#1b4f8f")
-            ax.text(x_over + 2.5, i, f"{A.loc[m, 'overall']:.2f}", va="center", ha="left", fontsize=5.5, color="#333333")
+            ax.text(x_over + 2.5, i, f"{A.loc[m, 'overall']:.2f} / {A.loc[m, 'overall_excl_undefined']:.2f}", va="center", ha="left", fontsize=5.5, color="#333333")
         ax.set_yticks(range(len(methods)))
         ax.set_yticklabels([METHOD_LABEL.get(m, m) for m in methods])
         ax.set_ylim(len(methods) - 0.5, -2.2)
@@ -145,7 +159,7 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
             ax.plot([prev - 0.4, cu - 0.6], [-1.0, -1.0], color="#333333", lw=1)
             ax.text((prev + cu - 1) / 2, -1.25, f"Track {tr}", ha="center", va="bottom", fontsize=7)
             prev = cu
-        ax.text(x_over, -1.25, "overall (lower is better)", ha="left", va="bottom", fontsize=6)
+        ax.text(x_over, -1.25, "overall, committed / undefined cells excluded (lower is better)", ha="left", va="bottom", fontsize=6)
         fig.tight_layout()
         pdf.savefig(fig)
         fig.savefig(OUT / "overview.png", dpi=220)
@@ -153,14 +167,14 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
         # page 2: every task
         tt = R.drop_duplicates(["track", "task", "metric"]).sort_values(["track", "fam", "task"])
         keys = list(zip(tt.track, tt.task, tt.metric))
-        F = R.set_index(["track", "task", "metric", "method"]).scaled
+        F = R[~R.undefined].set_index(["track", "task", "metric", "method"]).scaled
         P = np.full((len(methods), len(keys)), np.nan)
         for i, m in enumerate(methods):
             for j, k in enumerate(keys):
                 P[i, j] = F.get((*k, m), np.nan)
         fig, ax = plt.subplots(figsize=(min(17, max(8, 0.018 * len(keys) + 3)), 0.2 * len(methods) + 1.2))
         cm = cmap.copy()
-        cm.set_bad("#ffffff")
+        cm.set_bad("#d9d9d9")  # NA: undefined or not applicable, never a low score
         ax.imshow(np.ma.masked_invalid(P), aspect="auto", cmap=cm, vmin=0, vmax=1, interpolation="nearest")
         ax.set_yticks(range(len(methods)))
         ax.set_yticklabels([METHOD_LABEL.get(m, m) for m in methods])
@@ -202,6 +216,14 @@ def main():
     t = read_tidy()
     R = rank_tasks(t)
     R.to_csv(OUT / "ranks_long.csv", index=False)
+    U = R[R.undefined].copy()
+    if len(U):
+        def groups(task):
+            p = task.split("|")
+            f = RU.RES / "meta" / f"{RU.run_name(p[3], p[2], 0)}.json"
+            return "" if not f.exists() else ";".join(json.loads(f.read_text()).get("groups", []))
+        U["shared_groups_r0"] = U["task"].map(groups)
+    U.to_csv(OUT / "undefined_cells.csv", index=False)
     A = aggregate(R)
     A.to_csv(OUT / "aggregate.csv")
     print(A.round(3).to_string())
