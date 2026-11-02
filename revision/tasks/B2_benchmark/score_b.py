@@ -57,7 +57,12 @@ def consensus(frames: list[pd.Series], index, min_reps: int = RU.MIN_REPS) -> tu
     return c, M
 
 
+LABEL_BLIND_TOOLS = ("CAMEX", "SAMap")  # read no labels: on label-only settings their reading is that of `full`, marked label-independent, as Chimera on liver
+
+
 def tool_scores(tool: str, cohort: str, setting: str, index, reps=RU.REPS):
+    if tool in LABEL_BLIND_TOOLS and setting in RU.SETTINGS and RU.SETTINGS[setting]["family"] == "label":
+        setting = "full"
     fr = []
     for r in reps:
         p = TL / tool / f"{RU.run_name(cohort, setting, r)}.csv"
@@ -112,6 +117,8 @@ def reference(cohort: str, index) -> dict:
             out[k] = consensus(cols, index)[0]
     for t in RU.TOOLS:
         c, _ = tool_scores(t, cohort, "ref", index)
+        if c is None:  # deterministic given the data, or no reference seed: the full reading itself
+            c, _ = tool_scores(t, cohort, "full", index)
         if c is not None:
             out[t] = c
     return out
@@ -187,7 +194,7 @@ def score_task(cohort: str, setting: str) -> None:
             gold = RU.B_GOLDS[cohort][kind][0]
             d = dict(task=f"B|{fam}|{setting}|{cohort}|{kind}", metric="rho_p", gold=gold, rank_direction="higher")
         d.update(method=m, value=r["value"], ci_lo=r["ci_lo"], ci_hi=r["ci_hi"], n=r["n"], n_blocks=r["n_blocks"],
-                 flag=("label-independent" if label_indep and m in METHODS_FIT else ""))
+                 flag=("label-independent" if (label_indep and m in METHODS_FIT) or (fam == "label" and m in LABEL_BLIND_TOOLS) else ""))
         if kind != "agreement" and m in ("S_fwd", "D_raw", "random"):
             d["rank_direction"] = ""  # exploratory or control: tabled, not ranked
         if kind == "agreement" and m in ("S_fwd", "D_raw"):
