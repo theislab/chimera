@@ -478,7 +478,7 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
             U.append(unit(f"{h}:multi_nonzero:D", "F3", "multi_species_estimate_nonzero_all_species", h, mc, g, cov,
                           ["D"], subset="nonzero_all_species"))
         if tools is not None:
-            for t in [c for c in tools.columns if c != "hsapiens_gene_id"]:
+            for t in [c for c in tools.columns if c not in ("hsapiens_gene_id", "cohort")]:
                 U.append(unit(f"{h}:tool:{t}", "F1_tools", "tool_vs_D3", h, c, g, cov, ["D3", t]))
     U.append(unit("H1:evee_mean", "F3", "evee_mean_in_C", "H1", "liv_hmouse", "G_H1", "C_eveemean_liver", ["D"]))
     U.append(unit("H2:evee_mean", "F3", "evee_mean_in_C", "H2", "test_hmouse", "G_H2", "C_eveemean_testis", ["D"]))
@@ -508,6 +508,14 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
             for b in J + ["B3b"]:
                 U.append(dict(kind="set", id=f"set:{tis}:{s}:{b}", family="F3", tissue=tis, cohort=c, set=s, score=b,
                               strata="pi_expr", direction=d))
+    if tools is not None:  # curated sets for the primary tool scalars and D_3, Family 3 (T5.6, L4)
+        for tis, sets in SETS.items():
+            c = SET_COHORT[tis]
+            for s in sets:
+                d = "above" if s.startswith("C") else "below"
+                for t in ["D3"] + [x for x in tools.columns if x not in ("hsapiens_gene_id", "cohort")]:
+                    U.append(dict(kind="set", id=f"set:{tis}:{s}:{t}", family="F3", tissue=tis, cohort=c, set=s,
+                                  score=t, strata="pi_expr", direction=d))
     for s in SETS["liver"]:  # 4-sp set estimates (Figs 4-6 cohort) and the nonzero-in-every-species subset
         d = "above" if s.startswith("C") else "below"
         for sub in (None, "nonzero_all_species"):
@@ -569,7 +577,8 @@ def main(argv=None):
             D = DATA[c]
             idx = [D["seeds"].index(s) for s in (42, 43, 44)]
             D["tab"]["D3"] = D["M"][:, idx].mean(1)
-            D["tab"] = D["tab"].join(tools.set_index("hsapiens_gene_id"), on="hsapiens_gene_id")
+            per = tools[tools["cohort"] == c].drop(columns="cohort").set_index("hsapiens_gene_id")
+            D["tab"] = D["tab"].join(per, on="hsapiens_gene_id")
     units = build_units(tools) + calib_units()
     if a.only:
         import re
