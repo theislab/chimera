@@ -66,7 +66,7 @@ def leiden_species(X, P: dict) -> np.ndarray:
     h = a[:, a.var["highly_variable"].to_numpy()].copy()
     sc.pp.scale(h, max_value=10)
     sc.tl.pca(h, n_comps=P["n_pcs"], svd_solver="arpack", random_state=P["seed"])
-    sc.pp.neighbors(h, n_neighbors=P["n_neighbors"], n_pcs=P["n_pcs"], random_state=P["seed"])
+    sc.pp.neighbors(h, n_neighbors=P["n_neighbors"], n_pcs=P["n_pcs"], transformer="sklearn", random_state=P["seed"])
     sc.tl.leiden(h, resolution=P["resolution"], flavor="igraph", n_iterations=2, directed=False,
                  random_state=P["seed"])
     return h.obs["leiden"].astype(str).to_numpy()
