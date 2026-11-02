@@ -1,0 +1,22 @@
+gold	coarse_type	human_cell_type	tms_cell_type
+kidney_fine	pt	epithelial cell of proximal tubule	kidney proximal convoluted tubule epithelial cell
+kidney_fine	pt		epithelial cell of proximal tubule
+kidney_fine	pt		kidney proximal straight tubule epithelial cell
+kidney_fine	tal	kidney loop of Henle cortical thick ascending limb epithelial cell	kidney loop of Henle thick ascending limb epithelial cell
+kidney_fine	tal		kidney loop of Henle ascending limb epithelial cell
+kidney_fine	dct	kidney distal convoluted tubule epithelial cell	kidney distal convoluted tubule epithelial cell
+kidney_fine	pc	renal principal cell	kidney collecting duct principal cell
+kidney_fine	pc	kidney cortex collecting duct epithelial cell	kidney collecting duct epithelial cell
+kidney_fine	endothelial	kidney capillary endothelial cell	fenestrated endothelial cell
+kidney_fine	endothelial		kidney capillary endothelial cell
+kidney_fine	mesangial	mesangial cell	mesangial cell
+kidney_fine	macrophage	mononuclear phagocyte	macrophage
+kidney_fine	b_cell	B cell	B cell
+kidney_fine	t_cell	T cell	T cell
+kidney_fine	nk	natural killer cell	natural killer cell
+islet_fine	alpha	pancreatic A cell	pancreatic A cell
+islet_fine	beta	type B pancreatic cell	type B pancreatic cell
+islet_fine	delta	pancreatic D cell	pancreatic D cell
+islet_fine	pp	pancreatic PP cell	pancreatic PP cell
+islet_fine	ductal	pancreatic ductal cell	pancreatic ductal cell
+islet_fine	acinar	pancreatic acinar cell	pancreatic acinar cell
