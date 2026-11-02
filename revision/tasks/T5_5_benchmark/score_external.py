@@ -161,7 +161,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     fd.apply_design()
     fd.set_figure_dir(FIG)
-    master = pd.read_csv(CACHE / "master_table.csv")
+    master = pd.read_csv(CACHE / "master_table.csv", float_precision="round_trip")  # exact comparison below
     for tool_dir in NEW.values():
         for ds, (stem, _, _) in DATASETS.items():
             if not (latent_dir(tool_dir, stem) / "z_mean.npy").exists():
