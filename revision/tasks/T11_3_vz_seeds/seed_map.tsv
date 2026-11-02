@@ -1,0 +1,6 @@
+run_name	seed	source
+rev-vz-s42	42	rev-vz-grid1-s42 (selected grid run, grid_id 1)
+rev-vz-s43	43	training/runs/rev-vz-s43
+rev-vz-s44	44	training/runs/rev-vz-s44
+rev-vz-s45	45	training/runs/rev-vz-s45
+rev-vz-s46	46	training/runs/rev-vz-s46

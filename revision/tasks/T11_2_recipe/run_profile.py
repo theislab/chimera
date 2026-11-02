@@ -1,7 +1,8 @@
 """Per-run report for the Van Zyl grid and seeds: Delta-alpha sign profile and species mixing.
 
 Descriptive only, and never an input to the recipe choice: it refuses to run until
-``select_recipe.py`` has written its selection on all grid runs. Writes
+``select_recipe.py`` has written its selection, which is run once every grid row has ended
+(finished, or cancelled after a non-finite loss). Writes
 ``results/revision/T11_2/run_profile.tsv``.
 
 For each finished run, against the training prior (clamped where the recipe clamps) and
@@ -72,9 +73,7 @@ def main() -> int:
     sel_path = OUT / "selection.json"
     if not sel_path.exists():
         raise SystemExit("run select_recipe.py first")
-    sel = json.loads(sel_path.read_text())
-    if sel["n_finished"] != len(grid):
-        raise SystemExit("selection is not complete: this report runs after it")
+    sel = json.loads(sel_path.read_text())  # written only once every grid row has ended
     selected = (sel.get("selected") or {}).get("run_name")
 
     a = ad.read_h5ad(ADATA, backed="r")
