@@ -82,6 +82,14 @@ Lead B. Species-resolved margins in one joint fit
 
 Seeds. Lead A and B forward passes on the canonical runs and the seeds listed in SEEDS (all exist and were
 trained before X7). A seed result is reported as range; nothing is selected by seed.
+
+Amendment 1, 2026-11-02, before any Chimera X7 output was read (only the golds had been computed): Murat's
+primate objects carry the ten fine stages (Undifferentiated/Differentiated Spermatogonia, Leptotene/Zygotene/
+Pachytene Spermatocytes, Early/Late Round, Elongated spermatids, Sertoli, Other_somatic), the outgroups only the
+coarse types. The coarse map therefore also maps the fine labels (T4.2 TESTIS_COARSE). Added test A-i fine:
+test_hmac (human and macaque both carry the ten fine stages), type value per fine stage against the PP-tier
+divergence per fine stage across the five held-out primates (10 pairs), same statistic; and the same for
+test_3sp restricted to human and macaque cells.
 """
 
 from __future__ import annotations
@@ -98,7 +106,13 @@ LIVER_H3_MAP = {"Hepatocytes": "hepatocyte", "Endothelial": "endothelial", "fibr
 LIVER_MACRO = {"Macrophages": "macrophage", "Kupffer cells": "macrophage"}
 TESTIS_TYPES = ["SG", "SC", "rSD", "eSD", "Sertoli", "Other_somatic"]
 MURAT_COARSE = {"Spermatogonia": "SG", "Spermatocytes": "SC", "Round_spermatids": "rSD",
-                "Elongated_spermatids": "eSD", "Sertoli": "Sertoli", "Other_somatic": "Other_somatic"}
+                "Elongated_spermatids": "eSD", "Sertoli": "Sertoli", "Other_somatic": "Other_somatic",
+                "Undifferentiated_Spermatogonia": "SG", "Differentiated_Spermatogonia": "SG",
+                "Leptotene_Spermatocytes": "SC", "Zygotene_Spermatocytes": "SC", "Pachytene_Spermatocytes": "SC",
+                "Early_Round_spermatids": "rSD", "Late_Round_spermatids": "rSD"}
+FINE_STAGES = ["Undifferentiated_Spermatogonia", "Differentiated_Spermatogonia", "Leptotene_Spermatocytes",
+               "Zygotene_Spermatocytes", "Pachytene_Spermatocytes", "Early_Round_spermatids", "Late_Round_spermatids",
+               "Elongated_spermatids", "Sertoli", "Other_somatic"]
 TESTIS_TIER = {"test_hmac": "PP", "test_hmouse": "PO", "test_3sp": "all"}
 GOLD_COHORTS_A = {"liv_hmouse": "liver", "liv_4sp": "liver", "test_hmac": "testis", "test_hmouse": "testis",
                   "test_3sp": "testis"}
