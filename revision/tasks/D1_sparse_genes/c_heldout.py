@@ -29,7 +29,8 @@ def runs_of(c, fold, arm):
             hh = json.loads(h.read_text())
             used.append(dict(run=run, **{k: hh.get(k) for k in ("discard", "mix_entropy", "adv_acc_final", "rho_D_S", "frac_S_zero", "tail_pos", "tail_neg", "sat_hi", "active_dims")}))
             if not hh.get("discard", False):
-                fr.append(pd.read_parquet(p).set_index("hsapiens_gene_id"))
+                f = pd.read_parquet(p).set_index("hsapiens_gene_id")
+                fr.append(f[~f.index.duplicated(keep=False)])
     return fr, used
 
 

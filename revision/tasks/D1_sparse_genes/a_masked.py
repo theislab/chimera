@@ -63,8 +63,6 @@ def unit(c, kind, gold, covs, stratum, universe, split):
             out.append(dict(r, group="given_C_kNN_Block"))
         for r in CM.rho_rows(t, gold, covs, ["D"], r0, None, RU.N_DRAWS, lab, extra_spline=["R_S_p"]):
             out.append(dict(r, group="given_C_R_S_p"))
-        for r in CM.rho_rows(t, gold, covs, ["R_S_p"], r0, "R_S_p", RU.N_DRAWS, lab):
-            pass
         for r in CM.rho_rows(t, gold, covs, ["R_S_p", "R_Sdir_p", "R_B1_p"], r0, "R_S_p", RU.N_DRAWS, lab):
             out.append(dict(r, group="target"))
     return out
