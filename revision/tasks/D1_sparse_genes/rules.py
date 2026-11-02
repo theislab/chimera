@@ -107,3 +107,18 @@ def register() -> None:
 
 def useed(*parts) -> int:
     return zlib.crc32("|".join(map(str, ("D1",) + parts)).encode()) & 0x7FFFFFFF
+
+
+# Committed test L (coordinator, 2026-11-02, 21:25), before any label-free cluster margin exists. Chosen after S_fwd was read on masked genes, so its comparators are new and its reading of S_fwd is not blind.
+# Question: is S_fwd's label-free reading of sparse genes specific to Chimera, or does any latent with clusters give it?
+# Sdir_scvi: X6 Sdir with Leiden clusters (15-NN, resolution 1, T4.2 code) of scVI(batch=species, 100 epochs, 10 latent, 128 hidden, training/compare_vs_scvi.py) in place of labels, mean over seeds 42-44 at full
+# depth (S_fwd is a mean over 3 fits), one seed per replicate at depth 25%. Sdir_pca: same on 30 PCs of log1p CP10K, 2,000 HVGs by species, genes centred within species, deterministic.
+# Same cells, same counts. Cohorts liv_hmouse, liv_4sp, test_hmouse, kidney. Sets: masked clean genes; sparse_f at depth25. Golds in L_GOLDS, primary = first of each cohort.
+# Statistic rho_p given C_pat with ref S_fwd, 10,000 ESM-block draws, odd then even. Labelled Sdir and Lfc beside.
+# leads: S_fwd - max(Sdir_scvi, Sdir_pca) >= 0.03 with CI lower > 0 on odd and on even. trails: the reverse. Otherwise ties.
+# The candidate holds only if S_fwd leads on >= 2 of 4 cohorts on primary golds, masked genes, and trails on none; depth 25% read the same way where a healthy fit exists. A depth cell with no finished fit is "Chimera did not finish".
+L_COHORTS = ["liv_hmouse", "liv_4sp", "test_hmouse", "kidney"]
+L_GOLDS = {"liv_hmouse": ["pattern", "level_atlas"], "liv_4sp": ["pattern", "level_atlas"], "test_hmouse": ["pattern", "pattern_primates"], "kidney": ["pattern", "pattern_fine", "level_atlas"]}
+L_SEEDS = [42, 43, 44]
+L_HVG = 2000
+L_PCS = 30
