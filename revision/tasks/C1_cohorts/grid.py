@@ -76,7 +76,10 @@ def seeds_manifest(cohort: str, row: str, seeds=(43, 44)) -> Path:
 
 
 def runs_of(cohort: str) -> list[str]:
-    return sorted(d.name for d in RUNS.glob(f"rev-c1-{tag(cohort)}-*-s*") if d.is_dir())
+    import re
+
+    rx = re.compile(rf"^rev-c1-{re.escape(tag(cohort))}-[ab](A|2A|x[0-9.]+)-s\d+$")
+    return sorted(d.name for d in RUNS.glob(f"rev-c1-{tag(cohort)}-*-s*") if d.is_dir() and rx.match(d.name))
 
 
 def embedding(run: str, a: ad.AnnData) -> dict:
@@ -103,6 +106,31 @@ def canonical_embedding_floor(k: int) -> dict:
     return t
 
 
+CANON_LT_FLOOR = {2: 0.704, 3: 0.956}  # lowest label transfer of the canonical cohorts per K class, results/revision/H1/cohort_table.csv
+
+
+def select(t: pd.DataFrame, k: int, scvi: dict) -> dict:
+    """Plan 13.0: among healthy s42 rows, rows within 0.03 of the best rho, higher composite wins; a row below the canonical floor is flagged and a healthy unflagged row within 0.05 replaces it."""
+    h = t[(t["healthy"] == True) & t["run"].str.endswith("-s42")].copy()  # noqa: E712
+    if h.empty:
+        return dict(selected=None, reason="no healthy row")
+    floor = CANON_LT_FLOOR[2 if k == 2 else 3]
+    h["flag_embedding"] = h["emb_label_transfer_acc"] < floor
+    best = h["rho_DS"].max()
+    band = h[h["rho_DS"] >= best - TOP_SEED_BAND].copy()
+
+    def mm(x):
+        return (x - x.min()) / (x.max() - x.min()) if x.max() > x.min() else x * 0 + 0.5
+
+    band["composite"] = 0.4 * mm(band["emb_knn_mixing_entropy"]) + 0.6 * (mm(band["emb_label_transfer_acc"]) + mm(band["emb_sil_celltype"])) / 2
+    pick = band.sort_values(["composite", "rho_DS"], ascending=False).iloc[0]
+    if pick["flag_embedding"]:
+        alt = h[(~h["flag_embedding"]) & (h["rho_DS"] >= pick["rho_DS"] - FLAG_BAND)]
+        if len(alt):
+            pick = alt.sort_values("rho_DS", ascending=False).iloc[0]
+    return dict(selected=pick["run"], rho_DS=float(pick["rho_DS"]), label_transfer=float(pick["emb_label_transfer_acc"]), floor=floor, flagged=bool(pick["flag_embedding"]), n_healthy=len(h), scvi=scvi)
+
+
 def report(cohort: str) -> pd.DataFrame:
     sys.path.insert(0, str(ROOT / "revision/tasks/Z1_retune"))
     import diagnostics as ZD  # noqa: PLC0415
@@ -123,6 +151,11 @@ def report(cohort: str) -> pd.DataFrame:
     t.insert(0, "cohort", cohort)
     out = CF.RES / cohort
     t.to_csv(out / "grid_report.tsv", sep="\t", index=False)
+    k = int(depth_ratio(cohort)[1])
+    if "healthy" in t:
+        sel = select(t, k, scvi_reference(cohort))
+        (out / "selection.json").write_text(json.dumps(sel, indent=2, default=float))
+        print(sel)
     return t
 
 
