@@ -5,7 +5,7 @@ CAP=${1:-170}; MEMCAP=${2:-680}
 Q=revision/tasks/B1_ground_truth/queue.tsv
 T=revision/tasks/B1_ground_truth
 L=results/revision/B1/logs
-export SBATCH_EXCLUDE=${B1_EXCLUDE:-cpusrv114}  # node where every job fails with mamba not found (2026-11-02)
+EX=--exclude=${B1_EXCLUDE:-cpusrv114}  # node where every job fails with mamba not found (2026-11-02)
 n=$(($(wc -l < $Q) - 1))
 STATE=results/revision/B1/feeder.state
 i=$(cat "$STATE" 2>/dev/null || echo 0)
@@ -16,10 +16,10 @@ while (( i < n )); do
   if (( mine + cpus > CAP || mineg + ${mem%G} > MEMCAP )); then sleep 60; continue; fi
   i=$((i + 1))
   case $kind in
-    fit) sbatch -J "b1_$(basename "$manifest" .tsv | sed 's/grid_//')" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/array.sbatch "$manifest" ;;
-    saturn|camex|genespectra|cacimar|samap) sbatch -J "b1tool_$kind" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/tool_array.sbatch "$kind" "$manifest" ;;
-    placebo) sbatch -J "b1plc" -p cpu_p --qos=cpu_normal -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%j.out" --wrap="source revision/slurm/_body.sh; mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.placebo $manifest" ;;
-    trackd) sbatch -J b1trackd --array="$index" -o "$L/%x_%A_%a.out" $T/track_d/job.sbatch ;;
+    fit) sbatch $EX -J "b1_$(basename "$manifest" .tsv | sed 's/grid_//')" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/array.sbatch "$manifest" ;;
+    saturn|camex|genespectra|cacimar|samap) sbatch $EX -J "b1tool_$kind" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/tool_array.sbatch "$kind" "$manifest" ;;
+    placebo) sbatch $EX -J "b1plc" -p cpu_p --qos=cpu_normal -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%j.out" --wrap="source revision/slurm/_body.sh; mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.placebo $manifest" ;;
+    trackd) sbatch $EX -J b1trackd --array="$index" -o "$L/%x_%A_%a.out" $T/track_d/job.sbatch ;;
   esac
   echo "$i" > "$STATE"
   sleep 2
