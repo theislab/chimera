@@ -21,7 +21,6 @@ E=https://ftp.ensembl.org/pub
 case "$1" in
 small)
   M=https://raw.githubusercontent.com/ericminikel/genetic_support/main/data
-  for x in README; do :; done
   for f in pp.tsv merge2.tsv.gz assoc.tsv.gz indic.tsv universe.tsv areas.tsv meta_ccat.tsv meta_hcat.tsv meta_acat.tsv \
            drug_phase_summary.tsv pp_launched_alltime.tsv sim.tsv.gz otg_heavy_hitter_curation.tsv; do
     fetch minikel2024 "$M/$f"

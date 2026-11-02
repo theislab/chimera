@@ -26,7 +26,7 @@ USE 1. Genome annotation check.
                   mouse GRCm38 E84 (an annotation many mouse atlases used), M. fascicularis 5.0 (E98). The model was added or replaced after a reference an atlas may have used.
                   Which release each atlas used is not fully known per dataset, so this is a proxy for "the gene was not in the counting reference".
                   Amended before any join with a readout: Ensembl 98 to 116 proved frozen for macaque, zebrafish and lemur (prevalence near 0, counts only), so the planned label T_new98 had nothing to test there; kept as a column.
-      Only genes with biotype protein_coding in Ensembl 110 enter use 1: liver and testis tables also hold 80 and 637 ncRNA pairs, which have no protein-Compara row.
+      Only genes with biotype protein_coding in Ensembl 110 enter use 1: liver and testis tables also hold 80 and about 640 non-protein pairs, without a protein-Compara row.
     Secondary
       T_goc     : GOC < 50, on pairs where GOC exists.   T_wga: WGA < 50, on pairs where WGA exists.
       T_no3utr  : no three_prime_utr feature on the gene in the Ensembl 110 GTF. 3' chemistry reads the 3' end, so this is the mechanism most directly tied to losing counts.
@@ -77,7 +77,7 @@ USE 4. Cis-regulatory evidence.
   Hybrid references: Wang, Starr & Fraser 2024 eLife (GSE232948: hybrid lines Hyb1, Hyb2; CM, HP, MN, PP, SKM, RPE; allele counts on GRCh38 and PanTro6). Agoglia 2021 (GSE144825: iPS and cortical spheroids, bulk allele counts).
   a_gk = log2((h + 1) / (c + 1)) on sums over the replicates of type k, computed on each reference, averaged, centred on the type median. Scorable with >= MIN_ALLELIC allelic counts in the type on both references.
   Golds: L_k = -|a_gk| (cis level agreement in type k); P = -SD over types of a_gk (cis effect that does not change across types, i.e. no cis change of pattern) on genes scorable in >= 4 types.
-  There is no chimpanzee in any finished fit and no brain or pluripotent fit, so the closest available readouts are human-macaque: liver H+Monkey (hepatocytes against HP), eye H+M. mulatta (against RPE), testis H+Macaque (no matched type, negative context), and islet H+Mouse (against PP, a mouse row).
+  There is no chimpanzee in any finished fit and no brain or pluripotent fit, so the closest available readouts are human-macaque: liver H+Monkey (hepatocytes against HP), eye H+M. mulatta melanocytes (against RPE), testis H+Macaque (no matched type, negative context), and islet H+Mouse (against PP, a mouse row).
   Tests: rho_p(X, gold | C_pat) for X in S, D, B1, level gap (|x_human - x_macaque| in the matched type, median-centred, sign flipped), identity; 2,000 block draws. Tissue contrast: rho_p(X_T, L_matched) - rho_p(X_T, mean L of the other types).
   Verdict rule: usable if S on P or matched L has CI above 0 in at least 2 contexts and its tissue contrast has CI above 0 in at least 1, beyond the level gap and B1. Not usable otherwise; the reference table is kept for a chimpanzee fit (P14).
 """
