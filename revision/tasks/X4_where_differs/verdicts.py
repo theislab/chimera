@@ -25,7 +25,7 @@ def state(r, d):
         if lo > 0:
             return "agrees"
     lo, hi = sorted((d * r.ci_lo, d * r.ci_hi))
-    return "contradicts" if hi < 0 else "null"
+    return "contradicts" if hi < 0 else "no_signal"
 
 
 def rule(s, gs):
