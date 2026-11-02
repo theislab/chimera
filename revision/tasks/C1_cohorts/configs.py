@@ -105,3 +105,13 @@ SOURCES["zilionis"] = dict(
     species={"hsapiens": dict(name="Human", files=[DATA / "tumour_zilionis" / "prepared_human.h5ad"], source="Zilionis2019"),
              "mmusculus": dict(name="Mouse", files=[DATA / "tumour_zilionis" / "prepared_mouse.h5ad"], source="Zilionis2019")})
 COHORTS["tumour_zilionis"] = dict(source="zilionis", species=["hsapiens", "mmusculus"], tissue="tumour myeloid", label="Tumour human, mouse")
+
+
+# Reference only, never in training: Jorstad 2023 middle temporal gyrus; 10x 3' v3 cells. Chimpanzee and gorilla are not on CELLxGENE.
+MT = DATA / "brain_mtg"
+SOURCES["mtg"] = dict(
+    reference="Jorstad 2023 Science, CELLxGENE collection 4dca242c, reference only",
+    map=MAPS / "brain_mtg.tsv", label_col="Subclass", unit_col="donor_id",
+    species={"hsapiens": dict(name="Human", files=[MT / "224db6b4-2895-4c4e-8503-bb647fae9b29.h5ad"], source="Jorstad2023", filters={"assay": ["10x 3' v3"]}, filter_reason="Smart-seq reads are not on the UMI count scale"),
+             "mmulatta": dict(name="Macaque", files=[MT / "261dd26f-1507-41a5-94e5-b96903de74a9.h5ad"], source="Jorstad2023"),
+             "cjacchus": dict(name="Marmoset", files=[MT / "c556b8e8-e348-49b9-b4da-08b05cd43350.h5ad"], source="Jorstad2023")})
