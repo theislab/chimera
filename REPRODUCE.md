@@ -149,7 +149,9 @@ recomputes every column of the seven consensus tables from the archived `final_s
 (this needs the `checkpoints_revision` bundle too). `RUN_FIGURE=1` executes the notebook with
 the `python3` kernel of the active environment (`KERNEL=<name>` to change it) and writes its
 panels into `notebooks/figures/alpha_master/` of the checkout, so `git status` shows which
-panels were re-rendered.
+panels were re-rendered. The re-rendered panels carry the same values as the archived ones but are not
+pixel-identical: the archived panels were rendered on macOS, and fonts and antialiasing differ
+between platforms.
 
 ## 7. From raw data to the processed files
 
