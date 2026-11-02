@@ -41,9 +41,11 @@ TOOLS = RU.REPO / "results/revision/T5_6/tools_primary.csv"
 
 
 def gate_open() -> None:
+    """Coordinator decisions after the gate (amendment log 2026-11-02): H+Mouse and testis H+Mouse passed; 4-sp beyond, marginal, opened as a labelled exception. H+Monkey stays closed here."""
     g = json.loads((OUT / "gate.json").read_text())
-    if g["any_beyond"]:
-        raise SystemExit("beyond seed range: stop, no gold is read")
+    for c in ("liv_hmouse", "test_hmouse"):
+        if g[c]["all"]["beyond"] or g[c]["unrepaired"]["beyond"]:
+            raise SystemExit(f"{c} beyond seed range: stop, no gold is read")
 
 
 def patch_objects() -> None:
