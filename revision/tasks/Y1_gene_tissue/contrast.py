@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import os
 
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 
 from revision.tasks.T4_3_scoreboard import stats as S
 from revision.tasks.Y1_gene_tissue import common as Y
@@ -22,6 +24,7 @@ MAT, ORDER = P.MAT, RU.TISSUES
 OUT = RU.OUT
 GOLDS = {"liver": "liver", "testis": "testis", "kidney": "kidney", "pancreas": "islet"}
 PAT = ["prior_raw", "expr", "det", "log_cds_length", "tau"]
+WORKERS = int(os.environ.get("Y1_WORKERS", "1"))
 
 
 class Data:
@@ -52,9 +55,12 @@ def rho_table(D: Data, gold_col: str, genes, columns: dict, Z: np.ndarray, CNT: 
     names = list(columns)
     R = np.column_stack([S.midrank(D.gold[gold_col].reindex(genes).to_numpy(float))] + [S.midrank(columns[n].to_numpy(float)) for n in names])
     est = S.rho_p_matrix(R, Z)[1:]
-    draws = np.empty((len(CNT), len(names)))
-    for b, cnt in enumerate(CNT):
-        draws[b] = S.weighted_rho(R, Z, weights(D, genes, cnt))[1:]
+    def one(cnt):
+        return S.weighted_rho(R, Z, weights(D, genes, cnt))[1:]
+    if WORKERS > 1:
+        draws = np.array(Parallel(n_jobs=WORKERS, backend="threading", batch_size=64)(delayed(one)(c) for c in CNT))
+    else:
+        draws = np.array([one(c) for c in CNT])
     return names, est, draws
 
 
@@ -171,7 +177,7 @@ def run_main(D: Data, CNT) -> None:
                  ("D_T", "D_T", []), ("D_T | S_T", "D_T", ["S_T"]), ("D_T | others D", "D_T", ["others_D"]), ("others S alone", "others_S", []), ("others B1 alone", "others_B1", [])]
         for name, x, cond in specs:
             Z = design_T(D, T, genes, PAT, col, ex[cond] if cond else None)
-            n_, est, dr = rho_table(D, col, genes, {x: ex[x]}, Z, CNT[:2000])
+            n_, est, dr = rho_table(D, col, genes, {x: ex[x]}, Z, CNT)
             rows.append(summarise(name, est[0], dr[:, 0], gold=gold, T=T, n_genes=len(genes)))
     pd.DataFrame(rows).to_csv(OUT / "contrast_incremental.csv", index=False)
     pd.Series(uni).to_csv(OUT / "contrast_universes.csv")
@@ -223,7 +229,7 @@ def run_sens(D: Data, CNT) -> None:
                 if col == "G_testis":
                     g = g[D.gold["H4_nsp"].reindex(g).notna()]
                 Z = design_T(D, T, g, PAT, col)
-                _, e_, d_ = rho_table(D, col, g, {"own": D.raw[sc][T].reindex(g), "oth": D.raw[sc][t].reindex(g)}, Z, CNT[:2000])
+                _, e_, d_ = rho_table(D, col, g, {"own": D.raw[sc][T].reindex(g), "oth": D.raw[sc][t].reindex(g)}, Z, CNT)
                 own.append(e_[0] - e_[1])
                 ownD.append(d_[:, 0] - d_[:, 1])
                 rows.append(summarise(f"pair {t}", e_[0] - e_[1], d_[:, 0] - d_[:, 1], score=sc, sens="iv_pairwise", gold=gold, n_genes=len(g)))
@@ -232,7 +238,7 @@ def run_sens(D: Data, CNT) -> None:
         Z = design_T(D, T, genes, PAT, col)
         for sc in ("S_fw", "S_unw"):
             cols_ = {f"{sc}|{t}": D.raw[sc][t].reindex(genes) for t in ORDER}
-            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT[:2000])
+            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT)
             r, _ = contrast(n_, e_, d_, [sc], T)
             for x in r:
                 x.update(sens="v_forward_margin", gold=gold, n_genes=len(genes))
@@ -242,7 +248,7 @@ def run_sens(D: Data, CNT) -> None:
         for s in sm.columns:
             cols_ = {f"S|{t}": D.raw["S"][t].reindex(genes) for t in ORDER}
             cols_[f"S|{T}"] = sm[s]
-            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT[:500])
+            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT)
             r, _ = contrast(n_, e_, d_, ["S"], T)
             for x in r:
                 x.update(sens=f"vi_seed_{s}", gold=gold, n_genes=len(genes))
@@ -250,14 +256,14 @@ def run_sens(D: Data, CNT) -> None:
         if T == "liver":
             cols_ = {f"S|{t}": D.raw["S"][t].reindex(genes) for t in ORDER}
             cols_["S|liver"] = sm[[f"S_s{s}" for s in (42, 43, 44, 47, 48, 51)]].mean(axis=1)
-            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT[:2000])
+            n_, e_, d_ = rho_table(D, col, genes, cols_, Z, CNT)
             r, _ = contrast(n_, e_, d_, ["S"], T)
             for x in r:
                 x.update(sens="vi_liver_integrated_seeds", gold=gold, n_genes=len(genes))
                 rows.append(x)
         # (viii) leave one source tissue out of the mean, and sources by depth
         for drop in [t for t in ORDER if t != T]:
-            names, est, draws = rho_table(D, col, genes, source_columns(D, genes, scores), Z, CNT[:1000])
+            names, est, draws = rho_table(D, col, genes, source_columns(D, genes, scores), Z, CNT)
             idx = {n: i for i, n in enumerate(names)}
             for sc in scores:
                 oth = [idx[f"{sc}|{t}"] for t in ORDER if t not in (T, drop)]
@@ -311,7 +317,7 @@ def run_within(D: Data, CNT) -> None:
             c = (E[:, 0] * w) @ E
             return (c / np.sqrt(c[0] * ((E * E * w[:, None]).sum(0))))[1:]
         est = wr(np.ones(len(g)))
-        dr = np.stack([wr(weights(D, g, cnt)) for cnt in CNT[:2000]])
+        dr = np.stack([wr(weights(D, g, cnt)) for cnt in CNT])
         for i, n in enumerate(names):
             rows.append(summarise(f"{g1} vs {g2}", est[i], dr[:, i], score=n, n_genes=len(g), pair=f"{g1}|{g2}"))
         ii = names.index("S"), names.index("B1")
@@ -323,7 +329,7 @@ def run_within(D: Data, CNT) -> None:
             hi, lo = x > sd, x < -sd
             def eff(w):
                 return np.average(dG[hi], weights=w[hi]) - np.average(dG[lo], weights=w[lo])
-            flips.append(summarise(f"{g1} vs {g2}", eff(np.ones(len(g))), np.array([eff(weights(D, g, cnt) + 1e-12) for cnt in CNT[:2000]]), score=n,
+            flips.append(summarise(f"{g1} vs {g2}", eff(np.ones(len(g))), np.array([eff(weights(D, g, cnt) + 1e-12) for cnt in CNT]), score=n,
                                    pair=f"{g1}|{g2}", n_hi=int(hi.sum()), n_lo=int(lo.sum())))
         # head-to-head on disagreement (X4's frame): S says T1 > T2 and B1 says T1 < T2, or the reverse; > 0 sides with S
         sS, sB = dd["S"], dd["B1"]
@@ -331,7 +337,7 @@ def run_within(D: Data, CNT) -> None:
         A1, A2 = (sS > ts) & (sB < -tb), (sS < -ts) & (sB > tb)
         def h(w):
             return np.average(dG[A1], weights=w[A1]) - np.average(dG[A2], weights=w[A2])
-        h2h.append(summarise(f"{g1} vs {g2}", h(np.ones(len(g))), np.array([h(weights(D, g, cnt) + 1e-12) for cnt in CNT[:2000]]), n_S_up=int(A1.sum()), n_S_dn=int(A2.sum()), pair=f"{g1}|{g2}"))
+        h2h.append(summarise(f"{g1} vs {g2}", h(np.ones(len(g))), np.array([h(weights(D, g, cnt) + 1e-12) for cnt in CNT]), n_S_up=int(A1.sum()), n_S_dn=int(A2.sum()), pair=f"{g1}|{g2}"))
     t = pd.DataFrame(rows)
     for sc in t["score"].unique():
         m = t["score"] == sc

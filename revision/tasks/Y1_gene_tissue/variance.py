@@ -21,7 +21,7 @@ from revision.tasks.Y1_gene_tissue import rules as RU
 
 MAT, ORDER = P.MAT, RU.TISSUES
 OUT = RU.OUT
-N_BOOT = 2000
+N_BOOT = 10000
 
 
 def load(sc, dn):

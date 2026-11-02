@@ -77,7 +77,7 @@ def within(D, CNT, pairs, tag, matched: bool) -> list:
         dd = {sc: zT(D.raw[sc][T1], T1, c1, at1) - zT(D.raw[sc][T2], T2, c2, at2) for sc in ("S", "B1", "D", "Sdir")}
         A = np.column_stack([dG] + list(dd.values()))
         est = wcorr(A, np.ones(len(g)))
-        dr = np.stack([wcorr(A, CT.weights(D, g, c) + 1e-12) for c in CNT[:2000]])
+        dr = np.stack([wcorr(A, CT.weights(D, g, c) + 1e-12) for c in CNT])
         nm = list(dd)
         for i, n in enumerate(nm):
             rows.append(CT.summarise(f"{g1} vs {g2}", est[i], dr[:, i], score=n, pair=f"{g1}|{g2}", n_genes=len(g), variant=tag))
@@ -157,7 +157,7 @@ def sec_B(D, CNT):
         dd = {sc: z(D.raw[sc][T1], T1, c1) - z(D.raw[sc][T2], T2, c2) for sc in scores}
         A = np.column_stack([dG] + list(dd.values()))
         est = wcorr(A, np.ones(len(g)))
-        dr = np.stack([wcorr(A, CT.weights(D, g, c) + 1e-12) for c in CNT[:2000]])
+        dr = np.stack([wcorr(A, CT.weights(D, g, c) + 1e-12) for c in CNT])
         for i, n in enumerate(dd):
             wr.append(CT.summarise(f"{T1} vs {T2}", est[i], dr[:, i], score=n, n_genes=len(g)))
     w = pd.DataFrame(wr)
@@ -184,7 +184,7 @@ def sec_C(D, CNT):
                         g = m[m].index
                         g = D.cov_T(T, g)[PAT].dropna().index
                         Z = CT.design_T(D, T, g, PAT, col)
-                        _, e_, d_ = CT.rho_table(D, col, g, {"own": D.raw[sc][T].reindex(g), "oth": D.raw[sc][t].reindex(g)}, Z, CNT[:2000])
+                        _, e_, d_ = CT.rho_table(D, col, g, {"own": D.raw[sc][T].reindex(g), "oth": D.raw[sc][t].reindex(g)}, Z, CNT)
                         own.append(e_[0] - e_[1])
                         ownD.append(d_[:, 0] - d_[:, 1])
                     rows.append(CT.summarise(f"Delta({sc})", float(np.mean(own)), np.mean(ownD, axis=0), score=sc, gold=gold, universe=tag))
@@ -223,7 +223,7 @@ def sec_C(D, CNT):
         ex = pd.DataFrame(dict(B1_T=D.raw["B1"][T].reindex(g), S_T=D.raw["S"][T].reindex(g), others_S=zS[oth].reindex(g).mean(axis=1), others_B1=zB[oth].reindex(g).mean(axis=1)))
         for nm, x, cond in (("S_T", "S_T", []), ("S_T | B1_T", "S_T", ["B1_T"]), ("S_T | B1_T, others S", "S_T", ["B1_T", "others_S"]), ("B1_T", "B1_T", []), ("B1_T | S_T", "B1_T", ["S_T"]), ("B1_T | S_T, others B1", "B1_T", ["S_T", "others_B1"])):
             Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
-            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT[:2000])
+            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT)
             inc.append(CT.summarise(nm, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
     it = pd.DataFrame(inc)
     it.to_csv(OUT / "C_fine_incremental.csv", index=False)
@@ -269,7 +269,7 @@ def sec_D(D, CNT):
             rec[f"mean_{k}"] = x.mean()
             if len(x) >= 10:
                 idx = np.searchsorted(D.ub, D.block.reindex(x.index).to_numpy())
-                bt = [np.average(x.to_numpy(), weights=c[idx] + 1e-12) for c in CNT[:2000]]
+                bt = [np.average(x.to_numpy(), weights=c[idx] + 1e-12) for c in CNT]
                 rec[f"{k}_lo"], rec[f"{k}_hi"] = np.quantile(bt, .025), np.quantile(bt, .975)
         rows.append(rec)
     t = pd.DataFrame(rows)
@@ -369,7 +369,7 @@ def sec_H(D, CNT):
                 g = g[D.gold["H4_nsp"].reindex(g).notna()]
             Z = CT.design_T(D, T, g, PAT, col)
             cols = {f"{sc}|{x}": D.raw[sc][x].reindex(g) for sc in own for x in (T, t)}
-            nm, e_, d_ = CT.rho_table(D, col, g, cols, Z, CNT[:2000])
+            nm, e_, d_ = CT.rho_table(D, col, g, cols, Z, CNT)
             ix = {n: i for i, n in enumerate(nm)}
             for sc in own:
                 own[sc].append(e_[ix[f"{sc}|{T}"]] - e_[ix[f"{sc}|{t}"]])
@@ -390,7 +390,7 @@ def sec_H(D, CNT):
         for nm_, x, cond in (("S", "S_T", []), ("B1", "B1_T", []), ("Sdir", "Sdir_T", []), ("D", "D_T", []), ("S | B1", "S_T", ["B1_T"]), ("B1 | S", "B1_T", ["S_T"]), ("S | Sdir", "S_T", ["Sdir_T"]),
                              ("Sdir | S", "Sdir_T", ["S_T"]), ("S | B1, Sdir", "S_T", ["B1_T", "Sdir_T"])):
             Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
-            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT[:2000])
+            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT)
             inc.append(CT.summarise(nm_, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
     t = pd.DataFrame(rows)
     t.to_csv(OUT / "H_pairwise_joint.csv", index=False)
@@ -444,7 +444,7 @@ def sec_I(D, CNT):
             spec += [("Sdir fine labels", "fine", []), ("S | Sdir fine", "S_T", ["fine"]), ("S | Sdir fine, B1", "S_T", ["fine", "B1_T"]), ("Sdir fine | S", "fine", ["S_T"])]
         for nm_, x, cond in spec:
             Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
-            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT[:2000])
+            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT)
             rows.append(CT.summarise(nm_, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
         # per seed: S given B1 and the labelled margin
         sm = pd.read_parquet(MAT / f"seedS__{T}.parquet").reindex(g)
