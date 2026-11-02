@@ -24,9 +24,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import score_external as SE  # noqa: E402
 
 TIERS = [("no labels", ["PCA", "Harmony", "scVI-sp", "scVI-donor", "sysVI", "CAMEX"]),
-         ("within-species\nclusters", ["SATURN-Leiden"]),
-         ("cell-type labels", ["scANVI", "SATURN"]),
-         ("Chimera: liver none,\ntestis cond. MMD on labels", ["Chimera"])]
+         ("within-sp.\nclusters", ["SATURN-Leiden"]),
+         ("cell-type\nlabels", ["scANVI", "SATURN"]),
+         ("liver none;\ntestis cond.\nMMD, labels", ["Chimera"])]
 ORDER = [m for _, ms in TIERS for m in ms]
 
 
@@ -44,11 +44,12 @@ def panel(ax, M, title, cmap, vmin, vmax, mark, fd, lower_better=False):
     ax.set_xticklabels(M.columns, rotation=55, ha="right", fontsize=6)
     ax.set_yticks(range(M.shape[0]))
     ax.set_yticklabels(M.index, fontsize=6)
-    ax.set_title(title, fontsize=7)
+    ax.set_title(title, fontsize=7, pad=24)
     x = 0
-    for _, ms in TIERS:
+    for name, ms in TIERS:
         if x:
             ax.axvline(x - 0.5, color="#ffffff", lw=1.5)
+        ax.text(x + (len(ms) - 1) / 2, -0.6, name, ha="center", va="bottom", fontsize=4.6, color="#333333")
         x += len(ms)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -69,10 +70,6 @@ def figure(T: pd.DataFrame, fd) -> None:
         im = panel(ax, piv(c), t, cm, lo, hi, True, fd, lower_better=lb)
         cb = fig.colorbar(im, ax=ax, fraction=0.05, pad=0.01, location="bottom")
         cb.ax.tick_params(labelsize=5)
-    x = 0
-    for name, ms in TIERS:
-        axes[0].text(x + (len(ms) - 1) / 2, -0.75, name, ha="center", va="bottom", fontsize=4.8, color="#333333")
-        x += len(ms)
     fd.save_figure(fig, "composite_mixing_bio_10models", close=True)
 
 
@@ -117,6 +114,8 @@ def main():
     fd.set_figure_dir(SE.FIG)
     T = pd.read_csv(SE.OUT / "master_table_ext.csv")
     figure(T, fd)
+    if "--figure-only" in sys.argv:
+        return
     R, P = pca10(T)
     R.to_csv(SE.OUT / "supplement_pca10_sensitivity.csv", index=False)
     P.to_csv(SE.OUT / "supplement_pca10_composite_all_models.csv", index=False)
