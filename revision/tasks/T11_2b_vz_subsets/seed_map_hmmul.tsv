@@ -1,0 +1,4 @@
+run_name	seed	source
+rev-vz-hmmul-s42	42	rev-vz-hmmul-grid1-s42 (selected grid run)
+rev-vz-hmmul-s43	43	training/runs/rev-vz-hmmul-s43
+rev-vz-hmmul-s44	44	training/runs/rev-vz-hmmul-s44
