@@ -1,7 +1,7 @@
 """Y6 use 4: cis-regulatory evidence by proxy, rules.py USE 4. Human-chimpanzee hybrid allele counts against human-macaque readouts; islet is human-mouse.
 
-Matched contexts, closest available: liver H+Monkey hepatocytes vs hybrid hepatocyte progenitors (HP); eye H+M. mulatta ciliary body epithelium vs retinal pigment epithelium (RPE; both
-pigmented neuroectoderm, the eye fit has no RPE type); islet H+Mouse beta cells vs pancreatic progenitors (PP); testis H+Macaque has no matched type (negative context, level gap pooled).
+Matched contexts, closest available: liver H+Monkey hepatocytes vs hybrid hepatocyte progenitors (HP); eye H+M. mulatta melanocytes vs retinal pigment epithelium (RPE; both pigmented, the eye object has no RPE type); islet
+H+Mouse beta cells vs pancreatic progenitors (PP); testis H+Macaque has no matched type (negative context, level gap pooled).
 Brain and pluripotent golds (MN, iPS, cortical spheroids) have no fit, read only as a descriptive row against the same readouts.
 
     PYTHONPATH=$PWD python -m revision.tasks.Y6_uses.use4
@@ -23,7 +23,7 @@ CM.N_JOBS = 8
 OUT = RU.OUT / "use4"
 FIT = {
     "liv_hmonkey": dict(h5=gene_ids.h5ad_path("liv_hmonkey"), key="cell_type", type="Hepatocytes", human="Human", other="Monkey", match="HP", pre="mmulatta", table="data/processed/ortholog_table.csv"),
-    "vz_hmmul": dict(h5=RU.ROOT / "data/revision/van_zyl/van_zyl_hmmul.h5ad", key="cell_type_harmonised", type="ciliary body epithelial cell", human="human", other="macaca_mulatta", match="RPE", pre="mmulatta", table="data/revision/van_zyl/ortholog_table_van_zyl.csv", genes="T11"),
+    "vz_hmmul": dict(h5=RU.ROOT / "data/revision/van_zyl/van_zyl_hmmul.h5ad", key="cell_type_harmonised", type="Melanocyte", human="human", other="macaca_mulatta", match="RPE", pre="mmulatta", table="data/revision/van_zyl/ortholog_table_van_zyl.csv", genes="T11"),
     "islet": dict(h5=RU.ROOT / "data/revision/disease_islet/islet_healthy_train.h5ad", key="cell_type", type="beta", human="Human", other="Mouse", match="PP", pre="mmusculus", table="data/processed/ortholog_table_testis.csv"),
     "test_hmac": dict(h5=gene_ids.h5ad_path("test_hmac"), key=None, type=None, human="Human", other="Macaque", match=None, pre="mmulatta", table="data/processed/ortholog_table_testis.csv"),
 }
