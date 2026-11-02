@@ -9,6 +9,9 @@ Undefined cells (amendment by the coordinator after the liver 1:20 reading, befo
 loss. The committed rule stays and is reported as `overall`: it ranks last. Beside it `overall_excl_undefined`: such cells are left out and each task ranked among the methods with a value. Both are written for every method, Chimera included; in the figures undefined cells are drawn NA,
 never as a low score. `undefined_cells.csv` lists every such cell, with the groups left in the setting where known; the text states their number.
 
+Runs tried and finished (coordinator, same reason). A failed fit or a tool that crashes or returns nothing stays out of the scores; `completion.py` counts them per method and setting, joined here as tried and finished. A cell with fewer finished than tried carries a small
+"f/t"; a cell where nothing finished is a failure, drawn with a cross, not a blank, and it ranks last under the committed rule.
+
 Track I (integration, added by the coordinator's instruction before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
 keeps its committed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
 
@@ -89,7 +92,17 @@ def rank_tasks(t: pd.DataFrame) -> pd.DataFrame:
                              scaled_excl=(float(r[m]) - 1) / (n_def - 1) if n_def > 1 else np.nan, undefined=False))
         for m in missing:
             rows.append(dict(track=track, task=task, metric=metric, method=m, value=np.nan, rank=float(n), n_methods=n, scaled=1.0, scaled_excl=np.nan, undefined=True))
-    return pd.DataFrame(rows)
+    R = pd.DataFrame(rows)
+    f = RU.RES / "completion.csv"
+    R["tried"], R["finished"] = np.nan, np.nan
+    if f.exists():
+        C = pd.read_csv(f).set_index(["cohort", "setting", "method"])
+        for i, r in R[R.track == "B"].iterrows():
+            p = r["task"].split("|")
+            m = "Chimera" if r["method"] in RU.CHIMERA else r["method"]
+            if (p[3], p[2], m) in C.index:
+                R.loc[i, ["tried", "finished"]] = C.loc[(p[3], p[2], m), ["tried", "finished"]].to_numpy(dtype=float)
+    return R
 
 
 def aggregate(R: pd.DataFrame) -> pd.DataFrame:
@@ -151,6 +164,11 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
                     ax.scatter(j, i, s=s, c=[cmap(v)], edgecolors="none")
                 else:
                     ax.scatter(j, i, s=30, facecolors="none", edgecolors="#bbbbbb", hatch="////", linewidths=0.3)
+                sub = R[(R.method == m) & (R.col == c) & (R.tried > R.finished)]
+                if len(sub):
+                    ax.text(j + 0.32, i - 0.3, f"{int(sub.finished.sum())}/{int(sub.tried.sum())}", fontsize=3.8, color="#a33", ha="left", va="center")
+                    if (sub.finished == 0).any() and not np.isfinite(v):
+                        ax.scatter(j, i, marker="x", s=22, c="#a33", linewidths=0.8)
             ax.barh(i, (1 - A.loc[m, "overall"]) * 2.4, left=x_over, height=0.62, color="#1b4f8f")
             ax.text(x_over + 2.5, i, f"{A.loc[m, 'overall']:.2f} / {A.loc[m, 'overall_excl_undefined']:.2f}", va="center", ha="left", fontsize=5.5, color="#333333")
         ax.set_yticks(range(len(methods)))
@@ -189,6 +207,12 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
         ax.set_yticks(range(len(methods)))
         ax.set_yticklabels([METHOD_LABEL.get(m, m) for m in methods])
         ax.set_xticks([])
+        fail = R[(R.tried > 0) & (R.finished == 0)]
+        kk = {k: j for j, k in enumerate(keys)}
+        mm = {m: i for i, m in enumerate(methods)}
+        xs = [(kk[(r.track, r.task, r.metric)], mm[r.method]) for r in fail.itertuples() if r.method in mm and (r.track, r.task, r.metric) in kk]
+        if xs:
+            ax.scatter(*zip(*xs), marker="x", s=8, c="#a33", linewidths=0.5)
         prev = 0
         for tr in tracks:
             nn = sum(k[0] == tr for k in keys)

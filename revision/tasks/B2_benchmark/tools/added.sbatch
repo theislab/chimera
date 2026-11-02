@@ -15,6 +15,7 @@ for S in "$@"; do
   export PYTHONPATH=$PP
   mamba run --no-capture-output -n chimera_env python -m revision.tasks.B2_benchmark.tools.prep_object "$C" "$S" "$REP" "$h" || { echo "FAILED prep $run"; continue; }
   unset PYTHONPATH
-  mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}.py --h5ad "$h" --cohort "$TABLE" --label-key b2_label --seed $((142 + REP)) --out "$O/$run.csv" --work "$W/${TOOL}_$run" || echo "FAILED $run"
+  rc=0; mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}.py --h5ad "$h" --cohort "$TABLE" --label-key b2_label --seed $((142 + REP)) --out "$O/$run.csv" --work "$W/${TOOL}_$run" || { rc=$?; echo "FAILED $run"; }
+  mkdir -p results/revision/B2/attempts/${NAME[$TOOL]}; echo "$rc" > results/revision/B2/attempts/${NAME[$TOOL]}/$run.rc
   rm -rf "$h" "$W/${TOOL}_$run"
 done

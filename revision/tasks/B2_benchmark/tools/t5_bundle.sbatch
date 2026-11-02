@@ -14,6 +14,7 @@ for I in "$@"; do
   export PYTHONPATH=$PP
   mamba run --no-capture-output -n chimera_env python -m revision.tasks.B2_benchmark.tools.prep_inputs --manifest $M --index "$I" || { echo "FAILED prep $run"; continue; }
   unset PYTHONPATH
-  mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}_b2.py --run "$run" --seed "$seed" || echo "FAILED $run"
+  rc=0; mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}_b2.py --run "$run" --seed "$seed" || { rc=$?; echo "FAILED $run"; }
+  mkdir -p results/revision/B2/attempts/$U; echo "$rc" > results/revision/B2/attempts/$U/$run.rc
   rm -rf "data/revision/B2/tool_inputs/$run/camex" "data/revision/B2/tool_inputs/$run/saturn" "data/revision/B2/tool_inputs/$run/object.h5ad.tmp"
 done

@@ -12,4 +12,6 @@ U=$(echo "$TOOL" | tr a-z A-Z)
 [[ -f results/revision/B2/tool_scores/$U/$run.csv ]] && { echo done; exit 0; }
 mamba run --no-capture-output -n chimera_env python -m revision.tasks.B2_benchmark.tools.prep_inputs --manifest $M --index $I || exit 1
 unset PYTHONPATH
-mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}_b2.py --run "$run" --seed "$seed"
+rc=0; mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}_b2.py --run "$run" --seed "$seed" || rc=$?
+mkdir -p results/revision/B2/attempts/$U; echo "$rc" > results/revision/B2/attempts/$U/$run.rc
+exit $rc
