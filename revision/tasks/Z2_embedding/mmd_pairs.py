@@ -12,7 +12,7 @@ for c, (a, _) in sel.items():
         if not (RU.RUNS / r.run / "final_state.npz").exists():
             continue
         z = K.load_z(RU.RUNS / r.run / "final_state.npz")
-        if not np.isfinite(z).all():
+        if not np.isfinite(z).all() or len(z) != len(T["spc"]):
             continue
         d = K.all_rows(c, z, with_global=True)
         g = lambda t, k: d[(d.task == t) & (d.metric == k)].value.mean()
