@@ -68,10 +68,12 @@ def depth_panel(kind_rows):
             ax.plot(p[:, 0], p[:, 1], "-", color=col, lw=1.0, marker=mk, ms=3)
         ax.axhline(0, color="#444444", lw=0.6)
         ax.set_xticks([1, 2, 3], ["25%", "10%", "5%"], fontsize=6)
-        ax.set_title(f"{COH[c]}, {KIND.get(k, k)}", fontsize=6.5)
+        ax.set_title(f"{COH[c].replace(' species', '-sp')}", fontsize=6.5)
         ax.spines[["top", "right"]].set_visible(False)
         ax.tick_params(axis="y", labelsize=6)
-    np.atleast_1d(axes)[0].set_ylabel("ρp with gold, newly sparse genes", fontsize=6.5)
+    np.atleast_1d(axes)[0].set_ylabel("ρp, pattern gold, newly sparse", fontsize=6.5)
+    h = [plt.Line2D([], [], color=STYLE[s][0], marker=STYLE[s][1], ls="-", lw=1, ms=3.5, label=STYLE[s][2]) for s in ("D", "Sdir", "S_fwd", "R_S_p", "B1")]
+    fig.legend(handles=h, fontsize=5.5, frameon=False, loc="lower center", bbox_to_anchor=(0.5, 0.98), ncol=3, handletextpad=0.3, columnspacing=0.9)
     return fig, axes
 
 
@@ -79,7 +81,7 @@ def heldout_panel():
     """Held-out chromosomes, arm P (protein columns only): agreement with what was measured on those genes, given C; folds A and B as two marks."""
     c = pd.read_csv(RU.RES / "c_rho.csv")
     c = c[c.set == "held_unmasked"]
-    tg = [("D_full", "measured Δα"), ("S_full", "measured S"), ("Sdir_full", "measured Sdir"), ("G_H3", "TS/TMS pattern")]
+    tg = [("D_full", "measured Δα"), ("S_full", "measured S"), ("Sdir_full", "measured Sdir"), ("GOLD", "pattern gold")]
     sc = [("D_P", D_C, "o", "Chimera gate, protein only"), ("Rh_S", R_C, "D", "Ridge on protein, target S"), ("kNNh_D", GREY, "v", "Nearest proteins, their Δα"), ("pi", B1_C, "s", "π")]
     coh = [k for k in RU.DEPTH_COHORTS if k in set(c.cohort)]
     fig, axes = plt.subplots(1, len(coh), figsize=(1.75 * len(coh), 1.9), sharey=True)
@@ -87,7 +89,8 @@ def heldout_panel():
     for ax, k in zip(np.atleast_1d(axes), coh):
         for j, (t, _) in enumerate(tg):
             for i, (s, col, mk, _) in enumerate(sc):
-                g = c[(c.cohort == k) & (c.target == t) & (c.score == s)]
+                tt = ("G_H4" if k.startswith("test") else "G_H3") if t == "GOLD" else t
+                g = c[(c.cohort == k) & (c.target == tt) & (c.score == s)]
                 for f, dx in (("A", -0.05), ("B", 0.05)):
                     r = g[g.fold == f]
                     if len(r):
