@@ -80,3 +80,11 @@ z2-liv-novamp-s44	liv_hmouse	novamp	44	raw	--adata data/processed/camex_human_mo
 z2-liv-nl30-s44	liv_hmouse	nl30	44	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --n-latent 30 --seed 44
 z2-liv-zb0-s44	liv_hmouse	zb0	44	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --lambda-z-balance 0 --seed 44
 z2-liv-logx_adv0mmd0-s44	liv_hmouse	logx_adv0mmd0	44	log1p	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 0 --lambda-mmd 0 --seed 44
+z2-liv-adv50mmd10-s42	liv_hmouse	adv50mmd10	42	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 50 --lambda-mmd 10 --seed 42
+z2-liv-adv50mmd10-s43	liv_hmouse	adv50mmd10	43	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 50 --lambda-mmd 10 --seed 43
+z2-liv-adv20mmd10-s42	liv_hmouse	adv20mmd10	42	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 20 --lambda-mmd 10 --seed 42
+z2-liv-adv20mmd10-s43	liv_hmouse	adv20mmd10	43	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 20 --lambda-mmd 10 --seed 43
+z2-liv-adv50mmd5-s42	liv_hmouse	adv50mmd5	42	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 50 --lambda-mmd 5 --seed 42
+z2-liv-adv50mmd5-s43	liv_hmouse	adv50mmd5	43	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 50 --lambda-mmd 5 --seed 43
+z2-liv-adv20mmd5-s42	liv_hmouse	adv20mmd5	42	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 20 --lambda-mmd 5 --seed 42
+z2-liv-adv20mmd5-s43	liv_hmouse	adv20mmd5	43	raw	--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --adv-weight 20 --lambda-mmd 5 --seed 43

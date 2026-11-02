@@ -17,6 +17,7 @@ L, T = RU.COHORT_LEVELS["liv_hmouse"], RU.COHORT_LEVELS["test_hmouse"]
 rows += [row("liv_hmouse", lv, s) for lv in L for s in (42, 43)]
 rows += [row("test_hmouse", lv, s) for lv in T for s in (42, 43)]
 rows += [row("liv_hmouse", lv, 44) for lv in L]
+rows += [row("liv_hmouse", lv, s) for lv in ("adv50mmd10", "adv20mmd10", "adv50mmd5", "adv20mmd5") for s in (42, 43)]   # amendment 12
 p = Path(__file__).parent / "factorial.tsv"
 p.write_text("\n".join(rows) + "\n")
 print(len(rows) - 1)

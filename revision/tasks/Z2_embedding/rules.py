@@ -94,6 +94,8 @@ LEVELS = {
     "cmmd": ("raw", "--celltype-conditional-mmd --celltype-key cell_ontology_class"),   # liver only: label-conditional MMD on the eight labels
     "gmmd": ("raw", ""),                                                                 # testis only: global MMD, base without the conditional flags
     # Mechanism tests, not settings: the encoder reads raw counts (chimera/_module.py forward and _encoder_input). train_patched.py overrides that method from outside the package.
+    # Added after adv0 + MMD0 was read (amendment 12): both terms lowered together, a frontier between canonical and off. Two knobs by design.
+    "adv50mmd10": ("raw", "--adv-weight 50 --lambda-mmd 10"), "adv20mmd10": ("raw", "--adv-weight 20 --lambda-mmd 10"), "adv50mmd5": ("raw", "--adv-weight 50 --lambda-mmd 5"), "adv20mmd5": ("raw", "--adv-weight 20 --lambda-mmd 5"),
     "logx": ("log1p", ""), "logcp": ("logcp", ""), "logx_adv0mmd0": ("log1p", "--adv-weight 0 --lambda-mmd 0"),
 }
 # Budget amendment withdrawn by the coordinator (amendments 1, 2): the factorial as committed runs in full. The order in factorial.tsv is priority order, and rows only ever append.
