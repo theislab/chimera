@@ -40,30 +40,31 @@ def unit(c, kind, gold, covs, stratum, universe, split):
     r0 = rows_of(t, stratum, universe, split)
     lab = dict(cohort=c, kind=kind, stratum=stratum, universe=universe, split=split)
     out = []
+    draws = RU.N_DRAWS if (stratum, universe, split) == ("masked", "clean", "all") else RU.N_DRAWS_GRID
     if not (t[gold].notna().to_numpy() & r0).sum() >= CM.MIN_N:
         return [dict(lab, gold=gold, score="", rho_p=np.nan, n=int((t[gold].notna().to_numpy() & r0).sum()), group="too_few")]
     al = [s for s in ALWAYS if t.loc[r0, s].notna().mean() > 0.9]
-    for r in CM.rho_rows(t, gold, covs, al, r0, "D", RU.N_DRAWS, lab):
+    for r in CM.rho_rows(t, gold, covs, al, r0, "D", draws, lab):
         out.append(dict(r, group="always"))
     cp = [x for x in covs if x != "prior_raw"]
-    for r in CM.rho_rows(t, gold, cp, ["pi"], r0, None, RU.N_DRAWS, lab):
+    for r in CM.rho_rows(t, gold, cp, ["pi"], r0, None, draws, lab):
         out.append(dict(r, group="pi_given_C_without_pi"))
     for s in PARTIAL:
         if s not in t or t.loc[r0, s].notna().sum() < CM.MIN_N:
             out.append(dict(lab, gold=gold, score=s, rho_p=np.nan, n=int((t[gold].notna().to_numpy() & r0 & t[s].notna().to_numpy()).sum()), group="too_few"))
             continue
-        for r in CM.rho_rows(t, gold, covs, ["D", s], r0, "D", RU.N_DRAWS, lab):
+        for r in CM.rho_rows(t, gold, covs, ["D", s], r0, "D", draws, lab):
             out.append(dict(r, group=f"own_{s}"))
     if stratum == "masked" and universe == "clean":  # (d)
         pcs = [f"esm{i}" for i in range(64)]
         if (t[gold].notna().to_numpy() & r0).sum() >= 200:
-            for r in CM.rho_rows(t, gold, covs, ["D", "R_S_p"], r0, None, RU.N_DRAWS, lab, extra_linear=pcs):
+            for r in CM.rho_rows(t, gold, covs, ["D", "R_S_p"], r0, None, draws, lab, extra_linear=pcs):
                 out.append(dict(r, group="given_C_64PCs"))
-        for r in CM.rho_rows(t, gold, covs, ["D", "S_fwd"], r0, None, RU.N_DRAWS, lab, extra_spline=["kNN_S", "Block_S"]):
+        for r in CM.rho_rows(t, gold, covs, ["D", "S_fwd"], r0, None, draws, lab, extra_spline=["kNN_S", "Block_S"]):
             out.append(dict(r, group="given_C_kNN_Block"))
-        for r in CM.rho_rows(t, gold, covs, ["D"], r0, None, RU.N_DRAWS, lab, extra_spline=["R_S_p"]):
+        for r in CM.rho_rows(t, gold, covs, ["D"], r0, None, draws, lab, extra_spline=["R_S_p"]):
             out.append(dict(r, group="given_C_R_S_p"))
-        for r in CM.rho_rows(t, gold, covs, ["R_S_p", "R_Sdir_p", "R_B1_p"], r0, "R_S_p", RU.N_DRAWS, lab):
+        for r in CM.rho_rows(t, gold, covs, ["R_S_p", "R_Sdir_p", "R_B1_p"], r0, "R_S_p", draws, lab):
             out.append(dict(r, group="target"))
     return out
 
