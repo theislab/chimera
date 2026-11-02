@@ -37,14 +37,17 @@ def stats(c, name, method, seed, zm, lv, rate):
     zc = zm - zm.mean(0)
     u, s, vt = np.linalg.svd(zc, full_matrices=False)
     var = s ** 2 / len(zm)
-    # diagonal posterior projected on PC k: sum_d v_kd^2 sigma_d^2
-    pv = (np.exp(np.clip(lv, -30, 30))[:, None, :] * (vt ** 2)[None, :, :]).sum(-1)
-    post = np.median(pv, axis=0)   # typical cell: the mean is ruled by the few cells whose learned variance runs away (Z1)
-    pcs = pd.DataFrame(dict(cohort=c, latent=name, method=method, seed=seed, pc=np.arange(len(var)) + 1, share=var / var.sum(), noise_ratio=post / var,
+    # Rotation-free: the posterior is diagonal in the coordinates, the signal is not. Eigenvalues of D^-1/2 Cov(z_mean) D^-1/2, D = median posterior variance per coordinate (a coordinate whose variance
+    # runs away, which the decoder ignores, then costs nothing). Capacity = sum 0.5 log(1 + eig); effective axes = eig > 1.
+    d = np.median(np.exp(np.clip(lv, -30, 30)), axis=0)
+    W = zc / np.sqrt(d)
+    eig = np.sort(np.linalg.eigvalsh(W.T @ W / len(zm)))[::-1]
+    pcs = pd.DataFrame(dict(cohort=c, latent=name, method=method, seed=seed, pc=np.arange(len(var)) + 1, share=var / var.sum(), snr=eig,
                             r_loglib=[abs(np.corrcoef(u[:, k], lib)[0, 1]) for k in range(len(var))],
                             species_auc=[roc_auc_score(codes == 0, u[:, k]) for k in range(len(var))]))
     pcs["species_auc"] = (pcs.species_auc - 0.5).abs() + 0.5
-    r = dict(cohort=c, latent=name, method=method, seed=seed, rate=rate, median_noise_ratio=float(np.median(post / var)), noise_ratio_all=float(post.sum() / var.sum()),
+    post = d.max() * np.ones(1)
+    r = dict(cohort=c, latent=name, method=method, seed=seed, rate=rate, capacity=float(0.5 * np.log1p(eig).sum()), axes=int((eig > 1).sum()), max_post_var=float(d.max()), min_post_var=float(d.min()),
              sp_auc_all=species_auc(zm, codes), sp_auc_biglabel=species_auc(zm[q], codes[q]) if len(np.unique(codes[q])) > 1 else np.nan)
     return r, pcs
 
@@ -103,8 +106,8 @@ def main():
     pd.concat(pcs).to_csv(RU.OUT / f"snr_pcs_{TAG}.csv", index=False)
     pd.set_option("display.width", 200)
     t = pd.DataFrame(rows)
-    print(t.groupby(["cohort", "method"])[["rate", "noise_ratio_all", "median_noise_ratio", "sp_auc_all", "sp_auc_biglabel"]].agg(["mean", "min", "max"]).round(3).to_string())
-    print(pd.concat(pcs).groupby(["cohort", "method", "pc"])[["share", "noise_ratio", "r_loglib", "species_auc"]].mean().round(3).to_string())
+    print(t.groupby(["cohort", "method"])[["rate", "capacity", "axes", "sp_auc_all", "sp_auc_biglabel"]].agg(["mean", "min", "max"]).round(3).to_string())
+    print(pd.concat(pcs).groupby(["cohort", "method", "pc"])[["share", "snr", "r_loglib", "species_auc"]].mean().round(3).to_string())
 
 
 if __name__ == "__main__":

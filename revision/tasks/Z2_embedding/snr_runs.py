@@ -1,4 +1,4 @@
-"""Rate and effective axes of factorial runs: python -m revision.tasks.Z2_embedding.snr_runs  Output: results/revision/Z2/snr_runs.csv. Effective axes: z_mean PCs with noise ratio < 1. Skips finished runs."""
+"""Rate and effective axes of factorial runs: python -m revision.tasks.Z2_embedding.snr_runs  Output: results/revision/Z2/snr_runs.csv. Capacity and effective axes as snr.py. Skips finished runs."""
 import pandas as pd
 from revision.tasks.Z2_embedding import rules as RU
 from revision.tasks.Z2_embedding.train_patched import apply_patch
@@ -12,13 +12,14 @@ fac = pd.read_csv(RU.REPO / "revision/tasks/Z2_embedding/factorial.tsv", sep="\t
 rows = old.to_dict("records")
 patched = None
 for r in fac.itertuples():
-    if r.run in set(old.run) or not (RU.RUNS / r.run / "summary.json").exists() or r.input != "raw":
+    if r.run in set(old.run) or not (RU.RUNS / r.run / "summary.json").exists() :
         continue
+    from revision.tasks.Z2_embedding.train_patched import apply_patch as _ap
     post = S.chimera_post(r.cohort, r.run)
     if post is None:
         continue
     a, p = S.stats(r.cohort, r.run, "Chimera", r.seed, *post)
-    rows.append(dict(run=r.run, cohort=r.cohort, level=r.level, seed=r.seed, rate=a["rate"], sp_auc_biglabel=a["sp_auc_biglabel"], sp_auc_all=a["sp_auc_all"], axes=int((p.noise_ratio < 1).sum()), pc1=float(p.share.iloc[0]), pc2=float(p.share.iloc[1]), pc3=float(p.share.iloc[2])))
+    rows.append(dict(run=r.run, cohort=r.cohort, level=r.level, seed=r.seed, rate=a["rate"], capacity=a["capacity"], axes=a["axes"], sp_auc_biglabel=a["sp_auc_biglabel"], sp_auc_all=a["sp_auc_all"], pc1=float(p.share.iloc[0]), pc2=float(p.share.iloc[1]), pc3=float(p.share.iloc[2])))
     pd.DataFrame(rows).to_csv(f, index=False)
     print(r.run, flush=True)
-print(pd.DataFrame(rows).groupby(["cohort", "level"])[["rate", "axes", "pc1", "pc2", "pc3", "sp_auc_biglabel"]].mean().round(3).to_string())
+print(pd.DataFrame(rows).groupby(["cohort", "level"])[["rate", "capacity", "axes", "pc1", "pc2", "pc3", "sp_auc_biglabel"]].mean().round(3).to_string())

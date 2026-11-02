@@ -23,5 +23,6 @@ for s, run in runs.items():
                      lib=m[(m.task == "labelfree") & (m.metric == "lib_r2")].pipe(lambda x: np.average(x.value, weights=x.n)), wv=m[(m.task == "labelfree") & (m.metric == "within_var_r2")].pipe(lambda x: np.average(x.value, weights=x.n)),
                      tms=h("tms", "tms_auroc_lr", "asis", "author"), tms_depth=h("tms", "tms_auroc_lr", "depth", "author"), tms_self=h("tms", "rho_self", "asis", "all"), ts_self=h("ts", "rho_self", "asis", "all"), freeze=fr, pc1=sv[0] / sv.sum(), device=json.loads((d / "config.json").read_text()).get("accelerator")))
 t = pd.DataFrame(rows).round(3)
+t.to_csv(RU.OUT / "perseed_liver.csv", index=False)
 print(t.to_string())
 print(t.drop(columns=["device"]).corr(method="spearman").round(2)[["mixing", "rho_self", "tms", "lib"]].to_string())
