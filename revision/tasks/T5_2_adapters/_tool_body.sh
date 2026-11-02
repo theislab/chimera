@@ -20,6 +20,10 @@ run_tool() {
   if [[ $tool == saturn ]]; then
     mamba run --no-capture-output -n saturn_env python $A/run_saturn.py \
       --stem "$stem" --labels "$labels" --seed "$seed" --work "$work" --dest "$dest" || rc=$?
+  elif [[ $tool == saturn_1to1 ]]; then
+    mamba run --no-capture-output -n saturn_env python $A/run_saturn.py \
+      --stem "$stem" --labels "$labels" --seed "$seed" --work "$work" --dest "$dest" \
+      --inputs "data/revision/T5_inputs/$stem/saturn_1to1" --hv-genes 40000 --method-name saturn_1to1 || rc=$?
   else
     mamba run --no-capture-output -n camex_env python $A/run_camex.py \
       --stem "$stem" --seed "$seed" --work "$work" --dest "$dest" || rc=$?

@@ -51,6 +51,8 @@ def main(argv=None):
     p.add_argument("--epochs", type=int, default=DEFAULTS["epochs"])
     p.add_argument("--centroids", default=None, help="centroids pickle to reuse or create")
     p.add_argument("--method-name", default=None)
+    p.add_argument("--hv-genes", type=int, default=DEFAULTS["hv_genes"],
+                   help="Adapter B sets this above the gene count so every 1:1 gene stays")
     a = p.parse_args(argv)
 
     inputs = (Path(a.inputs) if a.inputs else C.INPUTS / a.stem / "saturn").resolve()
@@ -68,7 +70,7 @@ def main(argv=None):
         "--ref_label_col=cell_type",
         f"--embedding_model={DEFAULTS['embedding_model']}",
         f"--num_macrogenes={DEFAULTS['num_macrogenes']}",
-        f"--hv_genes={DEFAULTS['hv_genes']}",
+        f"--hv_genes={a.hv_genes}",
         f"--pe_sim_penalty={DEFAULTS['pe_sim_penalty']}",
         f"--model_dim={DEFAULTS['model_dim']}",
         f"--hidden_dim={DEFAULTS['hidden_dim']}",
@@ -150,7 +152,9 @@ def main(argv=None):
             "tool_cli": ["train-saturn.py"] + cli,
             "labels_used_in_training": f"{a.labels}, within species only (SATURN species-prefixed labels)",
             "label_agreement_after_alignment": agree,
-            "gene_input": "tool native symbols, ESM2-filtered, seurat_v3 HVG 8000 per species",
+            "gene_input": ("1:1 orthologs of the processed h5ad (Adapter B), ESM2-filtered, all kept"
+                           if method.endswith("1to1") else
+                           "tool native symbols, ESM2-filtered, seurat_v3 HVG 8000 per species"),
             "latent": "L2-normalised .X of the final SATURN h5ad; raw .X in z_raw.npy",
             "set_detect_anomaly": "True (unmodified clone)" if C.tool_state(C.SATURN_DIR)["local_diff"] is None
             else "see tool_state.local_diff",
