@@ -33,3 +33,5 @@ tier	cohort	setting	family	rep	seed	run	fit	arm
 3	test_hmouse	hoB_E	heldout	0	242	d1-test_hmouse-hoB_E-r0	1	E
 3	liv_4sp	hoA_E	heldout	0	242	d1-liv_4sp-hoA_E-r0	1	E
 3	liv_4sp	hoB_E	heldout	0	242	d1-liv_4sp-hoB_E-r0	1	E
+1	liv_4sp	hoA_P	heldout	2	244	d1-liv_4sp-hoA_P-r2	1	P
+1	liv_4sp	hoA_P	heldout	3	245	d1-liv_4sp-hoA_P-r3	1	P

@@ -55,7 +55,7 @@ def main():
     # tier 1: arm P both folds, two seeds, three cohorts; depth r0
     for c in RU.DEPTH_COHORTS:
         for f in "AB":
-            for r in RU.HOLD_SEEDS:
+            for r in (0, 1):
                 add(1, c, f"ho{f}_P", "heldout", r, RU.HOLD_SEEDS[r], "P")
         for s in ("depth5", "depth10", "depth25"):
             if not (c == "liv_hmouse" and s == "depth25"):  # B2 fits exist
@@ -69,6 +69,9 @@ def main():
     for c in RU.DEPTH_COHORTS:
         for f in "AB":
             add(3, c, f"ho{f}_E", "heldout", 0, RU.HOLD_SEEDS[0], "E")
+    # added after both 4-sp fold A seeds failed the health rule; at the end, so row numbers stay
+    add(1, "liv_4sp", "hoA_P", "heldout", 2, RU.HOLD_SEEDS[2], "P")
+    add(1, "liv_4sp", "hoA_P", "heldout", 3, RU.HOLD_SEEDS[3], "P")
     g = pd.DataFrame(rows)
     g.to_csv(RU.TASK / "grid.tsv", sep="\t", index=False)
     print(g.groupby(["tier", "cohort"]).size())

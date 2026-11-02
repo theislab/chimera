@@ -83,7 +83,7 @@ DEPTH_COHORTS = ["liv_hmouse", "test_hmouse", "liv_4sp"]
 DEPTHS = {"depth25": 0.25, "depth10": 0.10, "depth5": 0.05}
 HOLD_SHARE = 0.20
 PARALOG_ID = 40.0
-HOLD_SEEDS = {0: 242, 1: 243}
+HOLD_SEEDS = {0: 242, 1: 243, 2: 244, 3: 245}  # 2, 3: 4-sp fold A only, both first seeds failed the health rule
 ARMS = {"P": "--gin-feature-op zero_expr_stats", "E": ""}
 
 COHORT_FIT = {
