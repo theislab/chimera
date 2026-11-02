@@ -38,8 +38,9 @@ GROUPS = {"chimera": RU.CHIMERA, "direct": RU.DIRECT, "static": RU.STATIC, "tool
 
 def read_tidy() -> pd.DataFrame:
     fr = []
-    for f in glob.glob(str(RU.REPO / "results/revision/B1/tidy*.csv")) + glob.glob(str(RU.REPO / "results/revision/B1/*tidy*.parquet")) + glob.glob(str(RU.REPO / "results/revision/B1/track_*/*.csv")):
-        fr.append(pd.read_parquet(f) if f.endswith("parquet") else pd.read_csv(f))
+    b1 = RU.REPO / "results/revision/B1/B1_overview.csv"  # B1's rows for the overview: tracks A and D
+    if b1.exists():
+        fr.append(pd.read_csv(b1))
     for pat in ("track_B/*.parquet", "track_C/units/*.parquet", "track_C/lists/*.parquet", "integration/tidy.parquet"):
         for f in glob.glob(str(RU.RES / pat)):
             if not f.endswith("__h2h.parquet"):
