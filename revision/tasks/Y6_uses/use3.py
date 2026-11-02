@@ -182,6 +182,13 @@ def main():
     # Sensitivities on the summary at C5.
     g = frame("summary", base, tab, sm)
     sup = n_sup >= 3
+    # The ladder on one set of genes (those complete at C5), so the steps differ only in what is held; y_tgt beside it.
+    same = []
+    complete = sup & g[LADDER["C5"]].notna().all(axis=1)
+    for y in ["y_appr", "y_gen", "y_appr_ot", "y_gen_ot", "y_tgt"]:
+        for lad, covs in LADDER.items():
+            same += run_unit(g, y, covs, ["S", "D", "B1"], 1000, complete & g[y].notna(), dict(y=y, ladder=lad))
+    pd.DataFrame(same).to_csv(OUT / "ladder_same_genes.csv", index=False)
     cl = AN.gene_classes(pd.Index(g.index))
     cl = cl.reindex(g.index)
     class_cols = []

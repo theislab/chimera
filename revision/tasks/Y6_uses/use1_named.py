@@ -7,12 +7,10 @@ another gene of that species in Ensembl 110 carries the human symbol. Also the w
 from __future__ import annotations
 
 import pandas as pd
-from joblib import Parallel, delayed
 
 from revision.tasks.Y6_uses.annot_genome import GTF
 from revision.tasks.Y6_uses.candidates import gtf_names
 from revision.tasks.Y6_uses.use1 import OUT
-from revision.tasks.Y6_uses.use1_posthoc import boot_row
 
 
 def main():
@@ -36,12 +34,19 @@ def main():
     D["named_true_gene"] = [";".join(sorted(lab[r.species][1].get(str(r.symbol).upper(), set()) - {r.gene_id})) for r in D[["species", "symbol", "gene_id"]].itertuples()]
     D["own_name"] = [lab[r.species][0].get(r.gene_id, ("", "", ""))[0] for r in D[["species", "gene_id"]].itertuples()]
     print(D.groupby(["fit", "species_label"]).T_named_else.agg(["sum", "mean", "count"]).round(4), flush=True)
-    jobs = []
-    for (fit, l), m in D.groupby(["fit", "species_label"]):
-        for u in ("expr", "hi"):
-            jobs.append((m, "T_named_else", u, ["S_row", "gap_abs", "gap_log", "zero_gap", "zero_s", "id_neg"]))
-    res = Parallel(n_jobs=12)(delayed(boot_row)(*j) for j in jobs)
-    pd.DataFrame([r for x in res for r in x]).to_csv(OUT / "posthoc_named.csv", index=False)
+    # Too few per chromosome half for the odd/even split, so per row on all genes: median percentile and how many reach the top 1% of U_expr.
+    rows = []
+    for (fit, l), x in D.groupby(["fit", "species_label"]):
+        u = x[x.det_other >= 0.05]
+        hit = u.T_named_else.eq(1)
+        if hit.sum() < 3:
+            continue
+        r = dict(fit=fit, species_label=l, n=len(u), n_pos=int(hit.sum()))
+        for s in ["S_row", "gap_abs", "gap_log", "zero_gap", "zero_s", "id_neg"]:
+            p = u[s].fillna(u[s].min() - 1).rank(pct=True)
+            r[f"{s}_medpct"], r[f"{s}_top1pct"] = p[hit].median(), int((p[hit] >= 0.99).sum())
+        rows.append(r)
+    pd.DataFrame(rows).to_csv(OUT / "posthoc_named.csv", index=False)
     D[D.T_named_else == 1][["fit", "species_label", "species", "symbol", "gene_id", "own_name", "named_true_gene", "identity_s", "S_gs", "det_s", "det_other", "cp_s", "cp_other", "goc", "wga", "high_conf", "homology_type_110", "homology_type_116", "T_lowconf", "T_later", "split"]].sort_values(["fit", "species_label", "S_gs"]).to_csv(OUT / "named_else_pairs.csv", index=False)
 
 
