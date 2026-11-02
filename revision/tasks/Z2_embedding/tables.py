@@ -143,7 +143,7 @@ def levels(c: str) -> pd.DataFrame:
     f = RU.OUT / f"factorial_seeds_{c}.csv"
     t = pd.read_csv(f)
     t["healthy"] = t.healthy.fillna(False).astype(bool)
-    num = [x for x in t.columns if x not in ("run", "level", "healthy") and t[x].dtype != object]
+    num = [x for x in t.columns if x not in ("run", "level", "healthy", "cohort") and pd.api.types.is_numeric_dtype(t[x])]
     g = t[t.healthy].groupby("level")
     out = g[num].mean()
     out.insert(0, "n_healthy", g.size())
@@ -209,7 +209,7 @@ def tidy() -> pd.DataFrame:
         t = pd.read_csv(f)
         t = t[t.healthy.fillna(False).astype(bool)]
         for lv, g in t.groupby("level"):
-            for k in [x for x in g.columns if x not in ("run", "level", "healthy") and g[x].dtype != object]:
+            for k in [x for x in g.columns if x not in ("run", "level", "healthy", "cohort") and pd.api.types.is_numeric_dtype(g[x])]:
                 add("factorial", f"cohort={c};level={lv}", "Chimera", k, g[k], "lower" if k in ("lib_r2", "sat_hi") else "higher")
     t = pd.DataFrame(rows, columns=["track", "task", "setting", "method", "metric", "value", "ci_lo", "ci_hi", "n", "rank_direction"])
     t.to_csv(RU.OUT / "Z2_tidy.csv", index=False)

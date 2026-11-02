@@ -83,6 +83,8 @@ BASE = {
     "liv_hmouse": "--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0",
     "test_hmouse": "--adata data/processed/camex_testis_human_mouse.h5ad --max-epochs 200 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --prior-clamp-max 0.85 --celltype-conditional-mmd --celltype-key cell_ontology_class",
 }
+BASE["islet"] = "--adata data/revision/disease_islet/islet_healthy_train.h5ad --max-epochs 200 --batch-key batch --adv-weight 200 --lambda-anchor 0.006 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85"
+BASE["kidney"] = "--adata data/revision/disease_kidney/kidney_healthy_train.h5ad --max-epochs 200 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85"
 FACTORIAL_SEEDS = {"liv_hmouse": [42, 43, 44], "test_hmouse": [42, 43]}
 # level -> (encoder input, what replaces or adds to the base args). Later flags win in argparse.
 LEVELS = {
@@ -96,6 +98,8 @@ LEVELS = {
     # Mechanism tests, not settings: the encoder reads raw counts (chimera/_module.py forward and _encoder_input). train_patched.py overrides that method from outside the package.
     # Added after adv0 + MMD0 was read (amendment 12): both terms lowered together, a frontier between canonical and off. Two knobs by design.
     "adv50mmd10": ("raw", "--adv-weight 50 --lambda-mmd 10"), "adv20mmd10": ("raw", "--adv-weight 20 --lambda-mmd 10"), "adv50mmd5": ("raw", "--adv-weight 50 --lambda-mmd 5"), "adv20mmd5": ("raw", "--adv-weight 20 --lambda-mmd 5"),
+    # Added after novamp s42 was read (amendment 13): more mixing pressure without the VAMP prior.
+    "novamp_adv400": ("raw", "--no-vamp-prior --adv-weight 400"), "novamp_mmd100": ("raw", "--no-vamp-prior --lambda-mmd 100"),
     "logx": ("log1p", ""), "logcp": ("logcp", ""), "logx_adv0mmd0": ("log1p", "--adv-weight 0 --lambda-mmd 0"),
 }
 # Budget amendment withdrawn by the coordinator (amendments 1, 2): the factorial as committed runs in full. The order in factorial.tsv is priority order, and rows only ever append.
@@ -111,7 +115,7 @@ EXISTING_GRIDS = {
               "mmd100_a003": ["rev-isl-grid9-s42"], "mmd150_a003": ["rev-isl-grid10-s42"], "mmd200_a003": ["rev-isl-grid11-s42"], "fb15_adv200_mmd50": ["rev-isl-grid6-s42"]},
     "test_hmouse": {"base": [f"rev-test_hmouse-s{s}" for s in range(43, 52)], "global_nolabels": ["rev-ctl-test_hmouse-nolab-s43"]},
 }
-RUN_TAG = {"liv_hmouse": "liv", "test_hmouse": "tes"}
+RUN_TAG = {"liv_hmouse": "liv", "test_hmouse": "tes", "islet": "isl", "kidney": "kid"}
 
 
 def run_name(cohort: str, level: str, seed: int) -> str:
