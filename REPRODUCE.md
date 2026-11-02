@@ -90,14 +90,18 @@ bash revision/retrain_from_recipe.sh liv_hmouse 42 retrain-liv_hmouse-s42 cpu
 #       --adata data/processed/<h5ad> --seed <seed> --accelerator cpu <overrides>
 ```
 
-On 16 CPU threads liver Human+Mouse takes about 20 minutes, and liver 4-species, testis
-Human+Mouse and testis 3-species about 50-55 minutes each. The canonical checkpoints were trained on Apple MPS and the revision seeds on
+On 16 CPU threads liver Human+Mouse takes 20-45 minutes depending on the node, and liver
+4-species, testis Human+Mouse and testis 3-species about 50-55 minutes each. The canonical checkpoints were trained on Apple MPS and the revision seeds on
 CPU. A retrained run does not reproduce an archived run value by value: on CPU the same seed
 and configuration can end in a different training state (species mixing, adversary accuracy),
 and Δα follows that state. How much this matters depends on the cohort: seed-pair Spearman of Δα
 is 0.93-0.97 on liver 4-species and the testis cohorts but about 0.3 on liver Human+Mouse and
 Human+Monkey (`results/gene_tables/reliability.csv`), and two same-seed CPU repeats on liver
-Human+Mouse gave 0.10 and 0.63 (`results/revision/T6_8b_repeat.csv`). The readouts of the paper
+Human+Mouse gave 0.10 and 0.63 (`results/revision/T6_8b_repeat.csv`). On liver Human+Mouse the
+runs fall into two states: integrated (final adversary accuracy about 0.5) and poorly mixed
+(adversary accuracy 0.74-0.93, expectations E6.1 and E6.2 failing, narrow Δα); Δα agrees within a
+state far better than between states. Check `summary.json` (`adv_acc_final`,
+`failed_expectations`) before comparing a retrained run with an archived one. The readouts of the paper
 are therefore seed consensus tables (`results/gene_tables/`), and the archived runs remain the
 reference.
 
