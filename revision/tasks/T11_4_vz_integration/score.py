@@ -1,6 +1,6 @@
 """T11.4: Van Zyl integration benchmark, a separate row excluded from the 7-cohort mean.
 
-For the full cohort and the pairs human + mouse and human + M. mulatta: Chimera (the selected s42
+For every usable dataset (``vz.usable_datasets``): Chimera (the selected s42
 grid run; every seed in D beside it) against the canonical baseline panel (PCA, Harmony, scVI with
 species as batch, scVI / scANVI / sysVI with the sample as batch; ``baselines.tsv``), all scored with
 ``training/compare_vs_scvi.py::compute_integration_metrics`` unchanged (k = 15, seed 42, labels
@@ -26,7 +26,6 @@ from training.compare_vs_scvi import compute_integration_metrics
 sys.path.insert(0, str(vz.ROOT / "revision" / "tasks" / "T11_2_recipe"))
 from select_recipe import BATCH_KEYS, BIO_KEYS, correct, minmax  # noqa: E402
 
-DATASETS = ["full", "hmouse", "hmmul"]
 OUT = vz.OUT / "integration"
 B = vz.RUNS
 BASELINES = {  # model -> cache dir relative to training/runs, given the h5ad stem
@@ -49,7 +48,7 @@ def score(z: np.ndarray, obs: pd.DataFrame) -> dict:
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     rows, seeds_rows = [], []
-    for ds in DATASETS:
+    for ds in vz.usable_datasets():
         a = vz.read_h5ad(ds, backed=True)
         obs = a.obs.copy()
         stem = vz.DATASETS[ds]["h5ad"].stem
@@ -86,8 +85,12 @@ def main() -> int:
         norm = corr.apply(minmax)
         t.loc[ok, "mixing"] = norm[BATCH_KEYS].mean(1)
         t.loc[ok, "biology"] = norm[BIO_KEYS].mean(1)
-        t.loc[ok, "composite"] = 0.4 * t.loc[ok, "mixing"] + 0.6 * t.loc[ok, "biology"]
-        t.loc[ok, "rank"] = t.loc[ok, "composite"].rank(ascending=False, method="min")
+        if ok.all():  # min-max composites compare only on the full panel of 7 models
+            t.loc[ok, "composite"] = 0.4 * t.loc[ok, "mixing"] + 0.6 * t.loc[ok, "biology"]
+            t.loc[ok, "rank"] = t.loc[ok, "composite"].rank(ascending=False, method="min")
+        else:
+            t[["mixing", "biology"]] = np.nan
+            t["composite"], t["rank"] = np.nan, np.nan
         out.append(t)
     tab = pd.concat(out)
     tab.to_csv(OUT / "integration_table.csv", index=False)

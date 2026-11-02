@@ -1,16 +1,12 @@
-"""T11.5: Van Zyl gene table, reliability, covariate audit, baselines, H5/H6-style sets, margin support.
+"""T11.5: Van Zyl gene table, covariate audit, baselines, H5/H6-style sets, margin support.
 
-Per dataset (``vz.DATASETS``), with sections 2-5 and 9 of the pre-specified plan unchanged:
+Per usable dataset (``vz.usable_datasets``), with sections 2-5 and 9 of the pre-specified plan unchanged:
 
-* seed health and the seeds in D (``vz.seed_health``; amendment a82eaad: a seed failing G-V does
-  not enter D or S_ema; sensitivity ``D_sens`` uses every seed with finite alpha);
+* seeds in D: ``vz.seeds_in_D`` (latest amendment rows); genes with alpha > 0.95 in a seed are flagged;
 * covariates C: ``cohorts.gene_covariates`` (tau over ``cell_type_harmonised``), raw prior from the
   run's ``conservation_prior_raw.npy`` (checked against the h5ad prior), log human CDS length;
 * D = mean over D seeds of alpha - prior (as anchored, clamped 0.85 on clamped recipes) minus the
   median; ``D_raw`` against the raw prior; ``S_ema`` = mean ``S_g_ema``;
-* reliability: per-seed leave-one-out rho on the C-residual scale; rel(D|C) = 2r/(1+r), r = mean over
-  all splits of the seeds into two halves (2-vs-3 for 5 seeds, as section 3; 1-vs-2 for 3; 1-vs-1 for
-  2); none with fewer than 2 seeds (reported descriptively);
 * covariate audit (T2.4 functions): Spearman of D with each covariate, partial rho(D, S | expression),
   5-fold CV R^2 of D on the GIN feature groups;
 * B1 (T4.2 functions): cross-species pseudobulk profile correlation E over ``cell_ontology_class``,
@@ -20,18 +16,19 @@ Per dataset (``vz.DATASETS``), with sections 2-5 and 9 of the pre-specified plan
   expression decile cells (strata kept with >= 5 background genes per set gene); stratified AUROC,
   1,000 gene bootstraps, 2,000 permutations within strata, BH over the four sets; scores D, B1b and,
   stratified on expression only, the raw prior;
+* tidy per-gene table ``results/revision/T11/genes/genes_<dataset>.tsv`` (gene id, pi, alpha per seed,
+  centred Delta-alpha, S_ema, count support, margin support, saturated flag) for the harmonised panels;
 * margin support (section 9, T2.5 functions): per D seed, fraction of |Delta-alpha| > 0.05 genes whose
   S_g_ema agrees in sign and is at least the median |S|; mean over seeds.
 
 No glaucoma gene is read here.
 
-    PYTHONPATH=<chimera repo> python revision/tasks/T11_5_vz_genes/readout.py [--datasets full,hmouse,hmmul,primates]
+    PYTHONPATH=<chimera repo> python revision/tasks/T11_5_vz_genes/readout.py [--datasets full,hmouse]
 """
 
 from __future__ import annotations
 
 import argparse
-import itertools
 import sys
 
 import numpy as np
@@ -71,29 +68,6 @@ AUDIT = ["log_mean", "detection", "log_var", "tau", "prior", "prior_raw", "S_ema
 FEATURE_GROUPS = {"expr3": C.GIN_COLUMNS["expr3"], "esm64": C.GIN_COLUMNS["esm64"],
                   "esm64+expr3": C.GIN_COLUMNS["esm64"] + C.GIN_COLUMNS["expr3"], "all72": list(range(72))}
 N_BOOT, N_PERM = 1000, 2000
-
-
-def reliability(M: pd.DataFrame, Z: np.ndarray, ok: np.ndarray) -> dict:
-    seeds = list(M.columns)
-    n = len(seeds)
-    if n < 2:
-        return dict(n_seeds=n, note="fewer than 2 seeds: no reliability")
-    loo = {}
-    for s in seeds:
-        e1 = K.residual_rank(M.loc[ok, s].to_numpy(), Z)
-        e2 = K.residual_rank(M.loc[ok].drop(columns=s).mean(1).to_numpy(), Z)
-        loo[int(s)] = float(np.corrcoef(e1, e2)[0, 1])
-    rs = []
-    for half in itertools.combinations(seeds, n // 2):
-        rest = [s for s in seeds if s not in half]
-        if n % 2 == 0 and min(half) != min(seeds):
-            continue  # each even split once
-        e1 = K.residual_rank(M.loc[ok, list(half)].mean(1).to_numpy(), Z)
-        e2 = K.residual_rank(M.loc[ok, rest].mean(1).to_numpy(), Z)
-        rs.append(float(np.corrcoef(e1, e2)[0, 1]))
-    r = float(np.mean(rs))
-    return dict(n_seeds=n, split=f"{n // 2}-vs-{n - n // 2}", n_splits=len(rs), r_mean=r, rel=2 * r / (1 + r),
-                leave_one_out_rho_resid=loo)
 
 
 def set_tests(g: pd.DataFrame, gold: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
@@ -148,9 +122,8 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
     rho_t = gene_ids.assert_table_matches(a, gene_ids.load_table(vz.TABLE_COHORT))
     health = vz.seed_health(ds)
     runs = vz.seeds_in_D(ds)
-    runs_sens = vz.seeds_in_D(ds, sensitivity=True)
-    if not runs:
-        raise SystemExit(f"{ds}: no seed passes G-V")
+    if len(runs) < vz.MIN_SEEDS:
+        raise SystemExit(f"{ds}: fewer than {vz.MIN_SEEDS} seeds pass health")
     first = runs[min(runs)]
     praw = C.raw_prior(vz.TABLE_COHORT, first, a.var["conservation_prior"].to_numpy(dtype=float))
     a_tau = a.copy()
@@ -165,27 +138,21 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
     blk, binfo = I.esm_blocks(F[:, :I.N_PCS])
     g["block"] = blk
 
-    st = {s: K.read_run(r) for s, r in sorted(runs_sens.items())}
+    st = {s: K.read_run(r) for s, r in sorted(runs.items())}
     for s, x in st.items():
         if len(x["alpha"]) != a.n_vars or not np.isfinite(x["alpha"]).all():
             raise AssertionError(f"{ds} s{s}: wrong length or non-finite alpha")
     Dm = pd.DataFrame({s: x["D"] for s, x in st.items()}, index=a.var_names)
     Am = pd.DataFrame({s: x["alpha"] for s, x in st.items()}, index=a.var_names)
-    inD = [s for s in Dm.columns if s in runs]
-    g["prior"] = st[min(inD)]["prior"]
-    md = Dm[inD].mean(1)
+    g["prior"] = st[min(st)]["prior"]
+    md = Dm.mean(1)
     g["D"] = md - md.median()
-    dr = Am[inD].mean(1) - praw
+    dr = Am.mean(1) - praw
     g["D_raw"] = dr - dr.median()
-    ms = Dm.mean(1)
-    g["D_sens"] = ms - ms.median()
-    g["S_ema"] = np.mean([st[s]["S_g_ema"] for s in inD], axis=0)
+    g["S_ema"] = np.mean([x["S_g_ema"] for x in st.values()], axis=0)
+    g["saturated_flag"] = (Am > 0.95).any(axis=1).to_numpy()
     for s in Dm.columns:
         g[f"D_s{s}"] = Dm[s]
-    ok = g[K.COVARIATE_COLUMNS].notna().all(1).to_numpy()
-    Z = K.design(g.loc[ok], K.COVARIATE_COLUMNS)
-    rel = reliability(Dm[inD], Z, ok)
-    rel_sens = reliability(Dm, Z, ok) if len(Dm.columns) > len(inD) else None
 
     # covariate audit (T2.4 definitions)
     aud = [dict(covariate=c, spearman=float(spearmanr(g["D"], g[c], nan_policy="omit")[0])) for c in AUDIT]
@@ -216,29 +183,44 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
 
     OUT.mkdir(parents=True, exist_ok=True)
     g.reset_index(names="var_name").to_parquet(OUT / f"genes_{ds}.parquet")
+    # Tidy per-gene table for the harmonised panels (one row per vocabulary gene).
+    tidy = pd.DataFrame(dict(hsapiens_gene_id=g["hsapiens_gene_id"], symbol=g["symbol"], var_name=g.index,
+                             pi=g["prior_raw"], pi_anchored=g["prior"]))
+    for s in Am.columns:
+        tidy[f"alpha_s{s}"] = Am[s]
+    tidy["delta_alpha_centred"] = g["D"]
+    tidy["S_ema"] = g["S_ema"]
+    tidy["count_support"] = np.abs(g["S_ema"]) >= MG.MASK_EPS  # |S_g_ema| >= 1e-6, X4 definition
+    tidy["margin_support"] = MG.margin_flag(md.to_numpy(), g["S_ema"].to_numpy())  # T2.5 flag on the seed mean
+    tidy["saturated_flag"] = g["saturated_flag"]
+    tidy["log_cp10k_spmean"] = g["log_cp10k_spmean"]
+    tidy["detection_spmean"] = g["detection_spmean"]
+    tidy["B1b_pseudobulk"] = g["B1b"]
+    (vz.OUT / "genes").mkdir(parents=True, exist_ok=True)
+    tidy.to_csv(vz.OUT / "genes" / f"genes_{ds}.tsv", sep="\t", index=False)
     health.to_csv(OUT / f"seed_health_{ds}.tsv", sep="\t", index=False)
     pd.DataFrame(aud).to_csv(OUT / f"covariate_audit_{ds}.csv", index=False)
     pd.DataFrame(cv).to_csv(OUT / f"cv_r2_{ds}.csv", index=False)
     sets.to_csv(OUT / f"sets_{ds}.csv", index=False)
     meta = dict(dataset=ds, n_genes=int(a.n_vars), n_cells=int(a.n_obs), assert_table_matches=rho_t,
-                seeds_D={int(k): v for k, v in runs.items()}, seeds_sensitivity={int(k): v for k, v in runs_sens.items()},
-                reliability=rel, reliability_sensitivity=rel_sens, esm_blocks=binfo,
+                seeds_D={int(k): v for k, v in runs.items()}, esm_blocks=binfo,
+                n_saturated_flag=int(g["saturated_flag"].sum()),
                 sd_D=float(g["D"].std()), frac_D_pos=float((g["D"] > 0).mean()),
-                rho_D_Dsens=float(spearmanr(g["D"], g["D_sens"])[0]), rho_D_Draw=float(spearmanr(g["D"], g["D_raw"])[0]),
+                rho_D_Draw=float(spearmanr(g["D"], g["D_raw"])[0]),
                 rho_D_S=float(spearmanr(g["D"], g["S_ema"])[0]), rho_D_B1raw=float(spearmanr(g["D"], g["B1_raw"], nan_policy="omit")[0]),
                 n_B1=int(np.isfinite(E).sum()), b1_pairs=[{k: v for k, v in p.items() if k != "groups"} for p in pinfo],
                 units_used=int(units["used"].sum()), margin_support=ms_,
                 integration_reference=vz.integration_reference(a.obs))
     vz.write_json(OUT / f"meta_{ds}.json", meta)
-    print(ds, {k: meta[k] for k in ("n_genes", "seeds_D", "sd_D", "rho_D_S", "rho_D_B1raw")}, rel)
+    print(ds, {k: meta[k] for k in ("n_genes", "seeds_D", "n_saturated_flag", "sd_D", "rho_D_S", "rho_D_B1raw")})
 
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--datasets", default=",".join(vz.DATASETS))
+    p.add_argument("--datasets", default=None)
     a = p.parse_args()
     gold = pd.read_csv(GOLD, index_col=0)[list(SETS)].astype(bool)
-    for ds in a.datasets.split(","):
+    for ds in (a.datasets.split(",") if a.datasets else vz.usable_datasets()):
         readout(ds, gold)
     return 0
 

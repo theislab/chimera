@@ -1,7 +1,7 @@
 """T11.6: glaucoma gene translation on Van Zyl, V1-V3 of section 11 (Family 3, descriptive).
 
 Primary dataset fixed before any glaucoma readout (ledger T11_6): the full five-species cohort.
-The pairs (human + mouse, human + M. mulatta) are reported beside it. Gene list:
+The other usable datasets (``vz.usable_datasets``) are reported beside it. Gene list:
 ``revision/tasks/T11_1_vanzyl/glaucoma_genes.tsv`` (committed at T11.1), restricted to genes in the
 dataset vocabulary. Integration quality of each dataset is written beside every readout.
 
@@ -12,8 +12,10 @@ dataset vocabulary. Integration quality of each dataset is written beside every 
   list genes; genes named in van Zyl 2020.
 * V2: per-species fidelity of each gene across the outflow classes (``cell_class`` conventional or
   uveoscleral outflow) that species s shares with human.
-  - Chimera: per-species fit margin S_gs (T2.5 forward pass, ``cell_ontology_class`` groups), mean
-    over those classes and over the seeds in D.
+  - Chimera per-species residual (the plan's readout): residual-head RMS per gene (``residuals.py``),
+    mean over those classes and over the seeds in D; lower means closer to the shared program.
+  - Chimera per-species fit margin S_gs (T2.5 forward pass, ``cell_ontology_class`` groups), mean
+    over those classes and over the seeds in D; higher means better fit by the shared program.
   - Direct pseudobulk: Pearson r between the human and species-s pseudobulk profiles over the same
     classes (T4.2 ``pair_corr``; units ``obs['batch']`` with >= 30 cells).
   Reported per species: mean over glaucoma genes (absolute; published expectation: macaques closer
@@ -44,13 +46,13 @@ sys.path.insert(0, str(vz.ROOT / "revision" / "tasks" / "T2_5_celltype_margin"))
 import margin as MG  # noqa: E402
 
 PRIMARY = "full"
-DATASETS = ["full", "hmouse", "hmmul"]
 OUT = vz.OUT / "glaucoma"
 GLAUCOMA = vz.ROOT / "revision" / "tasks" / "T11_1_vanzyl" / "glaucoma_genes.tsv"
 OUTFLOW = {"conventional outflow", "uveoscleral outflow"}
 MACAQUES = ["macaca_fascicularis", "macaca_mulatta"]
 OTHERS = ["pig", "mouse"]
 N_BOOT, N_PERM = 1000, 5000
+METHODS = ("residual", "margin", "pseudobulk")
 
 
 def glaucoma_list() -> pd.DataFrame:
@@ -113,6 +115,32 @@ def forward_mean(ds: str, key: str, var_names) -> dict:
                 cell_types=d0["cell_types"], n_seeds=len(decs))
 
 
+def residual_mean(ds: str, var_names) -> dict:
+    """Mean over the seeds in D of the per-species, per-class residual RMS (``residuals.py``)."""
+    Rs = []
+    for s in vz.seeds_in_D(ds):
+        z = dict(np.load(vz.OUT / "residuals" / f"res_{ds}_s{s}.npz", allow_pickle=False))
+        if list(z["var_names"]) != list(var_names):
+            raise AssertionError(f"{ds} s{s}: residual var_names differ")
+        Rs.append(z)
+    return dict(rms=np.mean([z["rms"] for z in Rs], axis=0), species_idx=Rs[0]["species_idx"], labels=Rs[0]["labels"],
+                species=[str(s) for s in Rs[0]["species"]])
+
+
+def drivers_summary(ds: str, a) -> pd.DataFrame:
+    """All genes: share of the total divergent contribution (max(-C_gk, 0)) carried by each class."""
+    fwd = forward_mean(ds, vz.CLASS_KEY, a.var_names)
+    types = fwd["cell_types"]
+    div = np.maximum(-np.stack([fwd["C_gk"][k] for k in types]), 0)
+    top = div.argmax(0)
+    has = div.max(0) > 0
+    n = pd.crosstab(a.obs[vz.CLASS_KEY].astype(str), a.obs["species"].astype(str))
+    return pd.DataFrame(dict(dataset=ds, cell_class=types, share_divergent_mass=div.sum(1) / div.sum(),
+                             frac_genes_top=[float((top[has] == j).mean()) for j in range(len(types))],
+                             n_species_with_class=[int((n.loc[k] > 0).sum()) for k in types],
+                             n_cells=[int(n.loc[k].sum()) for k in types]))
+
+
 def pseudobulk(a):
     X = a.X.tocsr() if sp.issparse(a.X) else sp.csr_matrix(a.X)
     X = X.astype(np.float64)
@@ -126,6 +154,7 @@ def v2(ds: str, a, g: pd.DataFrame, gl: pd.DataFrame, rng) -> tuple[pd.DataFrame
     cls = a.obs[[vz.CLASS_KEY, "cell_class"]].astype(str).drop_duplicates()
     outflow = set(cls.loc[cls["cell_class"].isin(OUTFLOW), vz.CLASS_KEY])
     fwd = forward_mean(ds, vz.CLASS_KEY, a.var_names)
+    res = residual_mean(ds, a.var_names)
     x, f, sl = pseudobulk(a)
     hi = fwd["species"].index("human")
     fid = pd.DataFrame(index=g.index)
@@ -136,16 +165,19 @@ def v2(ds: str, a, g: pd.DataFrame, gl: pd.DataFrame, rng) -> tuple[pd.DataFrame
         s_cls = set(fwd["labels"][fwd["species_idx"] == si])
         shared = sorted(outflow & h_cls & s_cls)
         rows_s = [(i) for i, (sp_, l) in enumerate(zip(fwd["species_idx"], fwd["labels"])) if sp_ == si and l in shared]
-        fid[f"chimera_{s}"] = fwd["S_gsk"][rows_s].mean(0)
+        fid[f"margin_{s}"] = fwd["S_gsk"][rows_s].mean(0)
+        res_rows = [i for i, (sp_, l) in enumerate(zip(res["species_idx"], res["labels"]))
+                    if res["species"][sp_] == s and l in shared]
+        fid[f"residual_{s}"] = res["rms"][res_rows].mean(0)
         grp = [k for k in T42.shared_groups(x, sl, ["human", s]) if k in outflow]
         rr, _ = T42.pair_corr(x, f, "human", s, grp, a.n_vars)
         fid[f"pseudobulk_{s}"] = rr
-        info[s] = dict(chimera_classes=shared, pseudobulk_classes=grp)
+        info[s] = dict(margin_classes=shared, residual_classes=shared, pseudobulk_classes=grp)
     ids = set(gl["hsapiens_gene_id"])
     inset = g["hsapiens_gene_id"].isin(ids).to_numpy()
     rows = []
-    for method in ("chimera", "pseudobulk"):
-        cols = [c for c in fid.columns if c.startswith(method)]
+    for method in METHODS:
+        cols = [c for c in fid.columns if c.startswith(method + "_")]
         P = fid[cols].rank(pct=True)
         for c in cols:
             s = c.split("_", 1)[1]
@@ -158,9 +190,9 @@ def v2(ds: str, a, g: pd.DataFrame, gl: pd.DataFrame, rng) -> tuple[pd.DataFrame
     tab = pd.DataFrame(rows)
     # contrast macaques - (pig, mouse) on glaucoma genes, absolute and percentile, gene bootstrap
     con = []
-    if all(f"chimera_{s}" in fid for s in MACAQUES + OTHERS):
+    if all(f"margin_{s}" in fid for s in MACAQUES + OTHERS):
         idx = np.where(inset)[0]
-        for method in ("chimera", "pseudobulk"):
+        for method in METHODS:
             V = fid[[f"{method}_{s}" for s in MACAQUES + OTHERS]].to_numpy()
             Pm = fid[[f"{method}_{s}" for s in MACAQUES + OTHERS]].rank(pct=True).to_numpy()
             for scale, M in (("absolute", V), ("percentile", Pm)):
@@ -224,8 +256,8 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(20261102)
     gl = glaucoma_list()
-    v1_rows, v2_tabs, v2_cons, iq = [], [], [], {}
-    for ds in DATASETS:
+    v1_rows, v2_tabs, v2_cons, drv, iq = [], [], [], [], {}
+    for ds in vz.usable_datasets():
         a = vz.read_h5ad(ds)
         g = pd.read_parquet(vz.OUT / "readout" / f"genes_{ds}.parquet").set_index("var_name")
         if list(g.index) != list(a.var_names):
@@ -235,11 +267,12 @@ def main() -> int:
         tab, con = v2(ds, a, g, gl, rng)
         v2_tabs.append(tab)
         v2_cons.append(con)
-        if ds == PRIMARY:
-            v3(ds, a, g, gl).to_csv(OUT / f"v3_drivers_{ds}.csv", index=False)
+        v3(ds, a, g, gl).to_csv(OUT / f"v3_drivers_{ds}.csv", index=False)
+        drv.append(drivers_summary(ds, a))
     pd.DataFrame(v1_rows).to_csv(OUT / "v1_contrast.csv", index=False)
     pd.concat(v2_tabs).to_csv(OUT / "v2_species_fidelity.csv", index=False)
     pd.concat(v2_cons).to_csv(OUT / "v2_contrast.csv", index=False)
+    pd.concat(drv).to_csv(OUT / "drivers_summary.csv", index=False)
     vz.write_json(OUT / "integration_quality.json", iq)
     print(pd.DataFrame(v1_rows).round(3).to_string(index=False))
     print(pd.concat(v2_tabs).round(3).to_string(index=False))
