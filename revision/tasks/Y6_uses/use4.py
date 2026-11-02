@@ -59,7 +59,8 @@ def table(fit):
     d = FIT[fit]
     if d.get("genes") == "T11":
         g = pd.read_parquet(RU.RES / "T11/readout/genes_hmmul.parquet")
-        g = g.rename(columns={"prior_raw": "pi_raw", "B1_raw": "B1", "log_cp10k_spmean": "expr", "detection_spmean": "detection"}).set_index("var_name", drop=False)
+        g = g.rename(columns={"prior_raw": "pi_raw", "B1_raw": "B1"}).set_index("var_name", drop=False)
+        g["expr"], g["detection"] = g.log_cp10k_spmean, g.detection_spmean
     else:
         g = pd.read_parquet(RU.RES / f"H1/genes/{fit}.parquet")
         g = g.assign(var_name=g.index)
