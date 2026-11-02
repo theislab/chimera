@@ -7,7 +7,7 @@ Forward pass (``--forward <seed>``): the T2.5 checkpoint-only forward pass
 nothing is written to the run directory.
 
 Combine (``--combine``), per gene g, species s, type k (T2.5 ``margin.decompose``, posterior-mean z),
-over the seeds admitted to D (``seed_health.json``):
+over the seeds admitted to D (``seed_health.json``: G-V passing seeds):
 
 * species-row contribution R_gsk = w_sk S_gsk (w_sk = n_sk / (n_s K)); C_gk = sum_s R_gsk, so that
   sum_k C_gk = S_g; five-seed means;

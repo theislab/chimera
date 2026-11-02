@@ -74,10 +74,13 @@ def panel_a(ax):
     clean(ax, "y")
 
 
-def forest(ax, df, est, lo, hi, groups, xref, xlabel, title):
+def forest(ax, df, est, lo, hi, groups, xref, xlabel, title, heads=None):
     y0 = 0
     yt, yl = [], []
-    for g, mk in groups:
+    for gi, (g, mk) in enumerate(groups):
+        if heads:
+            ax.text(0.0, y0 - 0.75, heads[gi], transform=ax.get_yaxis_transform(), fontsize=5.5, color=INK2,
+                    ha="left", va="center", style="italic")
         for i, s in enumerate(ORDER):
             r = df[(df["score"] == s) & (df["grp"] == g)]
             if not len(r):
@@ -87,12 +90,12 @@ def forest(ax, df, est, lo, hi, groups, xref, xlabel, title):
             ax.plot([r[lo], r[hi]], [y, y], color=COL[s], lw=1.2, solid_capstyle="round")
             ax.plot(r[est], y, marker=mk, ms=4, color=COL[s], mfc=COL[s] if mk == "o" else "white", mew=1.0)
             yt.append(y)
-            yl.append(NAME[s] if g == groups[0][0] else "")
+            yl.append(NAME[s] if (heads or g == groups[0][0]) else "")
         y0 += len(ORDER) + 1
     ax.axvline(xref, color=INK2, lw=0.6, ls="--")
     ax.set_yticks(yt)
     ax.set_yticklabels(yl)
-    ax.invert_yaxis()
+    ax.set_ylim(y0 - 1, -1.5)
     ax.set_xlabel(xlabel)
     ax.set_title(title, loc="left")
     clean(ax, "x")
@@ -103,25 +106,27 @@ def main() -> int:
     e1 = e1[e1["score"].isin(ORDER)].rename(columns={"universe": "grp"})
     e2 = pd.read_csv(T / "e2.tsv", sep="\t")
     e2 = e2[(e2["strata"] == "pi_x_expr_deciles_5to1") & e2["score"].isin(ORDER)].assign(grp="main")
+    ex = pd.read_csv(T / "explore_e2_range_matched.tsv", sep="\t")
+    ex = ex[ex["comparison"].str.startswith("conserved with") & ex["score"].isin(ORDER)].assign(grp="range")
     e3 = pd.read_csv(T / "e3.tsv", sep="\t")
     e4 = pd.read_csv(T / "e4.tsv", sep="\t")
 
-    fig, axes = plt.subplots(2, 3, figsize=(7.2, 4.4), gridspec_kw=dict(wspace=0.55, hspace=0.75))
+    fig, axes = plt.subplots(2, 3, figsize=(7.2, 4.8), gridspec_kw=dict(wspace=0.95, hspace=0.7))
     a, b, c, d, e, f = axes.ravel()
     panel_a(a)
     label(a, "a")
 
     forest(b, e1, "rho_p", "ci_lo", "ci_hi", [("all", "o"), ("top_pi_tertile", "s")], 0.0,
-           "ρ$_p$(score, COE | C), 95% CI", "E1: partial rank correlation")
-    b.text(1.0, 0.02, "filled: all genes\nopen: top π tertile", transform=b.transAxes, ha="right", va="bottom",
-           fontsize=5, color=INK2)
-    # open markers for the tertile rows
+           "ρ$_p$(score, COE | C), 95% CI", "E1: partial rank correlation",
+           heads=["all genes (4,111)", f"top π tertile ({int(e1.loc[e1.grp == 'top_pi_tertile', 'n'].iloc[0]):,})"])
     label(b, "b")
     n_div = int(e2["n_divergent"].iloc[0])
     n_con = int(e2["n_conserved"].iloc[0])
-    forest(c, e2, "auroc", "ci_lo", "ci_hi", [("main", "o")], 0.5, "stratified AUROC, 95% CI",
-           f"E2: divergent ({n_div}) vs conserved ({n_con})")
-    c.text(0.02, 0.02, "< 0.5: divergent lower", transform=c.transAxes, fontsize=5, color=INK2)
+    n_c2 = int(ex["n_conserved"].iloc[0])
+    forest(c, pd.concat([e2, ex]), "auroc", "ci_lo", "ci_hi", [("main", "o"), ("range", "s")], 0.5,
+           "stratified AUROC, 95% CI (< 0.5: divergent lower)", f"E2: Shay divergent ({n_div}) vs COE-conserved",
+           heads=[f"pre-specified: all conserved ({n_con:,})",
+                  f"exploratory: range-matched ({n_c2})"])
     label(c, "c")
 
     names = {"Chimera C_gk, all species rows": ("Chimera, all rows", COL["D"]),
@@ -131,18 +136,19 @@ def main() -> int:
         nm, cl = names[r.readout]
         d.barh(i, r.n_hit, color=cl, height=0.55)
         d.plot([r.expected_empirical] * 2, [i - 0.38, i + 0.38], color=INK, lw=1.2)
-        d.text(r.n_hit + 0.15, i, f"{r.n_hit}/10, p = {r.p_empirical:.2f}", va="center", fontsize=5, color=INK)
+        d.text(r.n_hit + 0.2, i, f"{r.n_hit}/10, p = {r.p_empirical:.2f}", va="center", fontsize=5, color=INK)
     d.set_yticks(range(len(e3)))
-    d.set_yticklabels([names[r][0] for r in e3["readout"]])
+    d.set_yticklabels([names[r][0].replace(", ", ",\n").replace(" leave", "\nleave") for r in e3["readout"]])
     d.invert_yaxis()
     d.set_xlim(0, 10)
-    d.set_xlabel("genes whose top divergent type is a Shay lineage")
-    d.set_title("E3: named lineages (black tick: chance)", loc="left")
+    d.set_xticks([0, 2, 4, 6, 8, 10])
+    d.set_xlabel("of 10 named genes: top divergent\ntype is a Shay-named lineage")
+    d.set_title("E3: named lineages (tick: chance)", loc="left")
     clean(d, "x")
     label(d, "d")
 
     sets = ["Shay divergent", "COE conserved (above median)", "all vocabulary"]
-    short = {"Shay divergent": "Shay divergent", "COE conserved (above median)": "COE conserved",
+    short = {"Shay divergent": "divergent", "COE conserved (above median)": "conserved",
              "all vocabulary": "all genes"}
     for ax, key, cl, xl, tt, lab in (
             (e, "Chimera", COL["D"], "mouse minus lemur share\nof divergent S$_g$, 95% CI", "E4: Chimera species rows", "e"),

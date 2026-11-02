@@ -6,11 +6,11 @@ One row per vocabulary gene of build 2 (``gene_ids.h5ad_path("bone_marrow")``, 1
   h5ad prior), species-balanced mean log1p CP10K and detection (``cohorts.gene_covariates``), log
   human CDS length (``controls.cds_table``);
 * ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PCs (``T4_3 inputs.esm_blocks``);
-* D (section 2): mean over the seeds admitted by ``seed_health.py`` (``seed_health.json``) of
-  alpha - prior as anchored (clamped 0.85), minus the cohort median. All seeds are CPU runs, so the
-  MPS clause of the pooling rule does not apply; a non-finite seed cannot enter. ``D_raw`` = mean
-  alpha - pi_raw minus its median (named sensitivity); ``D_GV`` = D from the seeds that pass G-V
-  only (Family 3 sensitivity); ``S_ema`` = mean ``S_g_ema`` (Family 3);
+* D (section 2): mean over the seeds admitted by ``seed_health.py`` (``seed_health.json``: seeds
+  passing G-V, amendment chimera-private a82eaad) of alpha - prior as anchored (clamped 0.85), minus
+  the cohort median. ``D_raw`` = mean alpha - pi_raw minus its median (named sensitivity);
+  ``D_all`` = the same D over every finite seed, G-V failures included (the amendment's
+  sensitivity); ``S_ema`` = mean ``S_g_ema`` (Family 3);
   per-seed leave-one-out rho on the C-residual scale; rel(D|C) over the 10 2-vs-3 splits;
 * B1 (section 12): ``B1_raw`` = E, the T4.2 cross-species pseudobulk profile correlation over the
   nine harmonised types (``cell_ontology_class``), units = ``obs['batch']`` (species | donor |
@@ -57,9 +57,10 @@ def seeds_in_D() -> dict[int, str]:
     return {int(r.seed): r.run_name for r in tab.itertuples() if int(r.seed) in keep}
 
 
-def gv_seeds() -> set[int]:
+def finite_seeds() -> dict[int, str]:
+    h = json.loads((RES / "seed_health.json").read_text())
     tab = pd.read_csv(RES / "seed_health.tsv", sep="\t")
-    return {int(s) for s in tab.loc[tab["pass_GV"].astype(bool), "seed"]}
+    return {int(r.seed): r.run_name for r in tab.itertuples() if int(r.seed) in set(h["seeds_finite"])}
 
 
 def main() -> int:
@@ -67,6 +68,8 @@ def main() -> int:
     a = ad.read_h5ad(gene_ids.h5ad_path(COHORT))
     rho_t = gene_ids.assert_table_matches(a, gene_ids.load_table(COHORT))
     runs = seeds_in_D()
+    if len(runs) < 2:
+        raise SystemExit("fewer than 2 seeds pass G-V: descriptive only (amendment a82eaad)")
     first = runs[min(runs)]
     praw = C.raw_prior(COHORT, first, a.var["conservation_prior"].to_numpy(dtype=float))
     g = C.gene_covariates(a)
@@ -90,8 +93,9 @@ def main() -> int:
     g["D_raw"] = dr - dr.median()
     Sm = np.column_stack([x["S_g_ema"] for x in st.values()])
     g["S_ema"] = Sm.mean(1)
-    gv = [s for s in M.columns if s in gv_seeds()]
-    g["D_GV"] = M[gv].mean(1) - M[gv].mean(1).median()  # Family 3: seeds that pass G-V only
+    fin = finite_seeds()
+    Mall = pd.DataFrame({s: K.read_run(r)["D"] for s, r in sorted(fin.items())}, index=a.var_names)
+    g["D_all"] = Mall.mean(1) - Mall.mean(1).median()  # sensitivity: every finite seed
     for s in M.columns:
         g[f"D_s{s}"] = M[s]
     ok = g[K.COVARIATE_COLUMNS].notna().all(1).to_numpy()
@@ -106,7 +110,7 @@ def main() -> int:
                                                       np.delete(Sm, list(M.columns).index(s), 1).mean(1))[0]))
     rs = []
     seeds = list(M.columns)
-    if len(seeds) == 5:
+    if len(seeds) == 5:  # rel(D|C) needs the five-seed core
         for two in itertools.combinations(seeds, 2):
             three = [s for s in seeds if s not in two]
             e1 = K.residual_rank(M.loc[ok, list(two)].mean(1).to_numpy(), Z)
@@ -133,7 +137,8 @@ def main() -> int:
     g = g.reset_index(drop=True)
     g.to_parquet(OUT / "bm_genes.parquet")
     units.to_csv(OUT / "baseline_units.csv", index=False)
-    meta = dict(seeds={int(k): v for k, v in runs.items()}, seeds_D_GV=sorted(int(s) for s in gv), n_genes=int(a.n_vars), assert_table_matches=rho_t,
+    meta = dict(seeds={int(k): v for k, v in runs.items()}, seeds_D_all=sorted(int(s) for s in fin),
+                rho_D_D_all=float(spearmanr(g["D"], g["D_all"])[0]), n_genes=int(a.n_vars), assert_table_matches=rho_t,
                 blocks=binfo, leave_one_seed_out=loo, rel_D_given_C=dict(r_mean_2v3=r, rel=2 * r / (1 + r) if rs else None),
                 prior_clamped=bool(not np.allclose(st[min(st)]["prior"], praw)),
                 frac_D_pos=float((g["D"] > 0).mean()), sd_D=float(g["D"].std()),

@@ -14,9 +14,10 @@ Runs: ``revision/tasks/T12_2b_recipe/seed_map.tsv`` (s42 = the selected grid run
   ``cell_ontology_class``), final adversary accuracy.
 
 Flag, fixed before the seed runs were read: a seed with ``knn_mixing_entropy`` below 0.75 x that of
-s42 is listed as poorly mixed and reported separately (the P13 rule); D stays the mean over the
-seeds that the section 2 rule admits. A non-finite run cannot enter D and is reported, not dropped
-silently.
+s42 is listed as poorly mixed and reported separately (the P13 rule); poorly mixed healthy seeds stay
+in D. Seed entry (amendment "New cohorts ... G-V training-health gate", chimera-private a82eaad): a
+seed failing G-V does not enter D or S_ema and is reported with its health row; the sensitivity D
+uses every non-NaN seed; with fewer than 2 passing seeds the cohort is descriptive only.
 
 No D, S_g, COE, baseline or biology readout is computed here.
 
@@ -83,13 +84,16 @@ def main() -> int:
     tab = pd.DataFrame(rows)
     ref = float(tab.loc[tab.seed == 42, "knn_mixing_entropy"].iloc[0])
     tab["flag_poor_mixing"] = (tab.seed != 42) & (tab["knn_mixing_entropy"] < FLAG_RATIO * ref)
-    tab["enters_D"] = tab["finished"].astype(bool) & tab["no_nan"].fillna(False).astype(bool)
+    tab["finite"] = tab["finished"].astype(bool) & tab["no_nan"].fillna(False).astype(bool)
+    tab["enters_D"] = tab["finite"] & tab["pass_GV"].astype(bool)
     OUT.mkdir(parents=True, exist_ok=True)
     tab.to_csv(OUT / "seed_health.tsv", sep="\t", index=False)
     (OUT / "seed_health.json").write_text(json.dumps(dict(
         flag_rule=f"knn_mixing_entropy < {FLAG_RATIO} x s42 ({FLAG_RATIO * ref:.4f})",
-        enters_D_rule="finished and finite (all CPU: the section 2 MPS clause does not apply)",
-        seeds_enter_D=[int(s) for s in tab.loc[tab.enters_D, "seed"]]), indent=2))
+        enters_D_rule="pass G-V (chimera-private a82eaad); sensitivity: every finite seed",
+        seeds_enter_D=[int(s) for s in tab.loc[tab.enters_D, "seed"]],
+        seeds_finite=[int(s) for s in tab.loc[tab.finite, "seed"]],
+        descriptive_only=bool(tab.enters_D.sum() < 2)), indent=2))
     with pd.option_context("display.width", 250, "display.max_columns", 60):
         print(tab.T.to_string())
     return 0

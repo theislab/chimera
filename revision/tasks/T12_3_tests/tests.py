@@ -12,7 +12,7 @@ Mechanics (amendment-log row "Section 12 T12.3 mechanics", committed before D wa
   universe for every score). One-sided p from 10,000 permutations of the score residuals within
   pi_raw x expression strata; 95% CI from 10,000 ESM-block bootstraps (refit in each draw); gene
   bootstrap CI beside. Scores: D, B1_pi (B1 residualised on pi), B1_raw, and S_ema, D_raw beside
-  (Family 3), and D_GV (D from the seeds that pass G-V). Delta = rho_p(D) - rho_p(B) on the same block-bootstrap draws. Repeated within the top
+  (Family 3), and D_all (D over every finite seed, G-V failures included). Delta = rho_p(D) - rho_p(B) on the same block-bootstrap draws. Repeated within the top
   tertile of rank pi_raw (design rebuilt there). Raw Spearman and rho_pi beside.
 * E2: set = Shay divergent genes; comparison = genes with COE above the median COE of the E1
   universe; both inside the E1 universe. Stratified AUROC within pi_raw decile x expression decile
@@ -58,7 +58,7 @@ OUT = RES / "t12_3"
 COE = ROOT / "data" / "revision" / "bone_marrow" / "shay_coe.tsv"
 C_COLS = K.COVARIATE_COLUMNS
 SEED = 20261104
-SCORES = ["D", "B1_pi", "B1_raw", "S_ema", "D_raw", "D_GV"]
+SCORES = ["D", "B1_pi", "B1_raw", "S_ema", "D_raw", "D_all"]
 MARGIN = 0.03
 TYPES = ["B", "HSPC", "NK", "T", "erythroid", "macrophage", "monocyte", "neutrophil", "plasma"]
 NAMED = {  # section 12 E3; Shay granulocyte = our neutrophil
@@ -302,7 +302,7 @@ def main() -> int:
     summ = []
     for univ in ("all", "top_pi_tertile"):
         b = e1row(univ, "B1_pi")
-        for s in ("D", "S_ema", "D_raw", "D_GV", "B1_raw"):
+        for s in ("D", "S_ema", "D_raw", "D_all", "B1_raw"):
             r = e1row(univ, s)
             summ.append(dict(test="E1", readout=f"rho_p({s}, COE | C), {univ}", estimate=r.rho_p, ci_lo=r.ci_lo, ci_hi=r.ci_hi,
                              p=r.p_one_sided, baseline_estimate=b.rho_p, baseline_ci=fmt(b.ci_lo, b.ci_hi)))
@@ -310,7 +310,7 @@ def main() -> int:
         summ.append(dict(test="E1", readout=f"Delta rho_p(D) - rho_p(B1_pi), {univ}", estimate=d.delta, ci_lo=d.ci_lo,
                          ci_hi=d.ci_hi, p=np.nan, baseline_estimate=np.nan, baseline_ci=""))
     b = e2row("B1_pi")
-    for s in ("D", "S_ema", "D_raw", "D_GV", "B1_raw"):
+    for s in ("D", "S_ema", "D_raw", "D_all", "B1_raw"):
         r = e2row(s)
         summ.append(dict(test="E2", readout=f"stratified AUROC({s}), divergent vs COE-conserved", estimate=r.auroc,
                          ci_lo=r.ci_lo, ci_hi=r.ci_hi, p=r.p_one_sided_lower, baseline_estimate=b.auroc,
