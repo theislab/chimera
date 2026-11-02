@@ -1,7 +1,7 @@
-cohort	alt	effect	band	share	seed	run	reuse	duplicate_of	n_pairs	share_achieved	recipe
-liv_hmouse	none	0.0	all	0.0	45	rev-liv_hmouse-s45	rev-liv_hmouse-s45		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	none	0.0	all	0.0	46	rev-liv_hmouse-s46	rev-liv_hmouse-s46		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	none	0.0	all	0.0	47	rev-liv_hmouse-s47	rev-liv_hmouse-s47		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	none	0.0	all	0.0	48	rev-liv_hmouse-s48	rev-liv_hmouse-s48		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	none	0.0	all	0.0	49	rev-liv_hmouse-s49	rev-liv_hmouse-s49		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	none	0.0	all	0.0	50	rev-liv_hmouse-s50	rev-liv_hmouse-s50		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+cohort	alt	effect	band	share	seed	tier	run	reuse	duplicate_of	n_pairs	share_achieved	recipe
+liv_hmouse	none	0.0	all	0.0	45	0	rev-liv_hmouse-s45	rev-liv_hmouse-s45		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	none	0.0	all	0.0	46	0	rev-liv_hmouse-s46	rev-liv_hmouse-s46		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	none	0.0	all	0.0	47	0	rev-liv_hmouse-s47	rev-liv_hmouse-s47		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	none	0.0	all	0.0	48	0	rev-liv_hmouse-s48	rev-liv_hmouse-s48		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	none	0.0	all	0.0	49	0	rev-liv_hmouse-s49	rev-liv_hmouse-s49		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	none	0.0	all	0.0	50	0	rev-liv_hmouse-s50	rev-liv_hmouse-s50		0	0.0	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0

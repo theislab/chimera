@@ -47,7 +47,16 @@ COHORTS = {
 SPECIES = ("Human", "Mouse")
 
 # ---------------------------------------------------------------------------
-# Grid: full factorial of alteration x effect x expression band x share x seed, on all three cohorts
+# Grid: full factorial of alteration x effect x expression band x share x seed on all three cohorts (BENCHMARK_PLAN, second
+# amendment). Only cells that add no information leave: a share whose gene set equals a smaller share's (make_grid: duplicate_of).
+# Central setting: strongest effect of each alteration, band midhigh, share 5%, seed 42. Tiers set the submission order, so central
+# settings and main effects finish before interactions:
+#   0 central effects and nulls at the central setting
+#   1 main effects, one factor at a time: effect, band, share, seed
+#   2 effect x band and nulls x band, share 5%, seed 42
+#   4 the remaining shares, seed 42
+#   5 seed 43
+# Tier 3 is the tools' main settings, tier 6 their other rows (make_queue.py).
 # ---------------------------------------------------------------------------
 ALTERATIONS = {
     # q: share of the move from the observed profile to the swapped profile
@@ -57,8 +66,11 @@ ALTERATIONS = {
     # e: share of the gene's counts removed in its top type
     "loss": [0.5, 0.9, 1.0],
 }
+CENTRAL_EFFECT = {"pattern": 1.0, "level": 8, "loss": 1.0, "sham_swap": 1.0, "thin_both": 4}
 NULLS = {"sham_swap": [1.0], "thin_both": [4]}
 BANDS = ["low", "midlow", "midhigh", "high"]  # quartiles of species-balanced mean log1p CP10K, all genes
+CENTRAL_BAND = "midhigh"
+CENTRAL_SHARE = 0.05
 SHARES = [0.02, 0.05, 0.10]
 SEEDS = [42, 43]  # one seed drives gene draw, alteration and training of a run
 IDENTITY_BANDS = ["id_low", "id_mid", "id_high"]  # tertiles of pi_raw over all genes; draws are balanced on them
@@ -69,9 +81,12 @@ MIN_CONTRAST_LOG2 = 1  # pattern, loss, and their controls: top vs bottom shared
 MIN_TYPE_CELLS = 30    # shared types: >= 30 cells in both species (the T4.2 rule)
 MAX_PAIRS_FRAC = 0.5   # altered + control cannot exceed the eligible genes of the band
 
-# Main settings for the tools (SATURN, CAMEX): one share, strongest informative effects, all bands, both seeds
+# Tools (SATURN 1:1, CAMEX). Main settings, tier 3: central effects, bands midhigh and low, share 5%, seed 42, plus the unaltered object.
+# Tier 6: also level 4, sham_swap, all bands, seed 43.
 TOOL_SHARE = 0.05
 TOOL_ROWS = [("pattern", 1.0), ("level", 4), ("level", 8), ("loss", 1.0), ("sham_swap", 1.0)]
+TOOL_MAIN_ROWS = [("pattern", 1.0), ("level", 8), ("loss", 1.0)]
+TOOL_MAIN_BANDS = ["midhigh", "low"]
 TOOL_NONE_SEEDS = [42, 43]
 
 # Health (discard rule, fixed now): a run is discarded if alpha, z or S_g is non-finite or fewer than 10 of 10
@@ -89,14 +104,27 @@ def run_name(cohort, alt, effect, band, share, seed) -> str:
     return f"b1-{cohort}-{alt}{effect}-{band}-sh{int(round(share * 100)):02d}-s{seed}"
 
 
+def tier_of(alt, effect, band, share, seed) -> int:
+    central_e = effect == CENTRAL_EFFECT[alt]
+    central_b, central_s, central_seed = band == CENTRAL_BAND, share == CENTRAL_SHARE, seed == 42
+    n_off = (not central_e) + (not central_b) + (not central_s) + (not central_seed)
+    if n_off == 0:
+        return 0
+    if n_off == 1:
+        return 1
+    if central_s and central_seed:
+        return 2
+    return 4 if central_seed else 5
+
+
 def grid(cohort: str | None = None) -> list[dict]:
     rows = []
     for c in ([cohort] if cohort else COHORTS):
         fam = {**ALTERATIONS, **NULLS}
         for alt, effs in fam.items():
             for e, b, sh, s in itertools.product(effs, BANDS, SHARES, SEEDS):
-                rows.append(dict(cohort=c, alt=alt, effect=e, band=b, share=sh, seed=s,
+                rows.append(dict(cohort=c, alt=alt, effect=e, band=b, share=sh, seed=s, tier=tier_of(alt, e, b, sh, s),
                                  run=run_name(c, alt, e, b, sh, s), reuse=""))
         for s, r in COHORTS[c]["none_runs"].items():
-            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, run=r, reuse=r))
+            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, tier=0, run=r, reuse=r))
     return rows

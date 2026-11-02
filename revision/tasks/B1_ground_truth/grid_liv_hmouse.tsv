@@ -1,243 +1,243 @@
-cohort	alt	effect	band	share	seed	run	reuse	duplicate_of	n_pairs	share_achieved	recipe
-liv_hmouse	level	8.0	high	0.05	42	b1-liv_hmouse-level8-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	high	0.05	43	b1-liv_hmouse-level8-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	low	0.05	42	b1-liv_hmouse-level8-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	low	0.05	43	b1-liv_hmouse-level8-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.05	42	b1-liv_hmouse-level8-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.05	43	b1-liv_hmouse-level8-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.05	42	b1-liv_hmouse-level8-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.05	43	b1-liv_hmouse-level8-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.05	42	b1-liv_hmouse-loss1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.05	43	b1-liv_hmouse-loss1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	low	0.05	42	b1-liv_hmouse-loss1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	low	0.05	43	b1-liv_hmouse-loss1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.05	42	b1-liv_hmouse-loss1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.05	43	b1-liv_hmouse-loss1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.05	42	b1-liv_hmouse-loss1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.05	43	b1-liv_hmouse-loss1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.05	42	b1-liv_hmouse-pattern1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.05	43	b1-liv_hmouse-pattern1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	low	0.05	42	b1-liv_hmouse-pattern1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	low	0.05	43	b1-liv_hmouse-pattern1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.05	42	b1-liv_hmouse-pattern1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.05	43	b1-liv_hmouse-pattern1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.05	42	b1-liv_hmouse-pattern1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.05	43	b1-liv_hmouse-pattern1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.05	42	b1-liv_hmouse-sham_swap1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.05	43	b1-liv_hmouse-sham_swap1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	low	0.05	42	b1-liv_hmouse-sham_swap1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	low	0.05	43	b1-liv_hmouse-sham_swap1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.05	42	b1-liv_hmouse-sham_swap1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.05	43	b1-liv_hmouse-sham_swap1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.05	42	b1-liv_hmouse-sham_swap1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.05	43	b1-liv_hmouse-sham_swap1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.05	42	b1-liv_hmouse-thin_both4-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.05	43	b1-liv_hmouse-thin_both4-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	low	0.05	42	b1-liv_hmouse-thin_both4-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	low	0.05	43	b1-liv_hmouse-thin_both4-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.05	42	b1-liv_hmouse-thin_both4-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.05	43	b1-liv_hmouse-thin_both4-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.05	42	b1-liv_hmouse-thin_both4-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.05	43	b1-liv_hmouse-thin_both4-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.05	42	b1-liv_hmouse-level4-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.05	43	b1-liv_hmouse-level4-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	low	0.05	42	b1-liv_hmouse-level4-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	low	0.05	43	b1-liv_hmouse-level4-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.05	42	b1-liv_hmouse-level4-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.05	43	b1-liv_hmouse-level4-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.05	42	b1-liv_hmouse-level4-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.05	43	b1-liv_hmouse-level4-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.05	42	b1-liv_hmouse-loss0.9-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.05	43	b1-liv_hmouse-loss0.9-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	low	0.05	42	b1-liv_hmouse-loss0.9-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	low	0.05	43	b1-liv_hmouse-loss0.9-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.05	42	b1-liv_hmouse-loss0.9-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.05	43	b1-liv_hmouse-loss0.9-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.05	42	b1-liv_hmouse-loss0.9-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.05	43	b1-liv_hmouse-loss0.9-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.05	42	b1-liv_hmouse-pattern0.5-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.05	43	b1-liv_hmouse-pattern0.5-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	low	0.05	42	b1-liv_hmouse-pattern0.5-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	low	0.05	43	b1-liv_hmouse-pattern0.5-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.05	42	b1-liv_hmouse-pattern0.5-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.05	43	b1-liv_hmouse-pattern0.5-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.05	42	b1-liv_hmouse-pattern0.5-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.05	43	b1-liv_hmouse-pattern0.5-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.05	42	b1-liv_hmouse-level2-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.05	43	b1-liv_hmouse-level2-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	low	0.05	42	b1-liv_hmouse-level2-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	low	0.05	43	b1-liv_hmouse-level2-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.05	42	b1-liv_hmouse-level2-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.05	43	b1-liv_hmouse-level2-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.05	42	b1-liv_hmouse-level2-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.05	43	b1-liv_hmouse-level2-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.05	42	b1-liv_hmouse-loss0.5-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.05	43	b1-liv_hmouse-loss0.5-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	low	0.05	42	b1-liv_hmouse-loss0.5-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	low	0.05	43	b1-liv_hmouse-loss0.5-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.05	42	b1-liv_hmouse-loss0.5-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.05	43	b1-liv_hmouse-loss0.5-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.05	42	b1-liv_hmouse-loss0.5-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.05	43	b1-liv_hmouse-loss0.5-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.05	42	b1-liv_hmouse-pattern0.25-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.05	43	b1-liv_hmouse-pattern0.25-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	low	0.05	42	b1-liv_hmouse-pattern0.25-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	low	0.05	43	b1-liv_hmouse-pattern0.25-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.05	42	b1-liv_hmouse-pattern0.25-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.05	43	b1-liv_hmouse-pattern0.25-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.05	42	b1-liv_hmouse-pattern0.25-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.05	43	b1-liv_hmouse-pattern0.25-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	high	0.1	42	b1-liv_hmouse-level8-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	high	0.1	43	b1-liv_hmouse-level8-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.1	42	b1-liv_hmouse-level8-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.1	43	b1-liv_hmouse-level8-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.1	42	b1-liv_hmouse-level8-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.1	43	b1-liv_hmouse-level8-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.1	42	b1-liv_hmouse-loss1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.1	43	b1-liv_hmouse-loss1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.1	42	b1-liv_hmouse-loss1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.1	43	b1-liv_hmouse-loss1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.1	42	b1-liv_hmouse-loss1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.1	43	b1-liv_hmouse-loss1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.1	42	b1-liv_hmouse-pattern1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.1	43	b1-liv_hmouse-pattern1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.1	42	b1-liv_hmouse-pattern1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.1	43	b1-liv_hmouse-pattern1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.1	42	b1-liv_hmouse-pattern1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.1	43	b1-liv_hmouse-pattern1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.1	42	b1-liv_hmouse-sham_swap1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.1	43	b1-liv_hmouse-sham_swap1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.1	42	b1-liv_hmouse-sham_swap1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.1	43	b1-liv_hmouse-sham_swap1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.1	42	b1-liv_hmouse-sham_swap1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.1	43	b1-liv_hmouse-sham_swap1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.1	42	b1-liv_hmouse-thin_both4-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.1	43	b1-liv_hmouse-thin_both4-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.1	42	b1-liv_hmouse-thin_both4-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.1	43	b1-liv_hmouse-thin_both4-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.1	42	b1-liv_hmouse-thin_both4-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.1	43	b1-liv_hmouse-thin_both4-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.1	42	b1-liv_hmouse-level4-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.1	43	b1-liv_hmouse-level4-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.1	42	b1-liv_hmouse-level4-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.1	43	b1-liv_hmouse-level4-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.1	42	b1-liv_hmouse-level4-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.1	43	b1-liv_hmouse-level4-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.1	42	b1-liv_hmouse-loss0.9-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.1	43	b1-liv_hmouse-loss0.9-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.1	42	b1-liv_hmouse-loss0.9-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.1	43	b1-liv_hmouse-loss0.9-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.1	42	b1-liv_hmouse-loss0.9-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.1	43	b1-liv_hmouse-loss0.9-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.1	42	b1-liv_hmouse-pattern0.5-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.1	43	b1-liv_hmouse-pattern0.5-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.1	42	b1-liv_hmouse-pattern0.5-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.1	43	b1-liv_hmouse-pattern0.5-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.1	42	b1-liv_hmouse-pattern0.5-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.1	43	b1-liv_hmouse-pattern0.5-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.1	42	b1-liv_hmouse-level2-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.1	43	b1-liv_hmouse-level2-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.1	42	b1-liv_hmouse-level2-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.1	43	b1-liv_hmouse-level2-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.1	42	b1-liv_hmouse-level2-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.1	43	b1-liv_hmouse-level2-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.1	42	b1-liv_hmouse-loss0.5-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.1	43	b1-liv_hmouse-loss0.5-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.1	42	b1-liv_hmouse-loss0.5-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.1	43	b1-liv_hmouse-loss0.5-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.1	42	b1-liv_hmouse-loss0.5-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.1	43	b1-liv_hmouse-loss0.5-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.1	42	b1-liv_hmouse-pattern0.25-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.1	43	b1-liv_hmouse-pattern0.25-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.1	42	b1-liv_hmouse-pattern0.25-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.1	43	b1-liv_hmouse-pattern0.25-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.1	42	b1-liv_hmouse-pattern0.25-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.1	43	b1-liv_hmouse-pattern0.25-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	high	0.02	42	b1-liv_hmouse-level8-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	high	0.02	43	b1-liv_hmouse-level8-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	low	0.02	42	b1-liv_hmouse-level8-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	low	0.02	43	b1-liv_hmouse-level8-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.02	42	b1-liv_hmouse-level8-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midhigh	0.02	43	b1-liv_hmouse-level8-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.02	42	b1-liv_hmouse-level8-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	8.0	midlow	0.02	43	b1-liv_hmouse-level8-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.02	42	b1-liv_hmouse-loss1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	high	0.02	43	b1-liv_hmouse-loss1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	low	0.02	42	b1-liv_hmouse-loss1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	low	0.02	43	b1-liv_hmouse-loss1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.02	42	b1-liv_hmouse-loss1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midhigh	0.02	43	b1-liv_hmouse-loss1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.02	42	b1-liv_hmouse-loss1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	1.0	midlow	0.02	43	b1-liv_hmouse-loss1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.02	42	b1-liv_hmouse-pattern1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	high	0.02	43	b1-liv_hmouse-pattern1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	low	0.02	42	b1-liv_hmouse-pattern1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	low	0.02	43	b1-liv_hmouse-pattern1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.02	42	b1-liv_hmouse-pattern1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midhigh	0.02	43	b1-liv_hmouse-pattern1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.02	42	b1-liv_hmouse-pattern1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	1.0	midlow	0.02	43	b1-liv_hmouse-pattern1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.02	42	b1-liv_hmouse-sham_swap1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	high	0.02	43	b1-liv_hmouse-sham_swap1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	low	0.02	42	b1-liv_hmouse-sham_swap1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	low	0.02	43	b1-liv_hmouse-sham_swap1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.02	42	b1-liv_hmouse-sham_swap1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midhigh	0.02	43	b1-liv_hmouse-sham_swap1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.02	42	b1-liv_hmouse-sham_swap1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	sham_swap	1.0	midlow	0.02	43	b1-liv_hmouse-sham_swap1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.02	42	b1-liv_hmouse-thin_both4-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	high	0.02	43	b1-liv_hmouse-thin_both4-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	low	0.02	42	b1-liv_hmouse-thin_both4-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	low	0.02	43	b1-liv_hmouse-thin_both4-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.02	42	b1-liv_hmouse-thin_both4-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midhigh	0.02	43	b1-liv_hmouse-thin_both4-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.02	42	b1-liv_hmouse-thin_both4-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	thin_both	4.0	midlow	0.02	43	b1-liv_hmouse-thin_both4-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.02	42	b1-liv_hmouse-level4-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	high	0.02	43	b1-liv_hmouse-level4-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	low	0.02	42	b1-liv_hmouse-level4-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	low	0.02	43	b1-liv_hmouse-level4-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.02	42	b1-liv_hmouse-level4-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midhigh	0.02	43	b1-liv_hmouse-level4-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.02	42	b1-liv_hmouse-level4-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	4.0	midlow	0.02	43	b1-liv_hmouse-level4-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.02	42	b1-liv_hmouse-loss0.9-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	high	0.02	43	b1-liv_hmouse-loss0.9-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	low	0.02	42	b1-liv_hmouse-loss0.9-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	low	0.02	43	b1-liv_hmouse-loss0.9-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.02	42	b1-liv_hmouse-loss0.9-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midhigh	0.02	43	b1-liv_hmouse-loss0.9-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.02	42	b1-liv_hmouse-loss0.9-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.9	midlow	0.02	43	b1-liv_hmouse-loss0.9-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.02	42	b1-liv_hmouse-pattern0.5-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	high	0.02	43	b1-liv_hmouse-pattern0.5-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	low	0.02	42	b1-liv_hmouse-pattern0.5-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	low	0.02	43	b1-liv_hmouse-pattern0.5-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.02	42	b1-liv_hmouse-pattern0.5-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midhigh	0.02	43	b1-liv_hmouse-pattern0.5-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.02	42	b1-liv_hmouse-pattern0.5-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.5	midlow	0.02	43	b1-liv_hmouse-pattern0.5-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.02	42	b1-liv_hmouse-level2-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	high	0.02	43	b1-liv_hmouse-level2-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	low	0.02	42	b1-liv_hmouse-level2-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	low	0.02	43	b1-liv_hmouse-level2-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.02	42	b1-liv_hmouse-level2-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midhigh	0.02	43	b1-liv_hmouse-level2-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.02	42	b1-liv_hmouse-level2-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	level	2.0	midlow	0.02	43	b1-liv_hmouse-level2-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.02	42	b1-liv_hmouse-loss0.5-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	high	0.02	43	b1-liv_hmouse-loss0.5-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	low	0.02	42	b1-liv_hmouse-loss0.5-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	low	0.02	43	b1-liv_hmouse-loss0.5-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.02	42	b1-liv_hmouse-loss0.5-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midhigh	0.02	43	b1-liv_hmouse-loss0.5-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.02	42	b1-liv_hmouse-loss0.5-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	loss	0.5	midlow	0.02	43	b1-liv_hmouse-loss0.5-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.02	42	b1-liv_hmouse-pattern0.25-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	high	0.02	43	b1-liv_hmouse-pattern0.25-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	low	0.02	42	b1-liv_hmouse-pattern0.25-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	low	0.02	43	b1-liv_hmouse-pattern0.25-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.02	42	b1-liv_hmouse-pattern0.25-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midhigh	0.02	43	b1-liv_hmouse-pattern0.25-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.02	42	b1-liv_hmouse-pattern0.25-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
-liv_hmouse	pattern	0.25	midlow	0.02	43	b1-liv_hmouse-pattern0.25-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+cohort	alt	effect	band	share	seed	tier	run	reuse	duplicate_of	n_pairs	share_achieved	recipe
+liv_hmouse	level	8.0	midhigh	0.05	42	0	b1-liv_hmouse-level8-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.05	42	0	b1-liv_hmouse-loss1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.05	42	0	b1-liv_hmouse-pattern1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.05	42	0	b1-liv_hmouse-sham_swap1.0-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.05	42	0	b1-liv_hmouse-thin_both4-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.05	42	1	b1-liv_hmouse-level2-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.05	42	1	b1-liv_hmouse-level4-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.05	42	1	b1-liv_hmouse-level8-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	low	0.05	42	1	b1-liv_hmouse-level8-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midhigh	0.02	42	1	b1-liv_hmouse-level8-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midhigh	0.05	43	1	b1-liv_hmouse-level8-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midhigh	0.1	42	1	b1-liv_hmouse-level8-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.05	42	1	b1-liv_hmouse-level8-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.05	42	1	b1-liv_hmouse-loss0.5-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.05	42	1	b1-liv_hmouse-loss0.9-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.05	42	1	b1-liv_hmouse-loss1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	low	0.05	42	1	b1-liv_hmouse-loss1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.02	42	1	b1-liv_hmouse-loss1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.05	43	1	b1-liv_hmouse-loss1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.1	42	1	b1-liv_hmouse-loss1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.05	42	1	b1-liv_hmouse-loss1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.05	42	1	b1-liv_hmouse-pattern0.25-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.05	42	1	b1-liv_hmouse-pattern0.5-midhigh-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.05	42	1	b1-liv_hmouse-pattern1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	low	0.05	42	1	b1-liv_hmouse-pattern1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.02	42	1	b1-liv_hmouse-pattern1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.05	43	1	b1-liv_hmouse-pattern1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.1	42	1	b1-liv_hmouse-pattern1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.05	42	1	b1-liv_hmouse-pattern1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.05	42	1	b1-liv_hmouse-sham_swap1.0-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	low	0.05	42	1	b1-liv_hmouse-sham_swap1.0-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.02	42	1	b1-liv_hmouse-sham_swap1.0-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.05	43	1	b1-liv_hmouse-sham_swap1.0-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.1	42	1	b1-liv_hmouse-sham_swap1.0-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.05	42	1	b1-liv_hmouse-sham_swap1.0-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.05	42	1	b1-liv_hmouse-thin_both4-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	low	0.05	42	1	b1-liv_hmouse-thin_both4-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.02	42	1	b1-liv_hmouse-thin_both4-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.05	43	1	b1-liv_hmouse-thin_both4-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.1	42	1	b1-liv_hmouse-thin_both4-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.05	42	1	b1-liv_hmouse-thin_both4-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.05	42	2	b1-liv_hmouse-level2-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	low	0.05	42	2	b1-liv_hmouse-level2-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.05	42	2	b1-liv_hmouse-level2-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.05	42	2	b1-liv_hmouse-level4-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	low	0.05	42	2	b1-liv_hmouse-level4-low-sh05-s42			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.05	42	2	b1-liv_hmouse-level4-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.05	42	2	b1-liv_hmouse-loss0.5-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	low	0.05	42	2	b1-liv_hmouse-loss0.5-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.05	42	2	b1-liv_hmouse-loss0.5-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.05	42	2	b1-liv_hmouse-loss0.9-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	low	0.05	42	2	b1-liv_hmouse-loss0.9-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.05	42	2	b1-liv_hmouse-loss0.9-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.05	42	2	b1-liv_hmouse-pattern0.25-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	low	0.05	42	2	b1-liv_hmouse-pattern0.25-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.05	42	2	b1-liv_hmouse-pattern0.25-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.05	42	2	b1-liv_hmouse-pattern0.5-high-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	low	0.05	42	2	b1-liv_hmouse-pattern0.5-low-sh05-s42			211	0.02555407533002301	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.05	42	2	b1-liv_hmouse-pattern0.5-midlow-sh05-s42			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.02	42	4	b1-liv_hmouse-level2-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.1	42	4	b1-liv_hmouse-level2-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	low	0.02	42	4	b1-liv_hmouse-level2-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.02	42	4	b1-liv_hmouse-level2-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.1	42	4	b1-liv_hmouse-level2-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.02	42	4	b1-liv_hmouse-level2-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.1	42	4	b1-liv_hmouse-level2-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.02	42	4	b1-liv_hmouse-level4-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.1	42	4	b1-liv_hmouse-level4-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	low	0.02	42	4	b1-liv_hmouse-level4-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.02	42	4	b1-liv_hmouse-level4-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.1	42	4	b1-liv_hmouse-level4-midhigh-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.02	42	4	b1-liv_hmouse-level4-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.1	42	4	b1-liv_hmouse-level4-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.02	42	4	b1-liv_hmouse-level8-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.1	42	4	b1-liv_hmouse-level8-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	low	0.02	42	4	b1-liv_hmouse-level8-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.02	42	4	b1-liv_hmouse-level8-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.1	42	4	b1-liv_hmouse-level8-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.02	42	4	b1-liv_hmouse-loss0.5-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.1	42	4	b1-liv_hmouse-loss0.5-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	low	0.02	42	4	b1-liv_hmouse-loss0.5-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.02	42	4	b1-liv_hmouse-loss0.5-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.1	42	4	b1-liv_hmouse-loss0.5-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.02	42	4	b1-liv_hmouse-loss0.5-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.1	42	4	b1-liv_hmouse-loss0.5-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.02	42	4	b1-liv_hmouse-loss0.9-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.1	42	4	b1-liv_hmouse-loss0.9-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	low	0.02	42	4	b1-liv_hmouse-loss0.9-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.02	42	4	b1-liv_hmouse-loss0.9-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.1	42	4	b1-liv_hmouse-loss0.9-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.02	42	4	b1-liv_hmouse-loss0.9-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.1	42	4	b1-liv_hmouse-loss0.9-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.02	42	4	b1-liv_hmouse-loss1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.1	42	4	b1-liv_hmouse-loss1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	low	0.02	42	4	b1-liv_hmouse-loss1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.02	42	4	b1-liv_hmouse-loss1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.1	42	4	b1-liv_hmouse-loss1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.02	42	4	b1-liv_hmouse-pattern0.25-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.1	42	4	b1-liv_hmouse-pattern0.25-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	low	0.02	42	4	b1-liv_hmouse-pattern0.25-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.02	42	4	b1-liv_hmouse-pattern0.25-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.1	42	4	b1-liv_hmouse-pattern0.25-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.02	42	4	b1-liv_hmouse-pattern0.25-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.1	42	4	b1-liv_hmouse-pattern0.25-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.02	42	4	b1-liv_hmouse-pattern0.5-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.1	42	4	b1-liv_hmouse-pattern0.5-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	low	0.02	42	4	b1-liv_hmouse-pattern0.5-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.02	42	4	b1-liv_hmouse-pattern0.5-midhigh-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.1	42	4	b1-liv_hmouse-pattern0.5-midhigh-sh10-s42			638	0.07726777279883736	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.02	42	4	b1-liv_hmouse-pattern0.5-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.1	42	4	b1-liv_hmouse-pattern0.5-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.02	42	4	b1-liv_hmouse-pattern1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.1	42	4	b1-liv_hmouse-pattern1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	low	0.02	42	4	b1-liv_hmouse-pattern1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.02	42	4	b1-liv_hmouse-pattern1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.1	42	4	b1-liv_hmouse-pattern1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.02	42	4	b1-liv_hmouse-sham_swap1.0-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.1	42	4	b1-liv_hmouse-sham_swap1.0-high-sh10-s42			585	0.07084897662589318	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	low	0.02	42	4	b1-liv_hmouse-sham_swap1.0-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.02	42	4	b1-liv_hmouse-sham_swap1.0-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.1	42	4	b1-liv_hmouse-sham_swap1.0-midlow-sh10-s42			648	0.07847886641637399	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.02	42	4	b1-liv_hmouse-thin_both4-high-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.1	42	4	b1-liv_hmouse-thin_both4-high-sh10-s42			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	low	0.02	42	4	b1-liv_hmouse-thin_both4-low-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.02	42	4	b1-liv_hmouse-thin_both4-midlow-sh02-s42			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.1	42	4	b1-liv_hmouse-thin_both4-midlow-sh10-s42			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.02	43	5	b1-liv_hmouse-level2-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.05	43	5	b1-liv_hmouse-level2-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	high	0.1	43	5	b1-liv_hmouse-level2-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	low	0.02	43	5	b1-liv_hmouse-level2-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	low	0.05	43	5	b1-liv_hmouse-level2-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.02	43	5	b1-liv_hmouse-level2-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.05	43	5	b1-liv_hmouse-level2-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midhigh	0.1	43	5	b1-liv_hmouse-level2-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.02	43	5	b1-liv_hmouse-level2-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.05	43	5	b1-liv_hmouse-level2-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	2.0	midlow	0.1	43	5	b1-liv_hmouse-level2-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.02	43	5	b1-liv_hmouse-level4-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.05	43	5	b1-liv_hmouse-level4-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	high	0.1	43	5	b1-liv_hmouse-level4-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	low	0.02	43	5	b1-liv_hmouse-level4-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	low	0.05	43	5	b1-liv_hmouse-level4-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.02	43	5	b1-liv_hmouse-level4-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.05	43	5	b1-liv_hmouse-level4-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midhigh	0.1	43	5	b1-liv_hmouse-level4-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.02	43	5	b1-liv_hmouse-level4-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.05	43	5	b1-liv_hmouse-level4-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	4.0	midlow	0.1	43	5	b1-liv_hmouse-level4-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.02	43	5	b1-liv_hmouse-level8-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.05	43	5	b1-liv_hmouse-level8-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	high	0.1	43	5	b1-liv_hmouse-level8-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	low	0.02	43	5	b1-liv_hmouse-level8-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	low	0.05	43	5	b1-liv_hmouse-level8-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midhigh	0.02	43	5	b1-liv_hmouse-level8-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midhigh	0.1	43	5	b1-liv_hmouse-level8-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.02	43	5	b1-liv_hmouse-level8-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.05	43	5	b1-liv_hmouse-level8-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	level	8.0	midlow	0.1	43	5	b1-liv_hmouse-level8-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.02	43	5	b1-liv_hmouse-loss0.5-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.05	43	5	b1-liv_hmouse-loss0.5-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	high	0.1	43	5	b1-liv_hmouse-loss0.5-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	low	0.02	43	5	b1-liv_hmouse-loss0.5-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	low	0.05	43	5	b1-liv_hmouse-loss0.5-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.02	43	5	b1-liv_hmouse-loss0.5-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.05	43	5	b1-liv_hmouse-loss0.5-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midhigh	0.1	43	5	b1-liv_hmouse-loss0.5-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.02	43	5	b1-liv_hmouse-loss0.5-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.05	43	5	b1-liv_hmouse-loss0.5-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.5	midlow	0.1	43	5	b1-liv_hmouse-loss0.5-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.02	43	5	b1-liv_hmouse-loss0.9-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.05	43	5	b1-liv_hmouse-loss0.9-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	high	0.1	43	5	b1-liv_hmouse-loss0.9-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	low	0.02	43	5	b1-liv_hmouse-loss0.9-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	low	0.05	43	5	b1-liv_hmouse-loss0.9-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.02	43	5	b1-liv_hmouse-loss0.9-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.05	43	5	b1-liv_hmouse-loss0.9-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midhigh	0.1	43	5	b1-liv_hmouse-loss0.9-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.02	43	5	b1-liv_hmouse-loss0.9-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.05	43	5	b1-liv_hmouse-loss0.9-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	0.9	midlow	0.1	43	5	b1-liv_hmouse-loss0.9-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.02	43	5	b1-liv_hmouse-loss1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.05	43	5	b1-liv_hmouse-loss1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	high	0.1	43	5	b1-liv_hmouse-loss1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	low	0.02	43	5	b1-liv_hmouse-loss1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	low	0.05	43	5	b1-liv_hmouse-loss1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.02	43	5	b1-liv_hmouse-loss1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midhigh	0.1	43	5	b1-liv_hmouse-loss1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.02	43	5	b1-liv_hmouse-loss1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.05	43	5	b1-liv_hmouse-loss1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	loss	1.0	midlow	0.1	43	5	b1-liv_hmouse-loss1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.02	43	5	b1-liv_hmouse-pattern0.25-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.05	43	5	b1-liv_hmouse-pattern0.25-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	high	0.1	43	5	b1-liv_hmouse-pattern0.25-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	low	0.02	43	5	b1-liv_hmouse-pattern0.25-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	low	0.05	43	5	b1-liv_hmouse-pattern0.25-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.02	43	5	b1-liv_hmouse-pattern0.25-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.05	43	5	b1-liv_hmouse-pattern0.25-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midhigh	0.1	43	5	b1-liv_hmouse-pattern0.25-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.02	43	5	b1-liv_hmouse-pattern0.25-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.05	43	5	b1-liv_hmouse-pattern0.25-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.25	midlow	0.1	43	5	b1-liv_hmouse-pattern0.25-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.02	43	5	b1-liv_hmouse-pattern0.5-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.05	43	5	b1-liv_hmouse-pattern0.5-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	high	0.1	43	5	b1-liv_hmouse-pattern0.5-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	low	0.02	43	5	b1-liv_hmouse-pattern0.5-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	low	0.05	43	5	b1-liv_hmouse-pattern0.5-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.02	43	5	b1-liv_hmouse-pattern0.5-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.05	43	5	b1-liv_hmouse-pattern0.5-midhigh-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midhigh	0.1	43	5	b1-liv_hmouse-pattern0.5-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.02	43	5	b1-liv_hmouse-pattern0.5-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.05	43	5	b1-liv_hmouse-pattern0.5-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	0.5	midlow	0.1	43	5	b1-liv_hmouse-pattern0.5-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.02	43	5	b1-liv_hmouse-pattern1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.05	43	5	b1-liv_hmouse-pattern1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	high	0.1	43	5	b1-liv_hmouse-pattern1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	low	0.02	43	5	b1-liv_hmouse-pattern1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	low	0.05	43	5	b1-liv_hmouse-pattern1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.02	43	5	b1-liv_hmouse-pattern1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midhigh	0.1	43	5	b1-liv_hmouse-pattern1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.02	43	5	b1-liv_hmouse-pattern1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.05	43	5	b1-liv_hmouse-pattern1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	pattern	1.0	midlow	0.1	43	5	b1-liv_hmouse-pattern1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.02	43	5	b1-liv_hmouse-sham_swap1.0-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.05	43	5	b1-liv_hmouse-sham_swap1.0-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	high	0.1	43	5	b1-liv_hmouse-sham_swap1.0-high-sh10-s43			584	0.07072786726413952	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	low	0.02	43	5	b1-liv_hmouse-sham_swap1.0-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	low	0.05	43	5	b1-liv_hmouse-sham_swap1.0-low-sh05-s43			210	0.02543296596826935	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.02	43	5	b1-liv_hmouse-sham_swap1.0-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midhigh	0.1	43	5	b1-liv_hmouse-sham_swap1.0-midhigh-sh10-s43			636	0.07702555407533002	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.02	43	5	b1-liv_hmouse-sham_swap1.0-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.05	43	5	b1-liv_hmouse-sham_swap1.0-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	sham_swap	1.0	midlow	0.1	43	5	b1-liv_hmouse-sham_swap1.0-midlow-sh10-s43			653	0.0790844132251423	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.02	43	5	b1-liv_hmouse-thin_both4-high-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.05	43	5	b1-liv_hmouse-thin_both4-high-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	high	0.1	43	5	b1-liv_hmouse-thin_both4-high-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	low	0.02	43	5	b1-liv_hmouse-thin_both4-low-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	low	0.05	43	5	b1-liv_hmouse-thin_both4-low-sh05-s43			228	0.02761293447983529	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.02	43	5	b1-liv_hmouse-thin_both4-midhigh-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midhigh	0.1	43	5	b1-liv_hmouse-thin_both4-midhigh-sh10-s43			826	0.1000363328085261	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.02	43	5	b1-liv_hmouse-thin_both4-midlow-sh02-s43			165	0.01998304468935449	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.05	43	5	b1-liv_hmouse-thin_both4-midlow-sh05-s43			413	0.05001816640426305	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+liv_hmouse	thin_both	4.0	midlow	0.1	43	5	b1-liv_hmouse-thin_both4-midlow-sh10-s43			819	0.09918856727625046	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0

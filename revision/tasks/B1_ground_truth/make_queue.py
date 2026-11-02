@@ -1,0 +1,38 @@
+"""queue.tsv: every task, in the order the feeder submits them: kind, manifest, index, cpus, mem, wall, done_file, tier."""
+
+from __future__ import annotations
+
+import pandas as pd
+
+from revision.tasks.B1_ground_truth import rules as RU
+
+MEM = {"liv_hmouse": "24G", "test_hmouse": "32G", "kidney": "48G"}
+WALL = {"liv_hmouse": "04:00:00", "test_hmouse": "08:00:00", "kidney": "16:00:00"}
+TOOL_MEM = {"camex": "32G", "saturn": "64G"}
+
+
+def main():
+    rows = []
+    for c in ("test_hmouse", "kidney"):
+        rows.append(("placebo", c, 0, 8, "32G", "12:00:00", str(RU.RES / "placebo" / f"{c}.parquet"), -1))
+    j = pd.read_csv(RU.TASK_DIR / "track_d" / "jobs.tsv", sep="\t", keep_default_na=False)
+    for i, r in j.iterrows():
+        rows.append(("trackd", "jobs", i, 16, "96G", "23:50:00", str(RU.RES / "track_d" / f"{r['job']}.time.txt"), 0))
+    for c in RU.COHORTS:
+        g = pd.read_csv(RU.TASK_DIR / f"grid_{c}.tsv", sep="\t", keep_default_na=False)
+        man = f"revision/tasks/B1_ground_truth/grid_{c}.tsv"
+        for i, r in g.iterrows():
+            rows.append(("fit", man, i, 8, MEM[c], WALL[c], str(RU.RES / "scores" / f"{r['run']}.parquet"), int(r["tier"])))
+    t = pd.read_csv(RU.TASK_DIR / "grid_tools_v2.tsv", sep="\t")
+    for i, r in t.iterrows():
+        for tool in ("camex", "saturn"):
+            rows.append((tool, "revision/tasks/B1_ground_truth/grid_tools_v2.tsv", i, 8 if tool == "camex" else 16, TOOL_MEM[tool], "23:50:00",
+                         str(RU.RES / "tool_scores" / f"{tool}__{r['run']}.parquet"), int(r["tier"])))
+    q = pd.DataFrame(rows, columns=["kind", "manifest", "index", "cpus", "mem", "wall", "done_file", "tier"])
+    q = q.sort_values("tier", kind="stable")
+    q.to_csv(RU.TASK_DIR / "queue.tsv", sep="\t", index=False)
+    print(q.groupby(["tier", "kind"]).size())
+
+
+if __name__ == "__main__":
+    main()

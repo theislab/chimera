@@ -1,5 +1,5 @@
-"""Write the grid manifests. A row whose gene set would equal that of a smaller share (the band has too few eligible
-genes for the larger share) is listed with duplicate_of and not trained: it is the same experiment."""
+"""Write the grid manifests. A row whose gene set would equal that of a smaller share (the band has too few eligible genes for the
+larger share) is listed with duplicate_of and not trained: it adds no information. n_pairs and share_achieved are recorded for all."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ def main():
     rows["n_pairs"] = 0
     rows["share_achieved"] = 0.0
     rows["recipe"] = rows["cohort"].map(lambda c: RU.COHORTS[c]["recipe"])
+    rows["duplicate_of"] = ""
     for c in RU.COHORTS:
         a = A.read_base(c)
         g, _ = A.gene_table(a, c)
@@ -25,9 +26,8 @@ def main():
                 rows.loc[i, "n_pairs"] = n
                 rows.loc[i, "share_achieved"] = n / len(g)
             for e, s2 in sub.groupby("effect"):
-                s2 = s2.sort_values("share")
                 seen = {}
-                for i, r in s2.iterrows():
+                for i, r in s2.sort_values("share").iterrows():
                     n = rows.loc[i, "n_pairs"]
                     if n in seen:
                         rows.loc[i, "duplicate_of"] = seen[n]
@@ -35,14 +35,11 @@ def main():
                         seen[n] = r["run"]
     rows.to_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", index=False)
     for c in RU.COHORTS:
-        d = rows[(rows.cohort == c) & (rows.duplicate_of == "") & (rows.reuse == "")].copy()
-        # order: largest effect and middle share first, so early rows answer the main question first
-        d["ord"] = d["share"].map({0.05: 0, 0.10: 1, 0.02: 2}) * 10 + d.groupby(["alt"])["effect"].rank(method="dense", ascending=False)
-        d = d.sort_values(["ord", "alt", "band", "seed"]).drop(columns="ord")
+        d = rows[(rows.cohort == c) & (rows.reuse == "") & (rows.duplicate_of == "")].sort_values(["tier", "alt", "effect", "band", "share", "seed"])
         d.to_csv(RU.TASK_DIR / f"grid_{c}.tsv", sep="\t", index=False)
         n = rows[(rows.cohort == c) & (rows.reuse != "")]
         n.to_csv(RU.TASK_DIR / f"grid_{c}_none.tsv", sep="\t", index=False)
-        print(c, "train rows", len(d), "of", ((rows.cohort == c) & (rows.reuse == "")).sum(), "none rows", len(n), flush=True)
+        print(c, "train rows", len(d), "none", len(n), d.groupby("tier").size().to_dict(), flush=True)
 
 
 if __name__ == "__main__":
