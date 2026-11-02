@@ -6,7 +6,7 @@ Cohort checklist item 5, as on kidney and islet: a class enters the model only w
 Whole class filtered, 1,196 cells (thin species in brackets): NK/T 949 (mouse 40), B cell 144 (M. fascicularis 25), unresolved corneal 42 (mouse 42), myoepithelium 40 (mouse 40), neuron 21 (human 21).
 Kept by exception, reason: V2 and V3 compare each species with human over outflow classes (van Zyl's conventional or uveoscleral outflow groups, shared by human and another species): canal endothelium (mouse 25), ciliary muscle (mouse 30, pig 41), Schwann (mouse 27), corneal endothelium with human Schwalbe line (pig 34).
 
-**Models.** The recipes in use, unchanged except the object: full cohort T11.2 grid 1, human + mouse T11.2b grid 1. Seeds 42 and 43 (`manifest.tsv`): rev-vz-f50-s<seed>, rev-vz-f50-hmouse-s<seed>. A seed failing health (NaN, collapse, frozen) is replaced by the next seed until 2 pass.
+**Models.** Recipes unchanged except the object: human + mouse T11.2b grid 1; full cohort, the candidates of T11.2c (grids 1, 2, 6), trained in parallel so the comparison uses the recipe that wins T11.2c. Seeds 42 and 43 (`manifest.tsv`): rev-vz-f50-g<k>-s<seed>, rev-vz-f50-hmouse-s<seed>. A seed failing health (NaN, collapse, frozen) is replaced by the next seed until 2 pass.
 
 **Decision rule (per dataset; both must hold to keep the current models).** On genes shared by the filtered and current objects:
 - A_cross = mean Spearman of Delta-alpha (alpha - prior as anchored) over all pairs (filtered seed, current seed in D);

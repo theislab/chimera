@@ -22,7 +22,8 @@ from revision.tasks.T11_5_vz_genes import vz
 
 OUT = vz.OUT / "class_filter"
 F50 = vz.ROOT / "data" / "revision" / "van_zyl_f50"
-RUNS = {"full": ("rev-vz-f50", "van_zyl_unified.h5ad"), "hmouse": ("rev-vz-f50-hmouse", "van_zyl_hmouse.h5ad")}
+WINNER = int(json.loads((vz.ROOT / "results/revision/T11/count_rule/selection.json").read_text())["winner_grid"])
+RUNS = {"full": (f"rev-vz-f50-g{WINNER}", "van_zyl_unified.h5ad"), "hmouse": ("rev-vz-f50-hmouse", "van_zyl_hmouse.h5ad")}
 SEEDS_TRY = range(42, 52)
 N_NEEDED = 2
 
@@ -40,7 +41,8 @@ def filtered_seeds(name: str) -> list[str]:
         if not d.exists():
             continue
         g = vz.gate(d)
-        ok = g["finished"] and g.get("no_nan") and g.get("n_active_z") == 10 and g.get("tails_ok") \
+        up, dn = vz.raw_tails(f"{name}-s{s}") if g["finished"] else (0.0, 0.0)
+        ok = g["finished"] and g.get("no_nan") and g.get("n_active_z") == 10 and up >= 0.02 and dn >= 0.02 \
             and g["sat_high"] <= vz.SAT_MAX_SEED and g["sat_low"] <= vz.SAT_MAX_SEED
         print(f"{name}-s{s}", {k: g.get(k) for k in ("finished", "no_nan", "sat_high", "n_active_z", "tail_up", "tail_dn", "last_epoch")},
               "health:", bool(ok), flush=True)

@@ -45,7 +45,7 @@ MODELS = ["Chimera", "scVI-sp", "scVI-donor", "scANVI", "sysVI", "Harmony", "PCA
 C_DA, C_B1B, C_S = cm.STY["D"][0], cm.STY["B1b"][0], cm.STY["S"][0]  # paper's readout colours
 INK, INK2, GRID, SURFACE, MID = cm.INK, cm.MUTED, "#E6E6E6", "white", "#F0F0F0"
 GENE_GREY = "#BBBBBB"
-DS_COLOR = {"full": "#222222", "hmouse": "#D55E00", "hmmul": "#0072B2", "primates": "#009E73"}
+DS_COLOR = {"full": "#222222", "hmouse": "#D55E00", "hmmul": "#0072B2", "hpig": "#CC79A7", "hmfas": "#56B4E9", "primates": "#009E73"}
 SEQ = LinearSegmentedColormap.from_list("seq", [MID, "#BFDCEC", "#56A3CF", "#0072B2", "#00466E"])
 DIV = LinearSegmentedColormap.from_list("div", ["#00466E", "#0072B2", "#8FC2DF", MID, "#F0B48A", "#D55E00", "#8A3D00"])
 
@@ -55,7 +55,7 @@ def ds_label(ds: str) -> str:
 
 
 def short(ds: str) -> str:
-    return ds_label(ds).replace("human + ", "H+").replace("5 species", "5 sp").replace("M. mulatta", "Mmul")
+    return ds_label(ds).replace("human + ", "H+").replace("5 species", "5 sp").replace("M. mulatta", "Mmul").replace("M. fascicularis", "Mfas")
 
 
 def style(ax, grid="x"):
@@ -350,7 +350,7 @@ def figure(iq: dict) -> None:
 def main() -> int:
     iq = json.loads((R / "glaucoma" / "integration_quality.json").read_text())
     summary(iq).to_csv(R / "summary.csv", index=False)
-    figure(iq)
+    figure({k: v for k, v in iq.items() if not vz.DATASETS[k].get("beside")})
     print("wrote", R / "summary.csv", FIG / "vz_figure.pdf")
     return 0
 

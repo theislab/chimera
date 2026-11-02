@@ -1,11 +1,12 @@
 """Van Zyl datasets for T11.4-T11.7: paths, seed runs, seed health and integration references.
 
 Registry: ``DATASETS`` below plus optional rows in ``datasets_extra.tsv`` (columns dataset, h5ad,
-seed_map, label), so a retuned dataset is added with one row and one more pass of the scripts.
+seed_map, label, beside), so a retuned dataset is added with one row and one more pass of the
+scripts; ``beside`` marks a dataset reported next to the main ones (not in the figure).
 
 Seed rule for new cohorts (amendment log, latest rows): a seed enters D if it finished, has no NaN, no
-latent collapse (10/10 active z dims) and both Delta-alpha tails (not frozen), and saturation is at
-most 10% (above 5% its saturated genes are flagged). Other seeds are discarded and not analysed. A
+latent collapse (10/10 active z dims) and both Delta-alpha tails against the raw prior (not frozen),
+and saturation is at most 10% (above 5% its saturated genes are flagged). Other seeds are discarded and not analysed. A
 dataset needs 2 or more such seeds.
 """
 
@@ -43,7 +44,10 @@ DATASETS = {
 _extra = Path(__file__).resolve().parent / "datasets_extra.tsv"
 if _extra.exists():
     for _r in pd.read_csv(_extra, sep="\t").itertuples():
-        DATASETS[_r.dataset] = dict(h5ad=ROOT / _r.h5ad, seed_map=ROOT / _r.seed_map, label=_r.label)
+        DATASETS[_r.dataset] = dict(h5ad=ROOT / _r.h5ad, seed_map=ROOT / _r.seed_map, label=_r.label, beside=bool(_r.beside))
+_winner = ROOT / "revision/tasks/T11_2c_count_rule/seed_map_winner.tsv"  # written by select_count.py
+if _winner.exists():
+    DATASETS["full"]["seed_map"] = _winner
 
 sys.path.insert(0, str(ROOT / "revision" / "tasks" / "T11_2_recipe"))
 from select_recipe import gate  # noqa: E402  (Gate G-V, unchanged)
@@ -78,8 +82,11 @@ def seed_health(ds: str) -> pd.DataFrame:
                              "finished", "no_nan", "sat_high", "sat_low", "n_active_z", "z_var_min",
                              "tail_up", "tail_dn", "tails_ok", "pass_GV", "last_epoch")}))
     t = pd.DataFrame(rows)
-    ok = t["finished"].fillna(False).astype(bool) & t["no_nan"].fillna(False).astype(bool) & (t["n_active_z"] == 10)
-    ok &= (t["sat_high"] <= SAT_MAX_SEED) & (t["sat_low"] <= SAT_MAX_SEED) & t["tails_ok"].fillna(False).astype(bool)
+    ok = t["finished"].astype("boolean").fillna(False).astype(bool) & t["no_nan"].astype("boolean").fillna(False).astype(bool) & (t["n_active_z"] == 10)
+    fin = ok.to_numpy()
+    tails = [raw_tails(r.run_name) if f else (np.nan, np.nan) for r, f in zip(t.itertuples(), fin)]
+    t["tail_up_raw"], t["tail_dn_raw"] = [x[0] for x in tails], [x[1] for x in tails]
+    ok &= (t["sat_high"] <= SAT_MAX_SEED) & (t["sat_low"] <= SAT_MAX_SEED) & (t["tail_up_raw"] >= 0.02) & (t["tail_dn_raw"] >= 0.02)
     t["enters_D"] = ok
     t["saturation_flagged"] = ok & ((t["sat_high"] > 0.05) | (t["sat_low"] > 0.05))
     return t
@@ -88,6 +95,20 @@ def seed_health(ds: str) -> pd.DataFrame:
 def seeds_in_D(ds: str) -> dict[int, str]:
     t = seed_health(ds)
     return {int(r.seed): r.run_name for r in t.itertuples() if r.enters_D}
+
+
+def raw_tails(run: str) -> tuple[float, float]:
+    """Fractions of genes with alpha - raw prior above +0.05 and below -0.05."""
+    d = RUNS / run
+    with np.load(d / "final_state.npz") as z:
+        alpha, prior = z["alpha"].astype(float), z["prior"].astype(float)
+    f = d / "conservation_prior_raw.npy"
+    da = alpha - (np.load(f).astype(float) if f.exists() else prior)
+    return float((da > 0.05).mean()), float((da < -0.05).mean())
+
+
+def main_datasets() -> list[str]:
+    return [ds for ds in usable_datasets() if not DATASETS[ds].get("beside")]
 
 
 def usable_datasets() -> list[str]:
