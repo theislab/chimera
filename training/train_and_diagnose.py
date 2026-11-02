@@ -474,6 +474,7 @@ def train_and_diagnose(
     use_per_gene_bias: bool = False,
     lambda_mmd_aux: float | None = None,
     mmd_pair_weights: list[float] | None = None,
+    clamp_z_logvar: bool = False,
 ) -> Path:
     """Train a ChimeraModel and dump diagnostic artefacts.
 
@@ -605,6 +606,10 @@ def train_and_diagnose(
         # None = uniform pair averaging = byte-identical legacy. Length must
         # equal C(n_species, 2).
         extra_model_kwargs["mmd_pair_weights"] = [float(w) for w in mmd_pair_weights]
+    if clamp_z_logvar:
+        # Clamp the log-variance of the sampled z to the VAMP KL's range. Default
+        # OFF: the kwarg is not passed and the code path is unchanged.
+        extra_model_kwargs["clamp_z_logvar"] = True
     model = ChimeraModel.from_config(
         adata,
         config_name=config,
@@ -790,6 +795,7 @@ def train_and_diagnose(
         mmd_pair_weights=(
             None if mmd_pair_weights is None else [float(w) for w in mmd_pair_weights]
         ),
+        clamp_z_logvar=bool(clamp_z_logvar),
         mask_species_in_encoder=bool(mask_species_in_encoder),
         mask_batch_in_encoder=bool(mask_batch_in_encoder),
         WARMUP_KL_EPOCHS=WARMUP_KL_EPOCHS,
@@ -978,6 +984,9 @@ def main() -> int:
                              "'impossible' pairs (e.g. Zebrafish at 450 Myr) to concentrate "
                              "MMD pressure on close-pair mixing where data permits. Default "
                              "unset = uniform averaging = byte-identical legacy.")
+    parser.add_argument("--clamp-z-logvar", action="store_true",
+                        help="Clamp the log-variance of the sampled z to the VAMP KL's "
+                             "range [-10, 10]. Default off.")
     args = parser.parse_args()
     _mmd_pair_weights_cli = (
         None if args.mmd_pair_weights is None
@@ -1031,6 +1040,7 @@ def main() -> int:
         use_per_gene_bias=args.use_per_gene_bias,
         lambda_mmd_aux=args.lambda_mmd_aux,
         mmd_pair_weights=_mmd_pair_weights_cli,
+        clamp_z_logvar=args.clamp_z_logvar,
     )
     return 0
 

@@ -44,6 +44,11 @@ from chimera._constants import (
 # ---------------------------------------------------------------------------
 
 
+# Range of the log-variance in the VAMP KL (``ChimeraModule._vamp_kl``). With
+# ``clamp_z_logvar=True`` the sampled z uses the same range.
+Z_LOGVAR_BOUND = 10.0
+
+
 class ChimeraMinimalModule(nn.Module):
     """Minimal Chimera: fixed alpha, residual decoder, dual NB loss.
 
@@ -68,6 +73,9 @@ class ChimeraMinimalModule(nn.Module):
         Weight for L_shared_aux.
     lambda_res
         Weight for L_residual_sparsity (L1).
+    clamp_z_logvar
+        If True, the log-variance used to sample z is clamped to
+        ``[-Z_LOGVAR_BOUND, Z_LOGVAR_BOUND]``. Default False.
     """
 
     def __init__(
@@ -80,6 +88,7 @@ class ChimeraMinimalModule(nn.Module):
         conservation_prior: Optional[torch.Tensor] = None,
         lambda_aux: float = LAMBDA_AUX,
         lambda_res: float = LAMBDA_RES,
+        clamp_z_logvar: bool = False,
     ) -> None:
         super().__init__()
 
@@ -91,6 +100,7 @@ class ChimeraMinimalModule(nn.Module):
         self.lambda_aux = lambda_aux
         self.lambda_res = lambda_res
         self.free_bits: float = FREE_BITS
+        self.clamp_z_logvar = bool(clamp_z_logvar)
 
         # Alpha: fixed, non-learnable
         if conservation_prior is None:
@@ -189,7 +199,12 @@ class ChimeraMinimalModule(nn.Module):
         h_enc = self.encoder(enc_input)
         z_mean = self.z_mean_linear(h_enc)
         z_logvar = self.z_logvar_linear(h_enc)
-        z = z_mean + torch.randn_like(z_mean) * torch.exp(0.5 * z_logvar)
+        z_logvar_sample = (
+            z_logvar.clamp(min=-Z_LOGVAR_BOUND, max=Z_LOGVAR_BOUND)
+            if self.clamp_z_logvar
+            else z_logvar
+        )
+        z = z_mean + torch.randn_like(z_mean) * torch.exp(0.5 * z_logvar_sample)
 
         # ---- Decode ----
         h = self.decoder_hidden(z)
@@ -307,6 +322,10 @@ class ChimeraModule(nn.Module):
         Weight for L_fit_reward (FQR).
     lambda_disp
         Weight for dispersion regularization.
+    clamp_z_logvar
+        If True, the log-variance used to sample z is clamped to
+        ``[-Z_LOGVAR_BOUND, Z_LOGVAR_BOUND]``, the range the VAMP KL already
+        applies. The returned ``z_logvar`` stays unclamped. Default False.
     """
 
     def __init__(
@@ -341,6 +360,7 @@ class ChimeraModule(nn.Module):
         use_per_gene_bias: bool = False,
         lambda_mmd_aux: float = 0.0,
         mmd_pair_weights: Optional[Sequence[float]] = None,
+        clamp_z_logvar: bool = False,
     ) -> None:
         super().__init__()
 
@@ -418,6 +438,7 @@ class ChimeraModule(nn.Module):
         # feature dimension during training.
         self.lambda_anchor_neg_factor: float = float(lambda_anchor_neg_factor)
         self.free_bits: float = FREE_BITS
+        self.clamp_z_logvar = bool(clamp_z_logvar)
         self.kl_weight: float = 1.0  # set by ChimeraTrainingPlan during training
         # When True, the species one-hot is zeroed before being fed to the encoder.
         # The residual decoder still receives species one-hot for species-specific fitting.
@@ -989,7 +1010,12 @@ class ChimeraModule(nn.Module):
         h_enc = self.encoder(enc_input)
         z_mean = self.z_mean_linear(h_enc)
         z_logvar = self.z_logvar_linear(h_enc)
-        z = z_mean + torch.randn_like(z_mean) * torch.exp(0.5 * z_logvar)
+        z_logvar_sample = (
+            z_logvar.clamp(min=-Z_LOGVAR_BOUND, max=Z_LOGVAR_BOUND)
+            if self.clamp_z_logvar
+            else z_logvar
+        )
+        z = z_mean + torch.randn_like(z_mean) * torch.exp(0.5 * z_logvar_sample)
 
         # Optional: library size encoder
         L_kl_l = torch.tensor(0.0, device=x.device)

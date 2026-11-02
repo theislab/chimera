@@ -1,0 +1,35 @@
+run	kind	cohort	setting	rep	seed	form	base	mem	args
+rev-g1-bm2-s44	bm	bone_marrow	full		44	unchanged	rev-bm2-s44	4G	--config A --max-epochs 200 --adata data/revision/bone_marrow/v2/bone_marrow_unified.h5ad --seed 44 --adv-weight 150 --lambda-anchor 0.0057 --lambda-mmd 100 --free-bits 1 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --batch-key species --lambda-anchor-neg-factor 0.5
+rev-g1-bm2-s45	bm	bone_marrow	full		45	unchanged	rev-bm2-s45	4G	--config A --max-epochs 200 --adata data/revision/bone_marrow/v2/bone_marrow_unified.h5ad --seed 45 --adv-weight 150 --lambda-anchor 0.0057 --lambda-mmd 100 --free-bits 1 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --batch-key species --lambda-anchor-neg-factor 0.5
+rev-g1-liv_hmouse-s45	full	liv_hmouse	full		45	unchanged	rev-liv_hmouse-s45	4G	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 45
+rev-g1-liv_hmouse-s46	full	liv_hmouse	full		46	unchanged	rev-liv_hmouse-s46	4G	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 46
+rev-g1-test_hmouse-s45	full	test_hmouse	full		45	unchanged	rev-test_hmouse-s45	6G	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 45
+rev-g1-test_hmouse-s46	full	test_hmouse	full		46	unchanged	rev-test_hmouse-s46	6G	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 46
+g1-b2-test_hmouse-depth25-r0	b2	test_hmouse	depth25	0	142	unchanged	b2-test_hmouse-depth25-r0	6G	
+g1-b2-test_hmouse-depth25-r1	b2	test_hmouse	depth25	1	143	unchanged	b2-test_hmouse-depth25-r1	6G	
+g1-b2-test_hmouse-depth25_law-r0	b2	test_hmouse	depth25	0	142	law	b2-test_hmouse-depth25_law-r0	6G	
+g1-b2-test_hmouse-depth25_law-r1	b2	test_hmouse	depth25	1	143	law	b2-test_hmouse-depth25_law-r1	6G	
+g1-b2-kidney-depth25-r0	b2	kidney	depth25	0	142	unchanged	b2-kidney-depth25-r0	12G	
+g1-b2-kidney-depth25-r1	b2	kidney	depth25	1	143	unchanged	b2-kidney-depth25-r1	12G	
+g1-b2-kidney-depth25_law-r0	b2	kidney	depth25	0	142	law	b2-kidney-depth25_law-r0	12G	
+g1-b2-kidney-depth25_law-r1	b2	kidney	depth25	1	143	law	b2-kidney-depth25_law-r1	12G	
+g1-d1-liv_hmouse-depth5-r0	d1	liv_hmouse	depth5	0	142	unchanged	d1-liv_hmouse-depth5-r0	4G	
+g1-d1-liv_hmouse-depth5-r1	d1	liv_hmouse	depth5	1	143	unchanged	d1-liv_hmouse-depth5-r1	4G	
+g1-d1-liv_hmouse-depth5law-r0	d1	liv_hmouse	depth5	0	142	law	d1-liv_hmouse-depth5law-r0	4G	
+g1-d1-liv_hmouse-depth5law-r1	d1	liv_hmouse	depth5	1	143	law	d1-liv_hmouse-depth5law-r1	4G	
+g1-d1-test_hmouse-depth10-r0	d1	test_hmouse	depth10	0	142	unchanged	d1-test_hmouse-depth10-r0	6G	
+g1-d1-test_hmouse-depth10-r1	d1	test_hmouse	depth10	1	143	unchanged	d1-test_hmouse-depth10-r1	6G	
+g1-d1-test_hmouse-depth10law-r0	d1	test_hmouse	depth10	0	142	law	d1-test_hmouse-depth10law-r0	6G	
+g1-d1-test_hmouse-depth10law-r1	d1	test_hmouse	depth10	1	143	law	d1-test_hmouse-depth10law-r1	6G	
+g1-d1-test_hmouse-depth5-r0	d1	test_hmouse	depth5	0	142	unchanged	d1-test_hmouse-depth5-r0	6G	
+g1-d1-test_hmouse-depth5-r1	d1	test_hmouse	depth5	1	143	unchanged	d1-test_hmouse-depth5-r1	6G	
+g1-d1-test_hmouse-depth5law-r0	d1	test_hmouse	depth5	0	142	law	d1-test_hmouse-depth5law-r0	6G	
+g1-d1-test_hmouse-depth5law-r1	d1	test_hmouse	depth5	1	143	law	d1-test_hmouse-depth5law-r1	6G	
+g1-d1-liv_4sp-depth10-r0	d1	liv_4sp	depth10	0	142	unchanged	d1-liv_4sp-depth10-r0	4G	
+g1-d1-liv_4sp-depth10-r1	d1	liv_4sp	depth10	1	143	unchanged	d1-liv_4sp-depth10-r1	4G	
+g1-d1-liv_4sp-depth10law-r0	d1	liv_4sp	depth10	0	142	law	d1-liv_4sp-depth10law-r0	4G	
+g1-d1-liv_4sp-depth10law-r1	d1	liv_4sp	depth10	1	143	law	d1-liv_4sp-depth10law-r1	4G	
+g1-d1-liv_4sp-depth5-r0	d1	liv_4sp	depth5	0	142	unchanged	d1-liv_4sp-depth5-r0	4G	
+g1-d1-liv_4sp-depth5-r1	d1	liv_4sp	depth5	1	143	unchanged	d1-liv_4sp-depth5-r1	4G	
+g1-d1-liv_4sp-depth5law-r0	d1	liv_4sp	depth5	0	142	law	d1-liv_4sp-depth5law-r0	4G	
+g1-d1-liv_4sp-depth5law-r1	d1	liv_4sp	depth5	1	143	law	d1-liv_4sp-depth5law-r1	4G	

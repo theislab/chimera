@@ -352,3 +352,48 @@ class TestConfigM:
         assert np.allclose(alpha_api, expected, atol=1e-6), (
             "get_alpha and the forward-path formula disagree on Config M alpha"
         )
+
+
+class TestClampZLogvar:
+    """Option ``clamp_z_logvar``: the sampled z uses the VAMP KL's range."""
+
+    def test_sample_clamped_only_when_on_and_flag_survives_load(self, tmp_path):
+        adata = _prepare_adata(N=60, G=40, K=2, Nb=2)
+        off = ChimeraModel(adata, n_latent=4, n_hidden=16)
+        on = ChimeraModel(adata, n_latent=4, n_hidden=16, clamp_z_logvar=True)
+        assert off.module.clamp_z_logvar is False
+        assert on.module.clamp_z_logvar is True
+
+        # No new state: a state dict moves between the two without any key change.
+        assert list(off.module.state_dict()) == list(on.module.state_dict())
+        on.module.load_state_dict(off.module.state_dict())
+
+        # Force log-variance 20 in every cell x dim, above the clamp of 10.
+        for model in (off, on):
+            model.module.eval()
+            with torch.no_grad():
+                model.module.z_logvar_linear.weight.zero_()
+                model.module.z_logvar_linear.bias.fill_(20.0)
+        X = adata.X.toarray() if hasattr(adata.X, "toarray") else np.asarray(adata.X)
+        tensors = {
+            "X": torch.tensor(X, dtype=torch.float32),
+            "species": torch.tensor(adata.obs["species"].cat.codes.to_numpy()[:, None]),
+            "batch": torch.tensor(adata.obs["batch"].cat.codes.to_numpy()[:, None]),
+        }
+        outs = {}
+        for name, model in (("off", off), ("on", on)):
+            torch.manual_seed(0)
+            outs[name] = model.module(tensors)[1]
+        eps_off = (outs["off"]["z"] - outs["off"]["z_mean"]) / np.exp(10.0)
+        eps_on = (outs["on"]["z"] - outs["on"]["z_mean"]) / np.exp(5.0)
+        assert torch.allclose(eps_off, eps_on, rtol=1e-3, atol=1e-3)
+        assert eps_on.abs().max() > 0
+        # The reported log-variance stays raw, for diagnostics.
+        assert torch.allclose(outs["on"]["z_logvar"], torch.full_like(outs["on"]["z_logvar"], 20.0))
+
+        # Saved model and load: the flag comes back; models saved without it load as off.
+        for name, model, want in (("off", off, False), ("on", on, True)):
+            path = str(tmp_path / name)
+            model.save(path, overwrite=True)
+            loaded = ChimeraModel.load(path, adata=adata, accelerator="cpu")
+            assert loaded.module.clamp_z_logvar is want

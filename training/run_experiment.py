@@ -153,6 +153,7 @@ def run_experiment(
     use_per_gene_bias: bool = False,
     lambda_mmd_aux: float | None = None,
     mmd_pair_weights: list[float] | None = None,
+    clamp_z_logvar: bool = False,
 ) -> dict[str, Any]:
     """Train a Chimera model end-to-end and return a summary dict."""
     run_dir = train_and_diagnose(
@@ -193,6 +194,7 @@ def run_experiment(
         use_per_gene_bias=use_per_gene_bias,
         lambda_mmd_aux=lambda_mmd_aux,
         mmd_pair_weights=mmd_pair_weights,
+        clamp_z_logvar=clamp_z_logvar,
     )
     return summarize_run(run_dir)
 
@@ -316,6 +318,9 @@ def main() -> int:
                         "instead of uniform. Down-weight 'impossible' pairs (e.g. Zebrafish "
                         "at 450 Myr) to concentrate pressure on close-pair mixing. Default "
                         "unset = uniform = byte-identical legacy.")
+    p.add_argument("--clamp-z-logvar", action="store_true",
+                   help="Clamp the log-variance of the sampled z to the VAMP KL's range "
+                        "[-10, 10]. Default off.")
     p.add_argument("--plan", type=Path, default=None,
                    help="JSON file overriding all above args (single experiment).")
     args = p.parse_args()
@@ -368,6 +373,7 @@ def main() -> int:
                 None if args.mmd_pair_weights is None
                 else [float(w) for w in args.mmd_pair_weights.split(",") if w.strip()]
             ),
+            clamp_z_logvar=args.clamp_z_logvar,
         )
 
     es = summary["expectation_summary"]
