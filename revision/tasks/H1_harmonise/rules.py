@@ -77,7 +77,7 @@ _T = {s: f"rev-test_hmouse-s{s}" for s in range(43, 52)}
 
 # name -> tissue, label, species shown, h5ad, ortholog table key, cell-type key, integration label key, seeds tried
 COHORTS = {
-    "liv_hmonkey": dict(tissue="liver", label="Liver H+Macaque", species="human, macaque", h5ad=P / "camex_human_monkey.h5ad", table="liv_hmonkey",
+    "liv_hmonkey": dict(tissue="liver", label="Liver H+Monkey", species="human, macaque", h5ad=P / "camex_human_monkey.h5ad", table="liv_hmonkey",
                         ct="cell_type", role="reference", tried={42: "iter90-150ep-s42", 43: "iter90-150ep-s43", 44: "iter90-150ep-s44"}),
     "liv_hmouse": dict(tissue="liver", label="Liver H+Mouse", species="human, mouse", h5ad=P / "camex_human_mouse.h5ad", table="liv_hmouse", ct="cell_type",
                        role="reference", tried={42: "xds-hmouse-iter90-150ep-s42", 43: "xds-hmouse-iter90-150ep-s43", 44: "xds-hmouse-iter90-150ep-s44", **_H}),
