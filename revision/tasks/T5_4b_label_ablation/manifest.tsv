@@ -1,0 +1,10 @@
+run_name	args
+rev-ctl-test_hmac-nolab-s42	--config A --max-epochs 200 --adata data/processed/camex_testis_human_macaque.h5ad --seed 42 --adv-weight 100 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
+rev-ctl-test_hmac-nolab-s43	--config A --max-epochs 200 --adata data/processed/camex_testis_human_macaque.h5ad --seed 43 --adv-weight 100 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
+rev-ctl-test_hmac-nolab-s44	--config A --max-epochs 200 --adata data/processed/camex_testis_human_macaque.h5ad --seed 44 --adv-weight 100 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
+rev-ctl-test_hmouse-nolab-s42	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --prior-clamp-max 0.85
+rev-ctl-test_hmouse-nolab-s43	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 43 --adv-weight 200 --free-bits 1.0 --prior-clamp-max 0.85
+rev-ctl-test_hmouse-nolab-s44	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --seed 44 --adv-weight 200 --free-bits 1.0 --prior-clamp-max 0.85
+rev-ctl-test_3sp-nolab-s42	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 42 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
+rev-ctl-test_3sp-nolab-s43	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 43 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
+rev-ctl-test_3sp-nolab-s44	--config A --max-epochs 100 --adata data/processed/camex_testis_unified.h5ad --seed 44 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --prior-clamp-max 0.85
