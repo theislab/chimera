@@ -53,6 +53,15 @@ def table() -> pd.DataFrame:
     g = g[(g.alt != "none") & (g.duplicate_of == "")]
     active = active_runs()
     rows = []
+    if (RU.TASK_DIR / "grid_arms.tsv").exists():
+        ga = pd.read_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", keep_default_na=False)
+        for _, r in ga[ga.alt != "none"].iterrows():
+            base = dict(task=r["alt"], setting=setting(r), cohort=r["cohort"], effect=f"{float(r['effect']):g}", band=r["band"], share=r["share"])
+            h = RU.RES / "health" / f"{r['run']}.json"
+            tried = h.exists() or ((CO.RUNS_DIR / r["run"]).exists() and r["run"] not in active)
+            fin = h.exists() and not json.loads(h.read_text())["discard"]
+            for m in RU.ARM_METHODS:
+                rows.append(dict(base, method=f"{m}_{r['arm']}", tried=int(tried), finished=int(fin)))
     for _, r in g.iterrows():
         run, st = r["run"], setting(r)
         base = dict(task=r["alt"], setting=st, cohort=r["cohort"], effect=f"{float(r['effect']):g}", band=r["band"], share=r["share"])

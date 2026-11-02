@@ -42,6 +42,9 @@ def load_cells() -> tuple[pd.DataFrame, pd.DataFrame]:
     rows, failed = [], []
     g = pd.read_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", keep_default_na=False)
     g = g[(g.alt != "none") & (g.duplicate_of == "")]
+    if (RU.TASK_DIR / "grid_arms.tsv").exists():
+        ga = pd.read_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", keep_default_na=False)
+        g = pd.concat([g, ga[ga.alt != "none"]], ignore_index=True)
     for _, r in g.iterrows():
         run = r["run"]
         h, m = RU.RES / "health" / f"{run}.json", RU.RES / "metrics" / f"{run}.parquet"
@@ -108,8 +111,7 @@ def main():
     # placebo
     pl = []
     for c in RU.COHORTS:
-        f = RU.RES / "placebo" / f"{c}.parquet"
-        if f.exists():
+        for f in RU.RES.glob(f"placebo/{c}*.parquet"):
             t = pd.read_parquet(f)
             t["cohort"] = c
             pl.append(t)

@@ -42,5 +42,19 @@ def main():
         print(c, "train rows", len(d), "none", len(n), d.groupby("tier").size().to_dict(), flush=True)
 
 
+def arms():
+    d = pd.DataFrame(RU.arm_grid())
+    d["duplicate_of"] = ""
+    a = pd.read_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", keep_default_na=False)
+    key = ["cohort", "alt", "effect", "band", "share", "seed"]
+    a = a[a.alt != "none"].astype({"effect": float, "share": float, "seed": int})
+    d = d.merge(a[key + ["n_pairs", "share_achieved"]], on=key, how="left")
+    d = d.sort_values(["tier", "alt", "cohort", "arm", "seed"], key=lambda x: x.map({"none": "0"}).fillna(x) if x.name == "alt" else x)
+    d.to_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", index=False)
+    print(d.groupby(["tier", "arm"]).size())
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+
+    arms() if "arms" in sys.argv else main()

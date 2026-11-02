@@ -15,6 +15,9 @@ Chimera is retrained with the canonical recipe unchanged, no tuning on results. 
 
 Discard rule, fixed now: non-finite α, z or S_g, or fewer than 10 active z dims. A discarded fit removes only Chimera's row: the direct, sequence and tool readouts of that altered object are still scored. Mixing, tails and saturation are recorded for all fits and read as a sensitivity.
 
+## Gate arms
+Added after the interim reading: `free` (Config M) and `hybrid` (per-gene bias) on the same altered objects (`grid_arms.tsv`, `rules.arm_grid`). Tier 10: central alterations and nulls x 2 seeds, unaltered fits x 2 seeds. Tier 11: tier 1 main effects, after the tools' main settings. Predictions at the end of `PREDICTIONS.md`.
+
 ## Files
 | File | What |
 |---|---|

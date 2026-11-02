@@ -127,10 +127,15 @@ def one_set(sa, sc, ra, rc, method_group):
                 _diff=diff, n=len(sa))
 
 
-def reference(cohort: str) -> pd.DataFrame:
-    """Mean over the cohort's unaltered fits, and the mean masked share."""
+def arm_methods(arm: str) -> dict:
+    return {f"{m}_{arm}": (col, 1, "chimera_arm") for m, col in RU.ARM_METHODS.items()}
+
+
+def reference(cohort: str, arm: str | None = None) -> pd.DataFrame:
+    """Mean over the cohort's unaltered fits of the same model form, and the mean masked share."""
     frames = []
-    for s, r in RU.COHORTS[cohort]["none_runs"].items():
+    runs = RU.COHORTS[cohort]["none_runs"] if arm is None else {s: f"b1{arm}-{cohort}-none-s{s}" for s in RU.ARM_SEEDS}
+    for s, r in runs.items():
         f = RU.RES / "scores" / f"{r}.parquet"
         if f.exists():
             frames.append(pd.read_parquet(f).set_index("var_name"))

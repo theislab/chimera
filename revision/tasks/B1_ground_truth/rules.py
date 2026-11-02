@@ -96,6 +96,14 @@ ACTIVE_VAR = 0.01
 N_LATENT = 10
 
 
+# Gate arms (coordinator request after the interim, predictions in PREDICTIONS.md before scoring). Same altered objects as the main grid, recipe otherwise
+# unchanged. free: Config M, no GIN, one free c_g per gene. hybrid: GIN plus a per-gene bias (iter119). Tiers: 10 central alterations and nulls x 2 seeds with
+# unaltered fits, 11 the tier 1 main effects.
+ARMS = {"free": lambda r: r.replace("--config A", "--config M"), "hybrid": lambda r: r + " --use-per-gene-bias"}
+ARM_METHODS = {"S_g": "S_g", "Delta_alpha": "D", "Delta_alpha_raw": "D_raw", "c_g": "correction", "B1z": "B1z", "S_fwd": "S_fwd"}
+ARM_SEEDS = [42, 43]
+
+
 def useed(*parts) -> int:
     return zlib.crc32("|".join(map(str, parts)).encode()) & 0x7FFFFFFF
 
@@ -127,4 +135,24 @@ def grid(cohort: str | None = None) -> list[dict]:
                                  run=run_name(c, alt, e, b, sh, s), reuse=""))
         for s, r in COHORTS[c]["none_runs"].items():
             rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, tier=0, run=r, reuse=r))
+    return rows
+
+
+def arm_run(arm: str, main_run: str) -> str:
+    return main_run.replace("b1-", f"b1{arm}-", 1)
+
+
+def arm_grid() -> list[dict]:
+    rows = []
+    main = grid()
+    for arm, rec in ARMS.items():
+        for c, cfg in COHORTS.items():
+            for s in ARM_SEEDS:
+                rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, tier=10, arm=arm, run=f"b1{arm}-{c}-none-s{s}",
+                                 reuse="", recipe=rec(cfg["recipe"])))
+        for r in main:
+            if r["alt"] == "none" or r["tier"] > 1:
+                continue
+            c0 = r["effect"] == CENTRAL_EFFECT[r["alt"]] and r["band"] == CENTRAL_BAND and r["share"] == CENTRAL_SHARE
+            rows.append({**r, "tier": 10 if c0 else 11, "arm": arm, "run": arm_run(arm, r["run"]), "recipe": rec(COHORTS[r["cohort"]]["recipe"])})
     return rows

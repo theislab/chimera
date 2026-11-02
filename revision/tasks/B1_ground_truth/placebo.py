@@ -49,24 +49,27 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cohort")
     ap.add_argument("--jobs", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 8)))
+    ap.add_argument("--arm", default=None)
     a = ap.parse_args()
     c = a.cohort
     base = A.read_base(c)
     g, _ = A.gene_table(base, c)
     seq = MT.sequence_table()
     cols = {}
-    for s, r in RU.COHORTS[c]["none_runs"].items():
+    runs = RU.COHORTS[c]["none_runs"] if a.arm is None else {s: f"b1{a.arm}-{c}-none-s{s}" for s in RU.ARM_SEEDS}
+    methods = MT.METHODS if a.arm is None else MT.arm_methods(a.arm)
+    for s, r in runs.items():
         f = RU.RES / "scores" / f"{r}.parquet"
         if not f.exists():
             continue
         sc = MT.join_static(pd.read_parquet(f).set_index("var_name"), seq)
-        cols[r] = {m: sign * sc[col].astype(float) for m, (col, sign, _) in MT.METHODS.items() if col in sc}
+        cols[r] = {m: sign * sc[col].astype(float) for m, (col, sign, _) in methods.items() if col in sc}
     jobs = [(alt, b, d) for alt in ("level", "pattern") for b in RU.BANDS for d in range(N_DRAWS)]
     res = Parallel(n_jobs=a.jobs, batch_size=8)(delayed(one)(g, cols, alt, b, d, c) for alt, b, d in jobs)
     t = pd.DataFrame([x for r in res for x in r],
                      columns=["rule", "band", "share", "n", "fit", "method", "draw", "AUROC", "reject05", "power_05"])
     (RU.RES / "placebo").mkdir(parents=True, exist_ok=True)
-    t.to_parquet(RU.RES / "placebo" / f"{c}.parquet")
+    t.to_parquet(RU.RES / "placebo" / (f"{c}.parquet" if a.arm is None else f"{c}__{a.arm}.parquet"))
     print(t.groupby("method")[["AUROC", "reject05", "power_05"]].mean(), flush=True)
 
 

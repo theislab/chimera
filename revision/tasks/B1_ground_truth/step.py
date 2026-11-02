@@ -20,6 +20,10 @@ def build(row: dict) -> str:
     path = RU.H5AD_DIR / f"{row['run']}.h5ad"
     t0 = time.time()
     tmp = path.with_suffix(".tmp.h5ad")
+    if row["alt"] == "none":  # an arm's unaltered fit: the canonical object
+        A.read_base(row["cohort"]).write_h5ad(tmp)
+        tmp.replace(path)
+        return str(path)
     b, truth = A.build_altered(row, out_path=tmp)
     tmp.replace(path)
     tp = RU.RES / "truth" / f"{row['run']}.parquet"

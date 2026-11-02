@@ -42,6 +42,10 @@ def main():
     ap.add_argument("--run", default=None)
     a = ap.parse_args()
     g = pd.read_csv(a.grid, sep="\t", keep_default_na=False)
+    arms_tsv = RU.TASK_DIR / "grid_arms.tsv"
+    if arms_tsv.exists() and a.index is None:
+        g = pd.concat([g, pd.read_csv(arms_tsv, sep="\t", keep_default_na=False)], ignore_index=True)
+        g["arm"] = g["arm"].fillna("")
     g = g[(g.alt != "none") & (g.duplicate_of == "")].reset_index(drop=True)
     row = (g.iloc[a.index] if a.index is not None else g[g.run == a.run].iloc[0]).to_dict()
     run = row["run"]
@@ -50,11 +54,14 @@ def main():
         return
     truth = pd.read_parquet(RU.RES / "truth" / f"{run}.parquet")
     scores = pd.read_parquet(RU.RES / "scores" / f"{run}.parquet")
-    ref = MT.reference(row["cohort"])
+    arm = row.get("arm") or None
+    if isinstance(arm, float):
+        arm = None
+    ref = MT.reference(row["cohort"], arm)
     seq = MT.sequence_table()
     gt = pd.read_parquet(RU.RES / "base" / f"{row['cohort']}_genes.parquet")
     band_mask = (gt["band"].reindex(scores["var_name"]).to_numpy() == row["band"])
-    extra, methods = tool_scores(run), dict(MT.METHODS)
+    extra, methods = tool_scores(run), dict(MT.METHODS) if arm is None else MT.arm_methods(arm)
     if extra is not None:
         tr = tool_reference(row["cohort"])
         if tr is not None:
