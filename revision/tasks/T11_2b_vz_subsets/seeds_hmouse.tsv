@@ -1,0 +1,3 @@
+run_name	args
+rev-vz-hmouse-s43	--config A --max-epochs 150 --adata data/revision/van_zyl/van_zyl_hmouse.h5ad --seed 43 --batch-key source_batch --celltype-key cell_ontology_class --adv-weight 100 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 0.5 --celltype-conditional-mmd --prior-clamp-max 0.85
+rev-vz-hmouse-s44	--config A --max-epochs 150 --adata data/revision/van_zyl/van_zyl_hmouse.h5ad --seed 44 --batch-key source_batch --celltype-key cell_ontology_class --adv-weight 100 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 0.5 --celltype-conditional-mmd --prior-clamp-max 0.85

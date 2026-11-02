@@ -1,0 +1,4 @@
+run_name	seed	source
+rev-vz-hmouse-s42	42	rev-vz-hmouse-grid1-s42 (selected grid run)
+rev-vz-hmouse-s43	43	training/runs/rev-vz-hmouse-s43
+rev-vz-hmouse-s44	44	training/runs/rev-vz-hmouse-s44
