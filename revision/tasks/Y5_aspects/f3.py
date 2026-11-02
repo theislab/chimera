@@ -457,23 +457,38 @@ def b1z(cohorts=("liv_hmouse", "liv_4sp", "test_3sp", "test_hmouse")):
 
 
 def b1z_tests():
-    rows = []
+    """Each latent against the mean of Chimera's healthy seeds, on the genes both define. Latents with no shared cluster are reported."""
+    from revision.tasks.T4_2_gene_baselines import run as T42
+    rows, ks = [], []
     for c, gold in (("liv_hmouse", "G_H3"), ("liv_4sp", "G_H3"), ("test_3sp", "G_H4"), ("test_hmouse", "G_H4")):
         g = K.genes(c)
         z = pd.read_parquet(OUT / f"b1z__{c}.parquet").drop(columns=["var_name"])
         g = g.merge(z, on="hsapiens_gene_id")
         names = [k for k in z.columns if k.startswith("B1z_")]
-        chim = [k for k in names if "chimera" in k]
+        live = [k for k in names if g[k].notna().mean() > 0]
+        chim = [k for k in live if "chimera" in k]
         g["B1z_chimera_mean"] = g[chim].mean(1)
-        scols = names + ["B1z_chimera_mean", "B1b", "S"]
         covs = K.CPAT + (["H4_nsp"] if gold == "G_H4" else [])
-        # scores defined on every latent
+        a = C.read_adata(c, backed=True)
+        spc = a.obs["species"].astype(str).to_numpy()
+        a.file.close()
+        for nm in names:
+            cl = pd.read_parquet(OUT / f"clusters__{c}__{nm[4:]}.parquet").cl.to_numpy()
+            tab = pd.crosstab(cl, spc)
+            ks.append(dict(cohort=c, latent=nm[4:], n_clusters=len(tab), n_shared=int((tab >= T42.MIN_CELLS_CLUSTER).sum(1).ge(2).sum()),
+                           cells_in_shared=float(tab[(tab >= T42.MIN_CELLS_CLUSTER).sum(1).ge(2)].sum().sum() / tab.sum().sum()), defined=float(g[nm].notna().mean())))
         for half in ("odd", "even"):
-            T = g[(g.half == half) & g[[gold, "block"] + covs + scols].notna().all(1)]
-            r = K.scan(T, gold, scols, covs, seed=K.useed(c, gold, half), delta_to="B1z_chimera_mean", draws=1000)
-            r["cohort"], r["gold"], r["half"] = c, gold, half
-            rows.append(r)
+            for other in [k for k in live if k not in chim] + chim + ["B1b", "S"]:
+                T = g[(g.half == half) & g[[gold, "block", other, "B1z_chimera_mean"] + covs].notna().all(1)]
+                if len(T) < 100:
+                    continue
+                r = K.scan(T, gold, ["B1z_chimera_mean", other], covs, seed=K.useed(c, gold, half, other), delta_to="B1z_chimera_mean", draws=1000)
+                r = r[r.y == other]
+                r["chimera_rho"] = K.scan(T, gold, ["B1z_chimera_mean"], covs, draws=2).rho_p.iloc[0]
+                r["cohort"], r["gold"], r["half"] = c, gold, half
+                rows.append(r)
     pd.concat(rows, ignore_index=True).to_csv(OUT / "b1z_rho.csv", index=False)
+    pd.DataFrame(ks).to_csv(OUT / "b1z_shared_clusters.csv", index=False)
 
 
 def clusters():
