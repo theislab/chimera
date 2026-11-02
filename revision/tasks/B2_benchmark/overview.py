@@ -5,6 +5,9 @@ value in the task. Aggregate of a track = mean of a method's within-task scaled 
 beside. A method applicable to a task but with no value (failed fit, tool that failed there) ranks last in it. Not applicable (static score on agreement; a tool not run on that setting) is left out and drawn
 hatched. A row of the tidy tables enters if rank_direction is 'higher' or 'lower'. Every task appears: page 1 groups tasks by track and family, page 2 draws every task as its own column.
 
+Track I (integration, added by the coordinator's instruction before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
+keeps its committed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
+
 Inputs: results/revision/B1/*.csv|parquet (tracks A, D: columns track, task, setting, method, metric, value, ci_lo, ci_hi, n, rank_direction), results/revision/B2/track_B/*.parquet, track_C/units and lists.
 Re-runnable as B1, C1 and new cohorts add results. Outputs: results/revision/B2/overview/{ranks_long.csv, aggregate.csv, overview.pdf, overview.png}
     python -m revision.tasks.B2_benchmark.overview
@@ -32,14 +35,14 @@ def read_tidy() -> pd.DataFrame:
     fr = []
     for f in glob.glob(str(RU.REPO / "results/revision/B1/tidy*.csv")) + glob.glob(str(RU.REPO / "results/revision/B1/*tidy*.parquet")) + glob.glob(str(RU.REPO / "results/revision/B1/track_*/*.csv")):
         fr.append(pd.read_parquet(f) if f.endswith("parquet") else pd.read_csv(f))
-    for pat in ("track_B/*.parquet", "track_C/units/*.parquet", "track_C/lists/*.parquet"):
+    for pat in ("track_B/*.parquet", "track_C/units/*.parquet", "track_C/lists/*.parquet", "integration/tidy.parquet"):
         for f in glob.glob(str(RU.RES / pat)):
             if not f.endswith("__h2h.parquet"):
                 fr.append(pd.read_parquet(f))
     if not fr:
         raise SystemExit("no tidy tables yet")
     t = pd.concat(fr, ignore_index=True)
-    return t[t["method"].isin(ORDER) & t["rank_direction"].isin(["higher", "lower"]) & t["value"].notna()]
+    return t[(t["method"].isin(ORDER) | t["method"].astype(str).str.startswith("I:")) & t["rank_direction"].isin(["higher", "lower"]) & t["value"].notna()]
 
 
 def applicable(track: str, task: str, method: str) -> bool:
@@ -71,10 +74,17 @@ def rank_tasks(t: pd.DataFrame, tools_expected: dict[str, list[str]] | None = No
 def aggregate(R: pd.DataFrame) -> pd.DataFrame:
     a = R.groupby(["track", "method"]).agg(mean_scaled=("scaled", "mean"), mean_rank=("rank", "mean"), n_tasks=("task", "nunique")).reset_index()
     wide = a.pivot(index="method", columns="track", values="mean_scaled")
-    wide["overall"] = wide.mean(1, skipna=True)
-    wide["n_tracks"] = a.groupby("method").track.nunique()
-    wide = wide.sort_values("overall")
-    return wide
+    gene = [c for c in wide.columns if c != "I"]
+    wide["overall"] = wide[gene].mean(1, skipna=True)
+    wide["n_tracks"] = wide[gene].notna().sum(1)
+    if "I" in wide:
+        i = wide["I"].copy()
+        for tool in ("SATURN", "CAMEX"):
+            if f"I:{tool}" in i.index and tool in wide.index:
+                wide.loc[tool, "overall_with_I"] = float(np.nanmean(list(wide.loc[tool, gene].astype(float)) + [i[f"I:{tool}"]]))
+    un = a.pivot(index="method", columns="track", values="mean_rank").add_prefix("mean_rank_")
+    nt = a.pivot(index="method", columns="track", values="n_tasks").add_prefix("n_tasks_")
+    return wide.join(un).join(nt).sort_values("overall")
 
 
 def family_of(task: str) -> str:
@@ -91,6 +101,8 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
 
     matplotlib.rcParams.update({"pdf.fonttype": 42, "font.size": 6, "font.family": "DejaVu Sans"})
     methods = [m for m in A.index if m in ORDER]
+    R_i = R[R.track == "I"]
+    R = R[R.track != "I"]
     tracks = sorted(R.track.unique())
     # page 1: tracks x families as circles, overall bars
     R = R.copy()
@@ -162,6 +174,27 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
         fig.tight_layout()
         pdf.savefig(fig)
         plt.close(fig)
+        if len(R_i):
+            # page 3: Track I, integration (the substrate, not Chimera's aim), methods by cohort on composite, mixing, conservation
+            met = ["composite", "mixing_score", "conservation_score"]
+            imeth = R_i[R_i.metric == "composite"].groupby("method").scaled.mean().sort_values().index.tolist()
+            coh = list(dict.fromkeys(R_i.task.str.split("|").str[2]))
+            fig, axes = plt.subplots(1, 3, figsize=(7.2, 0.24 * len(imeth) + 1.4), sharey=True)
+            for ax, me in zip(axes, met):
+                V = R_i[R_i.metric == me].assign(c=lambda d: d.task.str.split("|").str[2]).pivot(index="method", columns="c", values="value").reindex(index=imeth, columns=coh)
+                ax.imshow(np.ma.masked_invalid(V.to_numpy(dtype=float)), aspect="auto", cmap="Blues", vmin=0, vmax=1)
+                ax.set_xticks(range(len(coh)))
+                ax.set_xticklabels(coh, rotation=90, fontsize=5)
+                ax.set_title(me.replace("_", " "), fontsize=6)
+                ax.tick_params(length=0)
+                for sp in ax.spines.values():
+                    sp.set_visible(False)
+            axes[0].set_yticks(range(len(imeth)))
+            axes[0].set_yticklabels([m[2:] for m in imeth])
+            fig.suptitle("Track I: integration is the substrate of Chimera's readouts, not its aim", fontsize=7)
+            fig.tight_layout()
+            pdf.savefig(fig)
+            plt.close(fig)
 
 
 def main():
