@@ -258,9 +258,9 @@ def make_manifest():
                 for s in RU.SEEDS:
                     main = (alt, e) in RU.TOOL_MAIN_ROWS and b in RU.TOOL_MAIN_BANDS and s == 42
                     rows.append(dict(cohort=c, alt=alt, effect=e, band=b, share=RU.TOOL_SHARE, seed=s, run=RU.run_name(c, alt, e, b, RU.TOOL_SHARE, s),
-                                     stem=STEM[c], tier=3 if main else 6, label_key=RU.COHORTS[c]["label_key"]))
+                                     stem=STEM[c], tier=3 if main else 6, label_key="cell_ontology_class"))
         for s in RU.TOOL_NONE_SEEDS:
-            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, run=f"b1-{c}-none-s{s}", stem=STEM[c], tier=3 if s == 42 else 6, label_key=RU.COHORTS[c]["label_key"]))
+            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, run=f"b1-{c}-none-s{s}", stem=STEM[c], tier=3 if s == 42 else 6, label_key="cell_ontology_class"))
     pd.DataFrame(rows).to_csv(RU.TASK_DIR / "grid_tools_v2.tsv", sep="\t", index=False)
     print(len(rows))
 
