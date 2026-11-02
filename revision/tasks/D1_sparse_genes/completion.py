@@ -21,7 +21,8 @@ def main():
         h = RU.RES / "health" / f"{r.run}.json"
         if h.exists():
             d = json.loads(h.read_text())
-            seen.add((r.cohort, r.setting, r.rep))
+            if r.arm != "L":
+                seen.add((r.cohort, r.setting, r.rep))
             tails = max(d.get("tail_pos") or 0.0, d.get("tail_neg") or 0.0)
             st = r.setting + ("law" if r.arm == "L" else "")
             rows.append(dict(cohort=r.cohort, setting=st, rep=r.rep, method="Chimera", tried=1, finished=int(not d["discard"]), finished_gate_tail=int((not d["discard"]) and tails >= 0.02), source="D1", run=r.run, finite=d.get("finite")))
