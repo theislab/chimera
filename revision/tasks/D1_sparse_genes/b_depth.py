@@ -23,11 +23,13 @@ FULL_ALIAS = {"S": "S_ema"}
 
 
 def load_runs(c: str, setting: str):
-    """Healthy replicates of a depth: B2 fits where they exist, D1 fits otherwise."""
+    """Replicates of a depth: B2 fits where they exist, D1 fits otherwise. Setting names ending in law are arm L, D1 only."""
     fr, used = [], []
     for r in range(3):
-        for p, h in ((RU.RES / "scores" / f"d1-{c}-{setting}-r{r}.parquet", RU.RES / "health" / f"d1-{c}-{setting}-r{r}.json"),
-                     (B2.RES / "scores" / f"b2-{c}-{setting}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{setting}-r{r}.json")):
+        cand = [(RU.RES / "scores" / f"d1-{c}-{setting}-r{r}.parquet", RU.RES / "health" / f"d1-{c}-{setting}-r{r}.json")]
+        if not setting.endswith("law"):
+            cand.append((B2.RES / "scores" / f"b2-{c}-{setting}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{setting}-r{r}.json"))
+        for p, h in cand:
             if p.exists() and h.exists():
                 hh = json.loads(h.read_text())
                 f = pd.read_parquet(p).set_index("hsapiens_gene_id")
@@ -175,7 +177,7 @@ def one(c, setting):
 
 def main():
     n = int(os.environ.get("SLURM_CPUS_PER_TASK", 8))
-    todo = [(c, s) for c in RU.DEPTH_COHORTS + ["kidney"] for s in RU.DEPTHS]
+    todo = [(c, s) for c in RU.DEPTH_COHORTS + ["kidney"] for s in RU.DEPTHS] + [(c, s) for c in RU.DEPTH_COHORTS for s in ("depth25law", "depth10law")]
     res = Parallel(n_jobs=min(n, len(todo)), backend="loky")(delayed(one)(*x) for x in todo)
     pd.DataFrame([r for x in res for r in x[0]]).to_csv(RU.RES / "b_rho.csv", index=False)
     pd.DataFrame([r for x in res for r in x[1]]).to_csv(RU.RES / "b_health.csv", index=False)
