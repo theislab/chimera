@@ -20,6 +20,9 @@ QC: ``min_genes`` only. No mitochondrial filter in this cohort, a deviation from
 20%: mt genes are named ND1/COX1 in rhesus and pig, so the prefix rule cannot see them, and the
 cynomolgus matrix has none, so the filter could not act evenly across species.
 
+Thin types: a harmonised cell type is removed from a species where it has fewer than 20 cells
+(owner default rule), before any statistic; removals are listed in ``build_report.json``.
+
 Batches: ``obs['source_batch']`` is ``species|chemistry`` (10x v2 or v3, ``batch_chemistry.tsv``);
 ``obs['batch']`` keeps the 16 samples.
 
@@ -85,6 +88,7 @@ ESM2_FILES = {
     "sscrofa": "pig_embedding.torch",
 }
 QC = dict(min_genes=200, max_mt_pct=100.0)  # no mt filter in this cohort, see module docstring
+THIN_MIN = 20  # cells per (species, harmonised type); fewer are removed (owner default rule)
 OWN_MATRIX = dict(zip(("mmusculus", "sscrofa", "hsapiens", "mfascicularis", "mmulatta"), CSVS))
 
 log = logging.getLogger("build_vanzyl")
@@ -391,7 +395,19 @@ def main() -> int:
         report["raw"]["equals_data_raw_van_zyl_raw_h5ad"] = bool(same)
         del old_raw
 
-    # 2. Per species: validate counts, QC filter.
+    # 2. Thin cell types (owner default rule): drop a harmonised type from a species where it
+    # has fewer than THIN_MIN cells, before any statistic is computed. No cap is applied.
+    raw.obs = harmonise(raw.obs)
+    counts = raw.obs.groupby(["species", "cell_type_harmonised"], observed=True).size()
+    thin = counts[counts < THIN_MIN]
+    report["thin_type_rule"] = {"min_cells_per_species": THIN_MIN, "removed": [
+        {"species": s, "cell_type_harmonised": t, "n_cells": int(n)} for (s, t), n in thin.items()]}
+    drop = pd.MultiIndex.from_arrays([raw.obs["species"].astype(str), raw.obs["cell_type_harmonised"].astype(str)]).isin(
+        [(str(s), str(t)) for s, t in thin.index])
+    raw = raw[~drop].copy()
+    report["thin_type_rule"]["n_cells_removed"] = int(drop.sum())
+
+    # 3. Per species: validate counts, QC filter.
     per_species, qc_rec = {}, {}
     for sp_label in sorted(raw.obs["species"].astype(str).unique()):
         a = raw[raw.obs["species"].astype(str) == sp_label].copy()
