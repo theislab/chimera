@@ -5,7 +5,8 @@ Arms, each a whole scoreboard run with the frozen draws, seeds and golds:
   rep3        repaired D of seeds 42, 43, 44, covariates, tau, ESM blocks and baselines recomputed on the repaired object;
   rep3_shared rep3 on the genes of the canonical object;
   rep3_norep  rep3 without the repaired genes: their own contribution;
-  rep3_int    post hoc: rep3 with liver H+Mouse on its integrated repaired seeds only (42, 44), since can3 is all integrated.
+  rep3_int    post hoc: rep3 with liver H+Mouse on its integrated repaired seeds only (42, 44), since can3 is all integrated;
+  can_int     post hoc: can3 with liver H+Mouse on the same seeds (42, 44).
 Testis 3-sp is not rebuilt: its rows stay canonical in every arm. Baseline split halves and ceilings are not computed here (no status uses them).
 
     PYTHONPATH=$PWD python -m revision.tasks.O1_orthologs.repair_sensitivity baselines
@@ -91,7 +92,7 @@ def patch_arm(arm: str) -> None:
     runs = {}
     for c in REP:
         can = {int(s): r for s, r in I.seed_runs_used(c).items()}
-        use = (42, 44) if (arm == "rep3_int" and c == "liv_hmouse") else SEEDS  # post hoc: repaired H+Mouse s43 is poorly mixed, canonical 42-44 are not
+        use = (42, 44) if (arm in ("rep3_int", "can_int") and c == "liv_hmouse") else SEEDS  # post hoc: repaired H+Mouse s43 is poorly mixed, canonical 42-44 are not
         runs[c] = {s: (f"o2-{c}-s{s}" if repaired else can[s]) for s in use}
     o_load, o_used = I.load, I.seed_runs_available
     o_u, o_su = R.universe, R.set_universe
@@ -136,7 +137,7 @@ def arm(name: str, workers: int) -> None:
     patch_arm(name)
     out = OUT / f"scoreboard_{name}"
     argv = ["--mode", "real", "--outdir", str(out), "--workers", str(workers)]
-    if TOOLS.exists():
+    if TOOLS.exists() and name not in ("rep3_int", "can_int"):  # the tool unit needs seeds 42, 43, 44
         argv += ["--tools", str(TOOLS)]
     R.main(argv)
 
@@ -160,6 +161,10 @@ def subsets() -> None:
             vals.append(float(S.rho_p_matrix(np.column_stack([g, S.midrank(x)]), Z)[1]))
         vals = np.array(vals)
         rows.append(dict(hyp=h, n_subsets=len(vals), min=vals.min(), q05=float(np.quantile(vals, 0.05)), median=float(np.median(vals)), q95=float(np.quantile(vals, 0.95)), max=vals.max()))
+        if v["cohort"] == "liv_hmouse":  # post hoc: all pairs of integrated canonical seeds
+            ii = [D["seeds"].index(q) for q in (42, 43, 44, 47, 48, 51)]
+            w = np.array([float(S.rho_p_matrix(np.column_stack([g, S.midrank(M[m][:, list(p)].mean(1))]), Z)[1]) for p in itertools.combinations(ii, 2)])
+            rows.append(dict(hyp=f"{h} integrated pairs", n_subsets=len(w), min=w.min(), q05=float(np.quantile(w, 0.05)), median=float(np.median(w)), q95=float(np.quantile(w, 0.95)), max=w.max()))
     pd.DataFrame(rows).to_csv(OUT / "three_seed_range.csv", index=False)
     print(pd.DataFrame(rows).round(4).to_string())
 
@@ -167,7 +172,7 @@ def subsets() -> None:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("what", choices=["baselines", "arm", "subsets"])
-    ap.add_argument("--arm", choices=["can3", "rep3", "rep3_shared", "rep3_norep", "rep3_int"])
+    ap.add_argument("--arm", choices=["can3", "rep3", "rep3_shared", "rep3_norep", "rep3_int", "can_int"])
     ap.add_argument("--workers", type=int, default=12)
     a = ap.parse_args()
     if a.what == "baselines":
