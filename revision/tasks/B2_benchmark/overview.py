@@ -40,7 +40,16 @@ def read_tidy() -> pd.DataFrame:
     fr = []
     b1 = RU.REPO / "results/revision/B1/B1_overview.csv"  # B1's rows for the overview: tracks A and D
     if b1.exists():
-        fr.append(pd.read_csv(b1))
+        d = pd.read_csv(b1)
+        # one column per task x cohort x metric; the all-cohort rows repeat them and stay out, so that nothing counts twice
+        coh = d["setting"].astype(str).str.extract(r"cohort=([^;]+)")[0]
+        d = d[coh.notna() & (coh != "all")].copy()
+        d["task"] = "A|" + d["task"].astype(str) + "|" + coh[coh.notna() & (coh != "all")] + "|" + d["metric"].astype(str)
+        for tag, x in (("closer_to_0.5", 0.5), ("closer_to_0.05", 0.05)):
+            m = d["rank_direction"] == tag
+            d.loc[m, "value"] = -(d.loc[m, "value"] - x).abs()  # distance from the nominal value, ranked higher = closer
+            d.loc[m, "rank_direction"] = "higher"
+        fr.append(d)
     for pat in ("track_B/*.parquet", "track_C/units/*.parquet", "track_C/lists/*.parquet", "integration/tidy.parquet"):
         for f in glob.glob(str(RU.RES / pat)):
             if not f.endswith("__h2h.parquet"):
