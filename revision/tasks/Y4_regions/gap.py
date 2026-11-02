@@ -40,6 +40,7 @@ def run(split: str) -> pd.DataFrame:
         Ps, Pd = pct_resid(T, "S", Z), pct_resid(T, "D_raw", Z)
         g = PATTERN[SC.tissue(c)]
         Pg = pct_resid(T, g, Z)
+        Pb = pct_resid(T, "B1b_raw", Z)
         sd0 = np.nanstd(Ps)
         for reg in SC.regs(c):
             m = reg["mask"][ok]
@@ -48,6 +49,7 @@ def run(split: str) -> pd.DataFrame:
             rows.append(dict(cohort=c, split=split, region=reg["name"], axis=reg["axis"], n=int(m.sum()),
                              id_pct=np.nanmean(P[m]), S_pct=np.nanmean(Ps[m]), D_pct=np.nanmean(Pd[m]), gold_pct=np.nanmean(Pg[m]),
                              gap_S=np.nanmean(P[m] - Ps[m]), gap_D=np.nanmean(P[m] - Pd[m]), gap_gold=np.nanmean(P[m] - Pg[m]),
+                             gap_B1b=np.nanmean(P[m] - Pb[m]),
                              share_hiId_loS=float(np.mean((P[m] > 2 / 3) & (Ps[m] < 1 / 3))),
                              share_hiId_hiS=float(np.mean((P[m] > 2 / 3) & (Ps[m] > 2 / 3))),
                              sd_ratio_S=float(np.nanstd(Ps[m]) / sd0)))

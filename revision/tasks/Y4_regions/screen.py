@@ -78,7 +78,13 @@ class Part:
         self.est = ST.rho_p_matrix(self.R, self.Z)
 
     def draw(self, wb):
-        return ST.weighted_rho(self.R, self.Z, wb[self.b].astype(float))
+        w = wb[self.b].astype(float)
+        if (w > 0).sum() < self.Z.shape[1] + 2:  # a draw that left too few genes in a small part
+            return np.full(self.R.shape[1], np.nan)
+        try:
+            return ST.weighted_rho(self.R, self.Z, w)
+        except np.linalg.LinAlgError:
+            return np.full(self.R.shape[1], np.nan)
 
 
 def j_of(t: pd.DataFrame) -> list[str]:
