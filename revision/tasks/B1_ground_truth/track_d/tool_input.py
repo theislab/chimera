@@ -26,7 +26,7 @@ STEM = {"liv_hmouse": "camex_human_mouse", "test_hmouse": "camex_testis_human_mo
 
 def main():
     tool, cohort, obj, dest = sys.argv[1:5]
-    dest = Path(dest)
+    dest = Path(dest).resolve()
     dest.mkdir(parents=True, exist_ok=True)
     os.environ["B1_TOOL"] = "trackd"
     spec = iu.spec_from_file_location("b1tools", HERE.parents[1] / "tools.py")
