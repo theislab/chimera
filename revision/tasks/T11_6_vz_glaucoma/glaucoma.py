@@ -77,7 +77,7 @@ def integration_quality(ds: str) -> dict:
 def v1(g: pd.DataFrame, gl: pd.DataFrame, rng) -> list[dict]:
     rows = []
     for subset, ids in (("all", set(gl["hsapiens_gene_id"])), ("vanzyl_named", set(gl.loc[gl["vanzyl_named"], "hsapiens_gene_id"]))):
-        for score in ("D", "B1b", "S_ema", "D_raw"):
+        for score in ("D", "D_unsat", "B1b", "S_ema", "D_raw"):  # D_unsat: without flagged saturated genes
             m = g[[score, "prior_raw", "log_cp10k_spmean"]].notna().all(1).to_numpy()
             T = g.loc[m]
             inset = T["hsapiens_gene_id"].isin(ids).to_numpy()

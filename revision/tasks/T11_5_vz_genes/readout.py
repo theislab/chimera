@@ -14,8 +14,8 @@ Per usable dataset (``vz.usable_datasets``), with sections 2-5 and 9 of the pre-
   raw prior, ``B1b`` on prior, expression and detection; pairwise ``E_human_<species>``;
 * sets (section 4, T4.3 functions): C1, C2 above, V2, V3 below matched background in raw prior x
   expression decile cells (strata kept with >= 5 background genes per set gene); stratified AUROC,
-  1,000 gene bootstraps, 2,000 permutations within strata, BH over the four sets; scores D, B1b and,
-  stratified on expression only, the raw prior;
+  1,000 gene bootstraps, 2,000 permutations within strata, BH over the four sets; scores D, D without
+  flagged saturated genes, B1b and, stratified on expression only, the raw prior;
 * tidy per-gene table ``results/revision/T11/genes/genes_<dataset>.tsv`` (gene id, pi, alpha per seed,
   centred Delta-alpha, S_ema, count support, margin support, saturated flag) for the harmonised panels;
 * margin support (section 9, T2.5 functions): per D seed, fraction of |Delta-alpha| > 0.05 genes whose
@@ -72,7 +72,7 @@ N_BOOT, N_PERM = 1000, 2000
 
 def set_tests(g: pd.DataFrame, gold: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
     rows = []
-    for score, strata in (("D", "pi_expr"), ("B1b", "pi_expr"), ("prior_raw", "expr")):
+    for score, strata in (("D", "pi_expr"), ("D_unsat", "pi_expr"), ("B1b", "pi_expr"), ("prior_raw", "expr")):
         m = g[[score, "prior_raw", "log_cp10k_spmean"]].notna().all(1).to_numpy()
         T = g.loc[m]
         lab = S.cells(T["prior_raw"].to_numpy(float) if strata == "pi_expr" else None,
@@ -151,6 +151,7 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
     g["D_raw"] = dr - dr.median()
     g["S_ema"] = np.mean([x["S_g_ema"] for x in st.values()], axis=0)
     g["saturated_flag"] = (Am > 0.95).any(axis=1).to_numpy()
+    g["D_unsat"] = g["D"].where(~g["saturated_flag"])  # sensitivity without flagged genes
     for s in Dm.columns:
         g[f"D_s{s}"] = Dm[s]
 
