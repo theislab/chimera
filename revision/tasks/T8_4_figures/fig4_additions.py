@@ -2,9 +2,9 @@
 
   fig4c_prior_landscape    Re-render of Fig 4c from code (D12): protein-identity prior vs Delta-alpha on
                            liver 4 species, the same four named gene groups as the original panel, no
-                           internal run name on any axis. A dagger marks a named gene without margin
-                           support (T2.5 rule: count evidence S_g unmasked, of the sign of Delta-alpha and
-                           at least the cohort median |S_g|), i.e. its position is imputed from features.
+                           internal run name on any axis. A dagger marks a named tail gene (|Delta-alpha|
+                           > 0.05) that lacks margin support (T2.5: count evidence S_g unmasked, of the sign
+                           of Delta-alpha and at least the cohort median |S_g|), i.e. imputed from features.
   fig4_celltype_drivers    Where each named gene's count-evidence margin S_g comes from: the exact
                            per-cell-type split C_gk (posterior-mean z) of T2.5, liver 4 species.
   fig4_margin_support      Fraction of tail genes (|Delta-alpha| > 0.05) with margin support, per cohort
@@ -52,9 +52,10 @@ def named(g: pd.DataFrame) -> pd.DataFrame:
         s["theme"], s["color"] = theme, col
         rows.append(s)
     out = pd.concat(rows)
-    # Dagger on every named gene without margin support (T2.5 rule, applied to all genes, not only the
-    # |Delta-alpha| > 0.05 tail): its position is imputed from features, not backed by counts.
-    out["label"] = out.symbol + np.where(~out.margin_support, DAGGER, "")
+    # Dagger: T2.5 flag ``lacks_margin_support`` (a tail gene, |Delta-alpha| > 0.05, whose count evidence
+    # does not back its sign), as planned for the main panel. Near-zero genes outside the tail carry no
+    # claim and no dagger.
+    out["label"] = out.symbol + np.where(out.lacks_margin_support, DAGGER, "")
     return out
 
 
