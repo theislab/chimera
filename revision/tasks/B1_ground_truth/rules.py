@@ -81,11 +81,11 @@ MIN_CONTRAST_LOG2 = 1  # pattern, loss, and their controls: top vs bottom shared
 MIN_TYPE_CELLS = 30    # shared types: >= 30 cells in both species (the T4.2 rule)
 MAX_PAIRS_FRAC = 0.5   # altered + control cannot exceed the eligible genes of the band
 
-# Tools (SATURN 1:1, CAMEX). Main settings, tier 3: central effects, bands midhigh and low, share 5%, seed 42, plus the unaltered object.
+# Tools. Main settings, tier 3: every alteration type (central effects) and the sham null, bands midhigh and low, share 5%, seed 42, plus the unaltered object.
 # Tier 6: also level 4, sham_swap, all bands, seed 43.
 TOOL_SHARE = 0.05
 TOOL_ROWS = [("pattern", 1.0), ("level", 4), ("level", 8), ("loss", 1.0), ("sham_swap", 1.0)]
-TOOL_MAIN_ROWS = [("pattern", 1.0), ("level", 8), ("loss", 1.0)]
+TOOL_MAIN_ROWS = [("pattern", 1.0), ("level", 8), ("loss", 1.0), ("sham_swap", 1.0)]
 TOOL_MAIN_BANDS = ["midhigh", "low"]
 TOOL_NONE_SEEDS = [42, 43]
 
