@@ -104,9 +104,12 @@ def reference(cohort: str, index) -> dict:
     fr = [f for f in fr if f is not None]
     for k in METHODS_FIT + METHODS_DIRECT:
         cols = [f[k] for f in fr if k in f and f[k].notna().any()]
-        if k in METHODS_DIRECT:
-            cols = cols[:1]
-        out[k] = consensus(cols, index)[0] if len(cols) >= 2 or (cols and k in METHODS_DIRECT) else (cols[0].reindex(index).to_numpy(dtype=float) if cols else np.full(len(index), np.nan))
+        if not cols:
+            out[k] = np.full(len(index), np.nan)
+        elif k in METHODS_DIRECT or len(cols) == 1:  # direct scores of the base object do not depend on the fit
+            out[k] = cols[0].reindex(index).to_numpy(dtype=float)
+        else:
+            out[k] = consensus(cols, index)[0]
     for t in RU.TOOLS:
         c, _ = tool_scores(t, cohort, "ref", index)
         if c is not None:
