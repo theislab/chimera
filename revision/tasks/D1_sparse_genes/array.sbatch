@@ -5,6 +5,8 @@
 #SBATCH --time=08:00:00
 # Usage (from chimera/): sbatch --array=<rows> -c <cpus> --mem=<mem> --output=results/revision/D1/logs/%x_%A_%a.out revision/tasks/D1_sparse_genes/array.sbatch
 source revision/slurm/_body.sh
+export PATH=/ictstr01/groups/ml01/workspace/kemal.inecik/_home/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null || { echo "no mamba on $(hostname)"; exit 3; }
 set -e
 I=$SLURM_ARRAY_TASK_ID
 PY="mamba run --no-capture-output -n chimera_env python"
