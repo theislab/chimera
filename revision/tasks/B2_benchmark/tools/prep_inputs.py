@@ -29,7 +29,7 @@ def main():
     out = ROOT / row["run"]
     (out / "saturn").mkdir(parents=True, exist_ok=True)
     (out / "camex").mkdir(parents=True, exist_ok=True)
-    if (out / "gene_map.csv").exists():
+    if (out / "saturn/run.csv").exists() and (out / "camex/gene_matches_human2mouse.csv").exists() and (out / "gene_map.csv").exists():
         return
     b, info = P.build(row, check=False)
     tab = gene_ids.load_table(RU.ALL_COHORTS[row["cohort"]]["gene_table"])

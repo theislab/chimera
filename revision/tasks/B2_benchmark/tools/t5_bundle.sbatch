@@ -16,5 +16,4 @@ for I in "$@"; do
   unset PYTHONPATH
   rc=0; mamba run --no-capture-output -n ${TOOL}_env python revision/tasks/B2_benchmark/tools/run_${TOOL}_b2.py --run "$run" --seed "$seed" || { rc=$?; echo "FAILED $run"; }
   mkdir -p results/revision/B2/attempts/$U; echo "$rc" > results/revision/B2/attempts/$U/$run.rc
-  rm -rf "data/revision/B2/tool_inputs/$run/camex" "data/revision/B2/tool_inputs/$run/saturn" "data/revision/B2/tool_inputs/$run/object.h5ad.tmp"
 done

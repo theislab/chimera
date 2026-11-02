@@ -25,7 +25,7 @@ def leiden_within(x: ad.AnnData) -> np.ndarray:
     b = b[:, b.var["highly_variable"].to_numpy()].copy()
     sc.pp.scale(b, max_value=10)
     sc.tl.pca(b, n_comps=30, svd_solver="arpack", random_state=0)
-    sc.pp.neighbors(b, n_neighbors=15, n_pcs=30, random_state=0)
+    sc.pp.neighbors(b, n_neighbors=15, n_pcs=30, transformer="sklearn", random_state=0)
     sc.tl.leiden(b, resolution=1.0, random_state=0, key_added="leiden")
     return ("L" + b.obs["leiden"].astype(str)).to_numpy()
 
