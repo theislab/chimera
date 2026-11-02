@@ -48,7 +48,7 @@ def gold_table() -> pd.DataFrame:
 def cohort_table(cohort: str) -> pd.DataFrame:
     """var_name, hsapiens_gene_id, covariates, block, tau_shared, H1 readouts, golds, static scores. All 14+ cohorts in one schema."""
     h = pd.read_parquet(RES / f"H1/genes/{cohort}.parquet").set_index("hsapiens_gene_id")
-    if cohort in CANON:
+    if cohort in CANON and (RES / f"T4_3/cache/{cohort}__inputs.parquet").exists():
         c = pd.read_parquet(RES / f"T4_3/cache/{cohort}__inputs.parquet")
         t = c[["hsapiens_gene_id", "var_name", "prior_raw", "log_cp10k_spmean", "detection_spmean", "log_cds_length", "tau_shared", "block"]].set_index("hsapiens_gene_id")
     else:
