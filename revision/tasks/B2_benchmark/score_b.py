@@ -91,10 +91,12 @@ def gather(cohort: str, setting: str, index) -> dict:
         elif (HL / f"{src}.json").exists():
             n_disc += 1
         n_fits += 1
+    # Tiers: a setting scored on fewer than three replicates (tier 0, tier 1) reads what it has; n_reps says how many. With all three, at least MIN_REPS as committed.
+    mr = RU.MIN_REPS if len(d_frames) >= 3 else 1
     for k in METHODS_DIRECT + ["random"]:
-        out[k] = consensus([f[k] for f in d_frames if k in f], index)
+        out[k] = consensus([f[k] for f in d_frames if k in f], index, min_reps=mr)
     for k in METHODS_FIT:
-        out[k] = consensus(c_frames.get(k, []), index)
+        out[k] = consensus(c_frames.get(k, []), index, min_reps=mr)
     for t in RU.TOOLS:
         c, M = tool_scores(t, cohort, setting, index)
         if c is not None:
