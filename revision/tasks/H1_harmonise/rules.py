@@ -120,7 +120,7 @@ COHORTS = {
     "vz_primates": dict(tissue="eye", label="Eye primates", species="human, M. fascicularis, M. mulatta", h5ad=VZ / "van_zyl_primates.h5ad", table="van_zyl",
                         ct="cell_ontology_class", role="new", tried={42: "rev-vz-primates-grid2-s42", 43: "rev-vz-primates-s43", 44: "rev-vz-primates-s44"}),
     "vz_full": dict(tissue="eye", label="Eye 5 species", species="human, M. fascicularis, M. mulatta, mouse, pig", h5ad=VZ / "van_zyl_unified.h5ad", table="van_zyl",
-                    ct="cell_ontology_class", role="new", tried={42: "rev-vz-grid1-s42", **{s: f"rev-vz-s{s}" for s in range(43, 47)}}),
+                    ct="cell_ontology_class", role="new", tried={s: f"rev-vz-grid2-s{s}" for s in (42, 43, 44)}),  # grid 2 by the count rule (T11_2c, seed_map_winner.tsv); grid 1, "full_g1", is not an H1 row
 }
 # Added once Z1 lists their selected seeds: one row per run in extra_runs.tsv (cohort, seed, run); see README.
 PENDING = {

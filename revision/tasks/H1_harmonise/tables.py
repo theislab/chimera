@@ -217,6 +217,8 @@ def build_cohort(args) -> dict:
         ty = pd.read_csv(tidy, sep="\t").set_index("var_name").reindex(vn)
         ck["n_saturated_flag_differs_T11"] = int((ty["saturated_flag"].astype(bool).to_numpy() != g.saturated_flag.to_numpy()).sum())
         ck["max_abs_diff_D_tidy"] = float(np.abs(g["D"] - ty["delta_alpha_centred"]).max())
+        if ck["max_abs_diff_D_tidy"] > 1e-6 or ck["n_saturated_flag_differs_T11"]:
+            raise AssertionError(f"{c}: H1 and the T11 tidy table disagree (seeds or runs differ)")
     for k in ("o1_T2", "o1_M_wrong_row", "o1_M_false_zero", "o1_zero_any"):
         ck[f"n_{k}"] = int(g[k].fillna(False).sum())
     ck["n_strict"], ck["n_nameable"] = int(g.strict_support.sum()), int(g.nameable.sum())
