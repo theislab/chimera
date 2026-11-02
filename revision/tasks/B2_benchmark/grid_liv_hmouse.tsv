@@ -1,0 +1,67 @@
+cohort	setting	family	rep	seed	run	fit	chimera_from
+liv_hmouse	full	control	0	142	b2-liv_hmouse-full-r0	1	
+liv_hmouse	full	control	1	143	b2-liv_hmouse-full-r1	1	
+liv_hmouse	full	control	2	144	b2-liv_hmouse-full-r2	1	
+liv_hmouse	relabel10	label	0	142	b2-liv_hmouse-relabel10-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	relabel10	label	1	143	b2-liv_hmouse-relabel10-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	relabel10	label	2	144	b2-liv_hmouse-relabel10-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	relabel25	label	0	142	b2-liv_hmouse-relabel25-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	relabel25	label	1	143	b2-liv_hmouse-relabel25-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	relabel25	label	2	144	b2-liv_hmouse-relabel25-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	relabel50	label	0	142	b2-liv_hmouse-relabel50-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	relabel50	label	1	143	b2-liv_hmouse-relabel50-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	relabel50	label	2	144	b2-liv_hmouse-relabel50-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	relabel25_near	label	0	142	b2-liv_hmouse-relabel25_near-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	relabel25_near	label	1	143	b2-liv_hmouse-relabel25_near-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	relabel25_near	label	2	144	b2-liv_hmouse-relabel25_near-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	coarse	label	0	142	b2-liv_hmouse-coarse-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	coarse	label	1	143	b2-liv_hmouse-coarse-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	coarse	label	2	144	b2-liv_hmouse-coarse-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	fine	label	0	142	b2-liv_hmouse-fine-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	fine	label	1	143	b2-liv_hmouse-fine-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	fine	label	2	144	b2-liv_hmouse-fine-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	species_diff	label	0	142	b2-liv_hmouse-species_diff-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	species_diff	label	1	143	b2-liv_hmouse-species_diff-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	species_diff	label	2	144	b2-liv_hmouse-species_diff-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	nolabel	label	0	142	b2-liv_hmouse-nolabel-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	nolabel	label	1	143	b2-liv_hmouse-nolabel-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	nolabel	label	2	144	b2-liv_hmouse-nolabel-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	nolabel_r02	label	0	142	b2-liv_hmouse-nolabel_r02-r0	0	b2-liv_hmouse-full-r0
+liv_hmouse	nolabel_r02	label	1	143	b2-liv_hmouse-nolabel_r02-r1	0	b2-liv_hmouse-full-r1
+liv_hmouse	nolabel_r02	label	2	144	b2-liv_hmouse-nolabel_r02-r2	0	b2-liv_hmouse-full-r2
+liv_hmouse	type_missing	composition	0	142	b2-liv_hmouse-type_missing-r0	1	
+liv_hmouse	type_missing	composition	1	143	b2-liv_hmouse-type_missing-r1	1	
+liv_hmouse	type_missing	composition	2	144	b2-liv_hmouse-type_missing-r2	1	
+liv_hmouse	rare_types	composition	0	142	b2-liv_hmouse-rare_types-r0	1	
+liv_hmouse	rare_types	composition	1	143	b2-liv_hmouse-rare_types-r1	1	
+liv_hmouse	rare_types	composition	2	144	b2-liv_hmouse-rare_types-r2	1	
+liv_hmouse	size_1to1	composition	0	142	b2-liv_hmouse-size_1to1-r0	1	
+liv_hmouse	size_1to1	composition	1	143	b2-liv_hmouse-size_1to1-r1	1	
+liv_hmouse	size_1to1	composition	2	144	b2-liv_hmouse-size_1to1-r2	1	
+liv_hmouse	size_1to5	composition	0	142	b2-liv_hmouse-size_1to5-r0	1	
+liv_hmouse	size_1to5	composition	1	143	b2-liv_hmouse-size_1to5-r1	1	
+liv_hmouse	size_1to5	composition	2	144	b2-liv_hmouse-size_1to5-r2	1	
+liv_hmouse	size_1to20	composition	0	142	b2-liv_hmouse-size_1to20-r0	1	
+liv_hmouse	size_1to20	composition	1	143	b2-liv_hmouse-size_1to20-r1	1	
+liv_hmouse	size_1to20	composition	2	144	b2-liv_hmouse-size_1to20-r2	1	
+liv_hmouse	cells50	sampling	0	142	b2-liv_hmouse-cells50-r0	1	
+liv_hmouse	cells50	sampling	1	143	b2-liv_hmouse-cells50-r1	1	
+liv_hmouse	cells50	sampling	2	144	b2-liv_hmouse-cells50-r2	1	
+liv_hmouse	cells25	sampling	0	142	b2-liv_hmouse-cells25-r0	1	
+liv_hmouse	cells25	sampling	1	143	b2-liv_hmouse-cells25-r1	1	
+liv_hmouse	cells25	sampling	2	144	b2-liv_hmouse-cells25-r2	1	
+liv_hmouse	cells10	sampling	0	142	b2-liv_hmouse-cells10-r0	1	
+liv_hmouse	cells10	sampling	1	143	b2-liv_hmouse-cells10-r1	1	
+liv_hmouse	cells10	sampling	2	144	b2-liv_hmouse-cells10-r2	1	
+liv_hmouse	depth50	sampling	0	142	b2-liv_hmouse-depth50-r0	1	
+liv_hmouse	depth50	sampling	1	143	b2-liv_hmouse-depth50-r1	1	
+liv_hmouse	depth50	sampling	2	144	b2-liv_hmouse-depth50-r2	1	
+liv_hmouse	depth25	sampling	0	142	b2-liv_hmouse-depth25-r0	1	
+liv_hmouse	depth25	sampling	1	143	b2-liv_hmouse-depth25-r1	1	
+liv_hmouse	depth25	sampling	2	144	b2-liv_hmouse-depth25-r2	1	
+liv_hmouse	extra_batch	technical	0	142	b2-liv_hmouse-extra_batch-r0	1	
+liv_hmouse	extra_batch	technical	1	143	b2-liv_hmouse-extra_batch-r1	1	
+liv_hmouse	extra_batch	technical	2	144	b2-liv_hmouse-extra_batch-r2	1	
+liv_hmouse	chemistry	technical	0	142	b2-liv_hmouse-chemistry-r0	1	
+liv_hmouse	chemistry	technical	1	143	b2-liv_hmouse-chemistry-r1	1	
+liv_hmouse	chemistry	technical	2	144	b2-liv_hmouse-chemistry-r2	1	
