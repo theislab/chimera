@@ -12,7 +12,7 @@ import scipy.sparse as sp
 
 from revision.tasks.Z2_embedding import rules as RU
 
-MANIFEST = [("bone_marrow", 42)]   # the only core cohort with no scVI latent on disk; others reuse Y5 and training/runs/baselines_scvi
+MANIFEST = [("bone_marrow", 42)] + [(c, s) for c in ("kidney", "islet", "test_hmouse", "test_3sp", "test_hmac", "liv_hmonkey", "bone_marrow") for s in (42, 43, 44) if (c, s) != ("bone_marrow", 42)]
 
 
 def chimera_batch_key(c: str) -> str:

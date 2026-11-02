@@ -83,7 +83,7 @@ BASE = {
     "liv_hmouse": "--adata data/processed/camex_human_mouse.h5ad --max-epochs 150 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0",
     "test_hmouse": "--adata data/processed/camex_testis_human_mouse.h5ad --max-epochs 200 --adv-weight 200 --lambda-anchor 0.003 --free-bits 1.0 --prior-clamp-max 0.85 --celltype-conditional-mmd --celltype-key cell_ontology_class",
 }
-FACTORIAL_SEEDS = {"liv_hmouse": [42, 43]}
+FACTORIAL_SEEDS = {"liv_hmouse": [42, 43, 44], "test_hmouse": [42, 43]}
 # level -> (encoder input, what replaces or adds to the base args). Later flags win in argparse.
 LEVELS = {
     "adv100": ("raw", "--adv-weight 100"), "adv50": ("raw", "--adv-weight 50"), "adv0": ("raw", "--adv-weight 0"),
@@ -96,10 +96,10 @@ LEVELS = {
     # Mechanism tests, not settings: the encoder reads raw counts (chimera/_module.py forward and _encoder_input). train_patched.py overrides that method from outside the package.
     "logx": ("log1p", ""), "logcp": ("logcp", ""), "logx_adv0mmd0": ("log1p", "--adv-weight 0 --lambda-mmd 0"),
 }
-# Amended (SLURM budget from the coordinator: 30 tasks in total, 10 in queue at once): liver H+Mouse only, 2 seeds, one knob at a time around the canonical recipe. 26 runs here,
-# 1 scVI on bone marrow (no scVI latent on disk), 3 kept for reruns or for a level that passes on liver. Second-cohort evidence comes from existing grids (rules.EXISTING_GRIDS), not new runs.
+# Budget amendment withdrawn by the coordinator (amendments 1, 2): the factorial as committed runs in full. The order in factorial.tsv is priority order, and rows only ever append.
 COHORT_LEVELS = {
-    "liv_hmouse": ["logx", "logcp", "adv50", "adv0", "mmd10", "mmd0", "cmmd", "fb05", "fb2", "nl20", "ep300", "klw5", "res01"],
+    "liv_hmouse": ["logx", "logcp", "adv50", "adv0", "mmd10", "mmd0", "cmmd", "fb05", "fb2", "nl20", "ep300", "klw5", "res01", "adv100", "adv0mmd0", "novamp", "nl30", "zb0", "logx_adv0mmd0"],
+    "test_hmouse": ["adv100", "adv0", "mmd10", "mmd0", "adv0mmd0", "gmmd", "fb05", "fb2", "nl20", "klw5", "logx", "logx_adv0mmd0"],
 }
 # Existing runs that already differ by one knob. Single seeds, read as dose evidence only: runs with a healthy Z1 row enter.
 EXISTING_GRIDS = {
@@ -121,8 +121,7 @@ def base_seed_runs(cohort: str) -> dict[int, str]:
     return {s: f"rev-{cohort}-s{s}" for s in (range(45, 52) if cohort == "liv_hmouse" else range(43, 52))}
 
 
-# Decision rule, fixed before reading. A setting is "clearly better" only if ALL hold, on seeds passing the Z1 health rule (both seeds of a level). Amended: new runs on liver H+Mouse only;
-# a level passing there is a candidate, and its testis leg (test H+Mouse, macaque held out) uses the kept tasks.
+# Decision rule, fixed before reading. A setting is "clearly better" only if ALL hold on both factorial cohorts, on seeds passing the Z1 health rule (at least 2 per level):
 THRESH = dict(
     min_healthy=2,
     gain_liver_tms_auroc=0.10,    # liver TMS zone AUROC through the encoder, mean over seeds, above base by at least this
