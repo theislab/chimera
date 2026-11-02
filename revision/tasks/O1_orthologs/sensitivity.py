@@ -23,7 +23,7 @@ from revision.tasks.T4_3_scoreboard import inputs as I
 from revision.tasks.T4_3_scoreboard import run as R
 from revision.tasks.T4_3_scoreboard import stats as S
 
-TIERS = ["T1", "T2", "T2L", "MAP", "T3", "TZ", "T2T"]
+TIERS = ["T1", "T2", "T2L", "MAP", "T3", "TZ", "T2T", "R2", "R3"]
 TOOLS = RU.REPO / "results/revision/T5_6/tools_primary.csv"
 
 

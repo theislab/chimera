@@ -32,12 +32,15 @@ def h1(tier: str, jobs: int) -> None:
     out = RU.RES / f"h1_{tier}"
     (out / "genes").mkdir(parents=True, exist_ok=True)
     for c, x in F.items():
-        g = pd.read_parquet(RU.REPO / f"results/revision/H1/genes/{c}.parquet")
+        src = RU.REPO / f"results/revision/H1/genes/{c}.parquet"
+        if not src.exists():  # the two eye fits not yet in H1's own tables
+            continue
+        g = pd.read_parquet(src)
         g = g[~g.hsapiens_gene_id.isin(set(x.hsapiens_gene_id[x[tier]]))]
         g.to_parquet(out / "genes" / f"{c}.parquet")
     for f in ("runs.tsv",):
         shutil.copy(RU.REPO / f"results/revision/H1/{f}", out / f)
-    env = dict(os.environ, H1_OUT=str(out), PYTHONPATH=str(RU.REPO))
+    env = dict(os.environ, H1_OUT=str(out), PYTHONPATH=str(RU.REPO), H1_EXTRA=str(out / "no_extra_runs.tsv"))  # the 14 cohorts of H1's tables
     subprocess.run([sys.executable, str(RU.REPO / "revision/tasks/H1_harmonise/recurrence.py"), "--jobs", str(jobs)], env=env, check=True)
 
 
@@ -75,7 +78,7 @@ def x4(tier: str, jobs: int) -> None:
     CM.N_JOBS = jobs
     A.N_JOBS = jobs
     G = {c: A.prepare(c) for c in A.RU.COHORTS}
-    for s in ("adds", "x1", "x2"):
+    for s in ("adds", "x1", "x2", "mechanism"):
         print("==", s, flush=True)
         A.SECTIONS[s](G)
 

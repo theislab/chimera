@@ -27,6 +27,7 @@ def sp_key(x: str) -> str:
 
 def main():
     P = pd.read_parquet(RU.RES / "table_pairs_flags.parquet")
+    P["R2"] = P.T1 | P.F_retro | P.F_named | (P.F_lowconf & ~((P.goc_score >= 50) & (P.wga_coverage >= 50)))
     M = pd.read_parquet(RU.RES / "mapping_rows.parquet")
     rows, gene_rows = [], []
     pair_flags = ["F_absent", "F_ncrna", "F_type", "F_biotype", "F_lowconf", "F_nosynt", "F_retro", "F_named_raw", "F_named", "F_later", "F_earlier", "T1", "T2"]
@@ -52,9 +53,9 @@ def main():
         pt = P[P.table == v["table"]].set_index(["species", "ortholog_group_id"])
         for k in cols_all:
             sub = pt.xs(k, level="species").reindex(gi)
-            for f in ["T1", "T2", "F_later"]:
+            for f in ["T1", "T2", "F_later", "R2"]:
                 g[f"{f}_{k}"] = sub[f].fillna(False).astype(bool).to_numpy()
-        for tier in ("T1", "T2"):
+        for tier in ("T1", "T2", "R2"):
             g[tier] = g[[f"{tier}_{k}" for k in partners]].any(axis=1)
             g[f"{tier}_table"] = g[[f"{tier}_{k}" for k in cols_all]].any(axis=1)
         g["T2L"] = g.T2 | g[[f"F_later_{k}" for k in partners]].any(axis=1)
@@ -69,6 +70,7 @@ def main():
         g["M_wrong_row"], g["M_false_zero"] = wrong, false0
         g["T3"] = g.T2 | g.M_wrong_row | g.M_false_zero
         g["T3b"] = g.T2L | g.M_wrong_row | g.M_false_zero
+        g["R3"] = g.R2 | g.M_wrong_row | g.M_false_zero
         g["TZ"] = g.T3 | g.zero_any
         gene_rows.append(g)
         for k in partners:
@@ -84,12 +86,13 @@ def main():
         print(c, len(g), {t: int(g[t].sum()) for t in ["T1", "T2", "T2L", "M_wrong_row", "M_false_zero", "T3", "zero_any", "TZ"]}, "table-wide T2", int(g.T2_table.sum()), spc, flush=True)
         a.file.close()
     G = pd.concat(gene_rows, ignore_index=True)
-    G.to_parquet(RU.RES / "flags_by_cohort.parquet")
+    G.to_parquet(RU.RES / "flags_by_cohort.parquet.tmp")
+    (RU.RES / "flags_by_cohort.parquet.tmp").replace(RU.RES / "flags_by_cohort.parquet")
     R = pd.DataFrame(rows)
     for f in pair_flags + ["zero_species", "goc_lt50", "wga_lt50"]:
         R[f"{f}_share"] = R[f] / R.n_pairs
     R.to_csv(RU.RES / "audit_by_cohort_species.csv", index=False)
-    S = G.groupby("cohort", sort=False)[["T1", "T2", "T2L", "M_wrong_row", "M_false_zero", "T3", "zero_any", "TZ", "T2_table"]].agg(["sum", "mean"])
+    S = G.groupby("cohort", sort=False)[["T1", "T2", "R2", "T2L", "M_wrong_row", "M_false_zero", "T3", "R3", "zero_any", "TZ", "T2_table"]].agg(["sum", "mean"])
     S.columns = [f"{a}_{'n' if b == 'sum' else 'share'}" for a, b in S.columns]
     S.insert(0, "n_genes", G.groupby("cohort", sort=False).size())
     S.to_csv(RU.RES / "audit_by_cohort.csv")

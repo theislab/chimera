@@ -26,6 +26,7 @@ Tiers, nested, used for every impact table:
   T3 "core + mapping": T2 | M_wrong_row | M_false_zero (mapping.py). Canonical cohorts only add anything here.
   T2L "core + drift": T2 | F_later (sensitivity: pairs gone by Compara 116; LYZ to 9530003J23Rik falls here and nowhere earlier).
   TZ "zero": T3 | gene with an exact zero count total in any species of the cohort (structural zeros, Y6 macaque testis, C36 zebrafish).
+  R2, R3 (post hoc, after reading PODXL and SPINK2 in the named list; no gold seen): R2 = T1 | F_retro | F_named | (F_lowconf and not (GOC >= 50 and WGA >= 50)). R3 = R2 + mapping flags.
 Count mapping flags (mapping.py; canonical cohorts, which were joined by gene symbol; raw matrices carry the Ensembl ID where available):
   M_wrong_row  the row picked by the table's species symbol carries an Ensembl ID that differs from the table's species ID and is a
                different gene in Ensembl 110 (its ID is in the 110 GTF);
@@ -41,6 +42,7 @@ from pathlib import Path
 
 from revision.common import gene_ids
 from revision.tasks.H1_harmonise.rules import COHORTS as H1_COHORTS
+from revision.tasks.H1_harmonise.rules import load_extra as H1_load_extra
 
 REPO = gene_ids.REPO_ROOT
 DATA = REPO / "data" / "revision" / "O1"
@@ -73,6 +75,11 @@ COHORT_TABLE = {"liv_hmonkey": "liver", "liv_hmouse": "liver", "liv_hzeb": "live
                 "test_3sp": "testis", "bone_marrow": "bone_marrow", "kidney": "kidney", "islet": "testis", "vz_hmouse": "van_zyl", "vz_hmmul": "van_zyl",
                 "vz_primates": "van_zyl", "vz_full": "van_zyl"}
 COHORTS = {k: dict(h5ad=Path(v["h5ad"]), table=COHORT_TABLE[k], label=v["label"]) for k, v in H1_COHORTS.items()}
+# The two eye pair fits that joined H1 after the 14 (extra_runs.tsv): flagged too, so H1's recurrence code can run; reported apart.
+_EXTRA = {k: v for k, v in H1_load_extra().items() if k not in COHORTS}
+for k, v in _EXTRA.items():
+    COHORT_TABLE[k] = "van_zyl"
+    COHORTS[k] = dict(h5ad=Path(v["h5ad"]), table="van_zyl", label=v["label"])
 OBS_SPECIES = {"human": "hsapiens", "monkey": "mmulatta", "macaque": "mmulatta", "mouse": "mmusculus", "zebrafish": "drerio", "mouse_lemur": "mmurinus",
                "macaca_fascicularis": "mfascicularis", "macaca_mulatta": "mmulatta", "pig": "sscrofa"}
 FLAGS_T1 = ["F_absent", "F_type", "F_ncrna", "F_biotype"]
