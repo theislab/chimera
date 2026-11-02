@@ -1,5 +1,5 @@
-"""H1 figures. Supplementary: one figure per new tissue with the first submission's standard panels, same axes, palette, order and fonts as the liver and testis originals. Main candidate:
-one reading across six tissues. Scripts read results/revision/H1/ only; no model is loaded.
+"""H1 figures, one PDF per panel in results/revision/H1/panels/, composed by F1_figures/compose.py with specs_h1.py. Supplementary: one figure per new tissue with the first submission's
+standard panels, same axes, palette, order and fonts as the liver and testis originals. Main candidate: one reading across six tissues. Scripts read results/revision/H1/ only; no model is loaded.
 
 Panels reuse the originals' forms: notebooks/_alpha_master_builder.py (A1.1-A1.3), _alpha_biology_simpler_builder.py (category boxes with d and q), _pathway_builder.py (Hallmark volcano),
 revision/tasks/T8_4_figures/fig4_additions.py (landscape, cell-type drivers), X5_sequence_axis/run.py (axis scatter). Design: notebooks/_figure_design.py.
@@ -10,6 +10,10 @@ from __future__ import annotations
 
 import argparse
 import re
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
 
 import matplotlib
 
@@ -18,7 +22,6 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from adjustText import adjust_text  # noqa: E402
-from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patches import Patch, Rectangle  # noqa: E402
 from scipy.stats import spearmanr, wilcoxon  # noqa: E402
@@ -55,11 +58,25 @@ def genes(c: str) -> pd.DataFrame:
 
 
 def named(g: pd.DataFrame) -> pd.DataFrame:
-    return g[g.strict_support & g.symbol.notna()]
+    return g[g.nameable & g.symbol.notna()]
 
 
-def letter(ax, s, x=-0.14, y=1.04):
-    ax.text(x, y, s, transform=ax.transAxes, fontsize=9, fontweight="bold", color=cm.INK, ha="right", va="bottom")
+def gene_label(r) -> str:
+    """^ alpha above 0.95 in a seed; section sign, pair flagged by the ortholog audit (kept, read with care)."""
+    return f"{r.symbol}{'^' if r.saturated_flag else ''}{'§' if bool(r.o1_T2) else ''}"
+
+
+PANELS = OUT / "panels"
+
+
+def panel_rc() -> None:
+    plt.rcParams.update({"font.size": 6.5, "axes.labelsize": 6.5, "xtick.labelsize": 5.6, "ytick.labelsize": 5.6, "legend.fontsize": 5.4})
+
+
+def psave(fig: plt.Figure, name: str) -> None:
+    PANELS.mkdir(parents=True, exist_ok=True)
+    fig.savefig(PANELS / f"{name}.pdf", format="pdf", bbox_inches="tight", pad_inches=0.015)
+    plt.close(fig)
 
 
 def clean_axes(ax):
@@ -93,7 +110,7 @@ def p_overlay(ax, g):
     fd.style_alpha_axis(ax, "x")
     ax.set_ylabel(fd.LABEL["density"])
     fd.thin_legend(ax, loc="upper left")
-    ax.text(0.03, 0.62, f"$n={len(g):,}$ genes\nmean $\\alpha={g.alpha.mean():.3f}$\nstd $={g.alpha.std():.3f}$", transform=ax.transAxes, fontsize=7, color="#222222", va="top")
+    ax.text(0.03, 0.56, f"$n={len(g):,}$ genes\nmean $\\alpha={g.alpha.mean():.3f}$\nstd $={g.alpha.std():.3f}$", transform=ax.transAxes, fontsize=5.6, color="#222222", va="top")
 
 
 def lineage_named(tissue, g):
@@ -111,27 +128,27 @@ def top_named(g, k=10):
     return pd.concat([n.nlargest(k, "D"), n.nsmallest(k, "D")])
 
 
-def p_landscape(fig, spec, g, tissue):
-    gs = GridSpecFromSubplotSpec(2, 2, spec, width_ratios=[5, 1], height_ratios=[1, 5], hspace=0.05, wspace=0.05)
+def p_landscape(g, tissue) -> plt.Figure:
+    fig = plt.figure(figsize=(4.05, 1.9))
+    gs = fig.add_gridspec(2, 2, width_ratios=[6, 1], height_ratios=[1, 6], hspace=0.05, wspace=0.03)
     ax = fig.add_subplot(gs[1, 0])
     top = fig.add_subplot(gs[0, 0], sharex=ax)
     right = fig.add_subplot(gs[1, 1], sharey=ax)
     fd.density_scatter(ax, g.pi_raw, g.D, s=1.6, alpha=0.25, color="#BBBBBB")
     ax.axhline(0, color="#888888", lw=0.5, ls="--", zorder=2)
     nm = lineage_named(tissue, g)
-    n2 = named(g)
     texts = []
     for theme, s in nm.groupby("theme", sort=False):
-        ax.scatter(s.pi, s.D, s=14, color=s.color.iloc[0], edgecolor="white", linewidth=0.4, zorder=4, label=theme)
-    sel = nm.reindex(nm.D.abs().sort_values(ascending=False).index).head(22)
+        ax.scatter(s.pi, s.D, s=11, color=s.color.iloc[0], edgecolor="white", linewidth=0.3, zorder=4, label=theme)
+    sel = nm.reindex(nm.D.abs().sort_values(ascending=False).index).head(18)
     for r in sel.itertuples():
         texts.append(ax.text(r.pi, r.D, r.symbol, fontsize=4.8, ha="center", va="center", color=cm.INK, zorder=5))
     ax.set_xlabel("protein-identity prior π")
     ax.set_ylabel("Δα (centred)")
     ax.set_xlim(0.15, 1.0)
-    ax.set_ylim(-0.45, 0.45)
+    ax.set_ylim(-0.6, 0.6)
     top.hist(g.pi_raw, bins=60, color="#999999", edgecolor="none")
-    right.hist(g.D.clip(-0.45, 0.45), bins=60, color="#999999", edgecolor="none", orientation="horizontal")
+    right.hist(g.D.clip(-0.6, 0.6), bins=60, color="#999999", edgecolor="none", orientation="horizontal")
     for a, hide in ((top, ("top", "right", "left")), (right, ("top", "right", "bottom"))):
         for sp in hide:
             a.spines[sp].set_visible(False)
@@ -143,7 +160,7 @@ def p_landscape(fig, spec, g, tissue):
         adjust_text(texts, x=sel.pi.to_numpy(), y=sel.D.to_numpy(), ax=ax, expand=(1.25, 1.6), force_text=(0.4, 0.7), force_static=(0.3, 0.5), arrowprops=dict(arrowstyle="-", color="#999999", lw=0.3), min_arrow_len=1.0)
     if len(nm):
         ax.legend(loc="lower left", fontsize=5, handletextpad=0.1, borderaxespad=0.1, frameon=False)
-    return ax, top
+    return fig
 
 
 def p_categories(ax, g, tissue, members):
@@ -156,17 +173,17 @@ def p_categories(ax, g, tissue, members):
                flierprops=dict(marker="o", markersize=1.0, markerfacecolor="#222222", markeredgecolor="none", alpha=0.4))
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--", zorder=0)
     ax.set_xlim(-0.20, 0.20)
-    ax.set_xticks([-0.20, -0.10, 0.0, 0.10, 0.20])
-    ax.set_xticklabels([f"{v:.2f}" for v in [-0.20, -0.10, 0.0, 0.10, 0.20]])
+    ax.set_xticks([-0.20, 0.0, 0.20])
+    ax.set_xticklabels([f"{v:.2f}" for v in [-0.20, 0.0, 0.20]])
     ax.set_xlabel(r"$\Delta\alpha$ (centred)")
     ax.set_yticks(range(len(order)))
-    ax.set_yticklabels(order, fontsize=6)
+    ax.set_yticklabels(order, fontsize=5.6)
     sd = g.D.std()
     ps = [wilcoxon(x, alternative="two-sided", zero_method="wilcox")[1] if len(x) > 5 else 1.0 for x in data]
     q = bh(ps)
     for i, c in enumerate(order):
         ax.text(1.02, i, rf"$d\!=\!{np.mean(data[i]) / sd:+.2f}$" + ("  ★" if q[i] < 0.05 else ""), ha="left", va="center", fontsize=5, color="#444444", transform=ax.get_yaxis_transform(), clip_on=False)
-        ax.text(-0.04, i - 0.32, f"$n${len(data[i])}", ha="right", va="center", fontsize=4.5, color="#999999", transform=ax.get_yaxis_transform(), clip_on=False)
+        ax.text(-0.04, i - 0.32, f"$n${len(data[i])}", ha="right", va="center", fontsize=4.6, color="#999999", transform=ax.get_yaxis_transform(), clip_on=False)
 
 
 def clean_term(t, max_len=30):
@@ -188,7 +205,7 @@ def p_volcano(ax, df, nes_lim=3.2, nlf_max=3.5):
     pts = []
     for sub in (sp, sn):
         for _, r in sub.assign(a=sub.NES.abs()).nlargest(3, "a").iterrows():
-            texts.append(ax.text(r.NES, r.nlf, clean_term(r.Term, 22), fontsize=4.6, ha="center", va="bottom", color="#222222"))
+            texts.append(ax.text(r.NES, r.nlf, clean_term(r.Term, 22), fontsize=4.7, ha="center", va="bottom", color="#222222"))
             pts.append((r.NES, r.nlf))
     ax.set_xlim(-nes_lim, nes_lim)
     ax.set_ylim(-0.1, nlf_max * 1.3)
@@ -230,7 +247,7 @@ def p_drivers(ax, c, g, tissue):
     if C is None:
         ax.text(0.5, 0.5, "forward pass pending", transform=ax.transAxes, ha="center")
         return
-    sel = pd.concat([nm.nlargest(9, "D"), nm.nsmallest(9, "D")]).drop_duplicates("symbol").sort_values("D")
+    sel = pd.concat([nm.nlargest(7, "D"), nm.nsmallest(7, "D")]).drop_duplicates("symbol").sort_values("D")
     if len(sel) < 8:
         extra = top_named(g, 6)
         extra = extra[~extra.symbol.isin(sel.symbol)].assign(pi=lambda d: d.pi_raw, theme="", color="")[["symbol", "theme", "color", "D", "pi"]]
@@ -251,11 +268,12 @@ def p_drivers(ax, c, g, tissue):
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=0)
     ax.set_yticks(range(len(sel)))
     ax.set_yticklabels([f"{r.symbol}  ({r.D:+.2f})" for r in sel.itertuples()], fontsize=5.0)
+    ax.tick_params(axis="y", pad=1)
     ax.set_ylim(len(sel) - 0.4, -0.6)
     ax.set_xlabel("contribution to $S_g$, by cell type\n(tick: total $S_g$; Δα in brackets)", fontsize=6)
     w = shares.weight
     hs = [Patch(color=col, label=f"{type_label(name)} ({w.reindex(ts).sum():.2f})" if ts else name) for name, ts, col in groups]
-    ax.legend(handles=hs, loc="upper center", bbox_to_anchor=(0.35, -0.23), ncol=2, fontsize=4.4, handlelength=0.9, columnspacing=0.6, frameon=False)
+    ax.legend(handles=hs, loc="upper center", bbox_to_anchor=(0.3, -0.36), ncol=2, fontsize=4.7, handlelength=0.9, columnspacing=0.6, frameon=False)
 
 
 def p_top(ax, g, c, k=12):
@@ -267,7 +285,7 @@ def p_top(ax, g, c, k=12):
     ax.barh(ys, t.D, color=[UP if v > 0 else DOWN for v in t.D], height=0.68, lw=0)
     ax.axvline(0, color=cm.MUTED, lw=0.6)
     ax.set_yticks(ys)
-    ax.set_yticklabels([s + ("^" if f else "") for s, f in zip(t.symbol, t.saturated_flag)], fontsize=5.0)
+    ax.set_yticklabels([gene_label(r) for r in t.itertuples()], fontsize=5.0)
     ax.set_ylim(len(t) - 0.4, -0.6)
     ax.set_xlim(-0.5, 0.5)
     ax.set_xlabel("Δα (centred)")
@@ -275,7 +293,7 @@ def p_top(ax, g, c, k=12):
         for y, vn, d in zip(ys, t.index, t.D):
             row = C.loc[vn]
             dom = row.abs().idxmax()
-            ax.text(-0.02 if d > 0 else 0.02, y, type_label(dom)[:20], fontsize=4.2, color=cm.MUTED, ha="right" if d > 0 else "left", va="center")
+            ax.text(-0.02 if d > 0 else 0.02, y, type_label(dom)[:20], fontsize=4.6, color=cm.MUTED, ha="right" if d > 0 else "left", va="center")
 
 
 def p_count(ax, g):
@@ -318,31 +336,36 @@ def p_eye_models(ax):
     ax.set_xlabel(r"$\Delta\alpha$ (centred)")
     ax.set_ylabel(fd.LABEL["density"])
     ax.axvline(0, color="#888888", lw=0.6, ls="--")
-    fd.thin_legend(ax, loc="upper left")
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.0)
+    ax.legend(loc="upper left", bbox_to_anchor=(0.56, 1.04), fontsize=4.7, ncol=1, handlelength=1.0, labelspacing=0.15, frameon=False, borderaxespad=0)
 
 
-def supp_figure(tissue: str, c: str, name: str) -> plt.Figure:
+def one(draw, size, *args, **kw) -> plt.Figure:
+    fig, ax = plt.subplots(figsize=size, layout="constrained")
+    clean_axes(ax)
+    draw(ax, *args, **kw)
+    return fig
+
+
+def supp_panels(tissue: str, c: str, stem: str) -> None:
     g = genes(c)
     g["var_name"] = g.index
     mem = pd.read_csv(OUT / "sets_membership.csv")
     gsea = pd.read_csv(OUT / "gsea" / f"{c}.csv")
-    fig = plt.figure(figsize=(7.2, 10.2))
-    G = GridSpec(4, 3, figure=fig, height_ratios=[0.8, 1.35, 1.25, 1.0], hspace=0.56, wspace=0.62, left=0.075, right=0.955, top=0.975, bottom=0.05)
-    ax = fig.add_subplot(G[0, 0]); p_scatter(ax, g); letter(ax, "a", -0.2)
-    ax = fig.add_subplot(G[0, 1]); p_hist(ax, g); letter(ax, "b", -0.2)
-    ax = fig.add_subplot(G[0, 2]); p_overlay(ax, g); letter(ax, "c", -0.2)
-    a2, top = p_landscape(fig, G[1, :2], g, tissue); letter(top, "d", -0.1, 0.8)
-    ax = fig.add_subplot(G[1, 2]); p_categories(ax, g, tissue, mem); letter(ax, "e", -0.65, 1.01)
-    ax = fig.add_subplot(G[2, 0]); p_volcano(ax, gsea, nes_lim=3.2, nlf_max=3.5); letter(ax, "f", -0.2)
-    ax = fig.add_subplot(G[2, 1]); p_drivers(ax, c, g, tissue); letter(ax, "g", -0.55, 1.01)
-    ax = fig.add_subplot(G[2, 2]); p_top(ax, g, c, 10); letter(ax, "h", -0.28, 1.01)
-    ax = fig.add_subplot(G[3, 0]); p_archetypes(ax, c); letter(ax, "i", -0.2)
-    ax = fig.add_subplot(G[3, 1]); p_count(ax, g); letter(ax, "j", -0.2)
+    psave(one(p_scatter, (2.2, 1.2), g), f"{stem}_a")
+    psave(one(p_hist, (2.2, 1.2), g), f"{stem}_b")
+    psave(one(p_overlay, (2.2, 1.2), g), f"{stem}_c")
+    psave(p_landscape(g, tissue), f"{stem}_d")
+    psave(one(p_categories, (2.3, 1.9), g, tissue, mem), f"{stem}_e")
+    psave(one(p_volcano, (2.0, 1.7), gsea, nes_lim=3.2, nlf_max=3.5), f"{stem}_f")
+    psave(one(p_drivers, (2.45, 1.75), c, g, tissue), f"{stem}_g")
+    psave(one(p_top, (2.2, 1.7), g, c, 8), f"{stem}_h")
+    psave(one(p_archetypes, (2.2, 1.05), c), f"{stem}_i")
+    psave(one(p_count, (2.2, 1.05), g), f"{stem}_j")
     if tissue == "eye":
-        ax = fig.add_subplot(G[3, 2]); p_eye_models(ax); letter(ax, "k", -0.2)
+        psave(one(p_eye_models, (2.2, 1.05)), f"{stem}_k")
     else:
-        ax = fig.add_subplot(G[3, 2]); p_support(ax, g); letter(ax, "k", -0.28)
-    return fig
+        psave(one(p_support, (2.2, 1.05), g), f"{stem}_k")
 
 
 # ---------------------------------------------------------------- main candidate
@@ -359,7 +382,7 @@ def cloud(ax, x, y, sup):
 
 def main_axis() -> plt.Figure:
     ax_t = pd.read_csv(OUT / "axis.csv")
-    fig, axes = plt.subplots(3, 6, figsize=(fd.DOUBLE_W + 0.4, 3.15), sharey="row", layout="constrained", gridspec_kw=dict(height_ratios=[0.7, 1, 1]))
+    fig, axes = plt.subplots(3, 6, figsize=(fd.DOUBLE_W + 0.15, 2.85), sharey="row", layout="constrained", gridspec_kw=dict(height_ratios=[0.7, 1, 1]))
     for j, t in enumerate(RU.TISSUE_ORDER):
         c = RU.PRIMARY[t]
         g = genes(c)
@@ -440,8 +463,8 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
     cols = RU.TISSUE_ORDER
     M = D.loc[rows, [f"z_{t}" for t in cols]].to_numpy(float)
     Q = D.loc[rows, [f"q_{t}" for t in cols]].to_numpy(float)
-    rh = 0.128
-    w_label, w_col, w_side = 1.62, 0.37, 0.3
+    rh = 0.112
+    w_label, w_col, w_side = 1.78, 0.5, 0.36
     W_in = w_label + 6 * w_col + 0.08 + 5 * w_side
     top_in, bot_in = 0.42, 0.04
     H = rh * len(rows) + top_in + bot_in
@@ -453,15 +476,15 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
         for j in range(M.shape[1]):
             v = M[i, j]
             if not np.isfinite(v):
-                ax.text(j, i, "—", ha="center", va="center", fontsize=4.8, color=cm.MUTED)
+                ax.text(j, i, "—", ha="center", va="center", fontsize=5, color=cm.MUTED)
                 continue
             col = "#ffffff" if abs(v) > 0.62 * vmax else "#222222"
-            ax.text(j, i, f"{v:+.1f}" + ("*" if Q[i, j] < 0.05 else ""), ha="center", va="center", fontsize=4.8, color=col)
+            ax.text(j, i, f"{v:+.1f}" + ("*" if Q[i, j] < 0.05 else ""), ha="center", va="center", fontsize=5, color=col)
     ax.set_xticks(range(len(cols)))
     ax.set_xticklabels([TISSUE_LABEL[t] for t in cols], fontsize=5.6, rotation=30, ha="left", rotation_mode="anchor")
     ax.xaxis.tick_top()
     ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([label_set(k) for k in rows], fontsize=5.2)
+    ax.set_yticklabels([label_set(k) for k in rows], fontsize=5.3)
     ax.tick_params(length=0)
     for sp in ax.spines.values():
         sp.set_visible(False)
@@ -477,13 +500,13 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
         ax2.text(j, -1.0, hd, fontsize=5.6, ha="center", va="bottom", color=cm.INK)
     for i, k in enumerate(rows):
         q = D.q_rec[k]
-        ax2.text(0, i, f"{q:.3f}" if q >= 0.001 else "<.001", fontsize=4.6, ha="center", va="center", color=cm.INK if k in keys else cm.MUTED)
+        ax2.text(0, i, f"{q:.3f}" if q >= 0.001 else "<.001", fontsize=4.9, ha="center", va="center", color=cm.INK if k in keys else cm.MUTED)
         for j, tab in zip((1, 2), (S, B)):
             r = tab.loc[k]
-            ax2.text(j, i, f"{int(r.n_up)}↑{int(r.n_down)}↓", fontsize=4.6, ha="center", va="center", color=cm.INK if r.recurrent else cm.MUTED)
+            ax2.text(j, i, f"{int(r.n_up)}↑{int(r.n_down)}↓", fontsize=4.9, ha="center", va="center", color=cm.INK if r.recurrent else cm.MUTED)
         for j, tab in zip((3, 4), (PI, W)):
             r = tab.loc[k]
-            ax2.text(j, i, f"{r.mean_z:+.1f}", fontsize=4.6, ha="center", va="center", color=cm.INK if abs(r.mean_z) >= RU.Z_CALL else cm.MUTED)
+            ax2.text(j, i, f"{r.mean_z:+.1f}", fontsize=4.9, ha="center", va="center", color=cm.INK if abs(r.mean_z) >= RU.Z_CALL else cm.MUTED)
     ax2.axis("off")
     ax2.set_ylim(ax.get_ylim())
     return fig
@@ -522,7 +545,7 @@ def main_lineage() -> plt.Figure:
 
 
 def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
-    fig, axes = plt.subplots(1, 6, figsize=(fd.DOUBLE_W + 0.4, 2.1), layout="constrained", sharex=True)
+    fig, axes = plt.subplots(1, 6, figsize=(fd.DOUBLE_W + 0.15, 1.95), layout="constrained", sharex=True)
     for ax, t in zip(axes, RU.TISSUE_ORDER):
         c = RU.PRIMARY[t]
         n = named(genes(c))
@@ -545,27 +568,40 @@ def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
         ax.set_title(TISSUE_LABEL[t], fontsize=7.5, fontweight="bold", pad=3)
         ax.spines["left"].set_visible(False)
         for yy, r in zip(y, sel.itertuples()):
-            ax.text(-0.012 if r.D > 0 else 0.012, yy, r.symbol + ("^" if r.saturated_flag else ""), fontsize=5.1, ha="right" if r.D > 0 else "left", va="center", color=cm.INK, fontweight="bold" if r.symbol in panel else "normal")
+            ax.text(-0.012 if r.D > 0 else 0.012, yy, gene_label(r), fontsize=5.2, ha="right" if r.D > 0 else "left", va="center", color=cm.INK, fontweight="bold" if r.symbol in panel else "normal")
     return fig
+
+
+def y1_masked() -> None:
+    """Y1's panel with its own letters covered, so that compose labels its six panels in sequence. Vector kept; the source file is not changed."""
+    src = cm.FIG_OUT / "fig_h1_y1_slot.pdf"
+    W, H = 511.914, 429.135
+    boxes = [(41.0, 1.8, 48.2, 13.1), (297.6, 1.8, 305.1, 13.1), (41.8, 125.0, 48.2, 136.2), (295.1, 125.0, 302.6, 136.2), (41.0, 288.1, 48.2, 299.4), (297.6, 288.1, 302.6, 299.4)]
+    rules = "\n".join(f"\\put({x0},{H - y1:.2f}){{\\color{{white}}\\rule{{{x1 - x0:.2f}\\unitlength}}{{{y1 - y0:.2f}\\unitlength}}}}" for x0, y0, x1, y1 in boxes)
+    tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx,xcolor}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
+           "\\begin{document}\\setlength{\\unitlength}{1bp}\\begin{picture}(%s,%s)(0,0)\\put(0,0){\\includegraphics[width=%sbp]{%s}}\n%s\n\\end{picture}\\end{document}" % (W, H, W, H, W, src, rules))
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / "m.tex").write_text(tex)
+        subprocess.run(["pdflatex", "-interaction=nonstopmode", "m.tex"], cwd=td, capture_output=True, check=True)
+        PANELS.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Path(td) / "m.pdf", PANELS / "y1_masked.pdf")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--reference", action="store_true", help="also render the standard panels for liver and testis, to the preview folder only, to compare with the originals")
+    ap.add_argument("--reference", action="store_true", help="also render the standard panels for liver and testis, to compare with the originals")
     a = ap.parse_args()
     cm.PREVIEW = OUT / "preview"
     cm.setup()
-    out = []
+    panel_rc()
     for t in RU.NEW_TISSUES:
-        c = RU.PRIMARY[t]
-        out.append(cm.save(supp_figure(t, c, FIG_NAME[t]), FIG_NAME[t]))
-    for name, fn in (("fig_h1_axis", main_axis), ("fig_h1_recurrence", main_recurrence), ("supp_h1_recurrence_all", lambda: main_recurrence("all")), ("supp_h1_lineage", main_lineage), ("fig_h1_genes", main_genes)):
-        out.append(cm.save(fn(), name))
+        supp_panels(t, RU.PRIMARY[t], FIG_NAME[t])
     if a.reference:
         for t in ("liver", "testis"):
-            fd.save_figure(supp_figure(t, RU.PRIMARY[t], "ref"), f"h1_reference_{t}", formats=("png",), out_dir=cm.PREVIEW, close=True)
-    for p in out:
-        print(p, cm.check_pdf(p))
+            supp_panels(t, RU.PRIMARY[t], f"h1_reference_{t.replace(' ', '_')}")
+    for name, fn in (("fig_h1_axis", main_axis), ("fig_h1_recurrence", main_recurrence), ("supp_h1_recurrence_all", lambda: main_recurrence("all")), ("supp_h1_lineage", main_lineage), ("fig_h1_genes", main_genes)):
+        psave(fn(), name)
+    y1_masked()
     return 0
 
 

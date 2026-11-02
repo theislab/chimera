@@ -10,4 +10,5 @@ $R $D/gsea.py --jobs 5
 $R $D/archetypes.py --jobs 5
 $R $D/drivers.py
 $R $D/figures.py
+$R -m revision.tasks.F1_figures.compose --spec $D/specs_h1.py --all
 $R $D/tex.py

@@ -13,9 +13,13 @@ Run from `chimera/`, in `chimera_env`:
 | Hallmark GSEA as in the first submission | `gsea.py` | `gsea/<cohort>.csv` |
 | Archetypes as in the first submission | `archetypes.py` | `archetypes/` |
 | Cell-type contributions from existing forward passes | `drivers.py` | `drivers/` |
-| Figures | `figures.py` | `chimera-manuscript/figures/revision/`, previews in `preview/` |
+| Panels, one PDF each | `figures.py` | `panels/` (not in the manuscript) |
+| Composed figures | `F1_figures/compose.py --spec specs_h1.py --all` | `chimera-manuscript/figures/revision/<name>_composed.pdf`, previews in `results/revision/F1/` |
 | Text | `tex.py` | `chimera-manuscript/supplementary/harmonised_cohorts.tex` |
 
-## Adding Van Zyl H+Pig and H+M. fascicularis
+## Cohorts and flags
 
-When `ledgers/Z1_retune.md` lists their seeds, write `revision/tasks/H1_harmonise/extra_runs.tsv` (tab-separated: `cohort`, `seed`, `run`; cohort `vz_hpig` or `vz_hmfas`, one row per run of the selected recipe, failing runs included) and re-run `run_all.sh`. The health rule decides which enter. If the Van Zyl tasks have made `results/revision/T11/readout/genes_<hpig|hmfas>.parquet` and `T11/drivers/fw_<ds>_s<seed>.npz`, B1 and cell-type contributions join; otherwise those columns stay empty and the cohort is reported without them. Then re-run `chimera-private/.../drafts/numbers_H1.py`.
+`rules.py` holds the registry; Van Zyl 5 species is grid 2 (`rev-vz-grid2-s42` to `s44`, T11_2c); grid 1 (`full_g1`) is not a row. H+Pig and H+M. fascicularis come from `extra_runs.tsv` (`cohort`, `seed`, `run`). `tables.py` stops if D or the saturated flag differ from the T11 tidy table.
+Per-gene tables carry O1's flags as columns (`o1_T2`, `o1_M_wrong_row`, `o1_M_false_zero`, `o1_zero_any`); no gene is dropped. `nameable` is what figures and captions may name.
+
+After a change of cohorts, also refresh the panels that read H1 (F1 ledger): `python -m revision.tasks.T8_4_figures.fig4_additions`, `python -m revision.tasks.T8_4_figures.fig7_validation`, `python -m revision.tasks.F1_figures.compose fig4_cont`. Then `chimera-private/.../drafts/numbers_H1.py`.
