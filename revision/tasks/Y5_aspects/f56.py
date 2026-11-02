@@ -129,5 +129,64 @@ def f6():
     pd.concat(rows, ignore_index=True).to_csv(OUT / "xlinked.csv", index=False)
 
 
+def f6b():
+    """F6 extension, after F6 was read. Human X-linked genes in spermatocytes against held-out species at known sex-chromosome ages.
+    X conserved region (XCR, chrX >= 47 Mb): X-linked in all therians, autosomal in platypus and chicken. X added region (XAR, < 47 Mb):
+    X-linked in eutherians, autosomal in opossum, platypus, chicken (Ross 2005; Veyrunes 2008). Meiotic silencing depends on being X-linked,
+    so SC minus SG is expected lower than autosomes where the region is on the X, and not elsewhere. Beside Chimera's C_SC and the direct contribution."""
+    import gzip, re
+    from revision.tasks.T4_3_scoreboard import stats as ST
+    start = {}
+    with gzip.open(K.REPO / "data/revision/ensembl110/Homo_sapiens.GRCh38.110.gtf.gz", "rt") as fh:
+        for line in fh:
+            if line.startswith("X\t"):
+                p = line.split("\t", 5)
+                if p[2] == "gene":
+                    start[re.search(r'gene_id "([^"]+)"', line).group(1)] = int(p[3])
+    z = np.load(X7 / "golds" / "murat_profiles.npz", allow_pickle=False)
+    genes = z["genes"].astype(str)
+    types = list(z["types"].astype(str))
+    chrom = pd.read_parquet(K.OUT / "chromosomes.parquet").set_index("hsapiens_gene_id").chrom
+    reg = np.where(pd.Series(genes).map(start).fillna(0).to_numpy() >= 47e6, "XCR", np.where(pd.Series(genes).map(start).notna(), "XAR", "A"))
+    auto = pd.Series(genes).map(chrom).isin(RU.ODD | RU.EVEN).to_numpy()
+    rows = []
+    for spc in ["bonobo", "chimpanzee", "gorilla", "gibbon", "marmoset", "opossum", "platypus", "chicken"]:
+        x, f = z[f"{spc}_x"], z[f"{spc}_f"]
+        sc, sg = types.index("SC"), types.index("SG")
+        ok = (np.nanmax(f, 1) >= 0.05) & np.isfinite(x[:, sc]) & np.isfinite(x[:, sg])
+        delta = x[:, sc] - x[:, sg]
+        lev = np.nanmean(x, 1)
+        for r in ("XCR", "XAR"):
+            m = ok & (auto | (reg == r))
+            T = pd.DataFrame(dict(d=delta[m], lev=lev[m], isX=(reg[m] == r).astype(float)))
+            e = ST.resid(ST.midrank(T.d.to_numpy()), ST.design(T, ["lev"]))
+            ex, sa = e[T.isX == 1], e[T.isX == 0]
+            rng = np.random.default_rng(0)
+            bs = [rng.choice(ex, len(ex)).mean() - rng.choice(sa, len(sa)).mean() for _ in range(2000)]
+            rows.append(dict(species=spc, region=r, n_X=len(ex), rank_shift=float((ex.mean() - sa.mean()) / len(T)), lo=float(np.quantile(bs, .025) / len(T)), hi=float(np.quantile(bs, .975) / len(T)),
+                             median_delta_X=float(np.median(T.d[T.isX == 1])), median_delta_A=float(np.median(T.d[T.isX == 0]))))
+    pd.DataFrame(rows).to_csv(OUT / "xlinked_depth.csv", index=False)
+    # Chimera C_SC and direct contribution by region on the training species
+    out = []
+    for c in ("test_3sp", "test_hmouse"):
+        g = K.genes(c)
+        g = g.drop(columns=[k for k in g.columns if k.startswith(("C_", "Csp_"))]).merge(K.contribs(c), on="var_name", how="left")
+        dr = pd.read_parquet(K.REPO / f"results/revision/X4/cache/Sdir__{c}.parquet")
+        cols = [k for k in dr.columns if k.startswith("Cdir_")]
+        g = g.merge(dr[["var_name"] + cols] if "var_name" in dr else dr[["hsapiens_gene_id"] + cols], how="left")
+        g["start"] = g.hsapiens_gene_id.map(start)
+        g["reg"] = np.where(g.start >= 47e6, "XCR", np.where(g.start.notna(), "XAR", "A"))
+        g = g[g.chrom.isin(RU.ODD | RU.EVEN | {"X"})]
+        for r in ("XCR", "XAR"):
+            q = g[g.reg.isin(["A", r]) & ~g.masked.astype(bool)].copy()
+            q["isX"] = (q.reg == r).astype(float)
+            ys = [k for k in ["C_SC", "Cdir_SC", "C_SG", "Cdir_SG", "C_rSD", "Cdir_rSD", "C_eSD", "Cdir_eSD", "S", "Sdir", "B1b"] if k in q]
+            q = q[q[ys + K.C4 + ["block"]].notna().all(1)]
+            rr = K.scan(q, "isX", ys, K.C4, seed=K.useed(c, r), draws=1000)
+            rr["cohort"], rr["region"], rr["nX"] = c, r, int(q.isX.sum())
+            out.append(rr)
+    pd.concat(out, ignore_index=True).to_csv(OUT / "xlinked_regions.csv", index=False)
+
+
 if __name__ == "__main__":
-    dict(f5=f5, f6=f6, cases=cases)[sys.argv[1]]()
+    dict(f5=f5, f6=f6, cases=cases, f6b=f6b)[sys.argv[1]]()
