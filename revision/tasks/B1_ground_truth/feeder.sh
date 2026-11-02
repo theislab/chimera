@@ -5,7 +5,9 @@ CAP=${1:-170}; LIMIT=${2:-95}
 Q=revision/tasks/B1_ground_truth/queue.tsv
 T=revision/tasks/B1_ground_truth
 L=results/revision/B1/logs
-n=$(($(wc -l < $Q) - 1)); i=${B1_START:-0}
+n=$(($(wc -l < $Q) - 1))
+STATE=results/revision/B1/feeder.state
+i=$(cat "$STATE" 2>/dev/null || echo 0)
 while (( i < n )); do
   IFS=$'\t' read -r kind manifest index cpus mem wall done_file tier <<<"$(sed -n "$((i + 2))p" $Q)"
   if [[ -f "$done_file" ]]; then i=$((i + 1)); continue; fi
@@ -19,6 +21,7 @@ while (( i < n )); do
     placebo) sbatch -J "b1plc" -p cpu_p --qos=cpu_normal -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%j.out" --wrap="source revision/slurm/_body.sh; mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.placebo $manifest" ;;
     trackd) sbatch -J b1trackd --array="$index" -o "$L/%x_%A_%a.out" $T/track_d/job.sbatch ;;
   esac
+  echo "$i" > "$STATE"
   sleep 2
 done
 echo "feeder done at $(date -Is)"

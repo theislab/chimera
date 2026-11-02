@@ -6,13 +6,11 @@ trackd	jobs	1	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/maste
 trackd	jobs	2	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/direct-liv_hmouse-full-r1.time.txt	0
 trackd	jobs	3	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/saturn-liv_hmouse-full-r1.time.txt	0
 trackd	jobs	4	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/camex-liv_hmouse-full-r1.time.txt	0
-trackd	jobs	5	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/chimera-test_hmouse-full-r1.time.txt	0
 trackd	jobs	6	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/chimera-test_hmouse-full-r2.time.txt	0
 trackd	jobs	7	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/direct-test_hmouse-full-r1.time.txt	0
 trackd	jobs	8	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/saturn-test_hmouse-full-r1.time.txt	0
 trackd	jobs	9	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/camex-test_hmouse-full-r1.time.txt	0
 trackd	jobs	10	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/chimera-kidney-full-r1.time.txt	0
-trackd	jobs	11	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/chimera-kidney-full-r2.time.txt	0
 trackd	jobs	12	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/direct-kidney-full-r1.time.txt	0
 trackd	jobs	13	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/saturn-kidney-full-r1.time.txt	0
 trackd	jobs	14	16	96G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/track_d/camex-kidney-full-r1.time.txt	0
@@ -204,7 +202,6 @@ fit	revision/tasks/B1_ground_truth/grid_kidney.tsv	56	8	48G	16:00:00	/ictstr01/g
 fit	revision/tasks/B1_ground_truth/grid_kidney.tsv	57	8	48G	16:00:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/scores/b1-kidney-pattern0.5-low-sh05-s42.parquet	2
 fit	revision/tasks/B1_ground_truth/grid_kidney.tsv	58	8	48G	16:00:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/scores/b1-kidney-pattern0.5-midlow-sh05-s42.parquet	2
 camex	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	0	8	32G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/camex__b1-liv_hmouse-pattern1.0-low-sh05-s42.parquet	3
-saturn	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	0	16	64G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/saturn__b1-liv_hmouse-pattern1.0-low-sh05-s42.parquet	3
 camex	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	4	8	32G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/camex__b1-liv_hmouse-pattern1.0-midhigh-sh05-s42.parquet	3
 saturn	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	4	16	64G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/saturn__b1-liv_hmouse-pattern1.0-midhigh-sh05-s42.parquet	3
 camex	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	16	8	32G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/camex__b1-liv_hmouse-level8-low-sh05-s42.parquet	3
@@ -244,7 +241,6 @@ saturn	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	108	16	64G	23:50:00	/ict
 camex	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	112	8	32G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/camex__b1-kidney-loss1.0-midhigh-sh05-s42.parquet	3
 saturn	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	112	16	64G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/saturn__b1-kidney-loss1.0-midhigh-sh05-s42.parquet	3
 camex	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	124	8	32G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/camex__b1-kidney-none-s42.parquet	3
-saturn	revision/tasks/B1_ground_truth/grid_tools_v2.tsv	124	16	64G	23:50:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/tool_scores/saturn__b1-kidney-none-s42.parquet	3
 fit	revision/tasks/B1_ground_truth/grid_liv_hmouse.tsv	59	8	24G	04:00:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/scores/b1-liv_hmouse-level2-high-sh02-s42.parquet	4
 fit	revision/tasks/B1_ground_truth/grid_liv_hmouse.tsv	60	8	24G	04:00:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/scores/b1-liv_hmouse-level2-high-sh10-s42.parquet	4
 fit	revision/tasks/B1_ground_truth/grid_liv_hmouse.tsv	61	8	24G	04:00:00	/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera/results/revision/B1/scores/b1-liv_hmouse-level2-low-sh02-s42.parquet	4
