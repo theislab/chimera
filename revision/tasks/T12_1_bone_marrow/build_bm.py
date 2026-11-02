@@ -7,14 +7,28 @@ Spleen, Tabula Muris Senis Bone marrow and Spleen (10x). Counts are ``raw/X`` (i
 Steps, in order:
 1. Cells: 10x 3' only (human 10x 3' v3; lemur and mouse 10x 3' v2). Smart-seq2 read counts and
    10x 5' libraries are not on the same count scale as 3' UMIs.
-2. QC per file: ``chimera._data_utils._qc_filter`` (min 200 genes, mitochondrial < 20%),
-   mitochondrial genes by symbol prefix (``feature_name``).
+2. QC per file: ``chimera._data_utils._qc_filter`` with min 200 genes and no mitochondrial
+   filter in any species (``max_mt_pct=100``), a deviation from the canonical 20%: the lemur
+   and mouse CELLxGENE matrices carry no mitochondrial genes, so the 20% rule acted in human
+   only (1,137 human cells in build 1) and cannot act evenly across species. Same decision as
+   Van Zyl (``T11_1_vanzyl/build_vanzyl.py``) and kidney (``P13_kidney/build.py``). The
+   human mitochondrial percentage stays in ``obs['pct_counts_mt']`` for disclosure.
 3. Labels: the committed map ``celltype_map.tsv`` (CELLxGENE ``cell_type`` to the nine
    harmonised types; ``DROP`` rows removed). Every label present must be in the map.
 4. Spleen rule (section 12): if lemur bone-marrow B or NK has fewer than 150 cells after steps
    1-3, the spleen files of all three atlases are added. Decided on these counts only.
-5. Caps: neutrophil and erythroid, per species (bone marrow and spleen together), at ``CAP``
+5. Caps (build 2, T12.2b): every species x type, bone marrow and spleen together, at ``CAP``
    cells, drawn uniformly without replacement (numpy default_rng(SEED) over sorted cell IDs).
+   ``CAP`` is the largest multiple of 50 for which the capped total does not exceed
+   ``SIZE_REF`` = 28,854 cells, the size of the testis 3-species cohort
+   (``data/processed/camex_testis_unified.h5ad``) on which the base recipe and its epoch-based
+   schedule (KL and FQR warm-ups at epoch 20, adversary at 5, plateau LR decay) were set.
+   Reason: at 128,328 cells (build 1, 452 steps per epoch against 78-113 in the canonical
+   cohorts) training collapsed the latent or went NaN, and a proportional 25k draw of the same
+   cells did not (``ledgers/T12_2b_debug.md`` in chimera-private). One per-type cap also
+   keeps any single type from dominating the cohort: after the spleen addition B and T, not
+   neutrophil and erythroid, were the largest classes, so build 1's neutrophil/erythroid-only
+   cap (5,000) had lost its reason. Decided on cell counts only.
 6. Pipeline, unchanged from ``chimera._data_utils``: ``compute_conservation_prior``,
    ``download_and_process_esm2``, ``pca_esm2``, ``compute_esm2_interspecies_variance``,
    ``construct_unified_adata``, ``compute_expression_stats``, ``assemble_gin_features``,
@@ -27,7 +41,9 @@ label), cell_ontology_class and cell_type_harmonised (the nine types), tissue, d
 sample_id, assay, age_months (mouse; NaN otherwise), development_stage, sex.
 
 Writes ``bone_marrow_unified.h5ad``, ``gin_scaler_bone_marrow.pkl``, ``build_report.json`` and
-count tables to ``data/revision/bone_marrow/`` (or ``--out``), never to ``data/processed/``.
+count tables to ``data/revision/bone_marrow/v2/`` (or ``--out``), never to ``data/processed/``.
+Build 1 (20% mt filter, neutrophil/erythroid cap 5,000; 128,328 cells) stays in
+``data/revision/bone_marrow/`` for the record of the T12.2 grid that was trained on it.
 
     python revision/tasks/T12_1_bone_marrow/build_bm.py [--out DIR]
 """
@@ -72,10 +88,11 @@ SPECIES = {
 ESM2_LINKS = {"human_embedding.torch": "human_embedding.torch",
               "mmurinus_embedding.torch": "mouse_lemur_embedding.torch",
               "mouse_embedding.torch": "mouse_embedding.torch"}
-QC = dict(min_genes=200, max_mt_pct=20.0)
+QC = dict(min_genes=200, max_mt_pct=100.0)  # no mt filter in any species, see module docstring
 TYPES = ["HSPC", "neutrophil", "monocyte", "macrophage", "B", "plasma", "T", "NK", "erythroid"]
-CAPPED = ("neutrophil", "erythroid")
-CAP = 5000
+CAPPED = tuple(TYPES)  # every type (build 2); build 1 capped neutrophil and erythroid at 5,000
+SIZE_REF = 28854  # testis 3-species cohort, cells (camex_testis_unified.h5ad)
+CAP_STEP = 50
 SEED = 42
 SPLEEN_MIN = 150  # lemur bone-marrow B or NK below this -> add spleen (section 12)
 OBS_KEEP = ["donor_id", "sample_id", "assay", "development_stage", "sex", "cell_type",
@@ -185,20 +202,29 @@ def load_file(ens: str, tissue: str, cmap: pd.DataFrame) -> tuple:
     return sub, rec
 
 
-def cap(adata, rng_seed: int) -> tuple:
+def choose_cap(counts: dict) -> int:
+    """Largest multiple of CAP_STEP whose capped total (all species x types) is <= SIZE_REF."""
+    n = np.array([v for per in counts.values() for v in per.values()], dtype=int)
+    c = CAP_STEP
+    while np.minimum(n, c + CAP_STEP).sum() <= SIZE_REF and c + CAP_STEP <= n.max():
+        c += CAP_STEP
+    return c
+
+
+def cap(adata, rng_seed: int, cap_n: int) -> tuple:
     keep = np.ones(adata.n_obs, dtype=bool)
     rec = {}
     names = np.asarray(adata.obs_names)
     for t in CAPPED:
         idx = np.flatnonzero(adata.obs["cell_type_harmonised"].to_numpy() == t)
         rec[t] = {"before": int(len(idx))}
-        if len(idx) > CAP:
+        if len(idx) > cap_n:
             order = idx[np.argsort(names[idx], kind="stable")]  # sorted cell IDs
             rng = np.random.default_rng(rng_seed)
-            chosen = rng.choice(order, size=CAP, replace=False)
+            chosen = rng.choice(order, size=cap_n, replace=False)
             drop = np.setdiff1d(idx, chosen)
             keep[drop] = False
-        rec[t]["after"] = int(min(len(idx), CAP))
+        rec[t]["after"] = int(min(len(idx), cap_n))
     return adata[keep].copy(), rec
 
 
@@ -215,7 +241,7 @@ def link_esm(out: Path) -> Path:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", type=Path, default=BM)
+    ap.add_argument("--out", type=Path, default=BM / "v2")
     ap.add_argument("--skip-input-hashes", action="store_true")
     args = ap.parse_args()
     out = args.out.resolve()
@@ -234,7 +260,7 @@ def main() -> int:
     report: dict = {
         "repo_sha": subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"],
                                    capture_output=True, text=True).stdout.strip(),
-        "qc": QC, "cap": CAP, "capped_types": list(CAPPED), "seed": SEED, "spleen_min": SPLEEN_MIN,
+        "build": 2, "qc": QC, "capped_types": list(CAPPED), "seed": SEED, "spleen_min": SPLEEN_MIN,
         "species": {k: v[:2] for k, v in SPECIES.items()},
     }
     if not args.skip_input_hashes:
@@ -261,11 +287,18 @@ def main() -> int:
             parts[ens]["spleen"], files_rec[f"{ens}|spleen"] = load_file(ens, "spleen", cmap)
     report["files"] = files_rec
 
+    merged = {ens: ad.concat(list(lt.values()), join="inner", merge="same") if len(lt) > 1 else next(iter(lt.values()))
+              for ens, lt in parts.items()}
+    pre_cap = {ens: a.obs["cell_type_harmonised"].value_counts().reindex(TYPES, fill_value=0).astype(int).to_dict()
+               for ens, a in merged.items()}
+    cap_n = choose_cap(pre_cap)
+    report["cap"] = cap_n
+    report["cap_rule"] = {"size_ref": SIZE_REF, "step": CAP_STEP, "pre_cap_counts": pre_cap,
+                          "capped_total": int(sum(min(v, cap_n) for per in pre_cap.values() for v in per.values()))}
+    log.info("cap rule: %s", {k: v for k, v in report["cap_rule"].items() if k != "pre_cap_counts"} | {"cap": cap_n})
     per_species, caps = {}, {}
-    for ens, label_tissue in parts.items():
-        a = ad.concat(list(label_tissue.values()), join="inner", merge="same") if len(label_tissue) > 1 \
-            else next(iter(label_tissue.values()))
-        a, caps[ens] = cap(a, SEED)
+    for ens, a in merged.items():
+        a, caps[ens] = cap(a, SEED, cap_n)
         o = a.obs
         o["batch"] = o["species"] + "|" + o["donor_id"] + "|" + o["tissue"]
         if ens == "mmusculus":
@@ -275,7 +308,7 @@ def main() -> int:
         o["cell_ontology_class"] = o["cell_type_harmonised"]
         per_species[ens] = a
     report["caps"] = caps
-    del parts
+    del parts, merged
 
     # Ortholog table, prior, ESM-2 features.
     table = pd.read_csv(TABLE)
