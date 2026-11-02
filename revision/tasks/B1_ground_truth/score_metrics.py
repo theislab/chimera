@@ -18,7 +18,7 @@ from revision.tasks.B1_ground_truth import rules as RU
 def tool_scores(run: str) -> pd.DataFrame | None:
     """SATURN and CAMEX scalars of the same altered object, if that tool ran on it."""
     frames = []
-    for t in ("saturn", "camex"):
+    for t in ("saturn", "camex", "genespectra", "cacimar", "samap"):
         f = RU.RES / "tool_scores" / f"{t}__{run}.parquet"
         if f.exists():
             frames.append(pd.read_parquet(f).set_index("var_name"))
@@ -27,7 +27,7 @@ def tool_scores(run: str) -> pd.DataFrame | None:
 
 def tool_reference(cohort: str) -> pd.DataFrame | None:
     frames = []
-    for t in ("saturn", "camex"):
+    for t in ("saturn", "camex", "genespectra", "cacimar", "samap"):
         fs = [RU.RES / "tool_scores" / f"{t}__b1-{cohort}-none-s{s}.parquet" for s in RU.TOOL_NONE_SEEDS]
         fs = [pd.read_parquet(f).set_index("var_name") for f in fs if f.exists()]
         if fs:

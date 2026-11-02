@@ -22,10 +22,10 @@ import _figure_design as fd  # noqa: E402
 
 OUT = RU.RES / "figures"
 COH = {"liv_hmouse": "liver", "test_hmouse": "testis", "kidney": "kidney"}
-ORDER = ["S_g", "Delta_alpha", "B1z", "S_fwd", "Sdir", "B1", "B1b", "B1c", "B2b", "Lfc", "B3a", "S_deploy", "S_cos", "C_cos", "pi", "dNdS", "LOEUF", "expr", "random"]
+ORDER = ["S_g", "Delta_alpha", "B1z", "S_fwd", "Sdir", "B1", "B1b", "B1c", "B2b", "Lfc", "B3a", "S_deploy", "S_cos", "C_cos", "GeneSpectra", "CACIMAR", "SAMap", "pi", "dNdS", "LOEUF", "expr", "random"]
 NAME = {"S_g": "$S_g$ (Chimera)", "Delta_alpha": "Δα (Chimera)", "B1z": "B1z (Chimera latent)", "S_fwd": "$S_{fwd}$, no mask (exploratory)", "Sdir": "Sdir (labels, no model)",
         "B1": "B1 profile correlation", "B1b": "B1b residualised", "B1c": "B1c rank level", "B2b": "B2b specificity", "Lfc": "Lfc fold change", "B3a": "B3a features only",
-        "S_deploy": "SATURN S_deploy", "S_cos": "SATURN S_cos", "C_cos": "CAMEX C_cos", "pi": "identity π", "dNdS": "dN/dS", "LOEUF": "LOEUF", "expr": "expression", "random": "random"}
+        "S_deploy": "SATURN S_deploy", "S_cos": "SATURN S_cos", "C_cos": "CAMEX C_cos", "GeneSpectra": "GeneSpectra", "CACIMAR": "CACIMAR", "SAMap": "SAMap", "pi": "identity π", "dNdS": "dN/dS", "LOEUF": "LOEUF", "expr": "expression", "random": "random"}
 STY = {"S_g": ("#0072B2", "s"), "Delta_alpha": ("#D55E00", "o"), "B1z": ("#CC79A7", "P"), "Sdir": ("#009E73", "D"), "B1": ("#222222", "^"), "B1c": ("#666666", "v"), "Lfc": ("#E69F00", "X"),
         "S_fwd": ("#56B4E9", "*"), "expr": ("#999999", "<")}
 EFFECT_LABEL = {"pattern": "share of swap q", "level": "fold f", "loss": "share removed e"}

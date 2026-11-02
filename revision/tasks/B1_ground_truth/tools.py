@@ -237,6 +237,17 @@ def score_camex(row: dict):
     res.reset_index().to_parquet(RU.RES / "tool_scores" / f"camex__{row['run']}.parquet")
 
 
+def score_csv(row: dict):
+    """Primary scalar of an overview-benchmark adapter; a gene without a row has no verdict and stays unscored."""
+    from revision.tasks.B1_ground_truth import rules as RU
+
+    tool = os.environ["B1_TOOL"]
+    t = pd.read_csv(wdir(row["run"]) / "out" / f"{tool}.csv")
+    col = {"genespectra": "GeneSpectra", "cacimar": "CACIMAR", "samap": "SAMap"}[tool]
+    (RU.RES / "tool_scores").mkdir(parents=True, exist_ok=True)
+    t[["var_name", "score"]].rename(columns={"score": col}).to_parquet(RU.RES / "tool_scores" / f"{tool}__{row['run']}.parquet")
+
+
 def make_manifest():
     from revision.tasks.B1_ground_truth import rules as RU
 
@@ -247,16 +258,16 @@ def make_manifest():
                 for s in RU.SEEDS:
                     main = (alt, e) in RU.TOOL_MAIN_ROWS and b in RU.TOOL_MAIN_BANDS and s == 42
                     rows.append(dict(cohort=c, alt=alt, effect=e, band=b, share=RU.TOOL_SHARE, seed=s, run=RU.run_name(c, alt, e, b, RU.TOOL_SHARE, s),
-                                     stem=STEM[c], tier=3 if main else 6))
+                                     stem=STEM[c], tier=3 if main else 6, label_key=RU.COHORTS[c]["label_key"]))
         for s in RU.TOOL_NONE_SEEDS:
-            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, run=f"b1-{c}-none-s{s}", stem=STEM[c], tier=3 if s == 42 else 6))
+            rows.append(dict(cohort=c, alt="none", effect=0, band="all", share=0.0, seed=s, run=f"b1-{c}-none-s{s}", stem=STEM[c], tier=3 if s == 42 else 6, label_key=RU.COHORTS[c]["label_key"]))
     pd.DataFrame(rows).to_csv(RU.TASK_DIR / "grid_tools_v2.tsv", sep="\t", index=False)
     print(len(rows))
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["build", "prep_saturn", "prep_camex", "score_saturn", "score_camex", "manifest"])
+    ap.add_argument("cmd", choices=["build", "prep_saturn", "prep_camex", "score_saturn", "score_camex", "score_csv", "manifest"])
     ap.add_argument("--manifest")
     ap.add_argument("--index", type=int)
     a = ap.parse_args()

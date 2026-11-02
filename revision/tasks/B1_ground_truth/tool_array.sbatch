@@ -17,7 +17,15 @@ if [[ -f "$out" ]]; then echo "already scored $tool $run"; exit 0; fi
 W=data/revision/B1/tools/$tool/$run
 if [[ ! -f "$W/altered.h5ad" ]]; then mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.tools build --manifest "$M" --index "$I"; fi
 t0=$SECONDS
-if [[ $tool == saturn ]]; then
+if [[ $tool == genespectra || $tool == cacimar || $tool == samap ]]; then
+  # the adapters of the overview benchmark (revision/tasks/B2_benchmark/tools), own env, same primary scalar
+  lk=$(get label_key); cohort=$(get cohort)
+  mkdir -p "$W/out"
+  mamba run --no-capture-output -n ${tool}_env python revision/tasks/B2_benchmark/tools/run_$tool.py --h5ad "$W/altered.h5ad" --cohort "$cohort" \
+    --label-key "$lk" --seed "$seed" --out "$W/out/$tool.csv" --work "$W/work"
+  echo "tool_elapsed_s=$((SECONDS - t0))"
+  mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.tools score_csv --manifest "$M" --index "$I"
+elif [[ $tool == saturn ]]; then
   rm -rf "$W/saturn_work" "$W/saturn_final"
   mamba run --no-capture-output -n saturn_env python $T prep_saturn --manifest "$M" --index "$I"
   mamba run --no-capture-output -n saturn_env python revision/tasks/T5_2_adapters/run_saturn.py --stem "$stem" --labels cell_type --seed "$seed" \

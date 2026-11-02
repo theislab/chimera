@@ -41,7 +41,8 @@ METHODS = {
     "pi": ("prior_raw", 1, "sequence"), "dNdS": ("dNdS", -1, "sequence"), "LOEUF": ("LOEUF", -1, "sequence"),
     "expr": ("expr", 1, "control"), "random": ("random", 1, "control"),
 }
-TOOLS = {"S_deploy": ("S_deploy", 1, "tool"), "S_cos": ("S_cos", 1, "tool"), "C_cos": ("C_cos", 1, "tool")}
+TOOLS = {"S_deploy": ("S_deploy", 1, "tool"), "S_cos": ("S_cos", 1, "tool"), "C_cos": ("C_cos", 1, "tool"),
+         "GeneSpectra": ("GeneSpectra", 1, "tool"), "CACIMAR": ("CACIMAR", 1, "tool"), "SAMap": ("SAMap", 1, "tool")}
 BOOT = 200
 MASK_EPS = 1e-6
 BOOT_METRICS = ["AUROC", "AUPRC_match", "power_05", "dir_acc"]

@@ -17,7 +17,7 @@ while (( i < n )); do
   i=$((i + 1))
   case $kind in
     fit) sbatch -J "b1_$(basename "$manifest" .tsv | sed 's/grid_//')" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/array.sbatch "$manifest" ;;
-    saturn|camex) sbatch -J "b1tool_$kind" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/tool_array.sbatch "$kind" "$manifest" ;;
+    saturn|camex|genespectra|cacimar|samap) sbatch -J "b1tool_$kind" --array="$index" -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%A_%a.out" $T/tool_array.sbatch "$kind" "$manifest" ;;
     placebo) sbatch -J "b1plc" -p cpu_p --qos=cpu_normal -c "$cpus" --mem="$mem" --time="$wall" -o "$L/%x_%j.out" --wrap="source revision/slurm/_body.sh; mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.placebo $manifest" ;;
     trackd) sbatch -J b1trackd --array="$index" -o "$L/%x_%A_%a.out" $T/track_d/job.sbatch ;;
   esac
