@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=23:50:00
-#SBATCH --exclude=cpusrv09,cpusrv18
+#SBATCH --exclude=cpusrv09,cpusrv18,cpusrv63
 # sbatch py.sbatch <script under C1_cohorts> <args...>; with --array, {T} in an argument becomes the line of $C1_LIST number task+1.
 source revision/slurm/_body.sh
 args=("$@")
