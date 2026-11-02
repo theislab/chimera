@@ -96,17 +96,22 @@ def main():
         print(c, "reproduction of T4.2 B1z_raw, max abs diff", delta, flush=True)
         infos[-1]["repro_max_abs_diff"] = float(delta)
         var = [f"B1z_{k}" for k in ("chimera", "scvi_species", "scvi_library", "saturn", "camex")]
+        units = []
         for v in var[1:]:
             ok = g[["D", "S"] + OTHERS + ["B1z_chimera", v]].notna().all(1).to_numpy()
             infos.append(dict(cohort=c, latent=v, n_genes_defined=int(g[v].notna().sum()), n_genes_chimera=int(g["B1z_chimera"].notna().sum()),
                               n_genes_common_panel=int(ok.sum())))
+            if ok.sum() < 30:
+                continue
             for gold, covs in GOLDS[c]:
                 base = dict(cohort=c, variant=v)
-                rows += CM.rho_unit(g, gold, covs, ["B1z_chimera", v], rows=ok, label=dict(base, given="none"), ref="B1z_chimera")
+                units.append(dict(g=g, gold=gold, covs=covs, scores=["B1z_chimera", v], rows=ok, label=dict(base, given="none"), ref="B1z_chimera"))
                 for w in ("B1z_chimera", v):
-                    rows += CM.rho_unit(g, gold, covs, [w], rows=ok, extra_spline=OTHERS, label=dict(base, given="other simple baselines"))
-                rows += CM.rho_unit(g, gold, covs, ["B1z_chimera"], rows=ok, extra_spline=[v], label=dict(base, given=v))
-                rows += CM.rho_unit(g, gold, covs, [v], rows=ok, extra_spline=["B1z_chimera"], label=dict(base, given="B1z_chimera"))
+                    units.append(dict(g=g, gold=gold, covs=covs, scores=[w], rows=ok, extra_spline=OTHERS, label=dict(base, given="other simple baselines")))
+                units.append(dict(g=g, gold=gold, covs=covs, scores=["B1z_chimera"], rows=ok, extra_spline=[v], label=dict(base, given=v)))
+                units.append(dict(g=g, gold=gold, covs=covs, scores=[v], rows=ok, extra_spline=["B1z_chimera"], label=dict(base, given="B1z_chimera")))
+        if units:
+            rows += CM.run_units(units).to_dict("records")
     pd.DataFrame(rows).to_csv(OUT / "b1z_latents.csv", index=False)
     pd.DataFrame(infos).to_csv(OUT / "b1z_clusters.csv", index=False)
 
