@@ -119,14 +119,14 @@ SOURCES["mtg"] = dict(
              "cjacchus": dict(name="Marmoset", files=[MT / "c556b8e8-e348-49b9-b4da-08b05cd43350.h5ad"], source="Jorstad2023")})
 
 
-# Model on young donors of the nucleus fraction, one chemistry per species; DE (prepare_de.py) on other donors, plan section 13f.
+# Model on young donors of the cell fraction, one chemistry per species; DE (prepare_de.py) on other donors, cell fraction, plan section 13f.
 SOURCES["muscle"] = dict(
-    reference="Kedlian 2024 Nature Aging, CELLxGENE collection 2d40e6a7; human intercostal nuclei 10x 3' v3, mouse hindlimb nuclei 10x 3' v2",
+    reference="Kedlian 2024 Nature Aging, CELLxGENE collection 2d40e6a7; cell suspensions, human intercostal 10x 3' v3, mouse hindlimb 10x 3' v2",
     map=MAPS / "muscle_ageing.tsv", unit_col="donor_id",
     species={"hsapiens": dict(name="Human", files=[MU / "5fd93c55-8047-48fb-905c-6ef2f7767483.h5ad"], source="Kedlian2024", label_col="annotation_level0",
-                              filters={"donor_id": ["529C", "566B"], "batch": ["nuclei"], "assay": ["10x 3' v3"]}, filter_reason="young donors kept out of the DE; one chemistry and fraction"),
+                              filters={"donor_id": ["583B", "591C"], "batch": ["cells"], "assay": ["10x 3' v3"]}, filter_reason="young donors kept out of the DE; one chemistry; cell fraction in both species, since fraction follows class in the nucleus libraries"),
              "mmusculus": dict(name="Mouse", files=[MU / "7085b988-463e-4183-b33d-838e1f6ad739.h5ad"], source="Kedlian2024", label_col="annotation",
-                               filters={"donor_id": ["Donor1", "Donor2"]}, filter_reason="3-month donors kept out of the DE; the nucleus libraries")})
+                               filters={"donor_id": ["Donor1", "Donor2"], "suspension_type": ["cell"]}, filter_reason="3-month donors kept out of the DE; cell fraction in both species")})
 COHORTS["muscle_ageing"] = dict(source="muscle", species=["hsapiens", "mmusculus"], tissue="skeletal muscle", label="Muscle human, mouse")
 
 

@@ -23,7 +23,7 @@ SEED = 20261102
 N_PERM = 200
 MIN_UNITS = 2
 CASES = {"ad": dict(types=["microglia", "astrocyte", "oligodendrocyte"], cov=dict(human=["sex"], mouse=[]), strata=dict(human=["sex"], mouse=[])),
-         "muscle": dict(types=["fb", "musc", "smc", "pericyte", "capec", "artec", "venec", "macrophage"], cov=dict(human=["assay", "sex"], mouse=[]), strata=dict(human=["assay", "sex"], mouse=[])),
+         "muscle": dict(types=["fb", "musc", "smc", "pericyte", "capec", "artec", "venec", "macrophage"], cov=dict(human=["sex"], mouse=[]), strata=dict(human=["sex"], mouse=[])),
          "lung": dict(types=["macrophage", "at2", "endothelial", "t", "dc"], cov=dict(human=["source"], mouse=[]), strata=dict(human=["source"], mouse=[]),
                       descriptive_only=["fibroblast"])}
 

@@ -15,7 +15,6 @@ def one(c: str) -> str:
     sp = r["species"]
     lines = [f"### {c}", "", f"Object `data/revision/new_usecases/c1_build/objects/{c}.h5ad`: {r['n_obs']:,} cells x {r['n_vars']:,} genes ({', '.join(f'{k} {v:,}' for k, v in r['per_species_cells'].items())}). {r['reference']}. Median library {r['median_library']}, depth ratio to the three-species testis cohort {r['depth_ratio_to_testis3sp']:.2f}; {r['steps_per_epoch']} steps per epoch; cap {r['cap']}; ESM features from {', '.join(r['esm_species'])}.", "", "| Step | Rule and threshold | Removed | Stated reason |", "|---|---|---|---|"]
     rep = r["species_reports"]
-    lines.append(f"| Source filter | As configured per species | {'; '.join(f'{s}: {rep[s]['n_filtered_out']:,}' for s in sp)} | Same chemistry on the UMI scale; same tissue; donors kept out of DE where stated |")
     lines.append(f"| Cell QC | At least 200 genes; no mitochondrial cut in any species | {'; '.join(f'{s}: {rep[s]['n_qc_removed']:,}' for s in sp)} | One threshold cannot act evenly: mitochondrial gene names in matrices: {', '.join(f'{s} {rep[s]['n_mt_named']}' for s in sp)} |")
     for f in r["filters"]:
         lines.append(f"| {f['step']} | {f['item']} | {'; '.join(f'{k}: {v:,}' for k, v in f['counts'].items())} | {f['reason']} |")

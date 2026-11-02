@@ -1,7 +1,8 @@
 """C1: Zilionis 2019 (GSE127465) to per-species h5ad, tumour libraries, raw counts from RAW.tar, authors' cell metadata.
 
-The normalised matrices are not used. Cells: those in the authors' metadata (their QC), tumour only: human Tissue == tumor, mouse
-Tumor or healthy == t. Symbols to Ensembl through the Ensembl 110 GTF, unique names on both sides; an unmapped gene is not listed, so it
+The normalised matrices are not used. Cells: those in the authors' metadata, tumour only: human Tissue == tumor, mouse Tumor or healthy == t.
+The authors' QC differs by species (human >= 300 UMI, mitochondrial <= 20%; mouse >= 637 UMI, <= 15%), so one rule is applied on top in both species, the stricter pair:
+at least 637 UMI and at most 15% mitochondrial (checklist item 4; the cut acts on the authors' columns). Symbols to Ensembl through the Ensembl 110 GTF, unique names on both sides; an unmapped gene is not listed, so it
 is a missing gene, not a zero. The deposit has symbols only; this departs from checklist item 2, stated in plan section 13.0.
 
     python revision/tasks/C1_cohorts/prepare_tumour.py
@@ -22,6 +23,7 @@ from revision.tasks.C1_cohorts import configs as CF
 from revision.tasks.C1_cohorts import orthologs as OR
 
 D = CF.DATA / "tumour_zilionis"
+UMI_MIN, MT_MAX = 637, 15.0
 LYMPH = {"tT cells": "T", "tB cells": "B", "tNK cells": "NK", "T cells": "T", "B cells": "B", "NK cells": "NK"}
 
 
@@ -79,8 +81,11 @@ def main() -> int:
     m = pd.read_csv(D / "GSE127465_mouse_cell_metadata_15939x12.tsv.gz", sep="\t")
     h = h[h["Tissue"] == "tumor"]
     m = m[m["Tumor or healthy"] == "t"].copy()
+    n0 = dict(human=len(h), mouse=len(m))
+    keep = lambda t: t[(t["Total counts"] >= UMI_MIN) & (t["Percent counts from mitochondrial genes"] <= MT_MAX)]  # noqa: E731
+    h, m = keep(h), keep(m)
     m["Library"] = m["Library"].astype(str)
-    rep = {}
+    rep = dict(common_qc=dict(umi_min=UMI_MIN, mt_max=MT_MAX, before=n0, after=dict(human=len(h), mouse=len(m))))
     with tarfile.open(D / "GSE127465_RAW.tar") as tar:
         for sp_short, meta, tag, unit, out in (("hsapiens", h, "human_", "Patient", "prepared_human.h5ad"), ("mmusculus", m, "mouse_", "Biological replicate", "prepared_mouse.h5ad")):
             X, genes, o = load(meta, tar, tag)

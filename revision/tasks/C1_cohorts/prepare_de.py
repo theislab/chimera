@@ -193,25 +193,25 @@ MUSCLE_DE_H = {"FB": "fb", "MuSC": "musc", "SMC": "smc", "Pericyte": "pericyte",
 MUSCLE_DE_M = {"FB": "fb", "MuSC": "musc", "SMC": "smc", "Pericyte": "pericyte", "CapEC": "capec", "ArtEC": "artec", "VenEC": "venec", "Macrophage-LYVE1": "macrophage", "Macrophage-LAM": "macrophage"}
 MUS_H_OLD = ["seventh decade stage", "eighth decade stage"]
 MUS_H_YOUNG = ["young adult stage", "third decade stage", "fourth decade stage"]
-MUS_H_TRAIN = ["529C", "566B"]
+MUS_H_DE = ["339C", "343B", "362C", "367C", "411C", "464C", "470BR"]  # v2 cells; 640C is the one old v3 donor, 583B and 591C train
 
 
 def muscle_human() -> None:
     """Cells of the cell fraction, donors not in training; old (7th, 8th decade) vs young; 6th decade not used."""
     f = CF.DATA / "muscle_ageing/5fd93c55-8047-48fb-905c-6ef2f7767483.h5ad"
-    X, o, ids, names = stream_h5ad(f, lambda ob: (ob["batch"] == "cells") & ob["development_stage"].isin(MUS_H_OLD + MUS_H_YOUNG) & ob["annotation_level0"].isin(MUSCLE_DE_H) & ~ob["donor_id"].isin(MUS_H_TRAIN), ["donor_id", "development_stage", "batch", "assay", "sex", "annotation_level0"])
+    X, o, ids, names = stream_h5ad(f, lambda ob: (ob["batch"] == "cells") & ob["development_stage"].isin(MUS_H_OLD + MUS_H_YOUNG) & ob["annotation_level0"].isin(MUSCLE_DE_H) & ob["donor_id"].isin(MUS_H_DE), ["donor_id", "development_stage", "batch", "assay", "sex", "annotation_level0"])
     qc = np.asarray((X > 0).sum(1)).ravel() >= CF.MIN_GENES
     X, o = X[qc], o[qc]
     o = o.assign(unit=o["donor_id"], cell_ontology_class=o["annotation_level0"].map(MUSCLE_DE_H), condition=np.where(o["development_stage"].isin(MUS_H_OLD), "disease", "control"))
     v = pd.DataFrame({"gene_ids": ids}, index=unique_symbols(names))
-    a = pb(X, o, v, ["assay", "sex"])
+    a = pb(X, o, v, ["sex"])
     a.write_h5ad(out_dir("muscle") / "pb_human.h5ad")
 
 
 def muscle_mouse() -> None:
     """19-month donors 4, 6, 8 vs 3-month donors 3, 5, 7 (donors 1, 2 are in training)."""
     f = CF.DATA / "muscle_ageing/7085b988-463e-4183-b33d-838e1f6ad739.h5ad"
-    X, o, ids, names = stream_h5ad(f, lambda ob: ob["donor_id"].isin(["Donor3", "Donor5", "Donor7", "Donor4", "Donor6", "Donor8"]) & ob["annotation"].isin(MUSCLE_DE_M), ["donor_id", "development_stage", "annotation"])
+    X, o, ids, names = stream_h5ad(f, lambda ob: ob["donor_id"].isin(["Donor3", "Donor5", "Donor7", "Donor4", "Donor6", "Donor8"]) & (ob["suspension_type"] == "cell") & ob["annotation"].isin(MUSCLE_DE_M), ["donor_id", "development_stage", "annotation", "suspension_type"])
     qc = np.asarray((X > 0).sum(1)).ravel() >= CF.MIN_GENES
     X, o = X[qc], o[qc]
     o = o.assign(unit=o["donor_id"], cell_ontology_class=o["annotation"].map(MUSCLE_DE_M), condition=np.where(o["development_stage"].str.startswith("19"), "disease", "control"))

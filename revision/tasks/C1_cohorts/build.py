@@ -280,6 +280,10 @@ def build_cohort(cohort: str) -> None:
         pbs[s] = ad.read_h5ad(d / "pseudobulk.h5ad")
         reports[s] = json.loads((d / "report.json").read_text())
     names = {s: cfg["species"][s]["name"] for s in species}
+    for s in species:
+        sc_ = cfg["species"][s]
+        if sc_.get("filters"):
+            filt_rows.append(dict(step="source", item=str(sc_["filters"]), counts={s: reports[s]["n_filtered_out"]}, reason=sc_.get("filter_reason", "")))
     # --- classes
     ct = pd.DataFrame({s: obsd[s].loc[obsd[s].qc_pass, "cell_ontology_class"].value_counts() for s in species}).fillna(0).astype(int)
     out_rep["class_counts_before"] = ct.to_dict()

@@ -142,7 +142,8 @@ def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, di
     eh, ep = d["gene_stable_id"].map(gh["max_exons"]), d["homology_gene_stable_id"].map(gp["max_exons"])
     weak0 = ~((d["goc_score"] > 50) & (d["wga_coverage"] > 50))
     shape = (ep <= 1) & (eh >= 3)
-    # One exon against three is also the shape of genuine intronless genes with an extra annotated human isoform (JUN, KCNA3), so the shape removes only with weak synteny labels.
+    # One exon against three is also the shape of genuine intronless genes with an extra annotated human isoform, so the shape removes only with weak synteny labels
+    # (GOC or WGA at most 50). A true gene with weak labels still goes (mouse: 4 pairs, Jun among them), stated in the ledger.
     retro = shape & weak0
     rep["retrocopy_shape_strong_labels_kept"] = int((shape & ~weak0).sum())
     rep["removed_retrocopy_shape"] = int(retro.sum())

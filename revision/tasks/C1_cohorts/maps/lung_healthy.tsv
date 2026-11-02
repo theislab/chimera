@@ -31,8 +31,8 @@ hsapiens	Myofibroblast	Myofibroblast
 hsapiens	Pericyte	Pericyte	
 hsapiens	Basophil/Mast 1	Basophil_mast	
 hsapiens	Basophil/Mast 2	Basophil_mast	
-hsapiens	Proliferating Macrophage	DROP	state ambiguous across species or class one species alone defines
-hsapiens	Proliferating NK/T	DROP	state ambiguous across species or class one species alone defines
+hsapiens	Proliferating Macrophage	DROP	proliferating state, dropped in every species
+hsapiens	Proliferating NK/T	DROP	proliferating state, dropped in every species
 hsapiens	Natural Killer T	DROP	state ambiguous across species or class one species alone defines
 hsapiens	IGSF21+ Dendritic	DROP	state ambiguous across species or class one species alone defines
 hsapiens	TREM2+ Dendritic	DROP	state ambiguous across species or class one species alone defines
@@ -50,7 +50,7 @@ hsapiens	Mucous	DROP	state ambiguous across species or class one species alone d
 hsapiens	Basal	DROP	state ambiguous across species or class one species alone defines
 hsapiens	Differentiating Basal	DROP	state ambiguous across species or class one species alone defines
 hsapiens	Proximal Basal	DROP	state ambiguous across species or class one species alone defines
-hsapiens	Proliferating Basal	DROP	state ambiguous across species or class one species alone defines
+hsapiens	Proliferating Basal	DROP	proliferating state, dropped in every species
 hsapiens	Goblet	DROP	state ambiguous across species or class one species alone defines
 hsapiens	Serous	DROP	state ambiguous across species or class one species alone defines
 hsapiens	Ionocyte	DROP	state ambiguous across species or class one species alone defines
@@ -61,27 +61,27 @@ mmurinus	alveolar epithelial cell type 1	AT1
 mmurinus	ciliated cell	Ciliated	
 mmurinus	club cell	Club	
 mmurinus	alveolar macrophage	Macrophage_alveolar	
-mmurinus	alveolar macrophage (PF)	Macrophage_alveolar	
+mmurinus	alveolar macrophage (PF)	DROP	proliferating state, dropped in every species
 mmurinus	alveolar macrophage (LPL+)	Macrophage_alveolar	
 mmurinus	alveolar macrophage (CXCL10+)	Macrophage_alveolar	
 mmurinus	interstitial macrophage	Macrophage_interstitial	
 mmurinus	interstitial macrophage (ABCA8+)	Macrophage_interstitial	
 mmurinus	interstitial macrophage (CXCL10+)	Macrophage_interstitial	
 mmurinus	monocyte	Monocyte	
-mmurinus	monocyte (PF)	Monocyte	
+mmurinus	monocyte (PF)	DROP	proliferating state, dropped in every species
 mmurinus	neutrophil	Neutrophil	
 mmurinus	neutrophil (CCL13+)	Neutrophil	
 mmurinus	neutrophil (IL18BP+)	Neutrophil	
-mmurinus	neutrophil (PF)	Neutrophil	
+mmurinus	neutrophil (PF)	DROP	proliferating state, dropped in every species
 mmurinus	natural killer cell	NK	
 mmurinus	natural killer cell (GZMB+)	NK	
 mmurinus	natural killer cell (KLRD1+)	NK	
-mmurinus	natural killer cell (PF)	NK	
+mmurinus	natural killer cell (PF)	DROP	proliferating state, dropped in every species
 mmurinus	T cell (CD4+ CD8+ CCL5+)	T	
 mmurinus	T cell (CD4+ CD8- CCL5-)	T	
 mmurinus	T cell (CD4+ CD8- CCL5+)	T	
 mmurinus	T cell (CD4- CD8+ CCL5+)	T	
-mmurinus	T cell (PF)	T	
+mmurinus	T cell (PF)	DROP	proliferating state, dropped in every species
 mmurinus	B cell	B	
 mmurinus	plasma cell	Plasma	
 mmurinus	conventional dendritic cell	cDC	
@@ -123,7 +123,7 @@ mmurinus	vascular associated smooth muscle cell	DROP	doublets, tumour metastasis
 mmurinus	non-myelinating Schwann cell	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
 mmurinus	myelinating Schwann cell	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
 mmurinus	erythroid lineage cell	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
-mmurinus	erythroid lineage cell (PF)	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
+mmurinus	erythroid lineage cell (PF)	DROP	proliferating state, dropped in every species
 mmurinus	erythroid progenitor cell	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
 mmurinus	eosinophil	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
 mmurinus	granulocyte monocyte progenitor cell	DROP	doublets, tumour metastasis cells, unresolved or lemur-only classes
@@ -137,19 +137,19 @@ mmusculus	Alveolar Epithelial Type 2	AT2
 mmusculus	Ciliated	Ciliated	
 mmusculus	Club	Club	
 mmusculus	Alveolar Macrophage	Macrophage_alveolar	
-mmusculus	Proliferating Alveolar Macrophage	Macrophage_alveolar	
+mmusculus	Proliferating Alveolar Macrophage	DROP	proliferating state, dropped in every species
 mmusculus	Interstitial Macrophage	Macrophage_interstitial	
 mmusculus	Classical Monocyte	Monocyte	
-mmusculus	Proliferating Classical Monocyte	Monocyte	
+mmusculus	Proliferating Classical Monocyte	DROP	proliferating state, dropped in every species
 mmusculus	Intermediate Monocyte	Monocyte	
 mmusculus	Nonclassical Monocyte	Monocyte	
 mmusculus	Neutrophil	Neutrophil	
 mmusculus	Natural Killer	NK	
-mmusculus	Proliferating NK	NK	
+mmusculus	Proliferating NK	DROP	proliferating state, dropped in every species
 mmusculus	CD4+ T	T	
 mmusculus	CD8+ T	T	
 mmusculus	Regulatory T	T	
-mmusculus	Proliferating T	T	
+mmusculus	Proliferating T	DROP	proliferating state, dropped in every species
 mmusculus	Ly6g5b+ T	T	
 mmusculus	B	B	
 mmusculus	Zbtb32+ B	B	
@@ -168,7 +168,7 @@ mmusculus	Myofibroblast	Myofibroblast
 mmusculus	Pericyte	Pericyte	
 mmusculus	Basophil	Basophil_mast	
 mmusculus	Natural Killer T	DROP	state ambiguous across species or class one species alone defines
-mmusculus	Proliferating Dendritic	DROP	state ambiguous across species or class one species alone defines
+mmusculus	Proliferating Dendritic	DROP	proliferating state, dropped in every species
 mmusculus	Ccr7+ Dendritic	DROP	state ambiguous across species or class one species alone defines
 mmusculus	Airway Smooth Muscle	DROP	state ambiguous across species or class one species alone defines
 mmusculus	Neuroendocrine	DROP	state ambiguous across species or class one species alone defines
