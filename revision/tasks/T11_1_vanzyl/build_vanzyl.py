@@ -261,6 +261,28 @@ def add_source_batch(obs: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def class_filter(raw, class_min: int):
+    """Remove a class from a species below ``class_min`` cells, unless a planned test needs the class.
+
+    Rule of the kidney and islet cohorts (checklist item 5). Exception, reason recorded: V2 and V3 compare
+    species over shared outflow types, so a class in van Zyl's conventional or uveoscleral outflow groups
+    and present in all five species stays.
+    """
+    t = pd.crosstab(raw.obs["cell_ontology_class"].astype(str), raw.obs["species"].astype(str))
+    groups = raw.obs[["cell_ontology_class", "cell_class"]].astype(str).drop_duplicates().set_index("cell_ontology_class")["cell_class"]
+    shared_outflow = (t > 0).all(axis=1) & groups.reindex(t.index).isin(["conventional outflow", "uveoscleral outflow"])
+    removed, kept = [], []
+    for k in t.index:
+        for s_ in t.columns:
+            if 0 < t.loc[k, s_] < class_min:
+                (kept if shared_outflow[k] else removed).append(dict(species=s_, cell_ontology_class=k, n_cells=int(t.loc[k, s_])))
+    drop = pd.MultiIndex.from_arrays([raw.obs["species"].astype(str), raw.obs["cell_ontology_class"].astype(str)]).isin(
+        [(r["species"], r["cell_ontology_class"]) for r in removed])
+    rec = dict(min_cells=class_min, removed=removed, kept_shared_outflow_exception=kept, n_cells_removed=int(drop.sum()),
+               exception_reason="V2 and V3 compare species over shared outflow types")
+    return raw[~drop].copy(), rec
+
+
 def harmonise(obs: pd.DataFrame) -> pd.DataFrame:
     cmap = pd.read_csv(TASK / "celltype_map.tsv", sep="\t")
     if cmap.duplicated(["species", "source_label"]).any():
@@ -350,6 +372,8 @@ def main() -> int:
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--no-compare", action="store_true", help="skip the cross-check with the old object")
     ap.add_argument("--skip-gunzip-check", action="store_true")
+    ap.add_argument("--class-min", type=int, default=None,
+                    help="cells per (species, cell_ontology_class); see class_filter (T11.8 sensitivity object)")
     args = ap.parse_args()
     out = args.out.resolve()
     if out.is_relative_to((REPO / "data" / "processed").resolve()):
@@ -406,6 +430,8 @@ def main() -> int:
         [(str(s), str(t)) for s, t in thin.index])
     raw = raw[~drop].copy()
     report["thin_type_rule"]["n_cells_removed"] = int(drop.sum())
+    if args.class_min:
+        raw, report["class_filter"] = class_filter(raw, args.class_min)
 
     # 3. Per species: validate counts, QC filter.
     per_species, qc_rec = {}, {}
