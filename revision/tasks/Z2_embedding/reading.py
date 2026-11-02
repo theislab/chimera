@@ -17,9 +17,8 @@ import diagnostics as Z1  # noqa: E402
 
 
 def consensus(c):
-    cols = pd.read_parquet(RU.REPO / f"results/revision/H1/genes/{c}.parquet", columns=None).columns.tolist()
-    use = [x for x in cols if x in ("var_name", "pi_clamped", "pi_raw", "D", "S_ema", "count_support") or x.startswith("alpha_s")]
-    return pd.read_parquet(RU.REPO / f"results/revision/H1/genes/{c}.parquet", columns=use).set_index("var_name")
+    d = pd.read_parquet(RU.REPO / f"results/revision/H1/genes/{c}.parquet")
+    return d[[x for x in d.columns if x in ("pi_clamped", "pi_raw", "D", "S_ema", "count_support") or x.startswith("alpha_s")]]
 
 
 def main():

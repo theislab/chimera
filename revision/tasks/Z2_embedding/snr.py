@@ -38,7 +38,8 @@ def stats(c, name, method, seed, zm, lv, rate):
     u, s, vt = np.linalg.svd(zc, full_matrices=False)
     var = s ** 2 / len(zm)
     # diagonal posterior projected on PC k: sum_d v_kd^2 sigma_d^2
-    post = (np.exp(lv)[:, None, :] * (vt ** 2)[None, :, :]).sum(-1).mean(0)
+    pv = (np.exp(np.clip(lv, -30, 30))[:, None, :] * (vt ** 2)[None, :, :]).sum(-1)
+    post = np.median(pv, axis=0)   # typical cell: the mean is ruled by the few cells whose learned variance runs away (Z1)
     pcs = pd.DataFrame(dict(cohort=c, latent=name, method=method, seed=seed, pc=np.arange(len(var)) + 1, share=var / var.sum(), noise_ratio=post / var,
                             r_loglib=[abs(np.corrcoef(u[:, k], lib)[0, 1]) for k in range(len(var))],
                             species_auc=[roc_auc_score(codes == 0, u[:, k]) for k in range(len(var))]))
