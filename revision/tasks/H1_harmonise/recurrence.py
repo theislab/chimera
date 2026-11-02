@@ -144,7 +144,7 @@ def one(args):
     """Set z for one cohort x readout. Returns long table and the null z matrix (for the primaries)."""
     c, readout, membership, n_perm = args
     g = pd.read_parquet(OUT / "genes" / f"{c}.parquet").dropna(subset=["hsapiens_gene_id"]).drop_duplicates("hsapiens_gene_id")
-    col = {"D": "D", "D_allgenes": "D", "D_raw": "D_raw", "D_hmid": "D", "S": "S_ema", "B1": "B1", "pi": "pi_raw", "dNdS": "dNdS", "D_integrated": None, "D_tau": "D", "S_tau": "S_ema", "D_block": "D", "S_block": "S_ema"}[readout]
+    col = {"D": "D", "D_allgenes": "D", "D_raw": "D_raw", "D_hmid": "D", "S": "S_ema", "B1": "B1", "pi": "pi_raw", "dNdS": "dNdS", "D_integrated": None, "D_tau": "D", "S_tau": "S_ema", "D_block": "D", "S_block": "S_ema", "D_nosat": "D", "S_nosat": "S_ema"}[readout]
     if readout == "D_integrated":
         keep = [f"alpha_s{s}" for s in (42, 43, 44, 47, 48, 51) if f"alpha_s{s}" in g]
         x = g[keep].mean(1) - g["pi_clamped"]
@@ -154,6 +154,8 @@ def one(args):
         g = g[g.dNdS > 0].assign(dNdS=lambda d: np.log10(d.dNdS.clip(lower=1e-3)))
     u = g if readout == "D_allgenes" else g[g.count_support]
     u = u.dropna(subset=[col, "expr"])
+    if readout.endswith("_nosat"):
+        u = u[~u.saturated_flag]
     if readout == "D_hmid":
         u = u.dropna(subset=["identity_human_mouse"])
     st = strata(u, readout not in ("pi", "dNdS"), "identity_human_mouse" if readout == "D_hmid" else "pi_raw", with_tau=readout.endswith("_tau"))
@@ -284,7 +286,7 @@ def main() -> int:
     primary = [RU.PRIMARY[t] for t in RU.TISSUE_ORDER]
     jobs = [(c, r, mem, a.n_perm) for c in primary for r in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid")]
     jobs += [("liv_hmouse", "D_integrated", mem, a.n_perm)]
-    jobs += [(c, r, mem, a.n_perm) for c in primary for r in ("D_tau", "S_tau")]
+    jobs += [(c, r, mem, a.n_perm) for c in primary for r in ("D_tau", "S_tau", "D_nosat", "S_nosat")]
     jobs += [(c, r, mem, 2000) for c in primary for r in ("D_block", "S_block")]
     jobs += [(c, r, mem, 2000) for c in cohorts if c not in primary for r in ("D", "S")]
     with ProcessPoolExecutor(a.jobs) as ex:
@@ -294,7 +296,7 @@ def main() -> int:
     idx = {(j[0], j[1]): i for i, j in enumerate(jobs)}
     fam = {k: k.split("|")[0] for k in mem.key.unique()}
     allrec, allts = [], []
-    tests = {k: k for k in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid", "D_tau", "S_tau", "D_block", "S_block")}
+    tests = {k: k for k in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid", "D_tau", "S_tau", "D_block", "S_block", "D_nosat", "S_nosat")}
     sets_all = res[0][2]
     keep = [s for s in sets_all if not s.startswith("lineage|")]
     ki = [sets_all.index(s) for s in keep]

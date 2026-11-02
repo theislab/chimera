@@ -44,13 +44,31 @@ RECIPE_SOURCE = {
     "liv_4sp": "canonical K = 4 recipe", "test_hmac": "canonical testis K = 2 recipe", "test_hmouse": "canonical testis K = 2 recipe, adversary doubled",
     "test_3sp": "canonical testis K = 3 recipe", "bone_marrow": "testis K = 3 form, tuned on training health (negative-side anchor at half weight)",
     "kidney": "testis K = 2 form, adversary one step up", "islet": "testis K = 2 form, anchor doubled", "vz_hmouse": "testis K = 2 form", "vz_hmmul": "testis K = 2 form",
-    "vz_primates": "canonical testis K = 3 row", "vz_full": "testis form scaled to K = 5", "vz_hpig": "testis K = 2 form", "vz_hmfas": "testis K = 2 form",
+    "vz_primates": "canonical testis K = 3 row", "vz_full": "testis form scaled to K = 5, adversary at the testis 3-species value; chosen on count dependence", "vz_hpig": "testis K = 2 form", "vz_hmfas": "testis K = 2 form",
 }
 
 
 def t33_seeds() -> dict:
     j = json.loads((RES / "T3_3" / "seed_pooling.json").read_text())
     return {r["cohort"]: [int(s) for s in r["used"]] for r in j}
+
+
+def o1_flags(c: str, vn: pd.Index, ens: pd.Series) -> pd.DataFrame:
+    """O1 flags as columns, per var_name; empty when O1 has no row for the cohort. No gene is dropped."""
+    cols = {"T2": "o1_T2", "M_wrong_row": "o1_M_wrong_row", "M_false_zero": "o1_M_false_zero", "zero_any": "o1_zero_any"}
+    f = RES / "O1" / "flags_by_cohort.parquet"
+    out = pd.DataFrame({v: pd.Series(pd.NA, index=vn, dtype="boolean") for v in cols.values()})
+    if not f.exists():
+        return out
+    d = pd.read_parquet(f, columns=["cohort", "var_name", "hsapiens_gene_id", *cols])
+    d = d[d.cohort == c].set_index("var_name")
+    if not len(d):
+        return out
+    d = d.reindex(vn)
+    known = d.hsapiens_gene_id.notna().to_numpy()
+    if (d.hsapiens_gene_id.to_numpy()[known] != ens.to_numpy()[known]).any():
+        raise AssertionError(f"{c}: O1 flags disagree with H1 on gene identity")
+    return d[list(cols)].astype("boolean").rename(columns=cols)
 
 
 def run_health(run: str) -> dict:
@@ -172,6 +190,10 @@ def build_cohort(args) -> dict:
             g[k] = cov[k]
     tt = task_table(c)
     g["B1"] = b1_column(c, tt, vn)
+    for k, v in o1_flags(c, vn, g["hsapiens_gene_id"]).items():
+        g[k] = v
+    flagged = (g["o1_M_wrong_row"].fillna(False) | g["o1_M_false_zero"].fillna(False) | g["o1_zero_any"].fillna(False)).astype(bool)
+    g["nameable"] = g["strict_support"] & ~flagged
     gold = pd.read_csv(RES / "T4_3/golds/gold_table.csv", index_col=0)[["dNdS", "LOEUF"]]
     g = g.reset_index().merge(gold, how="left", left_on="hsapiens_gene_id", right_index=True).set_index("var_name").reindex(vn)
     g.insert(0, "cohort", c)
@@ -189,6 +211,15 @@ def build_cohort(args) -> dict:
     ck["frac_alpha_table_join"] = float(g.symbol.notna().mean())
     if tt is not None and "D" in tt:
         ck["max_abs_diff_D_task_table"] = float(np.abs(g["D"] - tt["D"].reindex(vn)).max())
+    ck["n_saturated_flag"] = int(g.saturated_flag.sum())
+    tidy = RES / "T11" / "genes" / f"genes_{c[3:]}.tsv"
+    if c.startswith("vz_") and tidy.exists():  # the tidy table of the eye agent: same genes, same flag
+        ty = pd.read_csv(tidy, sep="\t").set_index("var_name").reindex(vn)
+        ck["n_saturated_flag_differs_T11"] = int((ty["saturated_flag"].astype(bool).to_numpy() != g.saturated_flag.to_numpy()).sum())
+        ck["max_abs_diff_D_tidy"] = float(np.abs(g["D"] - ty["delta_alpha_centred"]).max())
+    for k in ("o1_T2", "o1_M_wrong_row", "o1_M_false_zero", "o1_zero_any"):
+        ck[f"n_{k}"] = int(g[k].fillna(False).sum())
+    ck["n_strict"], ck["n_nameable"] = int(g.strict_support.sum()), int(g.nameable.sum())
     if c in t33_seeds():
         cs = pd.read_csv(RES / "T3_3" / f"{c}__consensus.csv").set_index("var_name").reindex(vn)
         ck["max_abs_diff_D_task_table"] = float(np.abs(g["D"] - cs["D"]).max())
@@ -328,7 +359,7 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
         a = ad.read_h5ad(d["h5ad"], backed="r")
         ref = chance_refs(a.obs["species"].astype(str).to_numpy())
         a.file.close()
-        z, i = z1[z1.cohort == c], integ[integ.cohort == c]
+        z, i = z1[z1.cohort == c], integ[integ.run.isin(kept.run)]
         un = g.count_support.to_numpy()
         tail = g[g.delta_alpha.abs() > RU.TAIL]
         ok = g.count_support & (np.sign(g.S_ema) == np.sign(g.delta_alpha)) & (g.S_ema.abs() >= np.median(g.S_ema.abs()[un]))
@@ -348,6 +379,10 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
             frac_at_clamp=float((g.pi_raw >= g.pi_clamped.max() - 1e-6).mean()),
             rho_DS_z1=float(z.rho_DS.mean()), rho_DS_z1_min=float(z.rho_DS.min()), rho_DS_z1_max=float(z.rho_DS.max()), rho_DS_partial_z1=float(z.rho_DS_partial.mean()),
             rho_DS_consensus=float(spearmanr(g.D[un], g.S_ema[un])[0]),
+            seed_sat_max=float(kept.sat_hi.max()), n_saturated=int(g.saturated_flag.sum()), nameable_n=int(g.nameable.sum()),
+            rho_DS_no_saturated=float(spearmanr(g.D[un & ~g.saturated_flag], g.S_ema[un & ~g.saturated_flag])[0]),
+            tail_up_D_no_saturated=float((g.D[~g.saturated_flag] > RU.TAIL).mean()), tail_dn_D_no_saturated=float((g.D[~g.saturated_flag] < -RU.TAIL).mean()),
+            n_o1_T2=int(g.o1_T2.fillna(False).sum()), n_o1_map=int((g.o1_M_wrong_row.fillna(False) | g.o1_M_false_zero.fillna(False)).sum()),
             mixing_entropy=float(i.knn_mixing_entropy.mean()), mixing_entropy_random=ref["entropy_random"], mixing_ratio=float(i.knn_mixing_entropy.mean() / ref["entropy_random"]),
             species_purity=float(i.knn_species_purity.mean()), label_transfer=float(i.label_transfer_acc.mean()), adv_acc=float(i.adv_acc.mean()), majority_rate=ref["majority_rate"],
             sat_hi=float(kept.sat_hi.mean()),

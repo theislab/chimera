@@ -19,6 +19,9 @@ Per-gene readouts, one schema (tables.py):
               alpha_seed - pi_clamped - seed median stable over every kept seed;  named genes need strict_support. Saturated genes (alpha > 0.95 in any
               seed) are flagged and may be named. Amendment, after the first gene lists: the first rule also excluded saturated genes, which on clamped recipes removes the
               whole upper tail near the ceiling (pi_clamped 0.85 + 0.10), including most lineage genes; their sign is backed by counts, only their rank among themselves is capped;
+  nameable    strict_support, no exact zero count in a species of the cohort and no mapping flag of the ortholog audit (O1). Amendment, after O1: a false zero
+              costs level and put renamed genes at the bottom of liver (BABAM2, MINDY1-3); such genes stay in the tables, flagged, and are not named;
+  o1_T2, o1_M_wrong_row, o1_M_false_zero, o1_zero_any  O1 flags on the cohort's own species (flags_by_cohort.parquet); columns only, no gene is dropped;
   expr, detection  species-balanced mean log1p CP10K and detection on the training object (cohorts.gene_covariates).
 
 Sign. Compared across cohorts only after centring, and in the set analysis only against genes matched on the prior and on
@@ -42,6 +45,8 @@ come from protein features; recurrence on S_ema does not. Both are reported.
 Post hoc sensitivities, added after 48 of 72 sets recurred on D and the sequence baselines recurred about as often, which says the gene-level null is a low bar for coherent sets: (i) D_tau, S_tau: strata
 also on cell-type specificity tau (5 bins), since the margin rewards having a pattern; (ii) D_block, S_block: a null that keeps ESM-module structure (block_scores, 2,000 draws) on values centred within strata. The main-figure list
 is the primary rule; survival under (i) and (ii) is shown beside it.
+
+(iii) D_nosat, S_nosat: genes with alpha > 0.95 in any seed left out, the sensitivity the amended seed rule asks for where a seed is above 5% saturation.
 
 Separate axis (recurrence.axis_table), per cohort: Spearman of D with pi_raw and with log10 dN/dS (Compara human-mouse, T4.3 gold table), on all genes
 and on count-supported genes; the same for S_ema and D_raw; rho(pi_raw, dN/dS) as the reference; partial rho(D, dN/dS | pi_raw, expr, detection).
