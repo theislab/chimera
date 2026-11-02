@@ -24,7 +24,14 @@ _BONE_MARROW = str(REPO_ROOT / "data" / "revision" / "bone_marrow" / "ortholog_t
 # Kidney AKI case (plan section 8c): human-mouse 1:1, P13_kidney/build_orthologs.py.
 _KIDNEY = str(REPO_ROOT / "data" / "revision" / "disease_kidney" / "ortholog_table_kidney.csv")
 
+# C1 new use cases (plan section 13): tables and objects in new_usecases/c1_build/objects.
+_C1 = REPO_ROOT / "data" / "revision" / "new_usecases" / "c1_build" / "objects"
+_C1_COHORTS = {"brain_dlpfc": "brain_dlpfc", "brain_dlpfc_hchimp": "brain_dlpfc", "brain_dlpfc_hmac": "brain_dlpfc", "brain_dlpfc_hmarm": "brain_dlpfc",
+               "brain_m1": "brain_m1", "brain_m1_hmouse": "brain_m1_hmouse", "lung_healthy": "lung_healthy", "tumour_zilionis": "tumour_zilionis",
+               "regen_hoang": "regen_hoang", "muscle_ageing": "muscle_ageing"}
+
 TABLES = {
+    **{k: str(_C1 / f"ortholog_table_{v}.csv") for k, v in _C1_COHORTS.items()},
     "liver": _LIVER,
     "liv_hmonkey": _LIVER,
     "liv_hmouse": _LIVER,
@@ -56,6 +63,7 @@ REVISION_H5ADS = {
     # build 2 (T12.2b: no mt filter, per-type cap at the testis 3-species size); build 1 in the parent folder
     "bone_marrow": REPO_ROOT / "data" / "revision" / "bone_marrow" / "v2" / "bone_marrow_unified.h5ad",
     "kidney": REPO_ROOT / "data" / "revision" / "disease_kidney" / "kidney_healthy_train.h5ad",
+    **{k: _C1 / f"{k}.h5ad" for k in _C1_COHORTS},
 }
 
 

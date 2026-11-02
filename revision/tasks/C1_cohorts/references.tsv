@@ -1,0 +1,126 @@
+cohort	set	gene	cell_type	direction	source
+brain	human_lineage	FOXP2	Micro	human-specific in microglia	Ma 2022
+brain	human_lineage	SLC47A1	SST	unique to human TH-expressing inhibitory subtypes	Ma 2022
+brain	human_lineage	GCH1	SST	human InN SST HGF GABRQ subtype	Ma 2022
+brain	human_lineage	SLC18A2	SST	human InN SST HGF GABRQ subtype	Ma 2022
+brain	human_lineage	DRD2	SST	human InN SST HGF GABRQ subtype	Ma 2022
+brain	human_lineage	MELTF	PVALB	up in human chandelier subtypes	Ma 2022
+brain	human_lineage	NMU		neuropeptide overrepresented among human-enriched, inhibitory	Ma 2022
+brain	human_lineage	PENK		neuropeptide overrepresented among human-enriched, inhibitory	Ma 2022
+brain	human_lineage	ANXA1	L2_3_IT	selectively human in upper-layer IT	Ma 2022
+brain	human_lineage	PKD2L1	L3_5_IT	enriched in human L3-5 IT	Ma 2022
+brain	human_lineage	TWIST2		human-lineage gene, excitatory	Ma 2022
+brain	human_lineage	ELK3		human-lineage gene, excitatory	Ma 2022
+brain	human_lineage	CCDC88C		human-lineage gene, excitatory	Ma 2022
+brain	human_lineage	MET		human-lineage gene, excitatory	Ma 2022
+brain	human_lineage	ALDH1A1		human-lineage gene, excitatory	Ma 2022
+brain	human_lineage	CACNA1D	Micro	enriched in human microglia	Ma 2022
+brain	human_lineage	MERTK	L3_5_IT	human-specific in L3-5 IT, conserved in microglia	Ma 2022
+brain	human_lineage	NR4A2	Mural	human-specific in smooth muscle	Ma 2022
+brain	human_lineage	DSCAM	Micro	human-specific in microglia	Ma 2022
+brain	human_lineage	VEGFB	Mural	enriched in human pericytes	Ma 2022
+brain	human_lineage	PGF	Mural	enriched in human pericytes	Ma 2022
+brain	human_lineage	CCL3	Micro	signature of human-specific microglia subtype	Ma 2022
+brain	human_lineage	CCL4	Micro	signature of human-specific microglia subtype	Ma 2022
+brain	human_lineage	CD83	Micro	signature of human-specific microglia subtype	Ma 2022
+brain	human_lineage	CH25H	Micro	signature of human-specific microglia subtype	Ma 2022
+brain	human_lineage	CD86	Micro	signature of human-specific microglia subtype	Ma 2022
+brain	hominini	CBLN2		up in human and chimpanzee, excitatory	Ma 2022
+brain	hominini	CYP26B1	L6_CT	enriched in Hominini	Ma 2022
+brain	hominini	GBA1		enriched in Hominini (named GBA)	Ma 2022
+brain	hominini	GOSR2		enriched in Hominini	Ma 2022
+brain	hominini	GLDN	Micro	human and chimpanzee microglia subtype	Ma 2022
+brain	hominini	MYO1E	Micro	human and chimpanzee microglia subtype	Ma 2022
+brain	hominini	PADI2	Micro	human and chimpanzee microglia subtype	Ma 2022
+brain	hominini	PPARG	Micro	human and chimpanzee microglia subtype	Ma 2022
+brain	hominini	OSMR	Astro	human and chimpanzee astrocyte subtype	Ma 2022
+brain	primate_vs_mouse	FOXP2	L3_5_IT	primate-specific in L4 granular, enriched in L3-5 IT, not mouse	Ma 2022
+brain	primate_vs_mouse	IL1RAPL2	L3_5_IT	primate-specific compared with mouse	Ma 2022
+brain	primate_vs_mouse	PHLDB2	L3_5_IT	primate-specific compared with mouse	Ma 2022
+brain	primate_vs_mouse	PLCH1	L3_5_IT	primate-specific compared with mouse	Ma 2022
+brain	primate_vs_mouse	OPALIN	Oligo	primate oligodendrocyte type, absent as a cluster in mouse	Bakken 2021
+brain	primate_vs_mouse	MAP6D1	Oligo	primate oligodendrocyte type	Bakken 2021
+brain	primate_vs_mouse	SLC1A3	Oligo	marmoset oligodendrocyte type	Bakken 2021
+brain	primate_vs_mouse	CACNA1C	L5_ET	higher in human L5 ET than mouse	Bakken 2021
+brain	primate_vs_mouse	KCNC2	L5_ET	higher in human L5 ET than mouse	Bakken 2021
+brain	conserved_marker	UNC5B	PVALB	conserved chandelier marker in all three species	Bakken 2021
+brain	conserved_marker	RORA	PVALB	conserved chandelier marker in all three species	Bakken 2021
+brain	conserved_marker	TRPS1	PVALB	conserved chandelier marker in all three species	Bakken 2021
+brain	conserved_marker	NFIB	PVALB	conserved chandelier marker in all three species	Bakken 2021
+brain	conserved_marker	KIT	LAMP5	Lamp5_2 rosehip-like type	Bakken 2021
+brain	conserved_marker	POU3F1	L5_ET	L5 ET marker in human and mouse	Bakken 2021
+brain	conserved_marker	AQP4	Astro	astrocyte marker across species	Bakken 2021
+brain	conserved_marker	ID3	Astro	astrocyte marker across species	Bakken 2021
+ad	dam_mouse_up	CST7	Micro	up in 5XFAD; not detected in human	Zhou 2020
+ad	dam_mouse_up	LPL	Micro	up in 5XFAD; not detected in human	Zhou 2020
+ad	dam_mouse_up	GPNMB	Micro	not detected in human	Zhou 2020
+ad	dam_mouse_up	CSF1	Micro	up in 5XFAD	Zhou 2020
+ad	dam_shared	APOE	Micro	up in both	Zhou 2020
+ad	dam_shared	TREM2	Micro	up in both	Zhou 2020
+ad	dam_shared	CD74	Micro	up in both (MHC-II)	Zhou 2020
+ad	dam_shared	CD68	Micro	up in human; DAM homologue	Zhou 2020
+ad	homeostatic_opposite	TMEM119	Micro	down in 5XFAD, up in human AD	Zhou 2020
+ad	homeostatic_opposite	P2RY12	Micro	down in 5XFAD, up in human AD	Zhou 2020
+ad	homeostatic_opposite	CX3CR1	Micro	down in 5XFAD, up in human AD	Zhou 2020
+ad	human_only	IRF8	Micro	up in human AD; IRF8-driven reactive phenotype	Zhou 2020
+ad	human_only	SORL1	Micro	up in human AD	Zhou 2020
+ad	human_only	A2M	Micro	up in human AD	Zhou 2020
+ad	human_only	CHI3L1	Micro	up in human AD	Zhou 2020
+ad	human_down	SPP1	Micro	down in human AD	Zhou 2020
+ad	human_down	FTH1	Micro	down in human AD	Zhou 2020
+ad	human_down	SLC25A37	Micro	down in human AD	Zhou 2020
+ad	oligo_mouse_reactive	C4B	Oligo	up in 5XFAD oligodendrocytes; human homologue in astrocytes	Zhou 2020
+ad	oligo_mouse_reactive	SERPINA3	Oligo	Serpina3n up in 5XFAD oligodendrocytes (mouse paralog: 1:1 table may lack it); human SERPINA3 astrocytic	Zhou 2020
+lung	adi_shared	KRT8	AT2	Krt8+ ADI in mouse; persists in human fibrosis	Strunz 2020
+lung	adi_shared	KRT17	AT2	co-expressed with KRT8 in fibrotic human epithelium	Strunz 2020
+lung	adi_mouse	ITGB6	AT2	pro-fibrogenic, ADI	Strunz 2020
+lung	adi_mouse	AREG	AT2	pro-fibrogenic, ADI	Strunz 2020
+lung	adi_mouse	HBEGF	AT2	pro-fibrogenic, ADI	Strunz 2020
+lung	adi_mouse	EDN1	AT2	pro-fibrogenic, ADI	Strunz 2020
+lung	adi_mouse	LGALS3	AT2	pro-fibrogenic, ADI	Strunz 2020
+lung	adi_mouse	PLAUR	AT2	ADI, not AT1	Strunz 2020
+lung	adi_mouse	CCN2	AT2	Ctgf, pro-fibrogenic, ADI	Strunz 2020
+lung	spp1_macrophage	SPP1	Macrophage	profibrotic macrophages in both species (scouting S3, not re-checked)	Aran 2019; Morse 2019
+lung	human_basaloid	KRT5	AT2	aberrant basaloid is KRT5-, KRT17+, human state	Habermann 2020
+lung	human_basaloid	COL1A1	AT2	expressed in KRT5-/KRT17+ cells	Habermann 2020
+lung	human_basaloid	FN1	AT2	expressed in KRT5-/KRT17+ cells	Habermann 2020
+lung	human_airway	MUC5B	AT2	airway program, expected not to transfer (scouting S3)	S3
+tumour	congruent_dc	XCR1	cDC	DC1, one-to-one	Zilionis 2019
+tumour	congruent_dc	CLEC9A	cDC	DC1, one-to-one	Zilionis 2019
+tumour	congruent_dc	BATF3	cDC	DC3, one-to-one	Zilionis 2019
+tumour	congruent_dc	IRF8	cDC	DC3, one-to-one	Zilionis 2019
+tumour	congruent_dc	CD74	Mono	MonoDC in both species	Zilionis 2019
+tumour	congruent_dc	CLEC10A	Mono	MonoDC in both species	Zilionis 2019
+tumour	congruent_mono	S100A8	Mono	Mono3 in both species	Zilionis 2019
+tumour	congruent_mono	S100A9	Mono	Mono3 in both species	Zilionis 2019
+tumour	congruent_mono	CSF3R	Mono	Mono3 in both species	Zilionis 2019
+tumour	congruent_neut	MMP8	Neutrophil	N1 in both	Zilionis 2019
+tumour	congruent_neut	MMP9	Neutrophil	N1 in both	Zilionis 2019
+tumour	congruent_neut	IFIT1	Neutrophil	N2 in both	Zilionis 2019
+tumour	congruent_neut	IRF7	Neutrophil	N2 in both	Zilionis 2019
+tumour	congruent_neut	RSAD2	Neutrophil	N2 in both	Zilionis 2019
+tumour	divergent_mac	CXCL5	Macrophage	human hMac1, poorly represented in mouse	Zilionis 2019
+tumour	divergent_mac	CXCL12	Macrophage	human hMac8	Zilionis 2019
+tumour	divergent_mac	CXCL9	Macrophage	human hMac9	Zilionis 2019
+tumour	divergent_mac	CXCL10	Macrophage	human hMac9	Zilionis 2019
+tumour	divergent_mac	CXCL11	Macrophage	human hMac9	Zilionis 2019
+tumour	divergent_mac	KRT19	Macrophage	mouse alveolar macrophage mMac4	Zilionis 2019
+tumour	divergent_mac	CA4	Macrophage	mouse alveolar macrophage mMac4 (Car4)	Zilionis 2019
+regen	resting	RLBP1	Muller	resting, reduced by Nfia/b/x loss	Hoang 2020
+regen	resting	GLUL	Muller	resting, reduced by Nfia/b/x loss	Hoang 2020
+regen	resting	LHX2	Muller	resting	Hoang 2020
+regen	resting	HES1	Muller	resting	Hoang 2020
+regen	nfi_quiescence	NFIA	Muller	maintains quiescence, mouse	Hoang 2020
+regen	nfi_quiescence	NFIB	Muller	maintains quiescence, mouse-only network	Hoang 2020
+regen	nfi_quiescence	NFIX	Muller	maintains quiescence, mouse	Hoang 2020
+regen	nfi_quiescence	SOX5	Muller	mouse-only quiescence network	Hoang 2020
+regen	reactive	STAT3	Muller	reactive	Hoang 2020
+regen	reactive	SOX9	Muller	reactive	Hoang 2020
+regen	reactive	TEAD1	Muller	reactive	Hoang 2020
+regen	reactive	RELA	Muller	reactive; Rela/b mouse-specific	Hoang 2020
+regen	reactive	RELB	Muller	reactive; Rela/b mouse-specific	Hoang 2020
+regen	proneurogenic	ASCL1	Muller	neurogenic, zebrafish; mouse only after Nfia/b/x loss	Hoang 2020
+regen	proneurogenic	FOXN4	Muller	pro-neurogenic zebrafish	Hoang 2020
+regen	proneurogenic	OLIG2	Muller	pro-neurogenic zebrafish	Hoang 2020
+regen	proneurogenic	TGIF1	Muller	pro-neurogenic zebrafish	Hoang 2020
+regen	proneurogenic	LIN28A	Muller	zebrafish-specific	Hoang 2020
