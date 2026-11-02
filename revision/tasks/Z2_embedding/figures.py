@@ -79,7 +79,7 @@ def panel_seeds():
     fig.savefig(OUT / "z2_c.pdf", bbox_inches="tight")
 
 
-GROUPS = {"Mixing terms": ["adv100", "adv50", "adv0", "mmd10", "mmd0", "adv0mmd0", "cmmd", "adv50mmd10", "adv20mmd10", "adv50mmd5", "adv20mmd5"], "KL and prior": ["fb05", "fb2", "novamp", "klw5"], "Size": ["nl20", "nl30", "ep300", "zb0", "res01"], "Input": ["logx", "logcp", "logx_adv0mmd0"]}
+GROUPS = {"Mixing terms": ["adv100", "adv50", "adv0", "mmd10", "mmd0", "adv0mmd0", "cmmd", "adv50mmd10", "adv20mmd10", "adv50mmd5", "adv20mmd5"], "KL and prior": ["fb05", "fb2", "novamp", "klw5", "novamp_adv400", "novamp_mmd100", "novamp_cmmd"], "Size": ["nl20", "nl30", "ep300", "zb0", "res01"], "Input": ["logx", "logcp", "logx_adv0mmd0"]}
 GC = {"Mixing terms": ("#D55E00", "o"), "KL and prior": ("#009E73", "^"), "Size": ("#CC79A7", "D"), "Input": ("#E69F00", "v")}
 
 

@@ -100,6 +100,7 @@ LEVELS = {
     "adv50mmd10": ("raw", "--adv-weight 50 --lambda-mmd 10"), "adv20mmd10": ("raw", "--adv-weight 20 --lambda-mmd 10"), "adv50mmd5": ("raw", "--adv-weight 50 --lambda-mmd 5"), "adv20mmd5": ("raw", "--adv-weight 20 --lambda-mmd 5"),
     # Added after novamp s42 was read (amendment 13): more mixing pressure without the VAMP prior.
     "novamp_adv400": ("raw", "--no-vamp-prior --adv-weight 400"), "novamp_mmd100": ("raw", "--no-vamp-prior --lambda-mmd 100"),
+    "novamp_cmmd": ("raw", "--no-vamp-prior --celltype-conditional-mmd --celltype-key cell_ontology_class"),  # amendment 15
     "logx": ("log1p", ""), "logcp": ("logcp", ""), "logx_adv0mmd0": ("log1p", "--adv-weight 0 --lambda-mmd 0"),
 }
 # Budget amendment withdrawn by the coordinator (amendments 1, 2): the factorial as committed runs in full. The order in factorial.tsv is priority order, and rows only ever append.
