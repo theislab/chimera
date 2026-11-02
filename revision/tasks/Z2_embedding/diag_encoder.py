@@ -66,7 +66,7 @@ def main():
             r = sens_share(J, order)
             r["zone_share"] = float((J[zone] ** 2).sum() / (J ** 2).sum())
             rows.append(dict(cohort=c, cells=cell_type, species=sp_name, model=f"chimera_s{s}", **r))
-        dirs = sorted((RU.REPO / "results/revision/Y5/scvi").glob(f"{c}_s*")) if c == "liv_hmouse" else sorted((RU.OUT / "scvi").glob(f"{c}_s*"))
+        dirs = sorted((RU.REPO / "results/revision/Y5/scvi").glob(f"{c}_s*"))
         for d in dirs[:3]:
             if not (d / "model.pt").exists():
                 continue
