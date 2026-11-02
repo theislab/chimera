@@ -96,3 +96,12 @@ def table_path(cohort: str) -> Path:
 
 def scaler_path(cohort: str) -> Path:
     return BUILD / "objects" / f"gin_scaler_{cohort}.pkl"
+
+
+# GEO cohort prepared by prepare_tumour.py; symbols mapped to Ensembl there.
+SOURCES["zilionis"] = dict(
+    reference="Zilionis 2019 Immunity, GSE127465, raw counts per library, inDrop; tumour-infiltrating immune cells, human NSCLC and KP mouse tumours",
+    map=MAPS / "tumour_zilionis.tsv", label_col="label", unit_col="donor_id",
+    species={"hsapiens": dict(name="Human", files=[DATA / "tumour_zilionis" / "prepared_human.h5ad"], source="Zilionis2019"),
+             "mmusculus": dict(name="Mouse", files=[DATA / "tumour_zilionis" / "prepared_mouse.h5ad"], source="Zilionis2019")})
+COHORTS["tumour_zilionis"] = dict(source="zilionis", species=["hsapiens", "mmusculus"], tissue="tumour myeloid", label="Tumour human, mouse")
