@@ -40,6 +40,12 @@ TESTIS = {
     "Macaque": ("2testis/dataset/raw-testis-macaque-Murat.h5ad", "macaca_mulatta"),
     "Mouse": ("2testis/dataset/raw-testis-mouse-Murat.h5ad", "mouse"),
 }
+# Kidney H+Mouse (P13 healthy training object). No authors' raw files: B1 builds tool inputs from the object itself.
+KIDNEY = {
+    "Human": ("kidney/raw-kidney-human-KPMP.h5ad", "human"),
+    "Mouse": ("kidney/raw-kidney-mouse-KPMP.h5ad", "mouse"),
+}
+PROCESSED_OVERRIDE = {"kidney_healthy_train": REPO / "data" / "revision" / "disease_kidney" / "kidney_healthy_train.h5ad"}
 # CAMEX homology files, relative to the tissue's dataset folder (human hub).
 CAMEX_REL = {
     ("liver", "Monkey"): "gene_matches_human2monkey.csv",
@@ -58,13 +64,14 @@ COHORTS = {
     "camex_testis_human_macaque": ("test_hmac", "testis", ["Human", "Macaque"]),
     "camex_testis_human_mouse": ("test_hmouse", "testis", ["Human", "Mouse"]),
     "camex_testis_unified": ("test_3sp", "testis", ["Human", "Macaque", "Mouse"]),
+    "kidney_healthy_train": ("kidney", "kidney", ["Human", "Mouse"]),
 }
 KEY_TO_STEM = {v[0]: k for k, v in COHORTS.items()}
 
 
 def species_map(stem: str) -> dict:
     tissue = COHORTS[stem][1]
-    table = LIVER if tissue == "liver" else TESTIS
+    table = {"liver": LIVER, "testis": TESTIS, "kidney": KIDNEY}[tissue]
     return {sp: table[sp] for sp in COHORTS[stem][2]}
 
 
@@ -200,7 +207,7 @@ def base_config(*, stem: str, n_obs: int, n_vars: int, method: str, seed: int,
 def processed_obs(stem: str):
     """obs of the processed h5ad (cell order of record), read in backed mode."""
     import anndata as ad
-    a = ad.read_h5ad(PROCESSED / f"{stem}.h5ad", backed="r")
+    a = ad.read_h5ad(PROCESSED_OVERRIDE.get(stem, PROCESSED / f"{stem}.h5ad"), backed="r")
     obs = a.obs[["species", "cell_type", "cell_ontology_class"]].copy()
     n_vars = a.n_vars
     a.file.close()

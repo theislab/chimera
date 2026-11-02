@@ -41,7 +41,7 @@ from CAMEX.trainer import Trainer  # noqa: E402
 
 
 def authors_params(tissue: str) -> dict:
-    sub = {"liver": "1liver", "testis": "2testis"}[tissue]
+    sub = {"liver": "1liver", "testis": "2testis", "kidney": "1liver"}[tissue]  # kidney: the authors' liver defaults
     spec = importlib.util.spec_from_file_location(f"camex_params_{tissue}", C.CAMEX_DIR / "analysis" / sub / "params.py")
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
@@ -70,6 +70,9 @@ def main(argv=None):
     P = authors_params(tissue)
     authors_train = copy.deepcopy(P["train"])
     rows = P["preprocess"]["dataset_file"]
+    if tissue == "kidney":
+        rows = pd.DataFrame([["raw-kidney-human-KPMP.h5ad", True, "gene_matches_human2mouse.csv", "raw-kidney-mouse-KPMP.h5ad", False]],
+                            columns=rows.columns)
     files = {Path(v[0]).name for v in smap.values()}
     rows = rows[rows["source"].isin(files) & rows["destination"].isin(files)].reset_index(drop=True)
     if len(rows) != len(smap) - 1:

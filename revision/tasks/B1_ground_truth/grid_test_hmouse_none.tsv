@@ -1,0 +1,7 @@
+cohort	alt	effect	band	share	seed	run	reuse	duplicate_of	n_pairs	share_achieved	recipe
+test_hmouse	none	0.0	all	0.0	45	rev-test_hmouse-s45	rev-test_hmouse-s45		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+test_hmouse	none	0.0	all	0.0	46	rev-test_hmouse-s46	rev-test_hmouse-s46		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+test_hmouse	none	0.0	all	0.0	47	rev-test_hmouse-s47	rev-test_hmouse-s47		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+test_hmouse	none	0.0	all	0.0	48	rev-test_hmouse-s48	rev-test_hmouse-s48		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+test_hmouse	none	0.0	all	0.0	49	rev-test_hmouse-s49	rev-test_hmouse-s49		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+test_hmouse	none	0.0	all	0.0	50	rev-test_hmouse-s50	rev-test_hmouse-s50		0	0.0	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
