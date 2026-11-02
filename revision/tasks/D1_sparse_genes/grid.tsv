@@ -1,0 +1,35 @@
+tier	cohort	setting	family	rep	seed	run	fit	arm
+1	liv_hmouse	hoA_P	heldout	0	242	d1-liv_hmouse-hoA_P-r0	1	P
+1	liv_hmouse	hoA_P	heldout	1	243	d1-liv_hmouse-hoA_P-r1	1	P
+1	liv_hmouse	hoB_P	heldout	0	242	d1-liv_hmouse-hoB_P-r0	1	P
+1	liv_hmouse	hoB_P	heldout	1	243	d1-liv_hmouse-hoB_P-r1	1	P
+1	liv_hmouse	depth5	sampling	0	142	d1-liv_hmouse-depth5-r0	1	
+1	liv_hmouse	depth10	sampling	0	142	d1-liv_hmouse-depth10-r0	1	
+1	test_hmouse	hoA_P	heldout	0	242	d1-test_hmouse-hoA_P-r0	1	P
+1	test_hmouse	hoA_P	heldout	1	243	d1-test_hmouse-hoA_P-r1	1	P
+1	test_hmouse	hoB_P	heldout	0	242	d1-test_hmouse-hoB_P-r0	1	P
+1	test_hmouse	hoB_P	heldout	1	243	d1-test_hmouse-hoB_P-r1	1	P
+1	test_hmouse	depth5	sampling	0	142	d1-test_hmouse-depth5-r0	1	
+1	test_hmouse	depth10	sampling	0	142	d1-test_hmouse-depth10-r0	1	
+1	test_hmouse	depth25	sampling	0	142	d1-test_hmouse-depth25-r0	1	
+1	liv_4sp	hoA_P	heldout	0	242	d1-liv_4sp-hoA_P-r0	1	P
+1	liv_4sp	hoA_P	heldout	1	243	d1-liv_4sp-hoA_P-r1	1	P
+1	liv_4sp	hoB_P	heldout	0	242	d1-liv_4sp-hoB_P-r0	1	P
+1	liv_4sp	hoB_P	heldout	1	243	d1-liv_4sp-hoB_P-r1	1	P
+1	liv_4sp	depth5	sampling	0	142	d1-liv_4sp-depth5-r0	1	
+1	liv_4sp	depth10	sampling	0	142	d1-liv_4sp-depth10-r0	1	
+1	liv_4sp	depth25	sampling	0	142	d1-liv_4sp-depth25-r0	1	
+2	liv_hmouse	depth5	sampling	1	143	d1-liv_hmouse-depth5-r1	1	
+2	liv_hmouse	depth10	sampling	1	143	d1-liv_hmouse-depth10-r1	1	
+2	test_hmouse	depth5	sampling	1	143	d1-test_hmouse-depth5-r1	1	
+2	test_hmouse	depth10	sampling	1	143	d1-test_hmouse-depth10-r1	1	
+2	test_hmouse	depth25	sampling	1	143	d1-test_hmouse-depth25-r1	1	
+2	liv_4sp	depth5	sampling	1	143	d1-liv_4sp-depth5-r1	1	
+2	liv_4sp	depth10	sampling	1	143	d1-liv_4sp-depth10-r1	1	
+2	liv_4sp	depth25	sampling	1	143	d1-liv_4sp-depth25-r1	1	
+3	liv_hmouse	hoA_E	heldout	0	242	d1-liv_hmouse-hoA_E-r0	1	E
+3	liv_hmouse	hoB_E	heldout	0	242	d1-liv_hmouse-hoB_E-r0	1	E
+3	test_hmouse	hoA_E	heldout	0	242	d1-test_hmouse-hoA_E-r0	1	E
+3	test_hmouse	hoB_E	heldout	0	242	d1-test_hmouse-hoB_E-r0	1	E
+3	liv_4sp	hoA_E	heldout	0	242	d1-liv_4sp-hoA_E-r0	1	E
+3	liv_4sp	hoB_E	heldout	0	242	d1-liv_4sp-hoB_E-r0	1	E
