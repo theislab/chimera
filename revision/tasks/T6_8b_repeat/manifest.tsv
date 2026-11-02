@@ -1,0 +1,3 @@
+run_name	args
+rev-rep-liv_hmouse-s46	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 46 --adv-weight 200 --free-bits 1.0
+rev-rep-liv_hmouse-s47	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --seed 47 --adv-weight 200 --free-bits 1.0
