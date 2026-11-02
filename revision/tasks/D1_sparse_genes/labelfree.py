@@ -128,7 +128,9 @@ def score():
             t, used = BD.frame(c, "depth25")
             if t is None:
                 return [dict(lab, gold=gold, note="Chimera did not finish")]
-            reps = sorted(int(u["run"].rsplit("-r", 1)[1]) for u in used)
+            reps = sorted(int(u["run"].rsplit("-r", 1)[1]) for u in used if not u["discard"])
+            if not reps:
+                return [dict(lab, gold=gold, note="Chimera did not finish")]
             rows = t["sparse_f"].to_numpy()
             sc = ["S_fwd_f", "Sdir_scvi", "Sdir_pca", "Sdir_f", "Lfc_f"]
             t["Sdir_scvi"] = lf(c, "depth25", "scvi", reps).reindex(t.hsapiens_gene_id).to_numpy()

@@ -30,16 +30,21 @@ def load_runs(c: str, setting: str):
                      (B2.RES / "scores" / f"b2-{c}-{setting}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{setting}-r{r}.json")):
             if p.exists() and h.exists():
                 hh = json.loads(h.read_text())
-                if not hh.get("discard", False):
-                    f = pd.read_parquet(p).set_index("hsapiens_gene_id")
-                    fr.append(f[~f.index.duplicated(keep=False)])
-                    used.append(dict(run=p.stem, **{k: hh.get(k) for k in ("mix_entropy", "adv_acc_final", "rho_D_S", "frac_S_zero", "tail_pos", "tail_neg", "sat_hi", "active_dims", "n_cells", "lib_median")}))
+                f = pd.read_parquet(p).set_index("hsapiens_gene_id")
+                f = f[~f.index.duplicated(keep=False)]
+                if hh.get("discard", False):  # no Chimera reading; direct scores of the object stay
+                    for k in ("D", "D_raw", "S_g", "S_fwd", "B1z", "alpha", "correction"):
+                        if k in f:
+                            f[k] = np.nan
+                fr.append(f)
+                used.append(dict(run=p.stem, discard=bool(hh.get("discard", False)), **{k: hh.get(k) for k in ("mix_entropy", "adv_acc_final", "rho_D_S", "frac_S_zero", "tail_pos", "tail_neg", "sat_hi", "active_dims", "n_cells", "lib_median")}))
                 break
     return fr, used
 
 
 def frame(c: str, setting: str):
-    t = CM.load(c).set_index("hsapiens_gene_id")
+    t = CM.load(c)
+    t = t[~t.hsapiens_gene_id.duplicated(keep=False)].set_index("hsapiens_gene_id")
     fr, used = load_runs(c, setting)
     if not fr:
         return None, used
@@ -49,12 +54,19 @@ def frame(c: str, setting: str):
         with np.errstate(invalid="ignore"):
             n = np.isfinite(M).sum(1)
             t[f"{m}_f"] = np.where(n > 0, np.nansum(M, 1) / np.maximum(n, 1), np.nan)
-    Ms = np.column_stack([np.abs(f["S_g"].reindex(t.index).to_numpy(float)) < 1e-6 for f in fr])
-    t["masked_f"] = Ms.all(1)
+    ok = [f for f, u in zip(fr, used) if not u["discard"]]
+    t["n_healthy"] = len(ok)
+    if ok:
+        Ms = np.column_stack([np.abs(f["S_g"].reindex(t.index).to_numpy(float)) < 1e-6 for f in ok])
+        t["masked_f"] = Ms.all(1)
+    else:  # no fit finished: genes expected to be masked, chance of passing the 20-cell mask under 5% (ppass of the setting's object); stated in the ledger
+        t["masked_f"] = (np.nanmean(np.column_stack([f["ppass"].reindex(t.index).to_numpy(float) for f in fr]), 1) < 0.05)
     t["sparse_f"] = (~t.masked).to_numpy() & t.clean.to_numpy() & t["masked_f"].to_numpy()
     t["always_masked"] = t.masked.to_numpy() & t.clean.to_numpy()
     tr = (~t["masked_f"]).to_numpy()
-    y = {"S": t["S_g_f"].to_numpy(float), "Sdir": t["Sdir_f"].to_numpy(float), "D": t["D_f"].to_numpy(float), "B1": t["B1_f"].to_numpy(float)}
+    y = {"Sdir": t["Sdir_f"].to_numpy(float), "B1": t["B1_f"].to_numpy(float)}
+    if ok:
+        y.update(S=t["S_g_f"].to_numpy(float), D=t["D_f"].to_numpy(float))
     Fp = np.column_stack([F, t[["prior_raw"]].to_numpy(float)])  # protein columns available in every setting
     for n, v in y.items():
         yy = np.where(tr & np.isfinite(v), v, np.nan)
@@ -89,7 +101,11 @@ def cell(c, setting, t, setn, rows, used):
     for m in METHODS:
         tt[f"{m}_full"] = tt[m]
     F = list(RU.COV_C)
-    all_f = [f"{m}_f" for m in METHODS] + ["R_S_f", "R_Sdir_f", "R_B1_f", "R_D_f", "kNN_S_f", "kNN_Sdir_f"]
+    all_f = [k for k in [f"{m}_f" for m in METHODS] + ["R_S_f", "R_Sdir_f", "R_B1_f", "R_D_f", "kNN_S_f", "kNN_Sdir_f"] if k in tt and tt[k].notna().any()]
+    hasD = "D_f" in all_f
+    pair = (lambda s: ["D_f", s] if hasD else [s])
+    refD = "D_f" if hasD else None
+    needD = tt["D_f"].notna().to_numpy() if hasD else np.ones(len(tt), bool)
     ful = ["D_full", "S_fwd_full", "Sdir_full", "Lfc_full", "B3a_full", "R_S_p", "kNN_S", "S_full"]
     # 1 own agreement
     for m in METHODS:
@@ -107,11 +123,11 @@ def cell(c, setting, t, setn, rows, used):
         for s in all_f:
             if s == "D_f":
                 continue
-            rw = rows & tt[target].notna().to_numpy() & tt[s].notna().to_numpy() & tt["D_f"].notna().to_numpy()
+            rw = rows & tt[target].notna().to_numpy() & tt[s].notna().to_numpy() & needD
             if rw.sum() < CM.MIN_N:
                 out.append(dict(lab, metric="common_target", target=target, method=s[:-2], n=int(rw.sum()), coverage=float(rw.sum() / max(rows.sum(), 1))))
                 continue
-            for x in CM.X4.rho_unit(tt, target, F, ["D_f", s], rows=rw, label=lab, draws=RU.N_DRAWS_GRID, ref="D_f"):
+            for x in CM.X4.rho_unit(tt, target, F, pair(s), rows=rw, label=lab, draws=RU.N_DRAWS_GRID, ref=refD):
                 x.update(metric="common_target", target=target, method=x["score"][:-2], coverage=float(rw.sum() / max(rows.sum(), 1)), pair=s[:-2])
                 out.append(x)
     # 3 gold: at this depth, and the same genes at full depth
@@ -124,10 +140,10 @@ def cell(c, setting, t, setn, rows, used):
             for s in all_f + ful:
                 if s in ("D_f",) or s not in tt:
                     continue
-                rw = r0 & tt[s].notna().to_numpy() & tt["D_f"].notna().to_numpy()
+                rw = r0 & tt[s].notna().to_numpy() & needD
                 if rw.sum() < CM.MIN_N:
                     continue
-                for x in CM.X4.rho_unit(tt, gold, covs, ["D_f", s], rows=rw, label=lab, draws=RU.N_DRAWS_GRID, ref="D_f"):
+                for x in CM.X4.rho_unit(tt, gold, covs, pair(s), rows=rw, label=lab, draws=RU.N_DRAWS_GRID, ref=refD):
                     x.update(metric="gold", target=gold, kind=kind, split=spl, method=x["score"], coverage=float(rw.sum() / max(r0.sum(), 1)), pair=s)
                     out.append(x)
             pi = rows & CM.split_rows(tt, spl) & tt[gold].notna().to_numpy()
@@ -145,6 +161,9 @@ def one(c, setting):
     ceil = []
     for setn in ("sparse_f", "always_masked"):
         rows = t[setn].to_numpy(bool)
+        if rows.sum() < 30:
+            ceil.append(dict(cohort=c, setting=setting, set=setn, n=int(rows.sum())))
+            continue
         ceil.append(dict(cohort=c, setting=setting, set=setn, n=int(rows.sum()), **ceiling(c, t, rows)))
         rows_out += cell(c, setting, t, setn, rows, used)
     (RU.RES / "b_genes").mkdir(exist_ok=True)
@@ -156,7 +175,7 @@ def one(c, setting):
 
 def main():
     n = int(os.environ.get("SLURM_CPUS_PER_TASK", 8))
-    todo = [(c, s) for c in RU.DEPTH_COHORTS for s in RU.DEPTHS]
+    todo = [(c, s) for c in RU.DEPTH_COHORTS + ["kidney"] for s in RU.DEPTHS]
     res = Parallel(n_jobs=min(n, len(todo)), backend="loky")(delayed(one)(*x) for x in todo)
     pd.DataFrame([r for x in res for r in x[0]]).to_csv(RU.RES / "b_rho.csv", index=False)
     pd.DataFrame([r for x in res for r in x[1]]).to_csv(RU.RES / "b_health.csv", index=False)
