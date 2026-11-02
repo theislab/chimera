@@ -68,9 +68,11 @@ SOURCES = {
 
 COHORTS = {
     # K = 4: the question of near-identical proteins. Pairs are CAMEX-style subsets below.
-    "brain_dlpfc": dict(source="dlpfc", species=["hsapiens", "ptroglodytes", "mmulatta", "cjacchus"], tissue="cortex", label="DLPFC 4 primates"),
+    # esm_species: gene features from the species with SATURN embeddings; chimpanzee and marmoset embeddings cost 37.6 M residues on CPU,
+    # so they enter as a sensitivity when ready (`*_esmfull`), plan amendment.
+    "brain_dlpfc": dict(source="dlpfc", species=["hsapiens", "ptroglodytes", "mmulatta", "cjacchus"], esm_species=["hsapiens", "mmulatta"], tissue="cortex", label="DLPFC 4 primates"),
     # K = 3: human, marmoset, mouse in one region.
-    "brain_m1": dict(source="m1", species=["hsapiens", "cjacchus", "mmusculus"], tissue="cortex", label="M1 human, marmoset, mouse"),
+    "brain_m1": dict(source="m1", species=["hsapiens", "cjacchus", "mmusculus"], esm_species=["hsapiens", "mmusculus"], tissue="cortex", label="M1 human, marmoset, mouse"),
     # K = 2 with its own table: human-mouse identity as the prior, the vocabulary of the Alzheimer case.
     "brain_m1_hmouse": dict(source="m1", species=["hsapiens", "mmusculus"], tissue="cortex", label="M1 human, mouse"),
     "lung_healthy": dict(source="lung", species=["hsapiens", "mmurinus", "mmusculus"], tissue="lung", label="Lung human, lemur, mouse"),

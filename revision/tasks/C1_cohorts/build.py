@@ -352,7 +352,8 @@ def build_cohort(cohort: str) -> None:
         seen &= m
     # --- features, all from chimera._data_utils, unchanged
     prior = compute_conservation_prior(table)
-    consensus, per_sp = download_and_process_esm2(table, species_list=species, saturn_data_dir=link_esm(cohort, species))
+    esm_species = cc.get("esm_species", species)
+    consensus, per_sp = download_and_process_esm2(table, species_list=esm_species, saturn_data_dir=link_esm(cohort, esm_species))
     esm_matched = {k: int(np.any(v != 0, axis=1).sum()) for k, v in per_sp.items()}
     esm_pca = pca_esm2(consensus, n_components=64)
     esm_var = compute_esm2_interspecies_variance(per_sp)
@@ -383,7 +384,7 @@ def build_cohort(cohort: str) -> None:
     out_rep.update(
         n_obs=int(obj.n_obs), n_vars=int(obj.n_vars), steps_per_epoch=int(obj.n_obs / 256), n_genes_table=G,
         n_genes_never_observed_in_a_species=n_never, n_genes_lt3_cells=int((seen & (nnz < 3)).sum()),
-        object_genes_zero_training_cells=zero_cells, esm_matched=esm_matched, n_constant_feature_columns=int((feats.std(axis=0) == 0).sum()),
+        object_genes_zero_training_cells=zero_cells, esm_matched=esm_matched, esm_species=esm_species, n_constant_feature_columns=int((feats.std(axis=0) == 0).sum()),
         frac_prior_ge_095=float((obj.var["conservation_prior"] >= 0.95).mean()), frac_prior_ge_085=float((obj.var["conservation_prior"] >= 0.85).mean()),
         median_library=med, depth_ratio_to_testis3sp=float(np.mean(list(med.values())) / 1097.0), x_max=float(X.data.max()),
         x_integer=bool(np.allclose(X.data, np.round(X.data))), layers_empty=len(obj.layers) == 0, batches=sorted(map(str, obj.obs["batch"].unique())),
