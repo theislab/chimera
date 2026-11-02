@@ -76,10 +76,36 @@ def depth_panel(kind_rows):
 
 
 def heldout_panel():
+    """Held-out chromosomes, arm P (protein columns only): agreement with what was measured on those genes, given C; folds A and B as two marks."""
     c = pd.read_csv(RU.RES / "c_rho.csv")
     c = c[c.set == "held_unmasked"]
-    rows = [("D_full", "measured Δα"), ("S_full", "measured S"), ("Sdir_full", "measured Sdir")]
-    return c, rows
+    tg = [("D_full", "measured Δα"), ("S_full", "measured S"), ("Sdir_full", "measured Sdir"), ("G_H3", "TS/TMS pattern")]
+    sc = [("D_P", D_C, "o", "Chimera gate, protein only"), ("Rh_S", R_C, "D", "Ridge on protein, target S"), ("kNNh_D", GREY, "v", "Nearest proteins, their Δα"), ("pi", B1_C, "s", "π")]
+    coh = [k for k in RU.DEPTH_COHORTS if k in set(c.cohort)]
+    fig, axes = plt.subplots(1, len(coh), figsize=(1.75 * len(coh), 1.9), sharey=True)
+    ceil = pd.read_csv(RU.RES / "c_ceiling.csv")
+    for ax, k in zip(np.atleast_1d(axes), coh):
+        for j, (t, _) in enumerate(tg):
+            for i, (s, col, mk, _) in enumerate(sc):
+                g = c[(c.cohort == k) & (c.target == t) & (c.score == s)]
+                for f, dx in (("A", -0.05), ("B", 0.05)):
+                    r = g[g.fold == f]
+                    if len(r):
+                        x = j + (i - 1.5) * 0.18 + dx
+                        ax.plot([x, x], [r.ci_lo.iloc[0], r.ci_hi.iloc[0]], color=col, lw=0.7)
+                        ax.plot(x, r.rho_p.iloc[0], mk, color=col, ms=2.8, mew=0, alpha=1.0 if f == "A" else 0.6)
+        cl = ceil[(ceil.cohort == k) & (ceil.set == "held_unmasked")].ceil_partial.mean()
+        ax.plot([-0.4, 0.4], [cl, cl], color="#222222", lw=0.6, ls=":")
+        ax.axhline(0, color="#444444", lw=0.6)
+        ax.set_xticks(range(len(tg)), [x[1] for x in tg], rotation=35, ha="right", fontsize=5.8)
+        ax.set_title(COH[k], fontsize=6.5)
+        ax.spines[["top", "right"]].set_visible(False)
+        ax.tick_params(axis="y", labelsize=6)
+    np.atleast_1d(axes)[0].set_ylabel("ρp on held-out genes, given C", fontsize=6.5)
+    h = [plt.Line2D([], [], color=col, marker=mk, ls="", ms=3.5, label=lab) for _, col, mk, lab in sc]
+    h.append(plt.Line2D([], [], color="#222222", ls=":", lw=0.8, label="seed against other seeds"))
+    fig.legend(handles=h, fontsize=5.5, frameon=False, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3, handletextpad=0.1, columnspacing=0.8)
+    return fig, axes
 
 
 def main():
@@ -89,6 +115,16 @@ def main():
     fig.savefig(OUT / "d1_masked.pdf", bbox_inches="tight")
     fig.savefig(OUT / "d1_masked.png", dpi=200, bbox_inches="tight")
     plt.close(fig)
+    if (RU.RES / "b_rho.csv").exists():
+        fig, _ = depth_panel([("liv_hmouse", "pattern"), ("liv_4sp", "pattern"), ("test_hmouse", "pattern_primates")])
+        fig.savefig(OUT / "d1_depth.pdf", bbox_inches="tight")
+        fig.savefig(OUT / "d1_depth.png", dpi=200, bbox_inches="tight")
+        plt.close(fig)
+    if (RU.RES / "c_rho.csv").exists():
+        fig, _ = heldout_panel()
+        fig.savefig(OUT / "d1_heldout.pdf", bbox_inches="tight")
+        fig.savefig(OUT / "d1_heldout.png", dpi=200, bbox_inches="tight")
+        plt.close(fig)
 
 
 if __name__ == "__main__":
