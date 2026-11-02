@@ -3,7 +3,7 @@
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=96G
+#SBATCH --mem=24G
 #SBATCH --time=23:50:00
 # One timed job of jobs.tsv on 16 CPUs. Usage (from chimera/): sbatch --array=0-N --output=results/revision/B1/logs/%x_%A_%a.out .../job.sbatch
 source revision/tasks/T5_2_adapters/_tool_body.sh

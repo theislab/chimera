@@ -6,9 +6,9 @@ import pandas as pd
 
 from revision.tasks.B1_ground_truth import rules as RU
 
-MEM = {"liv_hmouse": "24G", "test_hmouse": "32G", "kidney": "48G"}
+MEM = {"liv_hmouse": "7G", "test_hmouse": "10G", "kidney": "16G"}  # about 1.3 x observed peak; the per-user cap of 2T is the limit
 WALL = {"liv_hmouse": "04:00:00", "test_hmouse": "08:00:00", "kidney": "16:00:00"}
-TOOL_MEM = {"camex": "32G", "saturn": "64G"}
+TOOL_MEM = {"camex": "14G", "saturn": "20G"}
 
 
 def main():
