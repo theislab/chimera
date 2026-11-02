@@ -105,9 +105,9 @@ def one2one() -> pd.DataFrame:
         columns={"hsapiens_gene_id": "human_id", "mmusculus_gene_id": "mouse_id"})
 
 
-def load_type(t: str, o2o: pd.DataFrame):
-    h = pd.read_csv(DE / f"human_primary_{t}.tsv", sep="\t")
-    m = pd.read_csv(DE / f"mouse_primary_{t}.tsv", sep="\t")
+def load_type(t: str, o2o: pd.DataFrame, hc: str = "primary", mc: str = "primary"):
+    h = pd.read_csv(DE / f"human_{hc}_{t}.tsv", sep="\t")
+    m = pd.read_csv(DE / f"mouse_{mc}_{t}.tsv", sep="\t")
     h = h.dropna(subset=["log2fc_shrunk"]).drop_duplicates("gene_id", keep=False)
     m = m.dropna(subset=["log2fc_shrunk"]).drop_duplicates("gene_id", keep=False)
     j = o2o.merge(h, left_on="human_id", right_on="gene_id").merge(
@@ -116,8 +116,8 @@ def load_type(t: str, o2o: pd.DataFrame):
 
 
 def run_type(args):
-    t, sets, n_perm, o2o = args
-    j = load_type(t, o2o)
+    t, sets, n_perm, o2o, hc, mc = args
+    j = load_type(t, o2o, hc, mc)
     rh = pd.Series(j["log2fc_shrunk_h"].to_numpy(), index=j["gene_symbol_h"].to_numpy())
     rm = pd.Series(j["log2fc_shrunk_m"].to_numpy(), index=j["gene_symbol_h"].to_numpy())
     out = []
@@ -146,13 +146,18 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--n-perm", type=int, default=10000)
     p.add_argument("--jobs", type=int, default=6)
+    p.add_argument("--human-contrast", default="primary", help="sensitivity runs only; output in hd4_<h>_<m>/")
+    p.add_argument("--mouse-contrast", default="primary")
     a = p.parse_args()
-    OUT.mkdir(parents=True, exist_ok=True)
+    hc, mc = a.human_contrast, a.mouse_contrast
+    out = OUT if (hc, mc) == ("primary", "primary") else RES / f"hd4_{hc}_{mc}"
+    out.mkdir(parents=True, exist_ok=True)
     types = json.loads((DE / "de_meta.json").read_text())["de_types"]
+    types = [t for t in types if (DE / f"human_{hc}_{t}.tsv").exists() and (DE / f"mouse_{mc}_{t}.tsv").exists()]
     sets = {k: read_gmt(v) for k, v in SETS.items()}
     o2o = one2one()
     with ProcessPoolExecutor(max_workers=a.jobs) as ex:
-        res = list(ex.map(run_type, [(t, sets, a.n_perm, o2o) for t in types]))
+        res = list(ex.map(run_type, [(t, sets, a.n_perm, o2o, hc, mc) for t in types]))
     allg, summ, conc = [], [], []
     for t, g, n, c in res:
         allg.append(g)
@@ -161,10 +166,10 @@ def main() -> int:
                          n_transfer=int(g["transfers"].sum()),
                          n_not_transfer=int((g["call"] == "does_not_transfer").sum()),
                          nes_spearman_all_sets=float(spearmanr(g["h_nes"], g["m_nes"], nan_policy="omit")[0])))
-    pd.concat(allg).to_csv(OUT / "hd4.tsv", sep="\t", index=False)
-    pd.DataFrame(summ).to_csv(OUT / "hd4_summary.tsv", sep="\t", index=False)
-    pd.DataFrame(conc).to_csv(OUT / "lfc_concordance.tsv", sep="\t", index=False)
-    (OUT / "DONE").write_text("ok\n")
+    pd.concat(allg).to_csv(out / "hd4.tsv", sep="\t", index=False)
+    pd.DataFrame(summ).to_csv(out / "hd4_summary.tsv", sep="\t", index=False)
+    pd.DataFrame(conc).to_csv(out / "lfc_concordance.tsv", sep="\t", index=False)
+    (out / "DONE").write_text("ok\n")
     return 0
 
 
