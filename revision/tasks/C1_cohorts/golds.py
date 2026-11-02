@@ -62,6 +62,11 @@ def gold(src: str, partner: str) -> pd.DataFrame:
     r, det = T42.pair_corr(xx, ff, "h", "o", groups, len(t))
     out = pd.DataFrame(dict(hsapiens_gene_id=t["hsapiens_gene_id"], gold=r, scorable=det, n_groups=len(groups)))
     print(src, partner, len(t), "groups", len(groups), "scored", int(np.isfinite(r).sum()), flush=True)
+    # Direct level comparison, baseline for the level reference (E-B7): per class log2(1 + CPM) human minus partner; mean of the signed gap and of its size over shared classes.
+    if groups:
+        G = np.stack([xa[k] - xb[k] for k in groups])
+        out["signed_gap"] = G.mean(0)
+        out["level_gap"] = np.abs(G).mean(0)
     return out
 
 
@@ -69,7 +74,10 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     for src, partner, name in (("m1", "cjacchus", "M1_marmoset"), ("mtg", "cjacchus", "MTG_marmoset"), ("mtg", "mmulatta", "MTG_macaque"),
                                ("dlpfc", "cjacchus", "DLPFC_marmoset"), ("dlpfc", "mmulatta", "DLPFC_macaque"), ("dlpfc", "ptroglodytes", "DLPFC_chimpanzee"), ("m1", "mmusculus", "M1_mouse")):
-        gold(src, partner).to_parquet(OUT / f"{name}.parquet")
+        t = gold(src, partner)
+        t.to_parquet(OUT / f"{name}.parquet")
+        if name == "DLPFC_chimpanzee":
+            t.to_parquet(OUT / "DLPFC_chimpanzee_level.parquet")
     return 0
 
 

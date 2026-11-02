@@ -13,6 +13,11 @@ then reads as identity to human in every cohort.
 Also kept: ``<sp>_dn``, ``<sp>_ds`` (Compara, human against that species; NaN where absent) for the
 per-cohort dN/dS beside the human-mouse gold.
 
+Filters on each human-partner pair, counted in the report (coordinator, after Y6 found wrong one-to-one pairs in older tables, PIN1 to Pin1rt1, GJA1 to Gja6, RPL36AL to Gm6525):
+`is_high_confidence == 1`; `protein_coding` biotype in both species (GTF); no retrocopy target, meaning a target with one exon against a human gene with at least
+three exons in their longest transcripts (Y6 shape); no target that differs in name from the human gene while a different gene of the partner species carries the
+human name, case-insensitive (the shape of the wrong pairs above; flagged only when GOC and WGA are both above 50). GOC and WGA are kept as `<sp>_goc`, `<sp>_wga`.
+
 A group is kept only if every gene is in the measured feature list of its species (``measured``):
 a gene not in a species' list is a missing gene, not a zero. Rows are ordered by human Ensembl ID and
 numbered from 0.
@@ -66,26 +71,45 @@ def sha256(path: Path, chunk: int = 1 << 24) -> str:
 
 
 def gtf_names(path: Path) -> dict[str, str]:
-    names: dict[str, str] = {}
-    gid_re, name_re = re.compile(r'gene_id "([^"]+)"'), re.compile(r'gene_name "([^"]+)"')
+    t = gtf_table(path)
+    return t["name"].dropna().to_dict()
+
+
+_GTF: dict = {}
+
+
+def gtf_table(path: Path) -> pd.DataFrame:
+    """gene_id -> name, biotype, exons of the longest transcript (by exon count)."""
+    if path in _GTF:
+        return _GTF[path]
+    gid_re = re.compile(r'gene_id "([^"]+)"')
+    name_re, bio_re, tr_re = re.compile(r'gene_name "([^"]+)"'), re.compile(r'gene_biotype "([^"]+)"'), re.compile(r'transcript_id "([^"]+)"')
+    genes, exons = {}, {}
     with gzip.open(path, "rt") as f:
         for line in f:
             if line.startswith("#"):
                 continue
             p = line.split("\t", 9)
-            if p[2] != "gene":
-                continue
-            m = name_re.search(p[8])
-            if m:
-                names[gid_re.search(p[8]).group(1)] = m.group(1)
-    return names
+            if p[2] == "gene":
+                m, b = name_re.search(p[8]), bio_re.search(p[8])
+                genes[gid_re.search(p[8]).group(1)] = (m.group(1) if m else None, b.group(1) if b else None)
+            elif p[2] == "exon":
+                g, tr = gid_re.search(p[8]).group(1), tr_re.search(p[8]).group(1)
+                exons[(g, tr)] = exons.get((g, tr), 0) + 1
+    t = pd.DataFrame.from_dict(genes, orient="index", columns=["name", "biotype"])
+    mx: dict = {}
+    for (g, _), n in exons.items():
+        mx[g] = max(mx.get(g, 0), n)
+    t["max_exons"] = pd.Series(mx).reindex(t.index).fillna(0).astype(int)
+    _GTF[path] = t
+    return t
 
 
 def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, dict]:
     """One-to-one human-partner rows from both dumps, oriented human first."""
     comp = SPECIES[partner]["compara"]
     cols = ["gene_stable_id", "species", "identity", "homology_type", "homology_gene_stable_id", "homology_species",
-            "homology_identity", "dn", "ds"]
+            "homology_identity", "dn", "ds", "goc_score", "wga_coverage", "is_high_confidence"]
     out, rep = [], {}
     for path in (SPECIES["hsapiens"]["dump"], SPECIES[partner]["dump"]):
         df = pd.read_csv(path, sep="\t", usecols=cols, dtype=str)
@@ -98,17 +122,43 @@ def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, di
         rep[path.name] = dict(human_first=len(fwd), human_second=len(rev))
         out += [fwd[cols], rev[cols]]
     d = pd.concat(out, ignore_index=True).drop_duplicates(["gene_stable_id", "homology_gene_stable_id"])
-    for c in ("identity", "homology_identity", "dn", "ds"):
+    for c in ("identity", "homology_identity", "dn", "ds", "goc_score", "wga_coverage", "is_high_confidence"):
         d[c] = pd.to_numeric(d[c], errors="coerce")
     for c in ("gene_stable_id", "homology_gene_stable_id"):
         dup = d[c].duplicated(keep=False)
         rep[f"dropped_non_unique_{c}"] = int(dup.sum())
         d = d[~dup]
     rep["n_one2one"] = len(d)
+    # Filters, each counted on the pairs left by the one before.
+    gh, gp = gtf_table(SPECIES["hsapiens"]["gtf"]), gtf_table(SPECIES[partner]["gtf"])
+    hc = d["is_high_confidence"] == 1
+    rep["removed_not_high_confidence"] = int((~hc).sum())
+    d = d[hc]
+    bh, bp = d["gene_stable_id"].map(gh["biotype"]), d["homology_gene_stable_id"].map(gp["biotype"])
+    pc = (bh == "protein_coding") & (bp == "protein_coding")
+    rep["removed_not_protein_coding_human"] = int((bh != "protein_coding").sum())
+    rep["removed_not_protein_coding_partner"] = int((bp != "protein_coding").sum())
+    d = d[pc]
+    eh, ep = d["gene_stable_id"].map(gh["max_exons"]), d["homology_gene_stable_id"].map(gp["max_exons"])
+    retro = (ep <= 1) & (eh >= 3)
+    rep["removed_retrocopy_shape"] = int(retro.sum())
+    rep["removed_retrocopy_shape_examples"] = d.loc[retro, "homology_gene_stable_id"].map(gp["name"]).dropna().head(12).tolist()
+    d = d[~retro]
+    nh, np_ = d["gene_stable_id"].map(gh["name"]).astype(object), d["homology_gene_stable_id"].map(gp["name"]).astype(object)
+    partner_names = {str(x).upper() for x in gp["name"].dropna()}
+    other = nh.notna() & (nh.str.upper() != np_.astype(str).str.upper()) & nh.astype(str).str.upper().isin(partner_names)
+    weak = ~((d["goc_score"] > 50) & (d["wga_coverage"] > 50))
+    rep["name_elsewhere_strong_labels_kept"] = int((other & ~weak).sum())
+    rep["removed_name_elsewhere_weak_labels"] = int((other & weak).sum())
+    rep["removed_name_elsewhere_examples"] = (nh[other & weak].astype(str) + ">" + np_[other & weak].astype(str)).head(12).tolist()
+    d = d[~(other & weak)]
+    rep["n_after_filters"] = len(d)
+    rep["goc_median"] = float(d["goc_score"].median())
+    rep["wga_median"] = float(d["wga_coverage"].median())
     return d.rename(columns={"gene_stable_id": "hsapiens_gene_id", "homology_gene_stable_id": f"{partner}_gene_id",
                              "identity": f"{partner}_identity", "homology_identity": f"{partner}_perc_id_r1",
-                             "dn": f"{partner}_dn", "ds": f"{partner}_ds"})[
-        ["hsapiens_gene_id", f"{partner}_gene_id", f"{partner}_identity", f"{partner}_perc_id_r1", f"{partner}_dn", f"{partner}_ds"]], rep
+                             "dn": f"{partner}_dn", "ds": f"{partner}_ds", "goc_score": f"{partner}_goc", "wga_coverage": f"{partner}_wga"})[
+        ["hsapiens_gene_id", f"{partner}_gene_id", f"{partner}_identity", f"{partner}_perc_id_r1", f"{partner}_dn", f"{partner}_ds", f"{partner}_goc", f"{partner}_wga"]], rep
 
 
 def build(partners: list[str], measured: dict[str, set], compute_prior_over: list[str] | None = None) -> tuple[pd.DataFrame, dict]:

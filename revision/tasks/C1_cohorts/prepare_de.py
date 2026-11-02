@@ -64,7 +64,7 @@ def pb(X: sp.csr_matrix, obs: pd.DataFrame, var: pd.DataFrame, covs: list[str]) 
 
 
 def unique_symbols(sym: pd.Series) -> pd.Index:
-    return pd.Index(ad.utils.make_index_unique(pd.Index(sym.astype(str))))
+    return pd.Index(ad.utils.make_index_unique(pd.Index(sym.astype(str).to_numpy())), name=None)
 
 
 def ad_human() -> None:
@@ -139,7 +139,7 @@ def ad_mouse() -> None:
     b = a[:, a.var.highly_variable].copy()
     sc.pp.scale(b, max_value=10)
     sc.tl.pca(b, n_comps=50, random_state=0)
-    sc.pp.neighbors(b, n_neighbors=15, use_rep="X_pca", random_state=0)
+    sc.pp.neighbors(b, n_neighbors=15, use_rep="X_pca", transformer="sklearn", random_state=0)
     sc.tl.leiden(b, resolution=1.0, flavor="igraph", n_iterations=2, directed=False, random_state=0)
     cl = b.obs["leiden"].astype(str)
     rows = []
@@ -149,8 +149,10 @@ def ad_mouse() -> None:
         s = pd.Series(sc_).sort_values(ascending=False)
         rows.append(dict(cluster=c, n=int(m.sum()), best=s.index[0], best_score=s.iloc[0], second=s.index[1], second_score=s.iloc[1], margin=s.iloc[0] - s.iloc[1]))
     tab = pd.DataFrame(rows)
-    # A cluster gets its best class when the best marker mean leads the second by at least 0.5 log1p CP10K; otherwise unresolved.
-    tab["label"] = np.where(tab["margin"] >= 0.5, tab["best"], "unresolved")
+    # A cluster gets its best class when the best marker mean leads the second by at least 0.2 log1p CP10K; otherwise unresolved.
+    # First threshold 0.5 left no astrocyte cluster (Aqp4, Gfap, Aldh1l1 are low in nuclei; best astrocyte mean 0.73 vs 0.52); changed on
+    # marker means and cluster sizes only, before any contrast.
+    tab["label"] = np.where(tab["margin"] >= 0.2, tab["best"], "unresolved")
     mp = dict(zip(tab["cluster"], tab["label"]))
     obs["cell_ontology_class"] = cl.map(mp).to_numpy()
     tab.to_csv(out_dir("ad") / "mouse_cluster_labels.csv", index=False)

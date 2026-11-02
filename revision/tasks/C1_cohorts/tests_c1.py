@@ -223,6 +223,36 @@ def brain(n_perm: int, n_boot: int) -> None:
             sup = x.loc[ix, "count_support"].to_numpy() & y.loc[ix, "count_support"].to_numpy()
             rows.append(dict(a=a, b=b, n=len(ix), n_support=int(sup.sum()), rho_D=float(spearmanr(x.loc[ix, "D"], y.loc[ix, "D"])[0]), rho_D_support=float(spearmanr(x.loc[ix, "D"][sup], y.loc[ix, "D"][sup])[0]), rho_S_support=float(spearmanr(x.loc[ix, "S_ema"][sup], y.loc[ix, "S_ema"][sup])[0])))
     pd.DataFrame(rows).to_csv(out / "e_b6.tsv", sep="\t", index=False)
+    ase_test(n_perm, n_boot)
+
+
+def ase_test(n_perm: int, n_boot: int) -> None:
+    """E-B7, plan section 13a. Hybrid allele-specific reference (Wang, Starr, Fraser 2024; Agoglia 2021; Y6 gold table): cis level change human vs chimpanzee, non-atlas.
+    Targets, oriented so that positive means a smaller cis change: -abs(a_CS) (cortical spheroid), -abs(a_MN) (motor neuron), and P_cis. Join by human symbol."""
+    rng = np.random.default_rng(SEED + 7)
+    out = CF.RES / "cortex"
+    ase = pd.read_parquet(gene_gold_path()).reset_index()
+    lvl = pd.read_parquet(GOLD / "DLPFC_chimpanzee_level.parquet").drop_duplicates("hsapiens_gene_id").set_index("hsapiens_gene_id")
+    rows, signed = [], []
+    for c in ("brain_dlpfc_hchimp", "brain_dlpfc"):
+        if not (H1 / "genes" / f"{c}.parquet").exists():
+            continue
+        g = genes(c)
+        u = g[g["symbol"].notna() & ~g["symbol"].duplicated(keep=False)].merge(ase.drop_duplicates("symbol"), on="symbol", how="left")
+        u["level_gap"] = -lvl["level_gap"].reindex(u["hsapiens_gene_id"]).to_numpy()
+        u["signed_gap"] = lvl["signed_gap"].reindex(u["hsapiens_gene_id"]).to_numpy()
+        for tname, tv in (("abs_a_CS", -u["a_CS"].abs()), ("abs_a_MN", -u["a_MN"].abs()), ("P_cis", u["P_cis"])):
+            v = u.assign(_t=tv)
+            rows += rho_table(v, "_t", ["D", "S_ema", "B1", "level_gap", "pi_raw"], n_perm, n_boot, rng, dict(cohort=c, target=tname))
+        for col in ("a_CS", "a_MN"):
+            a = u.dropna(subset=[col, "signed_gap"])
+            signed.append(dict(cohort=c, context=col, n=len(a), spearman_signed_gap=float(spearmanr(a[col], a["signed_gap"])[0])))
+    pd.DataFrame(rows).to_csv(out / "e_b7.tsv", sep="\t", index=False)
+    pd.DataFrame(signed).to_csv(out / "e_b7_signed.tsv", sep="\t", index=False)
+
+
+def gene_gold_path():
+    return gene_ids.REPO_ROOT / "results" / "revision" / "Y6" / "gold" / "ase_reference.parquet"
 
 
 # ------------------------------------------------------------------------------------------------ disease cases
@@ -261,7 +291,7 @@ def h_d1(case: str, model: str, types: list[str], n_perm: int, n_boot: int) -> p
 def ref_de(case: str, ref_key: str, types_map: dict) -> pd.DataFrame:
     """Named genes in the DE of each species, no Chimera: sign, log2FC, padj."""
     de = CF.RES / case / "de"
-    tab = gene_ids.load_table("kidney")
+    tab = pd.read_csv(CF.BUILD / "objects" / "ortholog_table_hm_all.csv")
     h2m = dict(zip(tab["hsapiens_gene_name"], tab["mmusculus_gene_id"]))
     h2h = dict(zip(tab["hsapiens_gene_name"], tab["hsapiens_gene_id"]))
     rows = []
