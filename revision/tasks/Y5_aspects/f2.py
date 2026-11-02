@@ -56,6 +56,13 @@ def table(c):
     g = K.genes(c).merge(pd.read_parquet(OUT / "gold_depth.parquet"), on="hsapiens_gene_id", how="left")
     drop = [k for k in g.columns if k.startswith(("C_", "Csp_"))]
     g = g.drop(columns=drop).merge(K.contribs(c), on="var_name", how="left")
+    f = K.OUT / "F3" / f"b1z__{c}.parquet"
+    if f.exists():                     # B1z on healthy seeds, and on the scVI latent (T3.4), replace the canonical T4.2 value
+        z = pd.read_parquet(f)
+        chim = [k for k in z.columns if k.startswith("B1z_chimera") and z[k].notna().any()]
+        g["B1z"] = g.hsapiens_gene_id.map(z.set_index("hsapiens_gene_id")[chim].mean(1).to_dict())
+        if "B1z_scvi_s42" in z:
+            g["B1z_scvi"] = g.hsapiens_gene_id.map(z.set_index("hsapiens_gene_id")["B1z_scvi_s42"].to_dict())
     return g
 
 
@@ -81,7 +88,7 @@ def tests():
     yrs = np.log10(np.array([6, 30, 170, 318.0]))
     for c in ("test_3sp", "test_hmouse"):
         g = table(c)
-        scores = ["S", "D_raw", "B1b", "B1c", "Sdir", "B1z"]
+        scores = ["S", "D_raw", "B1b", "B1c", "Sdir", "B1z", "B1z_scvi"]
         covs = K.CPAT + ["n_species"]
         for half in ("odd", "even"):
             T = g[(g.half == half) & ~g.masked.astype(bool) & g[bins + scores + covs + ["block"]].notna().all(1)]
