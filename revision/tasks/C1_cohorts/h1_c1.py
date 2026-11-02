@@ -27,7 +27,7 @@ from revision.common import gene_ids  # noqa: E402
 from revision.tasks.C1_cohorts import configs as CF  # noqa: E402
 from revision.tasks.H1_harmonise import rules as RU  # noqa: E402
 
-KEPT = CF.RES / "kept_runs.tsv"
+KEPT = __import__("pathlib").Path(os.environ.get("C1_KEPT", str(CF.RES / "kept_runs.tsv")))
 LINEAGE_C1 = {
     "cortex": {"excitatory": ["SLC17A7", "SATB2", "CUX2", "RORB", "FEZF2", "THEMIS", "TLE4", "CCN2"],
                "inhibitory": ["GAD1", "GAD2", "PVALB", "SST", "VIP", "LAMP5", "SNCG", "LHX6", "ADARB2"],

@@ -5,6 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=12G
 #SBATCH --time=23:50:00
+#SBATCH --exclude=cpusrv09,cpusrv18,cpusrv63,cpusrv114
 # sbatch --array=0-K%L de_array.sbatch <case> <n_chunks>; omit the array for the primary fits (give only <case>)
 source revision/slurm/_body.sh
 if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then

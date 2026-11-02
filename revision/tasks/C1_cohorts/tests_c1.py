@@ -21,7 +21,7 @@ from revision.tasks.T4_3_scoreboard import inputs as I
 from revision.tasks.T4_3_scoreboard import stats as S
 
 C_COLS = ["pi_raw", "expr", "detection", "log_cds_length"]
-H1 = CF.RES / "h1"
+H1 = __import__("pathlib").Path(__import__("os").environ.get("C1_H1_OUT", str(CF.RES / "h1")))
 GOLD = CF.RES / "golds"
 REF = pd.read_csv(CF.TASK / "references.tsv", sep="\t", keep_default_na=False)
 SEED = 20261102
