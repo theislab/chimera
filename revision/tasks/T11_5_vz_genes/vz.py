@@ -1,13 +1,12 @@
 """Van Zyl datasets for T11.4-T11.7: paths, seed runs, seed health and integration references.
 
-Datasets with a selected recipe (T11.2, T11.2b): the full five-species cohort and the subsets
-human + mouse, human + M. mulatta and primates. Human + M. fascicularis and human + pig had no
-recipe passing Gate G-V (failed training) and are not analysed.
+Registry: ``DATASETS`` below plus optional rows in ``datasets_extra.tsv`` (columns dataset, h5ad,
+seed_map, label), so a retuned dataset is added with one row and one more pass of the scripts.
 
-Seed rule for new cohorts (amendment, private a82eaad): a seed failing G-V does not enter D or
-S_ema and is reported with its health row; sensitivity D uses every seed with a finite alpha; a
-dataset with fewer than 2 passing seeds is reported descriptively, without reliability or ceiling;
-healthy but poorly mixed seeds stay in.
+Seed rule for new cohorts (amendment log, latest rows): a seed enters D if it finished, has no NaN, no
+latent collapse (10/10 active z dims) and both Delta-alpha tails (not frozen), and saturation is at
+most 10% (above 5% its saturated genes are flagged). Other seeds are discarded and not analysed. A
+dataset needs 2 or more such seeds.
 """
 
 from __future__ import annotations
@@ -29,17 +28,22 @@ TABLE_COHORT = "van_zyl"  # every subset keeps the build-3 ortho_N names, so the
 LABEL_KEY = "cell_type_harmonised"  # integration labels, as in recipe selection
 CLASS_KEY = "cell_ontology_class"  # conditional-MMD classes; pseudobulk groups
 
+SAT_MAX_SEED = 0.10  # saturation above 5% and up to 10% keeps the seed, genes flagged
+MIN_SEEDS = 2
 DATASETS = {
     "full": dict(h5ad=VZ / "van_zyl_unified.h5ad", seed_map=ROOT / "revision/tasks/T11_3_vz_seeds/seed_map.tsv",
-                 label="Van Zyl, 5 species"),
+                 label="5 species"),
     "hmouse": dict(h5ad=VZ / "van_zyl_hmouse.h5ad", seed_map=ROOT / "revision/tasks/T11_2b_vz_subsets/seed_map_hmouse.tsv",
-                   label="Van Zyl, human + mouse"),
+                   label="human + mouse"),
     "hmmul": dict(h5ad=VZ / "van_zyl_hmmul.h5ad", seed_map=ROOT / "revision/tasks/T11_2b_vz_subsets/seed_map_hmmul.tsv",
-                  label="Van Zyl, human + M. mulatta"),
+                  label="human + M. mulatta"),
     "primates": dict(h5ad=VZ / "van_zyl_primates.h5ad", seed_map=ROOT / "revision/tasks/T11_2b_vz_subsets/seed_map_primates.tsv",
-                     label="Van Zyl, primates"),
+                     label="primates"),
 }
-FAILED_TRAINING = {"hmfas": "human + M. fascicularis", "hpig": "human + pig"}
+_extra = Path(__file__).resolve().parent / "datasets_extra.tsv"
+if _extra.exists():
+    for _r in pd.read_csv(_extra, sep="\t").itertuples():
+        DATASETS[_r.dataset] = dict(h5ad=ROOT / _r.h5ad, seed_map=ROOT / _r.seed_map, label=_r.label)
 
 sys.path.insert(0, str(ROOT / "revision" / "tasks" / "T11_2_recipe"))
 from select_recipe import gate  # noqa: E402  (Gate G-V, unchanged)
@@ -69,24 +73,26 @@ def seed_health(ds: str) -> pd.DataFrame:
     for s, run in sorted(seed_runs(ds).items()):
         d = RUNS / run
         g = gate(d)
-        finite = False
-        if g["finished"]:
-            with np.load(d / "final_state.npz") as z:
-                finite = bool(np.isfinite(z["alpha"]).all())
         rows.append(dict(dataset=ds, seed=s, run_name=run, first_nan_snapshot=first_nan_snapshot(run) if d.exists() else "",
-                         finite_alpha=finite, **{k: g.get(k) for k in (
+                         **{k: g.get(k) for k in (
                              "finished", "no_nan", "sat_high", "sat_low", "n_active_z", "z_var_min",
-                             "tail_up", "tail_dn", "pass_GV", "last_epoch")}))
+                             "tail_up", "tail_dn", "tails_ok", "pass_GV", "last_epoch")}))
     t = pd.DataFrame(rows)
-    t["enters_D"] = t["pass_GV"].fillna(False).astype(bool)
-    t["enters_D_sensitivity"] = t["finite_alpha"].astype(bool)
+    ok = t["finished"].fillna(False).astype(bool) & t["no_nan"].fillna(False).astype(bool) & (t["n_active_z"] == 10)
+    ok &= (t["sat_high"] <= SAT_MAX_SEED) & (t["sat_low"] <= SAT_MAX_SEED) & t["tails_ok"].fillna(False).astype(bool)
+    t["enters_D"] = ok
+    t["saturation_flagged"] = ok & ((t["sat_high"] > 0.05) | (t["sat_low"] > 0.05))
     return t
 
 
-def seeds_in_D(ds: str, sensitivity: bool = False) -> dict[int, str]:
+def seeds_in_D(ds: str) -> dict[int, str]:
     t = seed_health(ds)
-    col = "enters_D_sensitivity" if sensitivity else "enters_D"
-    return {int(r.seed): r.run_name for r in t.itertuples() if getattr(r, col)}
+    return {int(r.seed): r.run_name for r in t.itertuples() if r.enters_D}
+
+
+def usable_datasets() -> list[str]:
+    """Datasets in the registry with at least MIN_SEEDS seeds that pass health."""
+    return [ds for ds in DATASETS if len(seeds_in_D(ds)) >= MIN_SEEDS]
 
 
 def integration_reference(obs: pd.DataFrame, k: int = 15, n: int = 20000, seed: int = 0) -> dict:

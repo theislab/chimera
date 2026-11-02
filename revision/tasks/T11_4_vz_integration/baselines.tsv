@@ -17,3 +17,9 @@ hmmul:scVI-sp	--adata data/revision/van_zyl/van_zyl_hmmul.h5ad --method scvi --b
 hmmul:scVI-donor	--adata data/revision/van_zyl/van_zyl_hmmul.h5ad --method scvi --batch-key batch --seed 42
 hmmul:scANVI	--adata data/revision/van_zyl/van_zyl_hmmul.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
 hmmul:sysVI	--adata data/revision/van_zyl/van_zyl_hmmul.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+primates:PCA	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method pca --seed 42
+primates:Harmony	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method harmony --batch-key batch --seed 42
+primates:scVI-sp	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method scvi --batch-key species --seed 42
+primates:scVI-donor	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method scvi --batch-key batch --seed 42
+primates:scANVI	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+primates:sysVI	--adata data/revision/van_zyl/van_zyl_primates.h5ad --method sysvi --batch-key batch --species-key species --seed 42

@@ -8,6 +8,7 @@ through the ``van_zyl`` table, and two groupings: the harmonised fine types
 nothing is written to the run directory.
 
     PYTHONPATH=<chimera repo> python revision/tasks/T11_5_vz_genes/forward.py --dataset full --seed 42
+    PYTHONPATH=<chimera repo> python revision/tasks/T11_5_vz_genes/forward.py --missing  # every D seed without output
 """
 
 from __future__ import annotations
@@ -26,23 +27,34 @@ import run as T25RUN  # noqa: E402
 KEYS = [vz.LABEL_KEY, vz.CLASS_KEY]
 
 
+def one(ds: str, seed: int, threads: int, batch_size: int) -> None:
+    run = vz.seed_runs(ds)[seed]
+    out = vz.OUT / "drivers"
+    out.mkdir(parents=True, exist_ok=True)
+    C.read_adata = lambda cohort, backed=False: vz.read_h5ad(ds, backed)  # data for forward_sums
+    T25RUN.GROUP_KEYS = {"liver": KEYS, "testis": KEYS}
+    fw = T25RUN.forward_sums(f"{ds}_s{seed}", vz.TABLE_COHORT, run, threads, batch_size)
+    fw["run"] = np.array(run)
+    tmp = out / f"fw_{ds}_s{seed}.tmp.npz"
+    np.savez_compressed(tmp, **fw)
+    tmp.replace(out / f"fw_{ds}_s{seed}.npz")
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--dataset", required=True, choices=sorted(vz.DATASETS))
-    p.add_argument("--seed", type=int, required=True)
+    p.add_argument("--dataset", choices=sorted(vz.DATASETS))
+    p.add_argument("--seed", type=int)
+    p.add_argument("--missing", action="store_true")
     p.add_argument("--threads", type=int, default=16)
     p.add_argument("--batch-size", type=int, default=512)
     a = p.parse_args()
-    run = vz.seed_runs(a.dataset)[a.seed]
-    out = vz.OUT / "drivers"
-    out.mkdir(parents=True, exist_ok=True)
-    C.read_adata = lambda cohort, backed=False: vz.read_h5ad(a.dataset, backed)  # data for forward_sums
-    T25RUN.GROUP_KEYS = {"liver": KEYS, "testis": KEYS}
-    fw = T25RUN.forward_sums(f"{a.dataset}_s{a.seed}", vz.TABLE_COHORT, run, a.threads, a.batch_size)
-    fw["run"] = np.array(run)
-    tmp = out / f"fw_{a.dataset}_s{a.seed}.tmp.npz"
-    np.savez_compressed(tmp, **fw)
-    tmp.replace(out / f"fw_{a.dataset}_s{a.seed}.npz")
+    if a.missing:
+        for ds in vz.usable_datasets():
+            for s in vz.seeds_in_D(ds):
+                if not (vz.OUT / "drivers" / f"fw_{ds}_s{s}.npz").exists():
+                    one(ds, s, a.threads, a.batch_size)
+    else:
+        one(a.dataset, a.seed, a.threads, a.batch_size)
     return 0
 
 
