@@ -15,9 +15,10 @@ before any subset is built and before any subset run.
 | hmouse | human, mouse | 2 |
 | primates | human, macaca_fascicularis, macaca_mulatta | 3 |
 
-- Source: the T11.1 object `data/revision/van_zyl/van_zyl_unified.h5ad` (build 2: 10,081 genes
-  measured in all five species, no mitochondrial filter, `source_batch`). Built only after the
-  coordinator confirms the R4 re-audit of that object is clean.
+- Source: the T11.1 object `data/revision/van_zyl/van_zyl_unified.h5ad`, build 3 (10,081 genes
+  measured in all five species, each mapped to its Ensembl ID row where the matrix has one; no
+  mitochondrial filter; harmonised types with < 20 cells in a species removed; `source_batch`).
+  The R4 re-audit gate is satisfied (coordinator, 2026-11-02).
 - Output `data/revision/van_zyl/van_zyl_<tag>.h5ad` and `_config.json`;
   `subsets_build_report.json`.
 - `training/build_subset.py::build_subset` unchanged, with `drop_empty_genes=True,
@@ -29,7 +30,10 @@ before any subset is built and before any subset run.
   species: human and M. fascicularis v2 and v3, the others v3).
 - `revision.common.check_cohort <h5ad> --batch-key source_batch` must print OK for each subset.
 
-## Grid per subset (at most 4 rows, s42; `grid.tsv`; `manifest.tsv` = one array for all subsets)
+## Grid per subset (at most 4 rows, s42; `grid.tsv`; `manifest.tsv` = all subsets)
+
+`array_all_grids.tsv` is the one array submitted: the 8 full-cohort rows of
+`revision/tasks/T11_2_recipe/manifest.tsv` followed by the subset rows of `manifest.tsv`, unchanged.
 
 Every row passes `--config A --seed 42 --batch-key source_batch --celltype-key cell_ontology_class --accelerator cpu`
 and all its weights explicitly. Rows from canonical recipes (`07_EXPERIMENT_MATRIX.md`) are used unchanged.

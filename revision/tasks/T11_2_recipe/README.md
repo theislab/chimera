@@ -3,7 +3,11 @@
 Written and committed before the training run whose results are used. The cohort was added
 during the revision; its recipe is fixed by the rule below before training. Earlier
 submissions of this grid were cancelled before any run finished and no result of theirs is
-used (default sample-level batch key; then an object replaced after a build audit).
+used (default sample-level batch key; then objects replaced after the build audits R2 and R4).
+The object is build 3 (ledger T11_1): the same 10,081 genes as build 2, with each gene mapped to
+its Ensembl ID row where the matrix has one, and types with < 20 cells in a species removed;
+frac(prior >= 0.95) is unchanged. The full-cohort grid is submitted in one array with the
+T11.2b subset grids (`revision/tasks/T11_2b_vz_subsets/array_all_grids.tsv`).
 
 ## Base recipe (pre-specified rule, section 11)
 
@@ -26,7 +30,7 @@ anchor where a law saturates or K = 5 lies outside the calibrated K = 2-4 range:
 ## Grid (8 configurations, s42; `grid.tsv`, array manifest `manifest.tsv`)
 
 All rows: `--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 42 --batch-key source_batch --accelerator cpu`.
-Rows 1-6 and 8 add `--celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85`.
+Rows 1-6 and 8 add `--celltype-conditional-mmd --prior-clamp-max 0.85`. Every row passes `--celltype-key cell_ontology_class` explicitly (row 7 uses no conditional MMD, so there it has no effect).
 
 batch_key = `source_batch` = species|chemistry (10x v2 or v3), 7 levels, at most 2 per species.
 Human and M. fascicularis mix v2 and v3 and the other species are v3 only, so a species-level
