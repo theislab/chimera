@@ -1,0 +1,4 @@
+run_name	args
+o2-liv_hmouse-s42	--config A --max-epochs 150 --adata data/revision/O1/repair_liver/human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0
+o2-liv_hmouse-s43	--config A --max-epochs 150 --adata data/revision/O1/repair_liver/human_mouse.h5ad --seed 43 --adv-weight 200 --free-bits 1.0
+o2-liv_hmouse-s44	--config A --max-epochs 150 --adata data/revision/O1/repair_liver/human_mouse.h5ad --seed 44 --adv-weight 200 --free-bits 1.0

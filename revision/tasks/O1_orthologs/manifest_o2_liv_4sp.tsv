@@ -1,0 +1,4 @@
+run_name	args
+o2-liv_4sp-s42	--config A --max-epochs 200 --adata data/revision/O1/repair_liver/unified.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+o2-liv_4sp-s43	--config A --max-epochs 200 --adata data/revision/O1/repair_liver/unified.h5ad --seed 43 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+o2-liv_4sp-s44	--config A --max-epochs 200 --adata data/revision/O1/repair_liver/unified.h5ad --seed 44 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
