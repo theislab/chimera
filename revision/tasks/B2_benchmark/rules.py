@@ -46,6 +46,14 @@ COHORTS = {
                        "--free-bits 1.0 --prior-clamp-max 0.85",
         ref_runs={42: "rev-kid-grid3-s42", 43: "rev-kid-s43", 44: "rev-kid-s44", 45: "rev-kid-s45", 46: "rev-kid-s46"}),
 }
+# Second wave of Track B and the tools of Track C: objects can be built, fits are listed only if the wave is launched.
+WAVE2 = {
+    "islet": dict(
+        h5ad="data/revision/disease_islet/islet_healthy_train.h5ad", gene_table="testis", label_key="cell_ontology_class", coarse_map=False,
+        library_key="sample_batch", donor_key="sample_batch", batch_key="batch", model_key="cell_ontology_class", cpus=12, mem="32G",
+        recipe=None, nolabel_recipe=None, ref_runs={}),
+}
+ALL_COHORTS = {**COHORTS, **WAVE2}
 SPECIES = ("Human", "Mouse")
 # Cell-type maps. Testis model labels (cell_ontology_class) follow the T4.2 coarse labels through this map.
 TESTIS_MODEL_PARENT = {"SG": "Spermatogonia", "SC": "Spermatocytes", "rSD": "spermatids", "eSD": "spermatids",

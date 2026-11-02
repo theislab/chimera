@@ -48,5 +48,8 @@ SATURN and CAMEX through the T5 pipelines, on `TOOL_SETTINGS` of Track B and on 
 ## Overview
 `overview.py`. Fixed now: for each task, rank of every applicable method (best = 1, ties share the mean rank), scaled to [0, 1] by (rank - 1) / (n - 1), so tasks with fewer methods count the same. Aggregate = mean of within-task scaled ranks within each track, then the mean over tracks with equal weight per track. Unscaled mean ranks are written beside it. A method applicable to a task but with no value (failed fit, tool that failed there) ranks last in that task; a method not applicable (static score on agreement; a tool not run on that setting) is left out and drawn hatched. Every task appears as a column. Winners stated as computed.
 
-## Order of work
+## Order of work (see ledger)
 Settings, objects, scoring of per-gene readouts: committed first, fits launched. Scoring code and predictions committed before any setting met a gold. See the ledger `R/ledgers/B2_benchmark.md`.
+
+## Run order
+From `chimera/`, in `chimera_env` through SLURM: `make_grid`, `array.sbatch` per grid, `ref.sbatch`; `tools/make_tool_grid`, `tools/t5.sbatch`, tool sbatch files; `golds_c`; `track_c.sbatch baselines`, `track_c units`, `track_c.sbatch unit|lists|y4`; `score_b.sbatch`; `overview`.

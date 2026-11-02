@@ -33,11 +33,11 @@ def csr(X) -> sp.csr_matrix:
 def read_base(cohort: str):
     import anndata as ad
 
-    return ad.read_h5ad(RU.REPO / RU.COHORTS[cohort]["h5ad"])
+    return ad.read_h5ad(RU.REPO / RU.ALL_COHORTS[cohort]["h5ad"])
 
 
 def base_labels(a, cohort: str) -> np.ndarray:
-    cfg = RU.COHORTS[cohort]
+    cfg = RU.ALL_COHORTS[cohort]
     lab = a.obs[cfg["label_key"]].astype(str)
     if cfg["coarse_map"]:
         lab = lab.map(TESTIS_COARSE)
@@ -281,8 +281,8 @@ def species_sizes(rng, spc, ratio: int, rep: int) -> np.ndarray:
 def build(row: dict, out_path=None, check: bool = True):
     """Returns (adata, info). Row: cohort, setting, rep."""
     cohort, setting, rep = row["cohort"], row["setting"], int(row["rep"])
-    cfg = RU.COHORTS[cohort]
-    st = RU.SETTINGS[setting]
+    cfg = RU.ALL_COHORTS[cohort]
+    st = RU.SETTINGS["full" if setting == "ref" else setting]
     rng = np.random.default_rng(RU.useed("perturb", cohort, setting, rep))
     a = read_base(cohort)
     X0 = csr(a.X)
@@ -359,7 +359,6 @@ def build(row: dict, out_path=None, check: bool = True):
             parts.append((pick, factor))
             b1[pick] = [f"{v}_x" for v in batch[pick]]
             lib1[pick] = [f"{v}_x" for v in library[pick]]
-        Xl = X1.tolil(copy=False) if False else None
         X1 = X1.tocsr().copy()
         for pick, factor in parts:
             Y = thin(rng, X1[pick], factor)
