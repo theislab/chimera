@@ -74,6 +74,10 @@ def fac_table(d, enc, reading, c):
             return q.value.mean() if len(q) else np.nan
         if c == "liv_hmouse":
             r.update(hep_rho_self=get("hep_zone", "rho_self"), hep_rho_cross=get("hep_zone", "rho_cross"), hep_auroc=get("hep_zone", "auroc_lr"))
+        elif c == "islet":
+            r.update(beta_rho_self=get("beta_stress", "rho_self"), beta_rho_cross=get("beta_stress", "rho_cross"), beta_auroc=get("beta_stress", "auroc_lr"))
+        elif c == "kidney":
+            r.update(pt_seg_rho_self=get("pt_segment", "rho_self"), pt_seg_auroc=get("pt_segment", "auroc_lr"), pt_seg_cross=get("pt_segment", "rho_cross"), pt_state_auroc=get("pt_state", "auroc_lr"), pt_state_clisi=get("pt_state", "clisi"))
         else:
             for t in ("stage_SG", "stage_SC", "stage_SD"):
                 r[t + "_auroc"] = get(t, "auroc_lr")
@@ -88,7 +92,7 @@ def fac_table(d, enc, reading, c):
             r[k] = get("global", m)
         rows.append(r)
     t = pd.DataFrame(rows)
-    if not len(enc):
+    if not len(enc) or c in ("islet", "kidney"):
         return t
     e = enc[enc.cohort == c]
     if c == "liv_hmouse":
@@ -125,7 +129,7 @@ def main():
         rd = pd.read_csv(RU.OUT / "reading.csv")
     except FileNotFoundError:
         rd = pd.DataFrame()
-    for c in ("liv_hmouse", "test_hmouse"):
+    for c in ("liv_hmouse", "test_hmouse", "islet", "kidney"):
         t = fac_table(d, enc, rd, c)
         if not len(t):
             continue
@@ -202,7 +206,7 @@ def tidy() -> pd.DataFrame:
     dp = pd.read_csv(RU.OUT / "depth_axis.csv")
     for (c, m), g in dp.groupby(["cohort", "method"]):
         add("latent", f"cohort={c};mode=in_model", m, "z_within_label_variance_by_depth", g.within_z_var_by_lib, "lower")
-    for c in ("liv_hmouse", "test_hmouse"):
+    for c in ("liv_hmouse", "test_hmouse", "islet", "kidney"):
         f = RU.OUT / f"factorial_seeds_{c}.csv"
         if not f.exists():
             continue
@@ -218,7 +222,7 @@ def tidy() -> pd.DataFrame:
 
 if __name__ == "__main__":
     main()
-    L = pd.concat(levels(c) for c in ("liv_hmouse", "test_hmouse") if (RU.OUT / f"factorial_seeds_{c}.csv").exists())
+    L = pd.concat(levels(c) for c in ("liv_hmouse", "test_hmouse", "islet", "kidney") if (RU.OUT / f"factorial_seeds_{c}.csv").exists())
     L.to_csv(RU.OUT / "factorial_levels.csv", index=False)
     D = decide()
     D.to_csv(RU.OUT / "decision.csv", index=False)

@@ -24,7 +24,7 @@ def consensus(c):
 def main():
     fac = pd.read_csv(RU.REPO / "revision/tasks/Z2_embedding/factorial.tsv", sep="\t")
     rows, loo = [], []
-    for c in ("liv_hmouse", "test_hmouse"):
+    for c in ("liv_hmouse", "test_hmouse", "islet", "kidney"):
         H = consensus(c)
         sup = H.count_support.astype(bool).to_numpy()
         al = [x for x in H.columns if x.startswith("alpha_s")]

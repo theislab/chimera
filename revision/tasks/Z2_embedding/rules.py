@@ -124,6 +124,8 @@ def run_name(cohort: str, level: str, seed: int) -> str:
 
 def base_seed_runs(cohort: str) -> dict[int, str]:
     """Existing CPU seeds of the canonical recipe."""
+    if cohort in ("islet", "kidney"):
+        return {s: f"rev-{cohort[:3]}-s{s}" for s in range(43, 47)}
     return {s: f"rev-{cohort}-s{s}" for s in (range(45, 52) if cohort == "liv_hmouse" else range(43, 52))}
 
 
