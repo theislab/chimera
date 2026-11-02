@@ -1,0 +1,4 @@
+run_name	seed	source
+rev-vz-primates-s42	42	rev-vz-primates-grid2-s42 (selected grid run)
+rev-vz-primates-s43	43	training/runs/rev-vz-primates-s43
+rev-vz-primates-s44	44	training/runs/rev-vz-primates-s44
