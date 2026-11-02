@@ -17,3 +17,7 @@ At most one round of seeds per row: no seed is added to change a ranking.
 
 ## Rounds
 Round 1, Van Zyl H+Pig and H+M. fascicularis (`round1_vz_pairs.tsv`): reasons in the private ledger Z1_retune.md.
+
+Round 1 outcome: the highest-rho ranking above was not applied. By instruction received after submission, the round
+stopped once the existing rule-base recipe (row a) had 2 healthy seeds per cohort, without chasing a higher rho.
+Rows b, c and d were not analysed and enter nothing. Run names: private ledger Z1_retune.md.
