@@ -7,6 +7,7 @@
 source revision/slurm/_body.sh
 export DGLBACKEND=pytorch
 TOOL="$1"; shift; M=revision/tasks/B2_benchmark/tools/tool_grid.tsv; U=$(echo "$TOOL" | tr a-z A-Z); PP=$PYTHONPATH
+if ! command -v mamba >/dev/null; then echo "no mamba on $(hostname)"; exit 127; fi
 for I in "$@"; do
   run=$(awk -F'\t' -v i=$((I+2)) 'NR==i{print $5}' $M); seed=$(awk -F'\t' -v i=$((I+2)) 'NR==i{print $4}' $M)
   [[ -f results/revision/B2/tool_scores/$U/$run.csv ]] && continue
