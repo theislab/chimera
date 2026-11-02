@@ -53,3 +53,6 @@ Settings, objects, scoring of per-gene readouts: committed first, fits launched.
 
 ## Run order
 From `chimera/`, in `chimera_env` through SLURM: `make_grid`, `array.sbatch` per grid, `ref.sbatch`; `tools/make_tool_grid`, `tools/t5.sbatch`, tool sbatch files; `golds_c`; `track_c.sbatch baselines`, `track_c units`, `track_c.sbatch unit|lists|y4`; `score_b.sbatch`; `overview`.
+
+## Queue budget (amendment, 2026-11-02, before any setting was scored in Tracks B or C except one code test on liver relabel25)
+At most 35 tasks in queue and 400 in total, counted per array element. Hence `feeder.sh` (single tasks in the fixed order of a queue file), `pool.sbatch` (scoring in one job), `tools/t5_bundle.sbatch`. No setting of Track B is dropped: the grid is one factor at a time around the unperturbed central object, as written above. Tools: SATURN on one replicate per main setting and one reference seed (liver has more on full, relabel25, coarse because those ran before the cut; the scores use what exists and say so); CAMEX on three replicates. GeneSpectra, CACIMAR, SAMap on the unperturbed object of each cohort and on the main settings if they fit, listed in the ledger.

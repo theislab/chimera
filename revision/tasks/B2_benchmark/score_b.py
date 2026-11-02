@@ -45,15 +45,15 @@ def healthy(run: str) -> bool:
     return p.exists() and not json.loads(p.read_text())["discard"]
 
 
-def consensus(frames: list[pd.Series], index) -> tuple[np.ndarray, np.ndarray]:
-    """Per-gene mean over replicates, needing at least MIN_REPS defined. Returns consensus and the replicate matrix."""
+def consensus(frames: list[pd.Series], index, min_reps: int = RU.MIN_REPS) -> tuple[np.ndarray, np.ndarray]:
+    """Per-gene mean over replicates, needing at least min_reps defined. Returns consensus and the replicate matrix."""
     if not frames:
         return np.full(len(index), np.nan), np.full((len(index), 0), np.nan)
     M = np.column_stack([f.reindex(index).to_numpy(dtype=float) for f in frames])
     n = np.isfinite(M).sum(1)
     with np.errstate(invalid="ignore"):
         c = np.nansum(M, 1) / np.where(n > 0, n, 1)
-    c[n < RU.MIN_REPS] = np.nan
+    c[n < min_reps] = np.nan
     return c, M
 
 
@@ -63,7 +63,7 @@ def tool_scores(tool: str, cohort: str, setting: str, index, reps=RU.REPS):
         p = TL / tool / f"{RU.run_name(cohort, setting, r)}.csv"
         if p.exists():
             fr.append(pd.read_csv(p).set_index("var_name")["score"])
-    return consensus(fr, index) if fr else (None, None)
+    return consensus(fr, index, min_reps=1) if fr else (None, None)  # tools: SATURN on one replicate per setting, CAMEX on three, by budget; n_reps in the tool's sidecar
 
 
 def gather(cohort: str, setting: str, index) -> dict:

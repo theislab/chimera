@@ -48,12 +48,12 @@ def table(cohort: str) -> pd.DataFrame:
                 p = TL / tool / f"{RU.run_name(cohort, 'full', r)}.csv"
                 if p.exists():
                     fr.append(pd.read_csv(p).set_index("var_name")["score"])
-            if len(fr) >= RU.MIN_REPS:
+            if fr:  # SATURN one replicate on most settings, CAMEX three, by budget
                 M = np.column_stack([f.reindex(t["var_name"]).to_numpy(dtype=float) for f in fr])
                 with np.errstate(invalid="ignore"):
                     n = np.isfinite(M).sum(1)
                     v = np.nansum(M, 1) / np.where(n > 0, n, 1)
-                v[n < RU.MIN_REPS] = np.nan
+                v[n < 1] = np.nan
                 t[tool] = v
     return t.reset_index()
 
