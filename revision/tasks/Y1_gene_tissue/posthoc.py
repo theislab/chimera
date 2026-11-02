@@ -400,6 +400,65 @@ def sec_H(D, CNT):
     print(it.assign(v=it.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="gold", columns="name", values="v").to_string(), it.groupby("gold").n_genes.first().to_dict(), flush=True)
 
 
+def fine_direct(t: str, key: str):
+    """Direct margin on finer author labels (species x class x state), same code as X4; is S's lead over the labelled margin within-label state?"""
+    from revision.common import cohorts as C_
+    from revision.tasks.X4_where_differs import direct_margin as DM
+
+    a = Y.read(t)
+    a_hm, h, m = Y.hm_view(a)
+    a_hm.obs["cell_type"] = (a_hm.obs["y1_group"].astype(str) + "|" + a_hm.obs[key].astype(str)).values
+    vc = a_hm.obs.groupby(["species", "cell_type"], observed=True).size()
+    C_.read_adata = lambda cohort, backed=False: a_hm
+    df = DM.run(f"y1_fine_{t}")
+    df["n_groups"] = len(vc)
+    return df
+
+
+def sec_I(D, CNT):
+    """Added after H: S kept 0.13-0.14 beyond B1 and the labelled margin on kidney golds, 0.12 on liver. Reweighting of the two parts, or more?"""
+    OUT.mkdir(exist_ok=True)
+    zz = {}
+    for t, key in (("kidney", "CellStateLevel2"), ("liver", "SubAnno")):
+        f = OUT / f"Sdir_fine__{t}.parquet"
+        if not f.exists():
+            fine_direct(t, key).to_parquet(f)
+        tb = Y.tissue_table(t).set_index("var_name")
+        d = pd.read_parquet(f).set_index("var_name")
+        zz[t] = pd.Series(d["Sdir"].reindex(tb.index).to_numpy(), index=tb["hsapiens_gene_id"].to_numpy())
+    rows = []
+    pat, lev = pd.read_parquet(MAT / "raw_Sdir_pattern.parquet"), pd.read_parquet(MAT / "raw_Sdir_level.parquet")
+    for gold, T in {**CT.GOLDS, **NEW}.items():
+        col = f"G_{gold}"
+        g = D.gold[col].dropna().index
+        m = D.sup.reindex(g)[[T]].astype(bool).all(axis=1) & D.raw["B1"].reindex(g)[T].notna()
+        g = m[m].index
+        g = D.cov_T(T, g)[PAT].dropna().index
+        if col == "G_testis":
+            g = g[D.gold["H4_nsp"].reindex(g).notna()]
+        ex = pd.DataFrame(dict(S_T=D.raw["S"][T].reindex(g), B1_T=D.raw["B1"][T].reindex(g), Sdir_T=D.raw["Sdir"][T].reindex(g), pat_T=pat[T].reindex(g), lev_T=lev[T].reindex(g)))
+        spec = [("pattern", "pat_T", []), ("level", "lev_T", []), ("S | pattern, level", "S_T", ["pat_T", "lev_T"]), ("S | pattern, level, B1", "S_T", ["pat_T", "lev_T", "B1_T"]), ("pattern | S", "pat_T", ["S_T"]), ("level | S", "lev_T", ["S_T"])]
+        if T in zz:
+            g2 = g[zz[T].reindex(g).notna().to_numpy()]
+            ex["fine"] = zz[T].reindex(g)
+            spec += [("Sdir fine labels", "fine", []), ("S | Sdir fine", "S_T", ["fine"]), ("S | Sdir fine, B1", "S_T", ["fine", "B1_T"]), ("Sdir fine | S", "fine", ["S_T"])]
+        for nm_, x, cond in spec:
+            Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
+            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT[:2000])
+            rows.append(CT.summarise(nm_, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
+        # per seed: S given B1 and the labelled margin
+        sm = pd.read_parquet(MAT / f"seedS__{T}.parquet").reindex(g)
+        Z = CT.design_T(D, T, g, PAT, col, ex[["B1_T", "Sdir_T"]])
+        vals = []
+        for c in sm.columns:
+            _, e_, _d = CT.rho_table(D, col, g, {"x": sm[c]}, Z, CNT[:2])
+            vals.append(e_[0])
+        rows.append(dict(name="S | B1, Sdir per seed", gold=gold, est=float(np.mean(vals)), lo=float(np.min(vals)), hi=float(np.max(vals)), n_genes=len(g)))
+    t = pd.DataFrame(rows)
+    t.to_csv(OUT / "I_reweighting.csv", index=False)
+    print(t.assign(v=t.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="name", columns="gold", values="v").to_string(), flush=True)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--sections", default="A,B,C,D,E,F,G")
@@ -408,7 +467,7 @@ def main():
     D = data()
     D.sup = D.sup.astype(bool)
     CNT = CT.block_counts(D, RU.N_DRAWS, RU.SEED)
-    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G, H=sec_H)
+    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G, H=sec_H, I=sec_I)
     for s in a.sections.split(","):
         print("==", s, flush=True)
         fn[s](D, CNT)
