@@ -1,0 +1,36 @@
+gold	coarse_type	ts_cell_type	tms_cell_type
+kidney	epithelial	kidney epithelial cell	kidney proximal convoluted tubule epithelial cell
+kidney	epithelial		epithelial cell of proximal tubule
+kidney	epithelial		kidney proximal straight tubule epithelial cell
+kidney	epithelial		kidney loop of Henle thick ascending limb epithelial cell
+kidney	epithelial		kidney loop of Henle ascending limb epithelial cell
+kidney	epithelial		kidney distal convoluted tubule epithelial cell
+kidney	epithelial		kidney collecting duct principal cell
+kidney	epithelial		kidney collecting duct epithelial cell
+kidney	endothelial	endothelial cell	fenestrated endothelial cell
+kidney	endothelial		kidney capillary endothelial cell
+kidney	macrophage	macrophage	macrophage
+kidney	b_cell	B cell	B cell
+kidney	t_cell	CD8-positive, alpha-beta T cell	T cell
+kidney	t_cell	CD4-positive, alpha-beta T cell	
+kidney	t_cell	T cell	
+kidney	nk	natural killer cell	natural killer cell
+pancreas	acinar	pancreatic acinar cell	pancreatic acinar cell
+pancreas	ductal	pancreatic ductal cell	pancreatic ductal cell
+pancreas	endothelial	endothelial cell	endothelial cell
+pancreas	beta	type B pancreatic cell	type B pancreatic cell
+pancreas	alpha	pancreatic A cell	pancreatic A cell
+pancreas	leukocyte	macrophage	leukocyte
+pancreas	leukocyte	CD8-positive, alpha-beta T cell	
+pancreas	leukocyte	CD4-positive, alpha-beta T cell	
+pancreas	leukocyte	T cell	
+pancreas	leukocyte	classical monocyte	
+pancreas	leukocyte	intermediate monocyte	
+pancreas	leukocyte	non-classical monocyte	
+pancreas	leukocyte	monocyte	
+pancreas	leukocyte	B cell	
+pancreas	leukocyte	natural killer cell	
+pancreas	leukocyte	mature NK T cell	
+pancreas	leukocyte	plasma cell	
+pancreas	leukocyte	neutrophil	
+pancreas	leukocyte	mast cell	
