@@ -262,24 +262,24 @@ def add_source_batch(obs: pd.DataFrame) -> pd.DataFrame:
 
 
 def class_filter(raw, class_min: int):
-    """Remove a class from a species below ``class_min`` cells, unless a planned test needs the class.
+    """Filter a whole class from the model if a species that has it is below ``class_min`` cells.
 
-    Rule of the kidney and islet cohorts (checklist item 5). Exception, reason recorded: V2 and V3 compare
-    species over shared outflow types, so a class in van Zyl's conventional or uveoscleral outflow groups
-    and present in all five species stays.
+    Rule of the kidney and islet cohorts (checklist item 5), there with two species. Exception, reason
+    recorded: V2 and V3 compare each species with human over outflow classes, so a class in van Zyl's
+    conventional or uveoscleral outflow groups that human shares with another species stays.
     """
     t = pd.crosstab(raw.obs["cell_ontology_class"].astype(str), raw.obs["species"].astype(str))
     groups = raw.obs[["cell_ontology_class", "cell_class"]].astype(str).drop_duplicates().set_index("cell_ontology_class")["cell_class"]
-    shared_outflow = (t > 0).all(axis=1) & groups.reindex(t.index).isin(["conventional outflow", "uveoscleral outflow"])
-    removed, kept = [], []
-    for k in t.index:
-        for s_ in t.columns:
-            if 0 < t.loc[k, s_] < class_min:
-                (kept if shared_outflow[k] else removed).append(dict(species=s_, cell_ontology_class=k, n_cells=int(t.loc[k, s_])))
-    drop = pd.MultiIndex.from_arrays([raw.obs["species"].astype(str), raw.obs["cell_ontology_class"].astype(str)]).isin(
-        [(r["species"], r["cell_ontology_class"]) for r in removed])
-    rec = dict(min_cells=class_min, removed=removed, kept_shared_outflow_exception=kept, n_cells_removed=int(drop.sum()),
-               exception_reason="V2 and V3 compare species over shared outflow types")
+    outflow = groups.reindex(t.index).isin(["conventional outflow", "uveoscleral outflow"])
+    shared_with_human = (t["human"] > 0) & ((t.drop(columns="human") > 0).any(axis=1))
+    needed = outflow & shared_with_human
+    thin = {k: [dict(species=s_, n_cells=int(t.loc[k, s_])) for s_ in t.columns if 0 < t.loc[k, s_] < class_min] for k in t.index}
+    removed = {k: v for k, v in thin.items() if v and not needed[k]}
+    kept = {k: v for k, v in thin.items() if v and needed[k]}
+    drop = raw.obs["cell_ontology_class"].astype(str).isin(list(removed)).to_numpy()
+    rec = dict(min_cells=class_min, classes_removed=removed, classes_kept_by_exception=kept, n_cells_removed=int(drop.sum()),
+               cells_removed_by_species=raw.obs.loc[drop, "species"].astype(str).value_counts().to_dict(),
+               exception_reason="V2 and V3 compare each species with human over outflow classes")
     return raw[~drop].copy(), rec
 
 

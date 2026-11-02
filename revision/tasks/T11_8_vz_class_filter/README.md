@@ -1,10 +1,10 @@
 # T11.8 Van Zyl: class filter sensitivity (rule written before the filtered models are trained)
 
-Cohort checklist item 5, as on kidney and islet: a class enters only with at least 50 cells in each species that has it. Van Zyl build 3 has 10 class x species cells below 50.
+Cohort checklist item 5, as on kidney and islet: a class enters the model only with at least 50 cells in each species that has it; otherwise the whole class is filtered (`P13_kidney/build.py:297-303`, `T7_9_islet/build.py:270-277`). Van Zyl build 3 has 10 class x species cells below 50.
 
 **Filtered object** (`build_vanzyl.py --class-min 50 --out data/revision/van_zyl_f50`; human + mouse by `training/build_subset.py` from it).
-Removed, 202 cells: B cell M. fascicularis 25; NK/T mouse 40; unresolved corneal mouse 42; corneal endothelium pig 34; myoepithelium mouse 40; neuron human 21.
-Kept by exception, reason: V2 and V3 compare species over shared outflow types (in van Zyl's conventional or uveoscleral outflow groups and in all five species): canal endothelium mouse 25; ciliary muscle mouse 30, pig 41; Schwann mouse 27.
+Whole class filtered, 1,196 cells (thin species in brackets): NK/T 949 (mouse 40), B cell 144 (M. fascicularis 25), unresolved corneal 42 (mouse 42), myoepithelium 40 (mouse 40), neuron 21 (human 21).
+Kept by exception, reason: V2 and V3 compare each species with human over outflow classes (van Zyl's conventional or uveoscleral outflow groups, shared by human and another species): canal endothelium (mouse 25), ciliary muscle (mouse 30, pig 41), Schwann (mouse 27), corneal endothelium with human Schwalbe line (pig 34).
 
 **Models.** The recipes in use, unchanged except the object: full cohort T11.2 grid 1, human + mouse T11.2b grid 1. Seeds 42 and 43 (`manifest.tsv`): rev-vz-f50-s<seed>, rev-vz-f50-hmouse-s<seed>. A seed failing health (NaN, collapse, frozen) is replaced by the next seed until 2 pass.
 
