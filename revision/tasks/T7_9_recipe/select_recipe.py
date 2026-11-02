@@ -118,7 +118,7 @@ def main() -> int:
     for _, g in grid.iterrows():
         run_dir = RUNS / g.run_name
         r = {"grid_id": int(g.grid_id), "run_name": g.run_name, **gate(run_dir)}
-        if r["finished"]:
+        if r["finished"] and r.get("no_nan"):  # a run with NaN fails G-D2; no metrics on a NaN latent
             z = np.asarray(np.load(run_dir / "final_state.npz")["z_mean"])
             if z.shape[0] != len(obs):
                 raise RuntimeError(f"{g.run_name}: z has {z.shape[0]} rows, adata {len(obs)}")
