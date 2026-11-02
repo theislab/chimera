@@ -12,11 +12,20 @@ t (the G-D1k unit filter), with roles from ``unit_roles.tsv``:
   (``~ sex + collection + condition``); mouse acute only and late only (``~ condition``);
   Kirita 10x 3' v2 IRI pooled vs Sham 14 d, and its 2 d and 6 wk arms (``~ condition``).
 
-A covariate constant over a fit's units is dropped and logged. Wald tests; apeglm shrinkage of
-the condition coefficient (``lfc_shrink``). Genes with < 10 counts summed over the units are not
-tested. ``det_frac`` = nuclei with count > 0 / nuclei, over the units used (section 8c's 5% rule).
+A covariate constant over a fit's units is dropped and logged. Wald tests; PyDESeq2's apeGLM
+shrinkage of the condition coefficient (``lfc_shrink``), twice: ``log2fc_shrunk`` with the adaptive
+prior (the default, which collapses thin fits to zero, see T7.3) and ``log2fc_fixed`` with prior
+scale 1 (``adapt=False``). H-D1 uses ``log2fc_mle`` for l^h and ``log2fc_fixed`` for m; H-D4 ranks on
+``log2fc_fixed`` (plan amendment). Genes with < 10 counts summed over the units are not tested.
+``det_frac`` = nuclei with count > 0 / nuclei, over the units used (section 8c's 5% rule).
+
+``--perm <type index>`` fits the primary models of one DE-able type on permuted condition labels
+(human within sex x collection, mouse within stage, ``N_PERM`` draws each, never the observed
+labels or their swap), with the fixed-scale prior only, for the H-D4 and H-D1 label null. Output
+``de/perm/{human,mouse}_perm<ii>_<type>.tsv``.
 
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py [--types pt,...] [--n-cpus 16]
+    PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --perm 0 [--n-cpus 16]
 """
 
 from __future__ import annotations
@@ -46,6 +55,8 @@ OUT = RES / "de"
 MIN_CELLS_UNIT = 20
 MIN_COUNTS = 10
 MULTIOME = "10x multiome"
+N_PERM, SEED = 20, 20261101
+DE_ORDER = ["pt", "tal", "dct", "pc", "ic", "ec", "fib", "myeloid", "lymphoid"]
 
 
 def select(pb: ad.AnnData, t: str, mask: pd.Series) -> ad.AnnData:
@@ -54,7 +65,7 @@ def select(pb: ad.AnnData, t: str, mask: pd.Series) -> ad.AnnData:
     return pb[keep.to_numpy()].copy()
 
 
-def fit(sub: ad.AnnData, covariates: list[str], n_cpus: int) -> tuple[pd.DataFrame, str]:
+def fit(sub: ad.AnnData, covariates: list[str], n_cpus: int, adaptive: bool = True) -> tuple[pd.DataFrame, str]:
     meta = sub.obs.copy()
     for c in meta.columns:
         if meta[c].dtype.name == "category":
@@ -65,29 +76,76 @@ def fit(sub: ad.AnnData, covariates: list[str], n_cpus: int) -> tuple[pd.DataFra
                           columns=sub.var_names)
     counts = counts.loc[:, counts.sum(axis=0) >= MIN_COUNTS]
     inf = DefaultInference(n_cpus=n_cpus)
+    contrast = ["condition", "disease", "control"]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         dds = DeseqDataSet(counts=counts, metadata=meta, design=design, refit_cooks=True,
                            inference=inf, quiet=True)
         dds.deseq2()
-        ds = DeseqStats(dds, contrast=["condition", "disease", "control"], inference=inf, quiet=True)
+        ds = DeseqStats(dds, contrast=contrast, inference=inf, quiet=True)
         ds.summary()
         mle = ds.results_df.copy()
         coeff = [c for c in ds.LFC.columns if c.startswith("condition") and "disease" in c]
         if len(coeff) != 1:
             raise RuntimeError(f"condition coefficient not unique: {list(ds.LFC.columns)}")
-        ds.lfc_shrink(coeff=coeff[0])
-    res = ds.results_df.rename(columns={"log2FoldChange": "log2fc_shrunk", "lfcSE": "lfcse_shrunk"})
-    res["log2fc_mle"] = mle["log2FoldChange"]
-    res["lfcse_mle"] = mle["lfcSE"]
-    res["stat"] = mle["stat"]
-    res["pvalue"] = mle["pvalue"]
-    res["padj"] = mle["padj"]
+        if adaptive:
+            ds.lfc_shrink(coeff=coeff[0])
+            shrunk = ds.results_df.copy()
+            # lfc_shrink edits the LFC table in place, so the fixed-scale prior needs a fresh DeseqStats
+            ds = DeseqStats(dds, contrast=contrast, inference=inf, quiet=True)
+            ds.summary()
+        ds.lfc_shrink(coeff=coeff[0], adapt=False)
+    res = pd.DataFrame({"baseMean": mle["baseMean"], "log2fc_fixed": ds.results_df["log2FoldChange"],
+                        "lfcse_fixed": ds.results_df["lfcSE"], "log2fc_mle": mle["log2FoldChange"],
+                        "lfcse_mle": mle["lfcSE"], "stat": mle["stat"], "pvalue": mle["pvalue"], "padj": mle["padj"]})
+    if adaptive:
+        res["log2fc_shrunk"] = shrunk["log2FoldChange"]
+        res["lfcse_shrunk"] = shrunk["lfcSE"]
     det = np.asarray(sub[:, counts.columns].layers["n_detected"].sum(axis=0)).ravel()
     res["det_frac"] = det / float(sub.obs["n_nuclei"].astype(int).sum())
     res.index.name = "gene_symbol"
     res["gene_id"] = sub.var.loc[counts.columns, "gene_ids"].to_numpy()
     return res.reset_index(), design
+
+
+def permuted_labels(obs: pd.DataFrame, strata: list[str], rng, n: int) -> list:
+    """n distinct relabellings within strata, never the observed labels or their exact swap."""
+    real = obs["condition"].astype(str).to_numpy()
+    swap = np.where(real == "control", "disease", "control")
+    groups = list(obs.reset_index(drop=True).groupby([obs[c].astype(str).to_numpy() for c in strata]).indices.values())
+    seen, out = set(), []
+    for _ in range(200 * n):
+        lab = real.copy()
+        for idx in groups:
+            lab[idx] = rng.permutation(real[idx])
+        key = tuple(lab)
+        if key in seen or (lab == real).all() or (lab == swap).all():
+            continue
+        seen.add(key)
+        out.append(lab)
+        if len(out) == n:
+            break
+    return out
+
+
+def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int) -> None:
+    out = OUT / "perm"
+    out.mkdir(parents=True, exist_ok=True)
+    jobs = {j[0]: j for j in jobs_for(pb_h, pb_m, t) if j[1] == "primary"}
+    rows = []
+    for k, (species, strata) in enumerate((("human", ["sex", "collection"]), ("mouse", ["stage"]))):
+        _, _, sub, covs = jobs[species]
+        rng = np.random.default_rng([SEED, DE_ORDER.index(t), k])
+        for i, lab in enumerate(permuted_labels(sub.obs, strata, rng, N_PERM)):
+            s = sub.copy()
+            s.obs["condition"] = lab
+            r, design = fit(s, covs, n_cpus, adaptive=False)
+            r.to_csv(out / f"{species}_perm{i:02d}_{t}.tsv", sep="\t", index=False)
+            rows.append(dict(cell_type=t, species=species, perm=i, design=design,
+                             controls=",".join(s.obs["unit"].astype(str)[lab == "control"])))
+            pd.DataFrame(rows).to_csv(out / f"labels_{t}.tsv", sep="\t", index=False)
+            log.info("%s %s perm %d done", t, species, i)
+    (out / f"DONE_{t}").write_text("ok\n")
 
 
 def jobs_for(pb_h: ad.AnnData, pb_m: ad.AnnData, t: str) -> list:
@@ -114,6 +172,7 @@ def main() -> int:
     p.add_argument("--types", default=None)
     p.add_argument("--n-cpus", type=int, default=16)
     p.add_argument("--primary-only", action="store_true")
+    p.add_argument("--perm", type=int, default=None, help="index into DE_ORDER: permuted-label fits of that type")
     a = p.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     types = pd.read_csv(RES / "gd1k_types.csv")
@@ -122,6 +181,9 @@ def main() -> int:
         de_types = [t for t in de_types if t in a.types.split(",")]
     pb_h = ad.read_h5ad(DATA / "kidney_pseudobulk_human.h5ad")
     pb_m = ad.read_h5ad(DATA / "kidney_pseudobulk_mouse.h5ad")
+    if a.perm is not None:
+        run_perm(DE_ORDER[a.perm], pb_h, pb_m, a.n_cpus)
+        return 0
     summary = []
     for t in de_types:
         for species, contrast, sub, covs in jobs_for(pb_h, pb_m, t):
