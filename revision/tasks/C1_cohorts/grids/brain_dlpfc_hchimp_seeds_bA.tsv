@@ -1,0 +1,3 @@
+run_name	args
+rev-c1-brain-dlpfc-hchimp-bA-s43	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/brain_dlpfc_hchimp.h5ad --seed 43 --batch-key batch --adv-weight 200 --lambda-anchor 0.00615 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-c1-brain-dlpfc-hchimp-bA-s44	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/brain_dlpfc_hchimp.h5ad --seed 44 --batch-key batch --adv-weight 200 --lambda-anchor 0.00615 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
