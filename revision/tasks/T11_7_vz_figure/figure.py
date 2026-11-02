@@ -58,6 +58,11 @@ def short(ds: str) -> str:
     return ds_label(ds).replace("human + ", "H+").replace("5 species", "5 sp").replace("M. mulatta", "Mmul").replace("M. fascicularis", "Mfas")
 
 
+def col_head(ds: str) -> str:
+    """Column header for the six-dataset matrices and table."""
+    return short(ds).replace("H+", "H+\n").replace("primates", "prim.")
+
+
 def style(ax, grid="x"):
     ax.set_facecolor(SURFACE)
     for s in ("top", "right"):
@@ -236,7 +241,7 @@ def figure(iq: dict) -> None:
                 line.append(v.iloc[0] if len(v) else np.nan)
             M.append(line)
             rows.append(f"{lab} · {name}")
-    matrix(ax, np.array(M), rows, [short(d) for d in dss], TwoSlopeNorm(vcenter=0.5, vmin=0.2, vmax=0.8), DIV, fs=5.4)
+    matrix(ax, np.array(M), rows, [col_head(d) for d in dss], TwoSlopeNorm(vcenter=0.5, vmin=0.2, vmax=0.8), DIV, fs=5.4)
     ax.tick_params(axis="x", labelsize=5.2)
     ax.tick_params(axis="y", labelsize=5.4)
     ax.set_title("Gene classes vs matched genes (AUROC)", color=INK, loc="left", fontsize=7, pad=4, x=-0.45)
@@ -313,27 +318,31 @@ def figure(iq: dict) -> None:
         for k, ds in enumerate(dss):
             v = it[(it["dataset"] == ds) & (it["model"] == mdl)]["composite"]
             M[i, k] = v.iloc[0] if len(v) else np.nan
-    matrix(ax, M, MODELS, [short(d) for d in dss], plt.Normalize(0, 1), SEQ, fs=5.4)
+    matrix(ax, M, MODELS, [col_head(d) for d in dss], plt.Normalize(0, 1), SEQ, fs=5.4)
     ax.tick_params(axis="x", labelsize=5.2)
     panel(ax, "j", "Integration composite", x=-0.3)
 
     # k: plain values
     ax = fig.add_subplot(gs[3, 4:])
     ax.axis("off")
-    rows, cols = [], [short(d) for d in dss]
-    vals = {k: [] for k in ("runs kept", "ρ(Δα, $S_g$)", "margin support", "CV R², features", "mixing entropy", "random mixing", "adversary", "majority rate", "label transfer")}
+    cols = [col_head(d) for d in dss]
+    v1 = pd.read_csv(R / "glaucoma" / "v1_contrast.csv")
+    unsat = v1[(v1["subset"] == "all") & (v1["score"] == "D_unsat")].set_index("dataset")["auroc"]
+    vals = {k: [] for k in ("runs kept", "ρ(Δα, $S_g$)", "margin support", "CV R², features", "glaucoma Δα, unsat.", "mixing entropy", "random mixing", "adversary", "majority rate", "label transfer")}
     for ds in dss:
         m = json.loads((R / "readout" / f"meta_{ds}.json").read_text())
         cv = pd.read_csv(R / "readout" / f"cv_r2_{ds}.csv").set_index("features")["cv_r2"]
         q = iq[ds]
         for k, v in (("runs kept", str(len(m["seeds_D"]))), ("ρ(Δα, $S_g$)", f"{m['rho_D_S']:.2f}"),
                      ("margin support", f"{m['margin_support']['mean_frac_tail_with_margin_support']:.2f}"), ("CV R², features", f"{cv['all72']:.2f}"),
-                     ("mixing entropy", f"{q['knn_mixing_entropy']:.2f}"), ("random mixing", f"{q['entropy_random']:.2f}"),
+                     ("glaucoma Δα, unsat.", f"{unsat[ds]:.2f}"), ("mixing entropy", f"{q['knn_mixing_entropy']:.2f}"), ("random mixing", f"{q['entropy_random']:.2f}"),
                      ("adversary", f"{q['adv_acc']:.2f}"), ("majority rate", f"{q['majority_rate']:.2f}"), ("label transfer", f"{q['label_transfer_acc']:.2f}")):
             vals[k].append(v)
     tb = ax.table(cellText=list(vals.values()), rowLabels=list(vals), colLabels=cols, cellLoc="center", rowLoc="right", bbox=[0.3, 0.02, 0.7, 0.9])
     tb.auto_set_font_size(False)
     tb.set_fontsize(4.9)
+    for c in range(len(cols)):
+        tb[(0, c)].set_height(tb[(0, c)].get_height() * 1.9)
     for (r, c), cell in tb.get_celld().items():
         cell.set_edgecolor(GRID)
         cell.set_linewidth(0.4)
