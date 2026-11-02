@@ -5,6 +5,7 @@ CAP=${1:-170}; MEMCAP=${2:-680}
 Q=revision/tasks/B1_ground_truth/queue.tsv
 T=revision/tasks/B1_ground_truth
 L=results/revision/B1/logs
+export SBATCH_EXCLUDE=${B1_EXCLUDE:-cpusrv114}  # node where every job fails with mamba not found (2026-11-02)
 n=$(($(wc -l < $Q) - 1))
 STATE=results/revision/B1/feeder.state
 i=$(cat "$STATE" 2>/dev/null || echo 0)
