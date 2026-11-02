@@ -59,14 +59,15 @@ def f5():
             rev = {v: u for u, v in MAP_LIVER.items()}
             gl["k"] = gl.kk.map(rev)
         q = q.merge(gl[["hsapiens_gene_id", "k", "I"]], on=["hsapiens_gene_id", "k"])
-        # direct gene x type gap, level and detection from X7 (long or wide)
-        if {"Ddir", "k"} <= set(direct.columns) or {"Ddir", "type"} <= set(direct.columns):
-            kcol = "k" if "k" in direct.columns else "type"
-            q = q.merge(direct.rename(columns={kcol: "k"}), on=["var_name", "k"], how="left") if "var_name" in direct else q.merge(direct.rename(columns={kcol: "k"}), on=["hsapiens_gene_id", "k"], how="left")
-        else:
-            print("direct columns unexpected", direct.columns.tolist(), flush=True)
-        levc = [x for x in q.columns if x in ("level", "lev", "x_mean", "level_k")]
-        detc = [x for x in q.columns if x in ("det", "detection", "f_mean", "det_k")]
+        # direct gene x type gap, level and detection from X7 (wide: Ddir_<t>, det_<t>, x_<t> or level_<t>)
+        dd = direct.set_index("hsapiens_gene_id") if "hsapiens_gene_id" in direct else direct.set_index("var_name")
+        idc = "hsapiens_gene_id" if "hsapiens_gene_id" in direct else "var_name"
+        print(sorted({x.split("_")[0] for x in dd.columns}), flush=True)
+        q["Ddir"] = [dd.at[i, f"Ddir_{k}"] if f"Ddir_{k}" in dd.columns and i in dd.index else np.nan for i, k in zip(q[idc], q.k)]
+        q["det"] = [dd.at[i, f"det_{k}"] if f"det_{k}" in dd.columns and i in dd.index else np.nan for i, k in zip(q[idc], q.k)]
+        lvl = [x for x in ("lev", "level", "xbar", "x", "mean") if any(c2.startswith(x + "_") for c2 in dd.columns)][0]
+        q["lev"] = [dd.at[i, f"{lvl}_{k}"] if f"{lvl}_{k}" in dd.columns and i in dd.index else np.nan for i, k in zip(q[idc], q.k)]
+        levc, detc = ["lev"], ["det"]
         for k, tk in q.groupby("k"):
             for half in ("odd", "even"):
                 T = tk[(tk.half == half) & ~tk.masked.astype(bool) & tk[["I", "Xneg", "Xabs", "Ddir", "block"] + levc + detc].notna().all(1)]
