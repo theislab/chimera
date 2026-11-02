@@ -243,6 +243,30 @@ def sec_health_integration():
                               composite_10model_canonical=float(mt.loc["Chimera", "total_score"])))
     I = pd.DataFrame(integ)
     write(I, "integration.csv")
+    # 7-row panel means: liver rows as stored, the three testis rows with Chimera replaced by one label-free
+    # seed (substitute view); seed 42 canonical row = the stored table
+    pm = []
+    for variant in ["canonical"] + [f"label_free s{s}" for s in SEEDS]:
+        tabs = []
+        for ds, mt in master.groupby("dataset", sort=False):
+            mt = mt.set_index("model")
+            raw = mt[[f"raw__{m}" for m in METRICS]].rename(columns=lambda x: x[5:])
+            if variant != "canonical" and ds in COHORTS:
+                s = int(variant.split("s")[-1])
+                row = im[im.run == nolab(ds, s)].iloc[0]
+                raw.loc["Chimera"] = [row[m] for m in METRICS]
+            sc = score_table(raw)
+            tabs.append(pd.DataFrame(dict(dataset=ds, tissue=mt["tissue"], total=sc["total_score"])))
+        T = pd.concat(tabs).rename_axis("model").reset_index()
+        means = T.groupby("model")["total"].mean()
+        tm = T[T.tissue == "testis"].groupby("model")["total"].mean()
+        lm = T[T.tissue == "liver"].groupby("model")["total"].mean()
+        won = T.loc[T.groupby("dataset")["total"].idxmax(), "model"].value_counts()
+        for m in means.index:
+            pm.append(dict(variant=variant, model=m, mean_7=float(means[m]), mean_liver=float(lm[m]),
+                           mean_testis=float(tm[m]), rank_7=int(means.rank(ascending=False, method="min")[m]),
+                           rows_won=int(won.get(m, 0))))
+    write(pd.DataFrame(pm), "integration_panel_means.csv")
     # per cohort and arm, mean over seeds 42-44
     num = METRICS + ["composite_extra", "composite_substitute"]
     agg = I[I.arm.isin(["label_free", "labelled"])].groupby(["cohort", "arm"])[num].agg(["mean", "std", "min", "max", "count"])
