@@ -128,3 +128,8 @@ SOURCES["muscle"] = dict(
              "mmusculus": dict(name="Mouse", files=[MU / "7085b988-463e-4183-b33d-838e1f6ad739.h5ad"], source="Kedlian2024", label_col="annotation",
                                filters={"donor_id": ["Donor1", "Donor2"]}, filter_reason="3-month donors kept out of the DE; the nucleus libraries")})
 COHORTS["muscle_ageing"] = dict(source="muscle", species=["hsapiens", "mmusculus"], tissue="skeletal muscle", label="Muscle human, mouse")
+
+
+# Check of the feature choice (coordinator): human + macaque with its own table, prior on human-macaque identity and ESM of both species, as the canonical pairs;
+# compared with brain_dlpfc_hmac (subset of the 4-species object) on shared genes.
+COHORTS["brain_dlpfc_hmac_own"] = dict(source="dlpfc", species=["hsapiens", "mmulatta"], tissue="cortex", label="DLPFC human, macaque, own table")

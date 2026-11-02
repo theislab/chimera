@@ -26,7 +26,7 @@ _KIDNEY = str(REPO_ROOT / "data" / "revision" / "disease_kidney" / "ortholog_tab
 
 # C1 new use cases (plan section 13): tables and objects in new_usecases/c1_build/objects.
 _C1 = REPO_ROOT / "data" / "revision" / "new_usecases" / "c1_build" / "objects"
-_C1_COHORTS = {"brain_dlpfc": "brain_dlpfc", "brain_dlpfc_hchimp": "brain_dlpfc", "brain_dlpfc_hmac": "brain_dlpfc", "brain_dlpfc_hmarm": "brain_dlpfc",
+_C1_COHORTS = {"brain_dlpfc": "brain_dlpfc", "brain_dlpfc_hchimp": "brain_dlpfc", "brain_dlpfc_hmac": "brain_dlpfc", "brain_dlpfc_hmarm": "brain_dlpfc", "brain_dlpfc_hmac_own": "brain_dlpfc_hmac_own",
                "brain_m1": "brain_m1", "brain_m1_hmouse": "brain_m1_hmouse", "lung_healthy": "lung_healthy", "tumour_zilionis": "tumour_zilionis",
                "regen_hoang": "regen_hoang", "muscle_ageing": "muscle_ageing"}
 
