@@ -96,7 +96,8 @@ def score_set(c, fold, t, setn, rows, used):
         if r0.sum() < CM.MIN_N:
             out.append(dict(lab, target=name, kind=kind, n=int(r0.sum())))
             continue
-        for s in preds:
+        measured = ["D_full", "S_full", "Sdir_full", "B1_full"] if kind != "measured" else []
+        for s in preds + measured:
             use_covs = [k for k in covs if k != "prior_raw"] if s == "pi" else covs
             rw = r0 & t[s].notna().to_numpy() & t[ref].notna().to_numpy()
             if rw.sum() < CM.MIN_N:
