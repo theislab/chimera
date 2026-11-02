@@ -7,7 +7,13 @@ over libraries). The cell counts and raw UMI totals are recomputed here from the
 Worked genes, by a stated rule (the tables were already read in X1, X2 and X4, so the rule is descriptive):
     testis   of the 17 X4 named spermatocyte genes (reread_x1_named.csv): strict spermatocyte peak, all three golds
              present, largest residual Murat pattern r_G_H4.
-    liver    of the 13 X4-nameable 4-species core genes (reread_x2_named.csv), counts in all four species: largest |S|.
+    liver    of the 13 X4-nameable 4-species core genes (reread_x2_named.csv): hepatocyte detection >= 0.25 in human,
+             macaque and mouse, both independent golds present, lowest EVEE level value (G_H1).
+    Amendment after the first run, before any text: the first liver rule was largest |S| with counts in all four
+    species, which gave ASL. ASL is a poor example of its class: macaque cells of every type detect it at 66-100%
+    and zebrafish has 3 UMI in 5,289 hepatocytes, so its macaque profile is nearly flat. It stays a robust margin call,
+    named in the Fig 4 text, but it does not show "pattern shared, level differs" in raw counts. The rule above
+    was written after seeing the table, so the choice of worked gene is illustration, not evidence.
 
 Set-level checks, on the same tables:
     testis   X1 SC-peak group (human-defined): share of genes whose peak stage in mouse and macaque is SC too.
@@ -75,8 +81,11 @@ def main():
     dc4 = dc[dc.cohort == "liv_4sp"].set_index("symbol")
     nm["complete"] = nm.symbol.map(dc4["complete"])
     print("liver candidates\n", nm[["symbol", "prior_raw", "S", "B1b_raw", "complete"]].round(3).sort_values("S").to_string())
-    l_gene = nm[nm.complete.astype(bool)].assign(a=lambda d: d.S.abs()).sort_values("a", ascending=False).symbol.iloc[0]
     l4 = pd.read_parquet(RES / "X4/genes/liv_4sp.parquet")
+    det = l4.set_index("symbol").loc[nm.symbol, [f"f_{s_}_Hepatocytes" for s_ in ("Human", "Monkey", "Mouse")]]
+    keep_l = nm[(det.min(axis=1).to_numpy() >= 0.25)].dropna(subset=["G_H1", "G_H3"]).sort_values("G_H1")
+    print("liver rule\n", keep_l[["symbol", "S", "G_H1", "G_H3"]].round(3).to_string())
+    l_gene = keep_l.symbol.iloc[0]
     lm = pd.read_parquet(RES / "X4/genes/liv_hmouse.parquet")
     print("worked genes:", t_gene, l_gene, flush=True)
     keep = ["symbol", "prior_raw", "dNdS", "LOEUF", "D_raw", "S", "signfrac_D", "signfrac_S", "margin_support", "masked", "B1b_raw", "B1c_raw",
@@ -88,7 +97,8 @@ def main():
     pd.concat([tidy(t3, t_gene).assign(cohort="test_3sp"), tidy(tm, t_gene).assign(cohort="test_hmouse"),
                tidy(l4, l_gene).assign(cohort="liv_4sp"), tidy(lm, l_gene).assign(cohort="liv_hmouse")]).to_csv(OUT / "worked_pseudobulk.csv", index=False)
     pd.concat([raw_counts("test_3sp", t_gene, t3, True).assign(cohort="test_3sp"),
-               raw_counts("liv_4sp", l_gene, l4, False).assign(cohort="liv_4sp")]).to_csv(OUT / "worked_raw_counts.csv", index=False)
+               raw_counts("liv_4sp", l_gene, l4, False).assign(cohort="liv_4sp"),
+               raw_counts("liv_4sp", "ASL", l4, False).assign(cohort="liv_4sp")]).to_csv(OUT / "worked_raw_counts.csv", index=False)
     # set level, testis
     sc = pd.read_csv(RES / "X1/sc_peak_genes.csv")
     print("sc_peak columns", sc.columns.tolist()[:30], flush=True)
@@ -136,6 +146,20 @@ def main():
                          median_abs_gap_set_expr_both=float(np.nanmedian(d[in63 & expr])), median_abs_gap_all_expr_both=float(np.nanmedian(d[expr])),
                          n_set_expr_both=int((in63 & expr).sum())))
     pd.DataFrame(rows).to_csv(OUT / "worked_sets_liver_gaps.csv", index=False)
+    # level-matched hepatocyte gap: set genes against non-set genes in the same decile of pair-mean hepatocyte level
+    # (genes expressed in both species); per list, 63 genes and the 15 X4 core genes
+    core = pd.read_csv(RES / "X4/reread_x2_named.csv")
+    core = core[core.cohort == "liv_4sp"].symbol.tolist()
+    rows = []
+    for name, flag in (("prog63_noMT", in63), ("core15", l4.symbol.isin(core).to_numpy())):
+        for a_, b_ in itertools.combinations(spl, 2):
+            x, y = l4[f"x_{a_}_Hepatocytes"].to_numpy(float), l4[f"x_{b_}_Hepatocytes"].to_numpy(float)
+            ok = np.isfinite(x) & np.isfinite(y) & (np.minimum(x, y) > 0)
+            t = pd.DataFrame(dict(q=pd.qcut(((x + y) / 2)[ok], 10, labels=False, duplicates="drop"), gap=np.abs(x - y)[ok], st=flag[ok]))
+            exp = t[t.st].q.map(t[~t.st].groupby("q").gap.median())
+            rows.append(dict(set=name, pair=f"{a_}-{b_}", n=int(t.st.sum()), median_gap=float(t[t.st].gap.median()), median_gap_level_matched=float(exp.median()),
+                             share_above_matched=float((t[t.st].gap.to_numpy() > exp.to_numpy()).mean())))
+    pd.DataFrame(rows).to_csv(OUT / "worked_sets_liver_gaps_matched.csv", index=False)
 
 
 if __name__ == "__main__":
