@@ -84,7 +84,7 @@ DEPTHS = {"depth25": 0.25, "depth10": 0.10, "depth5": 0.05}
 HOLD_SHARE = 0.20
 PARALOG_ID = 40.0
 HOLD_SEEDS = {0: 242, 1: 243, 2: 244, 3: 245}  # 2, 3: 4-sp fold A only, both first seeds failed the health rule
-ARMS = {"P": "--gin-feature-op zero_expr_stats", "E": ""}
+ARMS = {"P": "--gin-feature-op zero_expr_stats", "E": "", "L": ""}  # L: anchor appended by anchor_arg.py, from revision/common/depth_anchor.py
 
 COHORT_FIT = {
     "liv_hmouse": dict(cpus=8, mem="6G"),

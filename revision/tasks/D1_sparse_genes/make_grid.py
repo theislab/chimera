@@ -72,6 +72,11 @@ def main():
     # added after both 4-sp fold A seeds failed the health rule; at the end, so row numbers stay
     add(1, "liv_4sp", "hoA_P", "heldout", 2, RU.HOLD_SEEDS[2], "P")
     add(1, "liv_4sp", "hoA_P", "heldout", 3, RU.HOLD_SEEDS[3], "P")
+    # arm L, coordinator 2026-11-02: the same depth objects (same draw, same seed) with the anchor scaled by revision/common/depth_anchor.py
+    for c in RU.DEPTH_COHORTS:
+        for st in ("depth25", "depth10"):
+            for r in (0, 1):
+                rows.append(dict(tier=4, cohort=c, setting=st, family="sampling", rep=r, seed=B2.FIT_SEEDS[r], run=f"d1-{c}-{st}law-r{r}", fit=1, arm="L"))
     g = pd.DataFrame(rows)
     g.to_csv(RU.TASK / "grid.tsv", sep="\t", index=False)
     print(g.groupby(["tier", "cohort"]).size())
