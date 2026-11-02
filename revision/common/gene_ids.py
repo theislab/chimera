@@ -17,9 +17,9 @@ DATA_PROCESSED = REPO_ROOT / "data" / "processed"
 
 _LIVER = "ortholog_table.csv"
 _TESTIS = "ortholog_table_testis.csv"
-_VAN_ZYL = "ortholog_table_van_zyl.csv"
 # Tables built during the revision live outside data/processed/; an absolute path here is
 # kept as is by ``DATA_PROCESSED / name``.
+_VAN_ZYL = str(REPO_ROOT / "data" / "revision" / "van_zyl" / "ortholog_table_van_zyl.csv")
 _BONE_MARROW = str(REPO_ROOT / "data" / "revision" / "bone_marrow" / "ortholog_table_bone_marrow.csv")
 # Kidney AKI case (plan section 8c): human-mouse 1:1, P13_kidney/build_orthologs.py.
 _KIDNEY = str(REPO_ROOT / "data" / "revision" / "disease_kidney" / "ortholog_table_kidney.csv")

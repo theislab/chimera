@@ -1,12 +1,15 @@
 # T11.2 Van Zyl recipe: fixed grid and selection rule
 
-Written and committed before any Van Zyl training run. The cohort was added during the
-revision; its recipe is fixed by the rule below before training.
+Written and committed before the training run whose results are used. The cohort was added
+during the revision; its recipe is fixed by the rule below before training. Earlier
+submissions of this grid were cancelled before any run finished and no result of theirs is
+used (default sample-level batch key; then an object replaced after a build audit).
 
 ## Base recipe (pre-specified rule, section 11)
 
 On the rebuilt object (`data/revision/van_zyl/van_zyl_unified.h5ad`, T11.1),
-frac(prior >= 0.95) = 0.2995 (4,084 of 13,636 ortholog groups). This is at least 20%, so the
+frac(prior >= 0.95) = 0.3356 (3,383 of 10,081 ortholog groups measured in all five species).
+This is at least 20%, so the
 coupled pair applies: the testis 3-species row is the base, with conditional MMD on the
 harmonised `cell_ontology_class` and the prior clamped at 0.85. K-dependent weights for
 K = 5 species follow the K-scaling table (`tables/k_scaling_laws.tex`), using the K = 4
@@ -20,15 +23,15 @@ anchor where a law saturates or K = 5 lies outside the calibrated K = 2-4 range:
 | 4 | free-bits | 1.5 | 0.5 * max(1, ceil(log2 K)) = 0.5 * 3 |
 | 5 | adv-weight (kappa * G) | 200 | K = 4 value; the (1 - 1/K) headroom rises from 0.75 to 0.80 |
 
-## Grid (7 configurations, s42; `grid.tsv`, array manifest `manifest.tsv`)
+## Grid (8 configurations, s42; `grid.tsv`, array manifest `manifest.tsv`)
 
-All rows: `--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 42 --batch-key species --accelerator cpu`.
-Rows 1-6 add `--celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85`.
+All rows: `--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 42 --batch-key source_batch --accelerator cpu`.
+Rows 1-6 and 8 add `--celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85`.
 
-batch_key = species, as in all canonical recipes (multi-batch-per-species fails, iter94).
-`obs['batch']` keeps the 16 sample-level batches for reference; it is not used in training.
-A first submission of this grid used the default `--batch-key batch` (sample level) and was
-cancelled before any run finished; no result from it is used.
+batch_key = `source_batch` = species|chemistry (10x v2 or v3), 7 levels, at most 2 per species.
+Human and M. fascicularis mix v2 and v3 and the other species are v3 only, so a species-level
+batch would leave chemistry unmodelled. Sample-level batches fail (iter94), so they stay in
+`obs['batch']`, unused in training; two batches in one species has the liver H+Monkey precedent.
 
 | grid_id | run | adv-weight | lambda-anchor | lambda-mmd | free-bits | clamp | role |
 |---|---|---|---|---|---|---|---|
@@ -39,8 +42,13 @@ cancelled before any run finished; no result from it is used.
 | 5 | rev-vz-grid5-s42 | 200 | 0.0006 | 100 | 1.5 | 0.85 | Law 2 at the 1/K edge of its band (0.003/5) |
 | 6 | rev-vz-grid6-s42 | 100 | 0.001 | 50 | 1.0 | 0.85 | testis 3-sp row weights unchanged |
 | 7 | rev-vz-grid7-s42 | 200 | 0.001 | 100 | 1.0 | none | liver 4-sp row (iter101), unclamped, no conditional MMD |
+| 8 | rev-vz-grid8-s42 | 200 | 0.001 | 50 | 1.5 | 0.85 | base with dual MMD: `--lambda-mmd 50 --lambda-mmd-aux 100` |
 
 Rows 2-5 change one K-dependent weight of the base at a time. Row 7 is the former fallback.
+Row 8 adds a global MMD term beside the conditional one, because 62.8% of mouse cells are in
+classes with no partner species, where conditional MMD does not act. Its two values are the
+only documented dual-MMD pair (iter121); that run collapsed z dims on liver 4-sp, which has 2
+shared classes against 8 here, so Gate G-V decides whether it holds on this cohort.
 
 ## Selection rule (`select_recipe.py`)
 

@@ -106,10 +106,12 @@ def test_assert_table_matches_every_cohort(cohort):
 
 @needs_data
 def test_assert_table_matches_van_zyl():
-    path = PROCESSED / "van_zyl_unified.h5ad"
+    import anndata as ad
+
+    path = gene_ids.h5ad_path("van_zyl")
     if not (path.exists() and (PROCESSED / gene_ids.TABLES["van_zyl"]).exists()):
         pytest.skip("van Zyl h5ad or table not available")
-    a = _read("van_zyl_unified")
+    a = ad.read_h5ad(path, backed="r")
     try:
         assert gene_ids.assert_table_matches(a, gene_ids.load_table("van_zyl")) > 0.9
     finally:

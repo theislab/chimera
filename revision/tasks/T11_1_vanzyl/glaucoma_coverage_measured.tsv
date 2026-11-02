@@ -1,0 +1,533 @@
+gene	source	hsapiens_gene_id	in_van_zyl_vocab	in_measured_vocab	ortholog_group_id	not_measured_in
+ANGPT1	vanzyl_mendelian;gharahkhani	ENSG00000154188	True	True	6030	
+ANGPT2	vanzyl_mendelian;gharahkhani	ENSG00000091879	True	True	1295	
+CPAMD8	vanzyl_mendelian	ENSG00000160111	False	False		
+CYP1B1	vanzyl_mendelian	ENSG00000138061	True	False		mfascicularis
+FOXC1	vanzyl_mendelian	ENSG00000054598	False	False		
+LOXL1	vanzyl_mendelian;gharahkhani	ENSG00000129038	True	True	3858	
+LTBP2	vanzyl_mendelian;gharahkhani	ENSG00000119681	True	False		mfascicularis
+MYOC	vanzyl_mendelian;gharahkhani	ENSG00000034971	True	True	334	
+OPTN	vanzyl_mendelian	ENSG00000123240	True	True	3460	
+PITX2	vanzyl_mendelian;gharahkhani	ENSG00000164093	False	False		
+TEK	vanzyl_mendelian	ENSG00000120156	True	True	3249	
+TBK1	vanzyl_mendelian	ENSG00000183735	True	True	8809	
+TMCO1	vanzyl_gwas;gharahkhani	ENSG00000143183	True	True	5191	
+TXNRD2	vanzyl_gwas;gharahkhani	ENSG00000184470	True	True	8881	
+CAV1	vanzyl_gwas;gharahkhani	ENSG00000105974	True	True	2091	
+CAV2	vanzyl_gwas;gharahkhani	ENSG00000105971	True	True	2090	
+ARHGEF12	vanzyl_gwas;gharahkhani	ENSG00000196914	True	True	9356	
+ATXN2	vanzyl_gwas	ENSG00000204842	True	True	9698	
+EFEMP1	vanzyl_text;gharahkhani	ENSG00000115380	True	True	2870	
+GAS7	vanzyl_text;gharahkhani	ENSG00000007237	True	True	102	
+KALRN	vanzyl_text	ENSG00000160145	False	False		
+PRSS23	vanzyl_text;gharahkhani	ENSG00000150687	True	True	5778	
+SIX6	vanzyl_text;gharahkhani	ENSG00000184302	True	False		mmulatta
+POU6F2	vanzyl_text	ENSG00000106536	True	True	2150	
+CACNA1A	vanzyl_text	ENSG00000141837	True	True	5114	
+ABCA1	gharahkhani	ENSG00000165029	True	True	7046	
+ABLIM2	gharahkhani	ENSG00000163995	True	True	6859	
+ABO	gharahkhani	ENSG00000175164	False	False		
+AC000003.2	gharahkhani		False	False		
+AC002066.1	gharahkhani	ENSG00000237813	False	False		
+AC003035.1	gharahkhani		False	False		
+AC005105.1	gharahkhani		False	False		
+AC005291.2	gharahkhani		False	False		
+AC006960.2	gharahkhani		False	False		
+AC006960.4	gharahkhani		False	False		
+AC007568.1	gharahkhani		False	False		
+AC007849.1	gharahkhani		False	False		
+AC007956.2	gharahkhani		False	False		
+AC009970.1	gharahkhani		False	False		
+AC012066.1	gharahkhani		False	False		
+AC012358.8	gharahkhani		False	False		
+AC013471.1	gharahkhani		False	False		
+AC022431.2	gharahkhani		False	False		
+AC073130.2	gharahkhani		False	False		
+AC074043.1	gharahkhani		False	False		
+AC079112.1	gharahkhani		False	False		
+AC079414.1	gharahkhani		False	False		
+AC079610.1	gharahkhani		False	False		
+AC079799.1	gharahkhani		False	False		
+AC083795.1	gharahkhani		False	False		
+AC089998.4	gharahkhani		False	False		
+AC090193.1	gharahkhani		False	False		
+AC092964.1	gharahkhani		False	False		
+AC092964.2	gharahkhani		False	False		
+AC093166.1	gharahkhani		False	False		
+AC093536.2	gharahkhani		False	False		
+AC093690.1	gharahkhani		False	False		
+AC097381.1	gharahkhani		False	False		
+AC105384.1	gharahkhani		False	False		
+AC105384.2	gharahkhani		False	False		
+AC116533.1	gharahkhani		False	False		
+AC130689.1	gharahkhani		False	False		
+ACAD10	gharahkhani	ENSG00000111271	False	False		
+ACOD1	gharahkhani	ENSG00000102794	True	False		hsapiens;mfascicularis
+ACOXL	gharahkhani	ENSG00000153093	False	False		
+ACP2	gharahkhani	ENSG00000134575	False	False		
+ADAM1A	gharahkhani	ENSG00000229186	False	False		
+ADAMTS8	gharahkhani	ENSG00000134917	True	True	4342	
+ADPRHL2	gharahkhani	ENSG00000116863	True	False		hsapiens;mfascicularis;mmulatta;mmusculus;sscrofa
+ADRB1	gharahkhani	ENSG00000043591	False	False		
+AF064858.11	gharahkhani		False	False		
+AFAP1	gharahkhani	ENSG00000196526	True	True	9318	
+AFAP1-AS1	gharahkhani	ENSG00000272620	False	False		
+AGBL2	gharahkhani	ENSG00000165923	True	False		mfascicularis
+AGPAT5	gharahkhani	ENSG00000155189	True	False		mfascicularis
+AL031768.1	gharahkhani		False	False		
+AL034370.1	gharahkhani		False	False		
+AL078605.1	gharahkhani		False	False		
+AL109618.2	gharahkhani		False	False		
+AL118523.1	gharahkhani		False	False		
+AL133319.1	gharahkhani		False	False		
+AL136369.1	gharahkhani		False	False		
+AL138479.1	gharahkhani		False	False		
+AL162414.1	gharahkhani		False	False		
+AL358115.1	gharahkhani		False	False		
+ALCAM	gharahkhani	ENSG00000170017	True	True	7695	
+ALDH2	gharahkhani	ENSG00000111275	False	False		
+ALDH9A1	gharahkhani	ENSG00000143149	False	False		
+ANGPTL2	gharahkhani	ENSG00000136859	True	True	4576	
+ANKH	gharahkhani	ENSG00000154122	True	False		mfascicularis
+ANKRD54	gharahkhani	ENSG00000100124	True	True	1440	
+ANTXR1	gharahkhani	ENSG00000169604	True	False		mfascicularis
+AP000462.3	gharahkhani		False	False		
+AP000679.1	gharahkhani		False	False		
+AP000758.1	gharahkhani		False	False		
+AP000769.1	gharahkhani		False	False		
+AP000942.2	gharahkhani		False	False		
+AP000974.1	gharahkhani		False	False		
+AP001362.1	gharahkhani		False	False		
+AP002348.1	gharahkhani		False	False		
+AP003486.1	gharahkhani		False	False		
+AP1B1	gharahkhani	ENSG00000100280	True	True	1465	
+APP	gharahkhani	ENSG00000142192	True	True	5132	
+APR2	gharahkhani		False	False		
+AREL1	gharahkhani	ENSG00000119682	False	False		
+ARFGAP2	gharahkhani	ENSG00000149182	True	True	5693	
+ARHGAP27	gharahkhani	ENSG00000159314	True	True	6386	
+ARHGEF3	gharahkhani	ENSG00000163947	True	True	6854	
+ARHGEF3-AS1	gharahkhani	ENSG00000240198	False	False		
+ARL17B	gharahkhani	ENSG00000228696	False	False		
+ARL2	gharahkhani	ENSG00000213465	True	True	9780	
+BCAS3	gharahkhani	ENSG00000141376	True	True	5061	
+BICC1	gharahkhani	ENSG00000122870	True	True	3433	
+BMP2	gharahkhani	ENSG00000125845	True	True	3671	
+BRAP	gharahkhani	ENSG00000089234	True	True	1217	
+BX093900	gharahkhani		False	False		
+C1QTNF4	gharahkhani	ENSG00000172247	False	False		
+CACNA2D1	gharahkhani	ENSG00000153956	True	True	6015	
+CADM1	gharahkhani	ENSG00000182985	True	False		mfascicularis
+CADM2	gharahkhani	ENSG00000175161	True	True	8209	
+CADM2-AS1	gharahkhani	ENSG00000239519	False	False		
+CADM2-AS2	gharahkhani	ENSG00000241648	False	False		
+CALD1	gharahkhani	ENSG00000122786	True	True	3429	
+CAPN1	gharahkhani	ENSG00000014216	True	False		mfascicularis
+CAPZA1	gharahkhani	ENSG00000116489	False	False		
+CASP7	gharahkhani	ENSG00000165806	True	True	7147	
+CCDC104	gharahkhani	ENSG00000163001	True	True	6686	
+CCDC83	gharahkhani	ENSG00000150676	True	True	5776	
+CCDC91	gharahkhani	ENSG00000123106	True	True	3449	
+CDC7	gharahkhani	ENSG00000097046	False	False		
+CDCA8	gharahkhani	ENSG00000134690	True	True	4318	
+CDH11	gharahkhani	ENSG00000140937	True	True	5028	
+CDKN2A	gharahkhani	ENSG00000147889	False	False		
+CDKN2B	gharahkhani	ENSG00000147883	False	False		
+CDKN2B-AS1	gharahkhani	ENSG00000240498	False	False		
+CELF1	gharahkhani	ENSG00000149187	True	True	5694	
+CHEK2	gharahkhani	ENSG00000183765	False	False		
+CHRDL1	gharahkhani	ENSG00000101938	True	True	1695	
+CISD1	gharahkhani	ENSG00000122873	False	False		
+CKAP5	gharahkhani	ENSG00000175216	True	True	8219	
+CLIC5	gharahkhani	ENSG00000112782	True	True	2665	
+CMB9-22P13.1	gharahkhani		False	False		
+COL11A1	gharahkhani	ENSG00000060718	True	True	541	
+COL4A1	gharahkhani	ENSG00000187498	True	False		sscrofa
+COL8A2	gharahkhani	ENSG00000171812	True	True	7890	
+COMMD6	gharahkhani	ENSG00000188243	False	False		
+CRHR1	gharahkhani	ENSG00000120088	True	True	3245	
+CRHR1-IT1	gharahkhani		False	False		
+CRYGS	gharahkhani	ENSG00000213139	True	True	9767	
+CSF2RB	gharahkhani	ENSG00000100368	False	False		
+CTBP2P8	gharahkhani	ENSG00000234383	False	False		
+CTC-236F12.4	gharahkhani		False	False		
+CTTNBP2	gharahkhani	ENSG00000077063	True	True	913	
+CTTNBP2NL	gharahkhani	ENSG00000143079	True	True	5176	
+CYP26A1	gharahkhani	ENSG00000095596	True	False		mfascicularis
+DCLRE1A	gharahkhani	ENSG00000198924	True	True	9599	
+DCTN6	gharahkhani	ENSG00000104671	True	True	1932	
+DDB2	gharahkhani	ENSG00000134574	False	False		
+DDR2	gharahkhani	ENSG00000162733	True	True	6642	
+DDX31	gharahkhani	ENSG00000125485	True	True	3633	
+DDX39BP2	gharahkhani	ENSG00000238024	False	False		
+DGKG	gharahkhani	ENSG00000058866	True	True	526	
+DHRS7	gharahkhani	ENSG00000100612	False	False		
+DHX35	gharahkhani	ENSG00000101452	True	True	1664	
+DHX9P1	gharahkhani	ENSG00000228002	False	False		
+DNALI1	gharahkhani	ENSG00000163879	True	True	6837	
+DQ577523	gharahkhani		False	False		
+DYNLT1	gharahkhani	ENSG00000146425	False	False		
+DYSF	gharahkhani	ENSG00000135636	True	True	4434	
+ECHDC3	gharahkhani	ENSG00000134463	True	True	4300	
+EFEMP2	gharahkhani	ENSG00000172638	True	True	7973	
+EHBP1L1	gharahkhani	ENSG00000173442	False	False		
+EIF3L	gharahkhani	ENSG00000100129	True	True	1441	
+EMID1	gharahkhani	ENSG00000186998	True	True	9085	
+ENPP6	gharahkhani	ENSG00000164303	True	True	6940	
+ENSG00000266481	gharahkhani		False	False		
+ENSG00000270160	gharahkhani		False	False		
+ETF1P1	gharahkhani	ENSG00000232757	False	False		
+ETF1P2	gharahkhani	ENSG00000240132	False	False		
+ETS1	gharahkhani	ENSG00000134954	True	True	4344	
+ETV7	gharahkhani	ENSG00000010030	False	False		
+EWSR1	gharahkhani	ENSG00000182944	True	True	8744	
+EXOC2	gharahkhani	ENSG00000112685	True	True	2658	
+F2	gharahkhani	ENSG00000180210	True	True	8555	
+FAM120B	gharahkhani	ENSG00000112584	True	True	2651	
+FAM125B	gharahkhani		False	False		
+FAM13A	gharahkhani	ENSG00000138640	True	True	4801	
+FAM180B	gharahkhani	ENSG00000196666	False	False		
+FAM183B	gharahkhani	ENSG00000164556	False	False		
+FAM19A3	gharahkhani	ENSG00000184599	True	False		hsapiens;mfascicularis;mmulatta;mmusculus;sscrofa
+FAM53B	gharahkhani	ENSG00000189319	True	True	9262	
+FAM83A-AS1	gharahkhani	ENSG00000204949	False	False		
+FAM89B	gharahkhani	ENSG00000176973	True	True	8354	
+FBXO32	gharahkhani	ENSG00000156804	True	True	6193	
+FHL3	gharahkhani	ENSG00000183386	True	True	8779	
+FIBP	gharahkhani	ENSG00000172500	True	True	7961	
+FIP1L1	gharahkhani	ENSG00000145216	False	False		
+FKTN	gharahkhani	ENSG00000106692	True	True	2168	
+FLVCR2	gharahkhani	ENSG00000119686	True	True	3197	
+FMNL2	gharahkhani	ENSG00000157827	True	True	6272	
+FNDC3B	gharahkhani	ENSG00000075420	True	True	869	
+FOXQ1	gharahkhani	ENSG00000164379	True	False		mmulatta
+FRMD8	gharahkhani	ENSG00000126391	False	False		
+FSD1L	gharahkhani	ENSG00000106701	True	False		mfascicularis
+GALR3	gharahkhani	ENSG00000128310	False	False		
+GARNL3	gharahkhani	ENSG00000136895	True	True	4589	
+GCAT	gharahkhani	ENSG00000100116	True	True	1438	
+GEMIN8	gharahkhani	ENSG00000046647	True	True	398	
+GFPT1	gharahkhani	ENSG00000198380	True	True	9508	
+GJA1	gharahkhani	ENSG00000152661	True	True	5929	
+GLIS1	gharahkhani	ENSG00000174332	True	True	8130	
+GLP2R	gharahkhani	ENSG00000065325	True	True	599	
+GLRX5	gharahkhani	ENSG00000182512	True	False		mmulatta
+GMDS	gharahkhani	ENSG00000112699	True	True	2660	
+GMDS-AS1	gharahkhani	ENSG00000250903	False	False		
+GNB1L	gharahkhani	ENSG00000185838	False	False		
+GNL2	gharahkhani	ENSG00000134697	True	True	4319	
+GNPNAT1	gharahkhani	ENSG00000100522	True	True	1525	
+GPM6B	gharahkhani	ENSG00000046653	True	True	399	
+GPR88	gharahkhani	ENSG00000181656	False	False		
+GTF2E2	gharahkhani	ENSG00000197265	True	True	9395	
+GTF3C4	gharahkhani	ENSG00000125484	True	True	3632	
+H1F0	gharahkhani	ENSG00000189060	False	False		
+HIKESHI	gharahkhani	ENSG00000149196	True	False		hsapiens;mfascicularis
+HLA-G	gharahkhani	ENSG00000204632	False	False		
+HLA-J	gharahkhani	ENSG00000204622	False	False		
+HSD17B7	gharahkhani	ENSG00000132196	True	False		mfascicularis
+HSF2	gharahkhani	ENSG00000025156	True	True	282	
+HSP90B3P	gharahkhani	ENSG00000203914	False	False		
+HUS1B	gharahkhani	ENSG00000188996	False	False		
+IFT43	gharahkhani	ENSG00000119650	True	True	3194	
+IKZF2	gharahkhani	ENSG00000030419	True	False		mfascicularis
+IL6ST	gharahkhani	ENSG00000134352	False	False		
+JAZF1	gharahkhani	ENSG00000153814	True	True	6001	
+JAZF1-AS1	gharahkhani	ENSG00000234336	False	False		
+JOSD1	gharahkhani	ENSG00000100221	True	False		mfascicularis
+KANSL1	gharahkhani	ENSG00000120071	True	True	3244	
+KANSL1-AS1	gharahkhani	ENSG00000214401	False	False		
+KBTBD4	gharahkhani	ENSG00000123444	True	True	3476	
+KCNJ1	gharahkhani	ENSG00000151704	True	True	5861	
+KCNK7	gharahkhani	ENSG00000173338	True	True	8048	
+KCTD20	gharahkhani	ENSG00000112078	True	True	2594	
+KLF5	gharahkhani	ENSG00000102554	False	False		
+KPNB1	gharahkhani	ENSG00000108424	True	True	2280	
+KREMEN1	gharahkhani	ENSG00000183762	True	True	8813	
+KRT8P22	gharahkhani	ENSG00000260731	False	False		
+LGALS1	gharahkhani	ENSG00000100097	False	False		
+LHPP	gharahkhani	ENSG00000107902	True	True	2244	
+LINC00926	gharahkhani	ENSG00000247982	False	False		
+LINC01571	gharahkhani	ENSG00000260057	False	False		
+LINC01820	gharahkhani	ENSG00000228100	False	False		
+LINC01948	gharahkhani	ENSG00000248727	False	False		
+LINC01953	gharahkhani	ENSG00000236193	False	False		
+LINC02210	gharahkhani	ENSG00000293460	False	False		
+LINC02210-CRHR1	gharahkhani	ENSG00000263715	False	False		
+LINC02322	gharahkhani	ENSG00000258556	False	False		
+LINC02551	gharahkhani	ENSG00000254842	False	False		
+LMO4	gharahkhani	ENSG00000143013	True	False		sscrofa
+LMO7	gharahkhani	ENSG00000136153	True	True	4508	
+LMO7-AS1	gharahkhani	ENSG00000261105	False	False		
+LMX1B	gharahkhani	ENSG00000136944	True	True	4599	
+LOC389199	gharahkhani		False	False		
+LOC644297	gharahkhani		False	False		
+LOXL1-AS1	gharahkhani	ENSG00000261801	False	False		
+LPP	gharahkhani	ENSG00000145012	True	False		mfascicularis
+LPP-AS1	gharahkhani	ENSG00000224563	False	False		
+LPP-AS2	gharahkhani	ENSG00000270959	False	False		
+LRMDA	gharahkhani	ENSG00000148655	True	False		hsapiens;mfascicularis
+LRP4	gharahkhani	ENSG00000134569	True	True	4309	
+LRP4-AS1	gharahkhani	ENSG00000247675	False	False		
+LRRC37A	gharahkhani	ENSG00000176681	False	False		
+LRRC37A2	gharahkhani	ENSG00000238083	False	False		
+LRRC37A4P	gharahkhani	ENSG00000214425	False	False		
+LRRC52	gharahkhani	ENSG00000162763	True	True	6650	
+LTBP3	gharahkhani	ENSG00000168056	True	True	7460	
+LYPLAL1	gharahkhani	ENSG00000143353	True	True	5217	
+MADD	gharahkhani	ENSG00000110514	True	True	2457	
+MAP3K1	gharahkhani	ENSG00000095015	True	True	1343	
+MAP3K11	gharahkhani	ENSG00000173327	True	False		mmulatta
+MAP3K5	gharahkhani	ENSG00000197442	True	True	9413	
+MAP7	gharahkhani	ENSG00000135525	True	False		mfascicularis
+MAP7D1	gharahkhani	ENSG00000116871	False	False		
+MAPK8IP1P2	gharahkhani	ENSG00000263503	False	False		
+MAPKAP1	gharahkhani	ENSG00000119487	True	True	3179	
+MAPT	gharahkhani	ENSG00000186868	True	True	9076	
+MAPT-AS1	gharahkhani	ENSG00000264589	False	False		
+MAPT-IT1	gharahkhani	ENSG00000279685	False	False		
+MARK2P12	gharahkhani	ENSG00000229708	False	False		
+MBOAT4	gharahkhani	ENSG00000177669	True	False		mmulatta
+MCCD1P2	gharahkhani	ENSG00000224312	False	False		
+MCM3	gharahkhani	ENSG00000112118	True	True	2597	
+MCPH1-AS1	gharahkhani	ENSG00000249898	False	False		
+ME3	gharahkhani	ENSG00000151376	True	True	5825	
+MEAF6	gharahkhani	ENSG00000163875	False	False		
+MECOM	gharahkhani	ENSG00000085276	True	True	1106	
+MEIS1	gharahkhani	ENSG00000143995	True	True	5303	
+MEIS1-AS2	gharahkhani	ENSG00000230749	False	False		
+MEIS1-AS3	gharahkhani	ENSG00000226819	False	False		
+MET	gharahkhani	ENSG00000105976	True	True	2092	
+METTL10	gharahkhani	ENSG00000203791	True	False		hsapiens;mfascicularis;sscrofa
+MGST3	gharahkhani	ENSG00000143198	True	True	5196	
+MICALL1	gharahkhani	ENSG00000100139	True	False		mfascicularis
+MIR1302-7	gharahkhani	ENSG00000221768	False	False		
+MIR216A	gharahkhani	ENSG00000207798	True	False		hsapiens;mfascicularis;mmusculus
+MIR216B	gharahkhani	ENSG00000211520	False	False		
+MIR217	gharahkhani	ENSG00000207548	False	False		
+MIR3126	gharahkhani	ENSG00000266649	False	False		
+MIR3199-1	gharahkhani	ENSG00000264073	False	False		
+MIR3616	gharahkhani	ENSG00000264901	False	False		
+MIR4487	gharahkhani	ENSG00000264583	False	False		
+MIR4642	gharahkhani	ENSG00000266619	False	False		
+MIR606	gharahkhani	ENSG00000207583	False	False		
+MNAT1	gharahkhani	ENSG00000020426	False	False		
+MNS1	gharahkhani	ENSG00000138587	True	True	4792	
+MOV10	gharahkhani	ENSG00000155363	True	False		mmulatta
+MRPL39	gharahkhani	ENSG00000154719	True	True	6062	
+MTAP	gharahkhani	ENSG00000099810	False	False		
+MTCH2	gharahkhani	ENSG00000109919	False	False		
+MTND3P1	gharahkhani	ENSG00000226118	False	False		
+MVB12B	gharahkhani	ENSG00000196814	True	True	9349	
+MXRA5	gharahkhani	ENSG00000101825	False	False		
+MYBPC3	gharahkhani	ENSG00000134571	True	True	4310	
+MYL4	gharahkhani	ENSG00000198336	False	False		
+MYLK4	gharahkhani	ENSG00000145949	True	False		sscrofa
+MYOF	gharahkhani	ENSG00000138119	True	True	4745	
+NAA38	gharahkhani	ENSG00000183011	True	False		sscrofa
+NDP	gharahkhani	ENSG00000124479	True	True	3561	
+NDP-AS1	gharahkhani	ENSG00000236276	False	False		
+NDUFS3	gharahkhani	ENSG00000213619	True	True	9783	
+NEFH	gharahkhani	ENSG00000100285	True	False		mfascicularis
+NEO1	gharahkhani	ENSG00000067141	True	True	651	
+NF2	gharahkhani	ENSG00000186575	True	True	9056	
+NIP7P1	gharahkhani	ENSG00000232805	False	False		
+NIPSNAP3A	gharahkhani	ENSG00000136783	False	False		
+NOC3L	gharahkhani	ENSG00000173145	True	False		mfascicularis
+NOL12	gharahkhani	ENSG00000273899	True	True	10048	
+NPAS4	gharahkhani	ENSG00000174576	True	True	8153	
+NPC2	gharahkhani	ENSG00000119655	True	True	3195	
+NPEPPS	gharahkhani	ENSG00000141279	True	True	5054	
+NPTN	gharahkhani	ENSG00000156642	True	True	6185	
+NR1H3	gharahkhani	ENSG00000025434	True	True	284	
+NSF	gharahkhani	ENSG00000073969	True	True	824	
+NSFP1	gharahkhani	ENSG00000260075	False	False		
+NUDT7	gharahkhani	ENSG00000140876	True	True	5027	
+NUP160	gharahkhani	ENSG00000030066	True	True	309	
+OR7E14P	gharahkhani	ENSG00000184669	False	False		
+OXSM	gharahkhani	ENSG00000151093	True	True	5803	
+PACSIN3	gharahkhani	ENSG00000165912	True	True	7158	
+PAQR8	gharahkhani	ENSG00000170915	True	True	7796	
+PCNXL3	gharahkhani	ENSG00000197136	True	False		hsapiens
+PDE7B	gharahkhani	ENSG00000171408	True	True	7834	
+PHYHIPL	gharahkhani	ENSG00000165443	True	False		mfascicularis
+PICK1	gharahkhani	ENSG00000100151	True	True	1446	
+PIGC	gharahkhani	ENSG00000135845	True	True	4462	
+PITPNB	gharahkhani	ENSG00000180957	True	True	8601	
+PKHD1	gharahkhani	ENSG00000170927	True	True	7799	
+PKN2	gharahkhani	ENSG00000065243	True	True	597	
+PLCE1	gharahkhani	ENSG00000138193	True	True	4755	
+PLCE1-AS1	gharahkhani	ENSG00000268894	False	False		
+PLD1	gharahkhani	ENSG00000075651	True	True	877	
+PLEKHA7	gharahkhani	ENSG00000166689	True	True	7272	
+PLEKHM1	gharahkhani	ENSG00000225190	True	True	9868	
+PLEKHS1	gharahkhani	ENSG00000148735	True	True	5665	
+PNPT1	gharahkhani	ENSG00000138035	True	True	4729	
+POLR2F	gharahkhani	ENSG00000100142	True	True	1443	
+POU2F3	gharahkhani	ENSG00000137709	True	True	4682	
+PPIL1	gharahkhani	ENSG00000137168	True	False		mfascicularis;mmulatta
+PPM1A	gharahkhani	ENSG00000100614	True	True	1544	
+PPM1J	gharahkhani	ENSG00000155367	False	False		
+PRKAG2	gharahkhani	ENSG00000106617	True	True	2158	
+PRKAG2-AS1	gharahkhani	ENSG00000239911	False	False		
+PRKCE	gharahkhani	ENSG00000171132	True	True	7811	
+PRKX	gharahkhani	ENSG00000183943	False	False		
+PRKX-AS1	gharahkhani	ENSG00000236188	False	False		
+PSMC3	gharahkhani	ENSG00000165916	True	True	7161	
+PTHLH	gharahkhani	ENSG00000087494	True	True	1166	
+PTPMT1	gharahkhani	ENSG00000110536	True	False		mmusculus
+PXT1	gharahkhani	ENSG00000179165	False	False		
+RALGPS1	gharahkhani	ENSG00000136828	True	True	4572	
+RAPSN	gharahkhani	ENSG00000165917	False	False		
+RARB	gharahkhani	ENSG00000077092	True	False		mfascicularis
+RELA	gharahkhani	ENSG00000173039	True	True	8013	
+RELN	gharahkhani	ENSG00000189056	True	True	9244	
+RERE	gharahkhani	ENSG00000142599	True	False		mfascicularis;sscrofa
+RFX4	gharahkhani	ENSG00000111783	False	False		
+RHOC	gharahkhani	ENSG00000155366	False	False		
+RIC8B	gharahkhani	ENSG00000111785	True	True	2561	
+RN7SKP86	gharahkhani	ENSG00000222386	False	False		
+RN7SL748P	gharahkhani	ENSG00000239964	False	False		
+RN7SL76P	gharahkhani	ENSG00000241959	False	False		
+RNF26	gharahkhani	ENSG00000173456	False	False		
+RNPC3	gharahkhani	ENSG00000185946	False	False		
+RNU6-105P	gharahkhani	ENSG00000200779	False	False		
+RNU6-1286P	gharahkhani	ENSG00000206598	False	False		
+RORA	gharahkhani	ENSG00000069667	True	False		mfascicularis
+RP1-239B22.5	gharahkhani		False	False		
+RP11-1042B17.3	gharahkhani		False	False		
+RP11-121M22.1	gharahkhani		False	False		
+RP11-12J10.3	gharahkhani		False	False		
+RP11-136H19.1	gharahkhani		False	False		
+RP11-144F15.1	gharahkhani		False	False		
+RP11-145E5.5	gharahkhani		False	False		
+RP11-157J24.2	gharahkhani		False	False		
+RP11-211N11.5	gharahkhani		False	False		
+RP11-217B7.2	gharahkhani		False	False		
+RP11-229O3.1	gharahkhani		False	False		
+RP11-302L19.3	gharahkhani		False	False		
+RP11-379H18.1	gharahkhani		False	False		
+RP11-412D9.4	gharahkhani		False	False		
+RP11-426L16.10	gharahkhani		False	False		
+RP11-466F5.8	gharahkhani		False	False		
+RP11-507B12.2	gharahkhani		False	False		
+RP11-798G7.6	gharahkhani		False	False		
+RP11-867G23.8	gharahkhani		False	False		
+RP13-452N2.1	gharahkhani		False	False		
+RP3-425C14.4	gharahkhani		False	False		
+RP5-1027O11.1	gharahkhani		False	False		
+RP6-218J18.2	gharahkhani		False	False		
+RPL23AP34	gharahkhani	ENSG00000225991	False	False		
+RPL23AP74	gharahkhani	ENSG00000227694	False	False		
+RPL31P20	gharahkhani	ENSG00000229756	False	False		
+RPL7P11	gharahkhani	ENSG00000234619	False	False		
+RPL7P44	gharahkhani	ENSG00000233873	False	False		
+RPS27AP1	gharahkhani	ENSG00000242692	False	False		
+RPS29P31	gharahkhani	ENSG00000224279	False	False		
+RPS6KL1	gharahkhani	ENSG00000198208	True	True	9496	
+RPSAP19	gharahkhani	ENSG00000183298	False	False		
+RPSAP64	gharahkhani	ENSG00000227721	False	False		
+RSPO1	gharahkhani	ENSG00000169218	True	True	7599	
+RSPO2	gharahkhani	ENSG00000147655	True	True	5595	
+RTL10	gharahkhani	ENSG00000215012	False	False		
+SALL1	gharahkhani	ENSG00000103449	True	True	1840	
+SALL4P7	gharahkhani	ENSG00000258692	False	False		
+SCARNA13	gharahkhani	ENSG00000252481	False	False		
+SCFD2	gharahkhani	ENSG00000184178	True	True	8850	
+SCYL1	gharahkhani	ENSG00000142186	True	False		mmulatta
+SEC62	gharahkhani	ENSG00000008952	True	True	131	
+SEC62-AS1	gharahkhani	ENSG00000240373	False	False		
+SEMA3A	gharahkhani	ENSG00000075213	True	True	856	
+SEMA3C	gharahkhani	ENSG00000075223	True	True	857	
+SEMA3E	gharahkhani	ENSG00000170381	True	True	7733	
+SERINC1	gharahkhani	ENSG00000111897	True	True	2580	
+SFTA1P	gharahkhani	ENSG00000225383	False	False		
+SH2B3	gharahkhani	ENSG00000111252	True	True	2511	
+SH3TC1	gharahkhani	ENSG00000125089	True	False		mfascicularis
+SIX1	gharahkhani	ENSG00000126778	True	False		mmulatta
+SIX4	gharahkhani	ENSG00000100625	True	True	1545	
+SLC25A3P1	gharahkhani	ENSG00000236253	False	False		
+SLC2A12	gharahkhani	ENSG00000146411	True	True	5503	
+SLC2A8	gharahkhani	ENSG00000136856	True	True	4575	
+SLC35D3	gharahkhani	ENSG00000182747	True	False		mmulatta
+SLC38A6	gharahkhani	ENSG00000139974	True	True	4941	
+SLC39A13	gharahkhani	ENSG00000165915	True	True	7160	
+SLCO3A1	gharahkhani	ENSG00000176463	True	True	8319	
+SMAD6	gharahkhani	ENSG00000137834	False	False		
+SMEK2	gharahkhani	ENSG00000275052	True	False		mfascicularis
+SMG6	gharahkhani	ENSG00000070366	True	True	726	
+SMIM18	gharahkhani	ENSG00000253457	False	False		
+SNHG10	gharahkhani	ENSG00000247092	False	False		
+SNIP1	gharahkhani	ENSG00000163877	True	True	6836	
+SNORD13D	gharahkhani	ENSG00000239035	False	False		
+SNX15	gharahkhani	ENSG00000110025	True	True	2421	
+SNX17	gharahkhani	ENSG00000115234	True	True	2849	
+SNX32	gharahkhani	ENSG00000172803	True	True	7989	
+SORCS2	gharahkhani	ENSG00000184985	False	False		
+SOX10	gharahkhani	ENSG00000100146	True	False		mmulatta
+SPI1	gharahkhani	ENSG00000066336	False	False		
+SPPL2C	gharahkhani	ENSG00000185294	True	False		mmulatta
+SRP72P2	gharahkhani	ENSG00000188451	False	False		
+SRR	gharahkhani	ENSG00000167720	True	False		mmulatta
+SRSF3	gharahkhani	ENSG00000112081	False	False		
+SSSCA1	gharahkhani	ENSG00000173465	True	False		hsapiens;mfascicularis;mmulatta;mmusculus;sscrofa
+ST7L	gharahkhani	ENSG00000007341	True	False		mfascicularis
+STAM2	gharahkhani	ENSG00000115145	True	True	2834	
+STK38	gharahkhani	ENSG00000112079	True	False		mfascicularis
+STOML1	gharahkhani	ENSG00000067221	True	True	657	
+STOX2	gharahkhani	ENSG00000173320	True	True	8046	
+SURF1	gharahkhani	ENSG00000148290	True	True	5629	
+SVEP1	gharahkhani	ENSG00000165124	True	True	7060	
+SYTL2	gharahkhani	ENSG00000137501	True	True	4657	
+TBC1D21	gharahkhani	ENSG00000167139	True	True	7340	
+TBC1D32	gharahkhani	ENSG00000146350	True	True	5496	
+TBKBP1	gharahkhani	ENSG00000198933	True	False		sscrofa
+TBPL1	gharahkhani	ENSG00000028839	True	True	303	
+TBX1	gharahkhani	ENSG00000184058	True	True	8843	
+TCF12	gharahkhani	ENSG00000140262	True	True	4962	
+TEKT2	gharahkhani	ENSG00000092850	True	True	1321	
+TES	gharahkhani	ENSG00000135269	False	False		
+TFAM	gharahkhani	ENSG00000108064	True	True	2256	
+TFAP2B	gharahkhani	ENSG00000008196	True	True	117	
+TFAP2D	gharahkhani	ENSG00000008197	True	True	118	
+TFEC	gharahkhani	ENSG00000105967	True	True	2089	
+TGFB2	gharahkhani	ENSG00000092969	True	True	1326	
+TGFB3	gharahkhani	ENSG00000119699	True	True	3201	
+TGFB3-AS1	gharahkhani	ENSG00000258876	False	False		
+TGFBR3	gharahkhani	ENSG00000069702	True	True	711	
+THRAP3	gharahkhani	ENSG00000054118	True	True	469	
+THSD7A	gharahkhani	ENSG00000005108	True	True	48	
+TIGD2	gharahkhani	ENSG00000180346	True	True	8567	
+TLCD5	gharahkhani	ENSG00000181264	True	False		hsapiens;mfascicularis;mmulatta;mmusculus;sscrofa
+TMEM106B	gharahkhani	ENSG00000106460	True	True	2144	
+TMEM135	gharahkhani	ENSG00000166575	True	True	7263	
+TMEM136	gharahkhani		False	False		
+TMEM181	gharahkhani	ENSG00000146433	True	True	5507	
+TPRG1	gharahkhani	ENSG00000188001	False	False		
+TPRG1-AS1	gharahkhani	ENSG00000234076	False	False		
+TRAPPC3	gharahkhani	ENSG00000054116	True	True	468	
+TRIB2	gharahkhani	ENSG00000071575	True	True	762	
+TRIM31	gharahkhani	ENSG00000204616	False	False		
+TRIOBP	gharahkhani	ENSG00000100106	True	True	1437	
+TSC22D2	gharahkhani	ENSG00000196428	True	False		mmulatta
+TSR1	gharahkhani	ENSG00000167721	True	False		mfascicularis
+TTC28-AS1	gharahkhani	ENSG00000235954	False	False		
+TTLL5	gharahkhani	ENSG00000119685	False	False		
+TUBB3P2	gharahkhani	ENSG00000230101	False	False		
+TUBB8P1	gharahkhani	ENSG00000229298	False	False		
+UBE2V2P4	gharahkhani	ENSG00000231849	False	False		
+UCK2	gharahkhani	ENSG00000143179	True	True	5190	
+VAMP4	gharahkhani	ENSG00000117533	True	True	3065	
+VARS2	gharahkhani	ENSG00000137411	True	True	4642	
+VCAM1	gharahkhani	ENSG00000162692	True	True	6632	
+WDYHV1	gharahkhani	ENSG00000156795	True	False		hsapiens;mfascicularis;mmulatta;sscrofa
+WLS	gharahkhani	ENSG00000116729	True	True	2993	
+WNT3	gharahkhani	ENSG00000108379	True	True	2275	
+WNT9B	gharahkhani	ENSG00000158955	True	True	6360	
+XRCC6P1	gharahkhani	ENSG00000237417	False	False		
+YAP1	gharahkhani	ENSG00000137693	True	True	4678	
+ZBTB34	gharahkhani	ENSG00000177125	True	True	8369	
+ZMAT5	gharahkhani	ENSG00000100319	False	False		
+ZNF280D	gharahkhani	ENSG00000137871	True	True	4710	
+ZNF408	gharahkhani	ENSG00000175213	True	True	8218	
+ZNF638	gharahkhani	ENSG00000075292	True	True	862	

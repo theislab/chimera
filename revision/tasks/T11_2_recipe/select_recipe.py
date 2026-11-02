@@ -116,8 +116,8 @@ def main() -> int:
     for _, g in grid.iterrows():
         run_dir = RUNS / g.run_name
         r = {"grid_id": int(g.grid_id), "run_name": g.run_name, **gate(run_dir)}
-        if r["finished"]:
-            z =np.asarray(np.load(run_dir / "final_state.npz")["z_mean"])
+        if r["finished"] and r["no_nan"]:  # a NaN run fails G-V; its z cannot be scored
+            z = np.asarray(np.load(run_dir / "final_state.npz")["z_mean"])
             if z.shape[0] != len(obs):
                 raise RuntimeError(f"{g.run_name}: z has {z.shape[0]} rows, adata {len(obs)}")
             m = compute_integration_metrics(z, species, labels, k=15, seed=42)
@@ -127,7 +127,7 @@ def main() -> int:
         rows.append(r)
     tab = pd.DataFrame(rows)
 
-    passing = tab[tab["pass_GV"]].copy()
+    passing = tab[tab["pass_GV"].astype(bool)].copy()
     tab["mixing"] = np.nan
     tab["biology"] = np.nan
     tab["composite"] = np.nan

@@ -6,8 +6,9 @@ Descriptive only, and never an input to the recipe choice: it refuses to run unt
 
 For each finished run, against the training prior (clamped where the recipe clamps) and
 the raw prior: fractions positive and negative, fractions beyond +0.05 and -0.05, SD,
-median of Delta-alpha; plus knn_mixing_entropy (k=15, seed 42, as in selection), final
-adversary accuracy and Gate G-V. A seed is flagged poorly mixed if its knn_mixing_entropy
+median of Delta-alpha; plus knn_mixing_entropy (k=15, seed 42, as in selection), the same
+entropy over mouse cells only (most mouse cells have no partner class for conditional MMD),
+final adversary accuracy, the first snapshot with a non-finite alpha and Gate G-V. A seed is flagged poorly mixed if its knn_mixing_entropy
 is below FLAG_RATIO times the selected run's (bar fixed before any seed was trained;
 Liver H+Mouse integrated seeds had 0.25-0.50, poorly mixed 0.06-0.19, ledger T3_3).
 Flagged seeds are reported separately; the primary D stays the mean over seeds (section 2).
@@ -32,6 +33,7 @@ from training.compare_vs_scvi import compute_integration_metrics  # noqa: E402
 
 FLAG_RATIO = 0.5
 TAIL = 0.05
+MOUSE = "mouse"
 
 
 def sign_profile(delta: np.ndarray, tag: str) -> dict:
@@ -43,6 +45,24 @@ def sign_profile(delta: np.ndarray, tag: str) -> dict:
         f"sd_{tag}": float(delta.std()),
         f"median_{tag}": float(np.median(delta)),
     }
+
+
+def species_entropy(z: np.ndarray, species: np.ndarray, which: str, k: int = 15) -> float:
+    """Mean normalised species entropy of the k nearest neighbours, over cells of one species."""
+    from sklearn.neighbors import NearestNeighbors
+
+    codes, names = pd.factorize(species, sort=True)
+    idx = NearestNeighbors(n_neighbors=k + 1).fit(z).kneighbors(z[species == which])[1][:, 1:]
+    p = np.stack([(codes[idx] == c).mean(axis=1) for c in range(len(names))], axis=1)
+    h = -(p * np.log(np.where(p > 0, p, 1.0))).sum(axis=1) / np.log(len(names))
+    return float(h.mean())
+
+
+def first_nan_snapshot(run_dir: Path) -> str:
+    for f in sorted((run_dir / "alpha_snapshots").glob("*.npz")):
+        if not np.isfinite(np.load(f)["alpha"]).all():
+            return f.stem
+    return ""
 
 
 def main() -> int:
@@ -74,17 +94,21 @@ def main() -> int:
         prior = np.asarray(fs["prior"], dtype=np.float64)
         raw_f = d / "conservation_prior_raw.npy"
         raw = np.load(raw_f).astype(np.float64) if raw_f.exists() else raw_var
-        m = compute_integration_metrics(np.asarray(fs["z_mean"]), species, labels, k=15, seed=42)
+        z = np.asarray(fs["z_mean"])
+        finite = bool(np.isfinite(z).all() and np.isfinite(alpha).all())
+        m = compute_integration_metrics(z, species, labels, k=15, seed=42)["global"] if finite else {}
         summ = json.loads((d / "summary.json").read_text())
         rows.append({
             "run_name": name,
             "selected": name == selected,
             "pass_GV": g["pass_GV"],
+            "first_nan_snapshot": first_nan_snapshot(d),
             "last_epoch": g.get("last_epoch"),
             **sign_profile(alpha - prior, "train"),
             **sign_profile(alpha - raw, "raw"),
-            "knn_mixing_entropy": m["global"]["knn_mixing_entropy"],
-            "knn_species_purity": m["global"]["knn_species_purity"],
+            "knn_mixing_entropy": m.get("knn_mixing_entropy", np.nan),
+            "mixing_entropy_mouse": species_entropy(z, species, MOUSE) if finite else np.nan,
+            "knn_species_purity": m.get("knn_species_purity", np.nan),
             "adv_acc_final": summ["key_metrics"].get("adv_acc_final"),
         })
     tab = pd.DataFrame(rows)

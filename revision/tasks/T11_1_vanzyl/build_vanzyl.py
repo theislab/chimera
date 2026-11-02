@@ -6,8 +6,22 @@ Uses the ``chimera._data_utils`` pipeline unchanged:
 ``download_and_process_esm2``, ``pca_esm2``, ``compute_esm2_interspecies_variance``,
 ``construct_unified_adata``, ``compute_expression_stats``, ``assemble_gin_features``,
 ``precompute_p_null``. The ortholog table ``data/processed/ortholog_table_van_zyl.csv``
-(Ensembl 110) is reused as reference data. Cell-type labels are harmonised with the
-committed map ``celltype_map.tsv``.
+(Ensembl 110) is reference data; it is restricted to the groups measured in all five species
+and written, renumbered, to ``ortholog_table_van_zyl.csv`` in the output folder. Cell-type
+labels are harmonised with the committed map ``celltype_map.tsv``.
+
+Measured genes: a group is kept only if, in every species, its gene is in that species' own
+count matrix, by symbol or by Ensembl ID (the rhesus and pig matrices name unannotated genes
+by ID), each matrix gene serving one group. ``construct_unified_adata`` maps through a single
+column, so a gene missing from one species would enter as a false zero there, and genes
+present under the other identifier would be lost.
+
+QC: ``min_genes`` only. No mitochondrial filter in this cohort, a deviation from the canonical
+20%: mt genes are named ND1/COX1 in rhesus and pig, so the prefix rule cannot see them, and the
+cynomolgus matrix has none, so the filter could not act evenly across species.
+
+Batches: ``obs['source_batch']`` is ``species|chemistry`` (10x v2 or v3, ``batch_chemistry.tsv``);
+``obs['batch']`` keeps the 16 samples.
 
 Inputs are fixed by symlink folders under the output directory, so the pipeline reads
 exactly these files: the five CSVs and the metafile, and the five species' ESM-2 files
@@ -42,7 +56,7 @@ from revision.common import gene_ids  # noqa: E402
 TASK = Path(__file__).resolve().parent
 RAW = REPO / "data" / "raw" / "van_zyl_raw"
 ESM2 = REPO / "data" / "raw" / "saturn_esm2" / "protein_embeddings_export" / "ESM2"
-TABLE = REPO / "data" / "processed" / "ortholog_table_van_zyl.csv"
+SOURCE_TABLE = REPO / "data" / "processed" / "ortholog_table_van_zyl.csv"
 OLD = REPO / "data" / "processed" / "van_zyl_unified.h5ad"
 OLD_RAW_CACHE = REPO / "data" / "raw" / "van_zyl_raw.h5ad"
 DEFAULT_OUT = REPO / "data" / "revision" / "van_zyl"
@@ -70,7 +84,8 @@ ESM2_FILES = {
     "mmusculus": "mouse_embedding.torch",
     "sscrofa": "pig_embedding.torch",
 }
-QC = dict(min_genes=200, max_mt_pct=20.0)
+QC = dict(min_genes=200, max_mt_pct=100.0)  # no mt filter in this cohort, see module docstring
+OWN_MATRIX = dict(zip(("mmusculus", "sscrofa", "hsapiens", "mfascicularis", "mmulatta"), CSVS))
 
 log = logging.getLogger("build_vanzyl")
 
@@ -148,10 +163,90 @@ def input_hashes(skip_gunzip_check: bool) -> dict:
                 raise RuntimeError(f"{csv.name} differs from gunzip of {gz.name}")
         rec[name] = r
     rec[META] = {"sha256": sha256(RAW / META)}
-    rec["ortholog_table_van_zyl.csv"] = {"sha256": sha256(TABLE)}
+    rec["ortholog_table_van_zyl.csv (source)"] = {"sha256": sha256(SOURCE_TABLE)}
     for sp_, name in ESM2_FILES.items():
         rec[f"ESM2/{name}"] = {"sha256": sha256(ESM2 / name)}
     return rec
+
+
+def own_gene_list(name: str) -> set:
+    """Gene names of one species' own matrix: first column of its CSV (genes by cells)."""
+    return set(pd.read_csv(RAW / name, usecols=[0], header=0).iloc[:, 0].astype(str))
+
+
+def measured_table(table: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict, pd.DataFrame]:
+    """Restrict ``table`` to groups measured in all species; see the module docstring.
+
+    Returns the renumbered table (ordered by human Ensembl ID, as the bone-marrow table), the
+    per-species ``{new group id: matrix gene}`` maps, a report, and a boolean frame (rows of
+    ``table``, one column per species) of where each group is measured.
+    """
+    rep: dict = {"n_groups_source": int(len(table)), "per_species": {}}
+    genes = {}
+    for sp in sorted(ENSEMBL.values()):
+        own = own_gene_list(OWN_MATRIX[sp])
+        name, gid = table[f"{sp}_gene_name"], table[f"{sp}_gene_id"]
+        name_unique = ~name.duplicated(keep=False) & name.notna()
+        by_name = name_unique & name.isin(own)
+        by_id = ~by_name & gid.isin(own)
+        g = pd.Series(pd.NA, index=table.index, dtype=object)
+        g[by_id] = gid[by_id]
+        g[by_name] = name[by_name]
+        clash = g.notna() & g.duplicated(keep=False)  # a matrix gene may serve one group only
+        g[clash] = pd.NA
+        genes[sp] = g
+        rep["per_species"][sp] = {
+            "n_genes_own_matrix": len(own), "n_by_name": int((by_name & ~clash).sum()),
+            "n_by_id": int((by_id & ~clash).sum()), "n_clash_dropped": int(clash.sum()),
+            "n_not_measured": int(g.isna().sum()), "n_ambiguous_name_rows": int((name.notna() & ~name_unique).sum()),
+        }
+    measured = pd.DataFrame({sp: g.notna() for sp, g in genes.items()})
+    keep = measured.all(axis=1).to_numpy()
+    new = table.loc[keep].copy()
+    new.insert(1, "source_ortholog_group_id", new["ortholog_group_id"])
+    order = new["hsapiens_gene_id"].sort_values(kind="stable").index
+    new = new.loc[order].reset_index(drop=False).rename(columns={"index": "_row"})
+    new["ortholog_group_id"] = np.arange(len(new))
+    maps = {sp: dict(zip(new["ortholog_group_id"], g.loc[new["_row"]])) for sp, g in genes.items()}
+    new = new.drop(columns="_row")
+    rep["n_groups"] = int(len(new))
+    return new, maps, rep, measured
+
+
+def glaucoma_coverage(source: pd.DataFrame, new: pd.DataFrame, measured: pd.DataFrame) -> dict:
+    """Coverage of the fixed glaucoma list on the measured vocabulary; the list itself is unchanged."""
+    gl = pd.read_csv(TASK / "glaucoma_genes.tsv", sep="\t")
+    missing = measured.apply(lambda r: ";".join(c for c in measured.columns if not r[c]), axis=1)
+    missing.index = source["hsapiens_gene_id"]
+    missing = missing[~missing.index.duplicated()]
+    ids = new.set_index("hsapiens_gene_id")["ortholog_group_id"]
+    out = gl[["gene", "source", "hsapiens_gene_id", "in_van_zyl_vocab"]].copy()
+    out["in_measured_vocab"] = out["hsapiens_gene_id"].isin(ids.index)
+    out["ortholog_group_id"] = out["hsapiens_gene_id"].map(ids).astype("Int64")
+    out["not_measured_in"] = out["hsapiens_gene_id"].map(missing).fillna("")
+    out.to_csv(TASK / "glaucoma_coverage_measured.tsv", sep="\t", index=False)
+    van = out["source"].str.contains("vanzyl")
+    gh = out["source"].str.contains("gharahkhani")
+    return {
+        "n_list": int(len(out)), "n_in_source_table": int(out["in_van_zyl_vocab"].sum()),
+        "n_in_measured_vocab": int(out["in_measured_vocab"].sum()),
+        "van_zyl_named_in_measured": int(out.loc[van, "in_measured_vocab"].sum()), "van_zyl_named": int(van.sum()),
+        "gharahkhani_in_measured": int(out.loc[gh, "in_measured_vocab"].sum()), "gharahkhani": int(gh.sum()),
+        "lost_from_table": out.loc[out["in_van_zyl_vocab"] & ~out["in_measured_vocab"], "gene"].tolist(),
+    }
+
+
+def add_source_batch(obs: pd.DataFrame) -> pd.DataFrame:
+    chem = pd.read_csv(TASK / "batch_chemistry.tsv", sep="\t").set_index("batch")
+    b = obs["batch"].astype(str)
+    if not b.isin(chem.index).all():
+        raise ValueError(f"batches without chemistry: {sorted(set(b) - set(chem.index))}")
+    if not (chem.loc[b, "species"].to_numpy() == obs["species"].astype(str).to_numpy()).all():
+        raise ValueError("batch_chemistry.tsv species disagrees with obs['species']")
+    out = obs.copy()
+    out["chemistry"] = pd.Categorical(chem.loc[b, "chemistry"].to_numpy())
+    out["source_batch"] = pd.Categorical(obs["species"].astype(str).to_numpy() + "|" + chem.loc[b, "chemistry"].to_numpy())
+    return out
 
 
 def harmonise(obs: pd.DataFrame) -> pd.DataFrame:
@@ -193,14 +288,14 @@ def shared_tables(obs: pd.DataFrame, out: Path) -> dict:
     return res
 
 
-def compare_old(new, out: Path) -> dict:
+def compare_old(new, table: pd.DataFrame, out: Path) -> dict:
     import anndata as ad
     import scipy.sparse as sp
 
     old = ad.read_h5ad(OLD)
     rec: dict = {"old_path": str(OLD.relative_to(REPO)), "old_sha256": sha256(OLD)}
     rec["shape_old"], rec["shape_new"] = list(old.shape), list(new.shape)
-    rec["var_names_identical"] = bool(old.var_names.equals(new.var_names))
+    rec["n_genes_only_old"] = int(old.n_vars - new.n_vars)
     so, sn = set(old.obs_names), set(new.obs_names)
     only_old = sorted(so - sn)
     rec["n_cells_only_old"], rec["n_cells_only_new"] = len(only_old), len(sn - so)
@@ -213,26 +308,19 @@ def compare_old(new, out: Path) -> dict:
     rec["per_species_old"] = old.obs["species"].astype(str).value_counts().to_dict()
     rec["per_species_new"] = new.obs["species"].astype(str).value_counts().to_dict()
     common = [c for c in new.obs_names if c in so]
-    o, n = old[common], new[common]
-    if rec["var_names_identical"]:
-        Xo = sp.csr_matrix(o.X)
-        Xn = sp.csr_matrix(n.X)
-        d = (Xo - Xn)
-        rec["X_equal_on_common_cells"] = bool(d.nnz == 0 or np.abs(d.data).max() == 0)
-        rec["conservation_prior_max_abs_diff"] = float(
-            np.abs(old.var["conservation_prior"].to_numpy() - new.var["conservation_prior"].to_numpy()).max()
-        )
-        gf = np.abs(np.asarray(old.varm["gene_features"]) - np.asarray(new.varm["gene_features"]))
-        rec["gene_features_max_abs_diff"] = float(gf.max())
-        rec["gene_features_max_abs_diff_per_block"] = {
-            "esm2_pca_0_63": float(gf[:, :64].max()),
-            "esm2_interspecies_var_64": float(gf[:, 64].max()),
-            "mean_identity_65": float(gf[:, 65].max()),
-            "expression_stats_66_68": float(gf[:, 66:69].max()),
-            "identity_spread_69_71": float(gf[:, 69:72].max()),
-        }
-        pn_o, pn_n = np.asarray(old.uns["p_null"]), np.asarray(new.uns["p_null"])
-        rec["p_null_max_rel_diff"] = float(np.abs(pn_o - pn_n).max() / np.abs(pn_o).max()) if pn_o.shape == pn_n.shape else None
+    # New groups are a renumbered subset: compare each with its source group in the old object.
+    src = [f"ortho_{i}" for i in table["source_ortholog_group_id"].to_numpy()]
+    o, n = old[common, src], new[common]
+    d = (sp.csr_matrix(o.X) - sp.csr_matrix(n.X)).tocsr()
+    d.eliminate_zeros()
+    rec["X_equal_on_common_cells_and_genes"] = bool(d.nnz == 0)
+    rec["n_genes_gaining_counts_by_species"] = {}
+    for s in sorted(new.obs["species"].astype(str).unique()):
+        m = (n.obs["species"].astype(str) == s).to_numpy()
+        rec["n_genes_gaining_counts_by_species"][s] = int((np.asarray(np.abs(d[m]).sum(axis=0)).ravel() > 0).sum())
+    rec["conservation_prior_max_abs_diff"] = float(
+        np.abs(o.var["conservation_prior"].to_numpy() - n.var["conservation_prior"].to_numpy()).max()
+    )
     rec["cell_type_equal_on_common_cells"] = bool(
         (o.obs["cell_type"].astype(str).to_numpy() == n.obs["cell_type"].astype(str).to_numpy()).all()
     )
@@ -256,6 +344,7 @@ def main() -> int:
         raise SystemExit("refusing to write under data/processed/")
     out.mkdir(parents=True, exist_ok=True)
     for stale in ("van_zyl_unified.h5ad", "gin_scaler_van_zyl.pkl", "build_report.json",
+                  "ortholog_table_van_zyl.csv",
                   "inputs/raw/van_zyl_raw.h5ad"):
         (out / stale).unlink(missing_ok=True)
 
@@ -309,8 +398,13 @@ def main() -> int:
     report["qc_per_species"] = qc_rec
     del raw
 
-    # 3. Ortholog table (reused), prior, ESM-2 features.
-    table = pd.read_csv(TABLE)
+    # 3. Ortholog table restricted to measured groups, prior, ESM-2 features.
+    source_table = pd.read_csv(SOURCE_TABLE)
+    table, gene_maps, report["measured_genes"], measured = measured_table(source_table)
+    table.to_csv(out / "ortholog_table_van_zyl.csv", index=False)
+    report["outputs_table_sha256"] = sha256(out / "ortholog_table_van_zyl.csv")
+    if out == DEFAULT_OUT.resolve():
+        report["glaucoma_coverage"] = glaucoma_coverage(source_table, table, measured)
     prior = du.compute_conservation_prior(table)
     report["n_ortholog_groups"] = int(len(table))
     report["frac_prior_ge_0.95"] = float((prior.numpy() >= 0.95).mean())
@@ -323,14 +417,26 @@ def main() -> int:
 
     # 4. Unified object, expression stats, GIN features, p_null.
     G = len(table)
-    unified = du.construct_unified_adata(per_species, table, np.zeros((G, 72), dtype=np.float32), prior)
+    # construct_unified_adata maps through one column: give it one exact key per group, so a
+    # group found by symbol in one species and by Ensembl ID in another maps to the same gene.
+    key = table[["ortholog_group_id"]].copy()
+    aligned = {}
+    for sp, a in per_species.items():
+        key[f"{sp}_gene_id"] = [f"group{i}" for i in table["ortholog_group_id"]]
+        groups = list(gene_maps[sp])
+        a = a[:, [gene_maps[sp][g] for g in groups]].copy()
+        a.var_names = [f"group{g}" for g in groups]
+        aligned[sp] = a
+    del per_species
+    unified = du.construct_unified_adata(aligned, key, np.zeros((G, 72), dtype=np.float32), prior)
     stats = du.compute_expression_stats(unified)
     features, scaler = du.assemble_gin_features(esm2_pca, esm2_var, table, stats)
     unified.varm["gene_features"] = features
     unified.uns["p_null"] = du.precompute_p_null(unified)
 
     # 5. Harmonised labels.
-    unified.obs = harmonise(unified.obs)
+    unified.obs = add_source_batch(harmonise(unified.obs))
+    report["cells_by_source_batch"] = unified.obs["source_batch"].astype(str).value_counts().to_dict()
     for col in ("species", "batch", "cell_type", "Cluster"):
         unified.obs[col] = pd.Categorical(unified.obs[col].astype(str))
     report["labels"] = shared_tables(unified.obs, out)
@@ -350,7 +456,7 @@ def main() -> int:
     report["outputs"] = {"van_zyl_unified.h5ad": sha256(path)}
 
     if not args.no_compare:
-        report["comparison_old_object"] = compare_old(unified, out)
+        report["comparison_old_object"] = compare_old(unified, table, out)
     (out / "build_report.json").write_text(json.dumps(report, indent=2, default=str))
     log.info("done: %s %s", path, unified.shape)
     return 0
