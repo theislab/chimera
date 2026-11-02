@@ -105,6 +105,16 @@ def gtf_table(path: Path) -> pd.DataFrame:
     return t
 
 
+OLD = gene_ids.REPO_ROOT / "data" / "revision" / "new_usecases" / "ensembl_old"
+
+
+def release_names(tag: str) -> pd.Series:
+    """Symbol -> stable Ensembl ID in the release a symbol-only matrix was built on (checklist 2b), names unique within that release. tag: hs91, mm81, hs84, mm75."""
+    t = gtf_table(OLD / f"{tag}.gtf.gz")["name"].dropna()
+    u = t[~t.duplicated(keep=False)]
+    return pd.Series(u.index, index=u.values)
+
+
 def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, dict]:
     """One-to-one human-partner rows from both dumps, oriented human first."""
     comp = SPECIES[partner]["compara"]

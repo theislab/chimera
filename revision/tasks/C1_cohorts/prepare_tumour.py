@@ -2,8 +2,8 @@
 
 The normalised matrices are not used. Cells: those in the authors' metadata, tumour only: human Tissue == tumor, mouse Tumor or healthy == t.
 The authors' QC differs by species (human >= 300 UMI, mitochondrial <= 20%; mouse >= 637 UMI, <= 15%), so one rule is applied on top in both species, the stricter pair:
-at least 637 UMI and at most 15% mitochondrial (checklist item 4; the cut acts on the authors' columns). Symbols to Ensembl through the Ensembl 110 GTF, unique names on both sides; an unmapped gene is not listed, so it
-is a missing gene, not a zero. The deposit has symbols only; this departs from checklist item 2, stated in plan section 13.0.
+at least 637 UMI and at most 15% mitochondrial (checklist item 4; the cut acts on the authors' columns). The deposit has symbols only. They are mapped through the release they were built on (checklist 2b): all 41,861 human names are in Ensembl 91 and all 28,205 mouse names in Ensembl 81, no other
+release checked (75-98) reaches that; names unique in the release; stable ID then joins Ensembl 110 orthologs. An unmapped gene is not listed, so it is a missing gene, not a zero.
 
     python revision/tasks/C1_cohorts/prepare_tumour.py
 """
@@ -33,15 +33,12 @@ def label(major: str, minor: str) -> str:
     return minor if major in ("tMoMacDC", "tNeutrophils", "tpDC", "MoMacDC", "Neutrophils", "pDC") else "other"
 
 
-def ids_for(names: pd.Index, sp_short: str) -> tuple[pd.Series, dict]:
-    n2 = OR.gtf_names(OR.SPECIES[sp_short]["gtf"])
-    s = pd.Series(n2)
-    uniq = s[~s.duplicated(keep=False)]
-    m = pd.Series(uniq.index, index=uniq.values)
+def ids_for(names: pd.Index, tag: str) -> tuple[pd.Series, dict]:
+    m = OR.release_names(tag)
     out = pd.Series(names, index=names).map(m)
     dup = pd.Index(names)[pd.Index(names).duplicated(keep=False)]
     out[out.index.isin(dup)] = np.nan
-    return out, dict(n_symbols=len(names), n_mapped=int(out.notna().sum()))
+    return out, dict(annotation=tag, n_symbols=len(names), n_mapped=int(out.notna().sum()))
 
 
 def load(meta: pd.DataFrame, tar: tarfile.TarFile, tag: str) -> tuple[sp.csr_matrix, pd.Index, pd.DataFrame]:
@@ -89,7 +86,7 @@ def main() -> int:
     with tarfile.open(D / "GSE127465_RAW.tar") as tar:
         for sp_short, meta, tag, unit, out in (("hsapiens", h, "human_", "Patient", "prepared_human.h5ad"), ("mmusculus", m, "mouse_", "Biological replicate", "prepared_mouse.h5ad")):
             X, genes, o = load(meta, tar, tag)
-            idm, r = ids_for(genes, sp_short)
+            idm, r = ids_for(genes, {"hsapiens": "hs91", "mmusculus": "mm81"}[sp_short])
             keep = idm.notna().to_numpy()
             ids = idm[keep].to_numpy()
             obs = pd.DataFrame(index=o.index)

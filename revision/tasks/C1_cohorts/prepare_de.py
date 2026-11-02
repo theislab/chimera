@@ -220,11 +220,9 @@ def muscle_mouse() -> None:
     a.write_h5ad(out_dir("muscle") / "pb_mouse.h5ad")
 
 
-def sym_ids(symbols: pd.Series, sp_short: str) -> pd.Series:
-    n2 = pd.Series(OR.gtf_names(OR.SPECIES[sp_short]["gtf"]))
-    u = n2[~n2.duplicated(keep=False)]
-    m = pd.Series(u.index, index=u.values)
-    return symbols.map(m)
+def sym_ids(symbols: pd.Series, tag: str) -> pd.Series:
+    """Symbols through the release of the matrix (checklist 2b): Habermann Ensembl 84 (33,660 of 33,694 names, Cell Ranger GRCh38 1.2), Strunz Ensembl 75 (23,400 of 23,400)."""
+    return symbols.map(OR.release_names(tag))
 
 
 def lung_human() -> None:
@@ -243,7 +241,7 @@ def lung_human() -> None:
     qc = ng >= CF.MIN_GENES
     X, meta = X[qc], meta[qc]
     meta = meta.assign(unit=meta["Sample_Name"], cell_ontology_class=meta["celltype"].map(HAB), condition=np.where(meta["Diagnosis"] == "IPF", "disease", "control"), source=meta["Sample_Source"])
-    ids = sym_ids(genes, "hsapiens")
+    ids = sym_ids(genes, "hs84")
     v = pd.DataFrame({"gene_ids": ids.astype(object).where(ids.notna(), "NA_" + genes).to_numpy()}, index=unique_symbols(genes))
     a = pb(X, meta, v, ["source"])
     a.write_h5ad(out_dir("lung") / "pb_human.h5ad")
@@ -265,7 +263,7 @@ def lung_mouse() -> None:
     qc = ng >= CF.MIN_GENES
     X, m = X[qc], m[qc]
     m = m.assign(unit=m["identifier"], cell_ontology_class=m["cell.type"].map(STR), condition=np.where(m["grouping"] == "PBS", "control", "disease"), day=m["grouping"])
-    ids = sym_ids(genes, "mmusculus")
+    ids = sym_ids(genes, "mm75")
     v = pd.DataFrame({"gene_ids": ids.astype(object).where(ids.notna(), "NA_" + genes).to_numpy()}, index=unique_symbols(genes))
     a = pb(X, m, v, ["day"])
     a.write_h5ad(out_dir("lung") / "pb_mouse.h5ad")
