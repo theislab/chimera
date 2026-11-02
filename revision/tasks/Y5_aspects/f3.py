@@ -491,6 +491,94 @@ def b1z_tests():
     pd.DataFrame(ks).to_csv(OUT / "b1z_shared_clusters.csv", index=False)
 
 
+def b1z_sweep(cohorts=("liv_hmouse", "test_3sp", "test_hmouse", "test_hmac", "liv_4sp")):
+    """T3.4 sensitivity: every latent at several Leiden resolutions; label-free testis runs; fine-label direct E (human, macaque)."""
+    from revision.tasks.T4_2_gene_baselines import run as T42
+    default = T42.LEIDEN_RESOLUTION
+    for c in cohorts:
+        f = OUT / f"b1z_sweep__{c}.parquet"
+        if f.exists():
+            continue
+        co = C.load_cohort(c, keep_adata=True, covariates=True)
+        a, g = co.adata, co.genes
+        X = sp.csr_matrix(a.X).astype(np.float64)
+        species = a.obs["species"].astype(str).to_numpy()
+        library = a.obs[T42.LIBRARY_KEY[tissue(c)]].astype(str).to_numpy()
+        species_list = sorted(set(species))
+        cov = g[["prior_raw", "log_cp10k_spmean", "detection_spmean"]]
+        res = pd.DataFrame({"hsapiens_gene_id": g.hsapiens_gene_id.values})
+        meta = []
+        L = latents(c)
+        chim = [k for k in L if k.startswith("chimera")][:3]
+        use = {k: L[k] for k in chim}
+        for k in ("scvi_s42", "scanvi", "sysvi", "harmony", "saturn", "camex"):
+            if k in L:
+                use[k] = L[k]
+        if c.startswith("test"):
+            for r in sorted(p.name for p in C.RUNS_DIR.glob(f"rev-ctl-{c}-nolab-s*")):
+                z = np.asarray(C.load_state(r)["z_mean"], float)
+                if np.isfinite(z).all():
+                    use["chimeranolab_" + r.rsplit("-", 1)[-1]] = z
+        for nm, z in use.items():
+            if z.shape[0] != X.shape[0]:
+                continue
+            for rs in (default / 4, default / 2, default, default * 2, default * 4):
+                T42.LEIDEN_RESOLUTION = rs
+                cl = T42.leiden_clusters(np.asarray(z, np.float32))
+                xz, fz, uz = T42.pseudobulk(X, species, cl, library, T42.MIN_CELLS_CLUSTER)
+                Ez, nEz, _ = T42.pooled_E(xz, fz, species_list, X.shape[1])
+                key = f"{nm}__r{rs:g}"
+                res[key] = T42.residualise(pd.Series(Ez, index=g.index), cov).to_numpy()
+                tab = pd.crosstab(cl, species)
+                shared = (tab >= T42.MIN_CELLS_CLUSTER).sum(1).ge(2)
+                meta.append(dict(cohort=c, latent=nm, res=rs, n_clusters=len(tab), n_shared=int(shared.sum()), cells_in_shared=float(tab[shared].sum().sum() / tab.sum().sum()), defined=float(np.isfinite(Ez).mean())))
+                print(c, key, meta[-1]["n_shared"], flush=True)
+        T42.LEIDEN_RESOLUTION = default
+        if c == "test_hmac":
+            lab = a.obs["cell_type"].astype(str).to_numpy()
+            xz, fz, uz = T42.pseudobulk(X, species, lab, library, T42.MIN_CELLS_TYPE)
+            Ez, nEz, _ = T42.pooled_E(xz, fz, species_list, X.shape[1])
+            res["direct_fine_labels"] = T42.residualise(pd.Series(Ez, index=g.index), cov).to_numpy()
+        res.to_parquet(f)
+        pd.DataFrame(meta).to_csv(OUT / f"b1z_sweep_meta__{c}.csv", index=False)
+
+
+def b1z_sweep_tests():
+    rows = []
+    for c, gold in (("liv_hmouse", "G_H3"), ("liv_4sp", "G_H3"), ("test_3sp", "G_H4"), ("test_hmouse", "G_H4"), ("test_hmac", "G_H4")):
+        f = OUT / f"b1z_sweep__{c}.parquet"
+        if not f.exists():
+            continue
+        z = pd.read_parquet(f)
+        src = "test_hmouse" if c == "test_hmac" else c
+        gg = K.genes(c)
+        if gold not in gg:
+            ref = K.genes(src)[["hsapiens_gene_id", gold, "H4_nsp", "tau_shared", "block"]].drop_duplicates("hsapiens_gene_id")
+            gg = gg.merge(ref, on="hsapiens_gene_id", how="left")
+        g = gg.merge(z, on="hsapiens_gene_id")
+        keys = [k for k in z.columns if k != "hsapiens_gene_id"]
+        covs = K.CPAT + (["H4_nsp"] if gold == "G_H4" else [])
+        for half in ("odd", "even"):
+            base = g[(g.half == half) & g[[gold, "block"] + covs].notna().all(1)]
+            for k in keys:
+                T = base[base[k].notna()]
+                if len(T) < 100:
+                    rows.append(dict(cohort=c, half=half, key=k, n=len(T), rho_p=np.nan))
+                    continue
+                r = K.scan(T, gold, [k], covs, seed=K.useed(c, half, k), draws=300).iloc[0]
+                rows.append(dict(cohort=c, half=half, key=k, n=len(T), rho_p=r.rho_p, lo=r.ci_lo, hi=r.ci_hi))
+            # common genes across every default-resolution latent that exists
+            dk = [k for k in keys if k.endswith("__r1") or k == "direct_fine_labels"]
+            alive = [k for k in dk if base[k].notna().mean() > .3]
+            T = base[base[alive].notna().all(1)]
+            if len(T) > 100 and alive:
+                ref = [k for k in alive if k.startswith("chimera_")][0]
+                r = K.scan(T, gold, alive, covs, seed=K.useed(c, half, "common"), delta_to=ref, draws=1000)
+                r["cohort"], r["half"], r["universe"] = c, half, "common"
+                rows.append(r)
+    pd.DataFrame(rows).to_csv(OUT / "b1z_sweep_rho.csv", index=False)
+
+
 def clusters():
     rows = []
     for c in ("liv_hmouse", "liv_4sp", "test_3sp"):
@@ -521,5 +609,5 @@ if __name__ == "__main__":
     p.add_argument("section")
     p.add_argument("--cohort", default=None)
     a = p.parse_args()
-    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, clusters=clusters)[a.section]
+    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, b1z_sweep=b1z_sweep, b1z_sweep_tests=b1z_sweep_tests, clusters=clusters)[a.section]
     fn((a.cohort,)) if a.cohort else fn()
