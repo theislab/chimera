@@ -459,6 +459,163 @@ def sec_I(D, CNT):
     print(t.assign(v=t.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="name", columns="gold", values="v").to_string(), flush=True)
 
 
+def model_split(D) -> dict:
+    """Pm, Lm per tissue x gene: ppass x human and mouse rows of the split forward pass, mean over the tissue's seeds; masked genes 0. Per-seed tables kept."""
+    pm, lm, seedP = {}, {}, {}
+    fwS = pd.read_parquet(MAT / "raw_S_fw.parquet")
+    checks = []
+    for t in ORDER:
+        tb = Y.tissue_table(t)
+        tb = tb[tb["hsapiens_gene_id"].notna()]
+        ps, ls = {}, {}
+        for s_ in Y.TISSUES[t]["runs"]:
+            z = np.load(Y.FW / f"split_{t}_s{s_}.npz")
+            spn = [str(x) for x in z["species"]]
+            hi = [i for i, x in enumerate(spn) if x.lower() in ("human", "mouse")]
+            ns = np.asarray(z["n_species"], float)
+            gs = z["g_species"]
+            P_ = sum(z["Pg"][gs == i].sum(0) / ns[i] for i in hi) / 2
+            L_ = sum(z["Lg"][gs == i].sum(0) / ns[i] for i in hi) / 2
+            fi = pd.Series(np.arange(len(z["var_names"])), index=z["var_names"].astype(str)).reindex(tb["var_name"]).to_numpy()
+            w = tb["ppass"].to_numpy(float) * (~tb["masked"].to_numpy(bool))
+            ps[f"s{s_}"], ls[f"s{s_}"] = w * P_[fi], w * L_[fi]
+        P_m, L_m = pd.DataFrame(ps, index=tb["hsapiens_gene_id"]), pd.DataFrame(ls, index=tb["hsapiens_gene_id"])
+        pm[t], lm[t], seedP[t] = P_m.mean(axis=1), L_m.mean(axis=1), P_m
+        s42 = (P_m["s42"] + L_m["s42"]).reindex(fwS.index)
+        ok = fwS[t].notna() & s42.notna()
+        sup = D.sup[t]
+        dp = pd.read_parquet(MAT / "raw_Sdir_pattern.parquet")[t]
+        dl = pd.read_parquet(MAT / "raw_Sdir_level.parquet")[t]
+        checks.append(dict(tissue=t, closure_max=float(np.abs(s42[ok] - fwS.loc[ok, t] - (s42[ok] - fwS.loc[ok, t]).median()).max()), closure_r=float(np.corrcoef(s42[ok], fwS.loc[ok, t])[0, 1]),
+                           rho_Pm_direct_pattern=float(pd.concat([pm[t].reindex(sup[sup].index), dp.reindex(sup[sup].index)], axis=1).corr(method="spearman").iloc[0, 1]),
+                           rho_Lm_direct_level=float(pd.concat([lm[t].reindex(sup[sup].index), dl.reindex(sup[sup].index)], axis=1).corr(method="spearman").iloc[0, 1]),
+                           rho_Pm_S=float(pd.concat([pm[t].reindex(sup[sup].index), D.raw["S"][t].reindex(sup[sup].index)], axis=1).corr(method="spearman").iloc[0, 1]),
+                           rho_Pm_B1=float(pd.concat([pm[t].reindex(sup[sup].index), D.raw["B1"][t].reindex(sup[sup].index)], axis=1).corr(method="spearman").iloc[0, 1])))
+    D.raw["Pm"], D.raw["Lm"] = pd.DataFrame(pm).reindex(fwS.index), pd.DataFrame(lm).reindex(fwS.index)
+    return dict(checks=pd.DataFrame(checks), seedP=seedP)
+
+
+def sec_J(D, CNT):
+    sp_ = model_split(D)
+    sp_["checks"].to_csv(OUT / "J_checks.csv", index=False)
+    print(sp_["checks"].round(3).to_string(), flush=True)
+    D.raw["Dp"] = pd.read_parquet(MAT / "raw_Sdir_pattern.parquet")
+    golds = {**CT.GOLDS, **NEW}
+    own, dl, sd = [], [], []
+    for gold, T in golds.items():
+        col = f"G_{gold}"
+        g = D.gold[col].dropna().index
+        m = D.sup.reindex(g)[[T]].astype(bool).all(axis=1) & D.raw["B1"].reindex(g)[T].notna()
+        g = m[m].index
+        g = D.cov_T(T, g)[PAT].dropna().index
+        if col == "G_testis":
+            g = g[D.gold["H4_nsp"].reindex(g).notna()]
+        ex = pd.DataFrame({k: D.raw[k][T].reindex(g) for k in ("S", "Pm", "Lm", "Dp", "B1", "Sdir")})
+        Z = CT.design_T(D, T, g, PAT, col)
+        nm, e_, d_ = CT.rho_table(D, col, g, {k: ex[k] for k in ex}, Z, CNT)
+        ix = {n: i for i, n in enumerate(nm)}
+        for n in nm:
+            own.append(CT.summarise(n, e_[ix[n]], d_[:, ix[n]], gold=gold, kind="own", n_genes=len(g)))
+        for a, b in (("Pm", "S"), ("Pm", "B1"), ("Pm", "Dp"), ("S", "B1")):
+            own.append(CT.summarise(f"{a}-{b}", e_[ix[a]] - e_[ix[b]], d_[:, ix[a]] - d_[:, ix[b]], gold=gold, kind="diff", n_genes=len(g)))
+        for nm_, x, cond in (("Pm | B1", "Pm", ["B1"]), ("B1 | Pm", "B1", ["Pm"]), ("Pm | direct pattern", "Pm", ["Dp"]), ("direct pattern | Pm", "Dp", ["Pm"]), ("Pm | B1, direct pattern", "Pm", ["B1", "Dp"]),
+                             ("Lm | Pm", "Lm", ["Pm"]), ("S | Pm", "S", ["Pm"])):
+            Zc = CT.design_T(D, T, g, PAT, col, ex[cond])
+            _, ee, dd = CT.rho_table(D, col, g, {x: ex[x]}, Zc, CNT)
+            own.append(CT.summarise(nm_, ee[0], dd[:, 0], gold=gold, kind="incr", n_genes=len(g)))
+        sm = sp_["seedP"][T]
+        vals = [CT.rho_table(D, col, g, {"x": sm[c].reindex(g)}, Z, CNT[:2])[1][0] for c in sm.columns]
+        own.append(dict(name="Pm per seed", gold=gold, kind="seed", est=float(np.mean(vals)), lo=float(np.min(vals)), hi=float(np.max(vals)), n_genes=len(g)))
+        # tissue-matched: all-six universe (matched variability beside), pairwise mean
+        for tag in ("all_six", "matched_variability"):
+            g6 = CT.universe(D, T, col)
+            exv = None
+            if tag == "matched_variability":
+                at = atlas_cols(gold)
+                g6 = g6[D.gold[at].reindex(g6).notna().all(axis=1) & D.cov["amp"][T].reindex(g6).notna().to_numpy()]
+                exv = D.gold[at].reindex(g6).assign(amp_T=D.cov["amp"][T].reindex(g6))
+            Z6 = CT.design_T(D, T, g6, PAT, col, exv)
+            sc = ["S", "Pm", "B1", "Dp"]
+            n6, e6, d6 = CT.rho_table(D, col, g6, CT.source_columns(D, g6, sc), Z6, CNT)
+            r_, dd_ = CT.contrast(n6, e6, d6, sc, T)
+            for x in r_:
+                x.update(gold=gold, n_genes=len(g6), universe=tag)
+                dl.append(x)
+            for a, b in (("Pm", "S"), ("Pm", "B1"), ("Pm", "Dp")):
+                dl.append(CT.summarise(f"Delta({a})-Delta({b})", dd_[a][0] - dd_[b][0], dd_[a][1] - dd_[b][1], score=f"{a}-{b}", gold=gold, n_genes=len(g6), universe=tag))
+        o_, oD = {k: [] for k in ("S", "Pm", "B1", "Dp")}, {k: [] for k in ("S", "Pm", "B1", "Dp")}
+        for t in ORDER:
+            if t == T:
+                continue
+            gg = D.gold[col].dropna().index
+            mm = D.sup.reindex(gg)[[T, t]].astype(bool).all(axis=1) & D.raw["B1"].reindex(gg)[[T, t]].notna().all(axis=1)
+            gg = mm[mm].index
+            gg = D.cov_T(T, gg)[PAT].dropna().index
+            if col == "G_testis":
+                gg = gg[D.gold["H4_nsp"].reindex(gg).notna()]
+            Zp = CT.design_T(D, T, gg, PAT, col)
+            nmp, ep, dp = CT.rho_table(D, col, gg, {f"{sc_}|{x_}": D.raw[sc_][x_].reindex(gg) for sc_ in o_ for x_ in (T, t)}, Zp, CNT)
+            ipx = {n: i for i, n in enumerate(nmp)}
+            for sc_ in o_:
+                o_[sc_].append(ep[ipx[f"{sc_}|{T}"]] - ep[ipx[f"{sc_}|{t}"]])
+                oD[sc_].append(dp[:, ipx[f"{sc_}|{T}"]] - dp[:, ipx[f"{sc_}|{t}"]])
+        mv = {k: (float(np.mean(o_[k])), np.mean(oD[k], axis=0)) for k in o_}
+        for k in mv:
+            dl.append(CT.summarise(f"Delta({k})", mv[k][0], mv[k][1], score=k, gold=gold, universe="pairwise"))
+        for a, b in (("Pm", "S"), ("Pm", "B1"), ("Pm", "Dp")):
+            dl.append(CT.summarise(f"Delta({a})-Delta({b})", mv[a][0] - mv[b][0], mv[a][1] - mv[b][1], score=f"{a}-{b}", gold=gold, universe="pairwise"))
+    ot = pd.DataFrame(own)
+    ot.to_csv(OUT / "J_own.csv", index=False)
+    print(ot.assign(v=ot.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="name", columns="gold", values="v").to_string(), ot.groupby("gold").n_genes.first().to_dict(), flush=True)
+    dt = pd.DataFrame(dl)
+    dt.to_csv(OUT / "J_delta.csv", index=False)
+    print(dt.assign(v=dt.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot_table(index=["gold", "universe"], columns="score", values="v", aggfunc="first").to_string(), flush=True)
+    # within gene, C and matched variability, S, Pm, B1
+    wr = []
+    G4 = [("liver", "liver"), ("testis", "testis"), ("kidney_fine", "kidney"), ("islet_noacinar", "islet")]
+    G0 = [("liver", "liver"), ("testis", "testis"), ("kidney", "kidney"), ("pancreas", "islet")]
+    for tag, Gs in (("primary", G0), ("fine", G4)):
+        for matched in (False, True):
+            for (g1, T1), (g2, T2) in itertools.combinations(Gs, 2):
+                c1, c2 = f"G_{g1}", f"G_{g2}"
+                g = D.gold[[c1, c2]].dropna().index
+                m = D.sup.reindex(g)[[T1, T2]].astype(bool).all(axis=1) & D.raw["B1"].reindex(g)[[T1, T2]].notna().all(axis=1)
+                g = m[m].index
+                g = D.cov_T(T1, g)[PAT + ["amp"]].dropna().index.intersection(D.cov_T(T2, g)[PAT + ["amp"]].dropna().index)
+                if "G_testis" in (c1, c2):
+                    g = g[D.gold["H4_nsp"].reindex(g).notna()]
+                a1, a2 = (atlas_cols(g1), atlas_cols(g2)) if matched else (None, None)
+                if matched:
+                    g = g[D.gold[a1 + a2].reindex(g).notna().all(axis=1)]
+                zT = lambda y, T, c, at: z_gold_or_score(D, y, g, T, c, PAT, at)  # noqa: E731
+                dG = zT(D.gold[c1], T1, c1, a1) - zT(D.gold[c2], T2, c2, a2)
+                dd = {sc: zT(D.raw[sc][T1], T1, c1, a1) - zT(D.raw[sc][T2], T2, c2, a2) for sc in ("S", "Pm", "B1", "Dp")}
+                A = np.column_stack([dG] + list(dd.values()))
+                est = wcorr(A, np.ones(len(g)))
+                dr = np.stack([wcorr(A, CT.weights(D, g, c) + 1e-12) for c in CNT])
+                for i, n in enumerate(dd):
+                    wr.append(CT.summarise(f"{g1} vs {g2}", est[i], dr[:, i], score=n, set=tag, matched=matched, n_genes=len(g)))
+                wr.append(CT.summarise(f"{g1} vs {g2}", est[1] - est[2], dr[:, 1] - dr[:, 2], score="Pm-B1", set=tag, matched=matched, n_genes=len(g)))
+                wr.append(CT.summarise(f"{g1} vs {g2}", est[1] - est[0], dr[:, 1] - dr[:, 0], score="Pm-S", set=tag, matched=matched, n_genes=len(g)))
+    wt = pd.DataFrame(wr)
+    wt.to_csv(OUT / "J_within.csv", index=False)
+    print(wt.assign(v=wt.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot_table(index=["set", "matched", "name"], columns="score", values="v", aggfunc="first").to_string(), flush=True)
+    # gene share of the split, complete cases
+    sup = pd.read_parquet(MAT / "support.parquet")
+    b1 = pd.read_parquet(MAT / "raw_B1.parquet")
+    cc = sup.all(axis=1) & b1.notna().all(axis=1)
+    genes = cc[cc].index
+    cov = {c: pd.read_parquet(MAT / f"cov_{c}.parquet") for c in ("expr", "det", "tau")}
+    vs = []
+    for dn, cols in (("ED", ["expr", "det"]), ("EDtau", ["expr", "det", "tau"])):
+        for sc in ("Pm", "Lm"):
+            Z = pd.DataFrame({t: P.z_on(D.raw[sc][t].reindex(genes), pd.DataFrame({c: cov[c][t] for c in cols}).reindex(genes), cols) for t in ORDER})
+            pr = [np.corrcoef(Z[a], Z[b])[0, 1] for a, b in itertools.combinations(ORDER, 2)]
+            vs.append(dict(score=sc, design=dn, n=len(genes), gene_share=float(np.mean(pr))))
+    pd.DataFrame(vs).to_csv(OUT / "J_gene_share.csv", index=False)
+    print(pd.DataFrame(vs).round(3).to_string(), flush=True)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--sections", default="A,B,C,D,E,F,G")
@@ -467,7 +624,7 @@ def main():
     D = data()
     D.sup = D.sup.astype(bool)
     CNT = CT.block_counts(D, RU.N_DRAWS, RU.SEED)
-    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G, H=sec_H, I=sec_I)
+    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G, H=sec_H, I=sec_I, J=sec_J)
     for s in a.sections.split(","):
         print("==", s, flush=True)
         fn[s](D, CNT)
