@@ -87,23 +87,29 @@ def b1z_seeds():
     pd.DataFrame(rows).to_csv(K.OUT / "F3/b1z_seeds.csv", index=False)
 
 
+def table_for(var_names) -> pd.DataFrame:
+    """Ortholog rows in model gene order; ortho_N is ortholog_group_id N of this cohort's table."""
+    t = gene_ids.load_table("liver").reindex([int(v.split("_")[1]) for v in var_names]).copy()
+    t["var_name"] = list(var_names)
+    return t
+
+
 def external_counts(var_table: pd.DataFrame):
     """TS (10x 3' v3) and TMS hepatocytes in the model's gene order; missing genes are zero, and counted."""
     import anndata as ad
     ts = ad.read_h5ad(K.REPO / "data/revision/gold/G2/ts_liver.h5ad")
     m = (ts.obs.assay.astype(str) == "10x 3' v3") & (ts.obs.free_annotation.astype(str) == "hepatocyte")
     t = ts[m.to_numpy()]
-    X1 = sp.csr_matrix(t.raw[:, :].X).astype(np.float32)
+    X1 = sp.csc_matrix(t.raw[:, :].X).astype(np.float32)
     pos = pd.Index(t.raw.var_names).get_indexer(var_table.hsapiens_gene_id)
     tms = ad.read_h5ad(K.REPO / "data/revision/gold/G3/tms_liver_10x.h5ad")
     fa = tms.obs.free_annotation.astype(str)
     m2 = fa.str.startswith("Hepatocyte")
     u = tms[m2.to_numpy()]
-    X2 = sp.csr_matrix(u.raw[:, :].X).astype(np.float32)
+    X2 = sp.csc_matrix(u.raw[:, :].X).astype(np.float32)
     pos2 = pd.Index(u.raw.var_names).get_indexer(var_table.mmusculus_gene_id)
     def take(X, p):
         ok = p >= 0
-        out = sp.lil_matrix((X.shape[0], len(p)), dtype=np.float32).tocsc()
         return sp.hstack([X[:, q] if q >= 0 else sp.csr_matrix((X.shape[0], 1), dtype=np.float32) for q in p]).tocsr(), float(ok.mean())
     A1, f1 = take(X1, pos)
     A2, f2 = take(X2, pos2)
@@ -118,7 +124,7 @@ def encode(which: str, seed: int):
         return
     c = "liv_hmouse"
     a = C.read_adata(c)
-    tb = gene_ids.load_table("liver").reindex(a.var_names)
+    tb = table_for(a.var_names)
     A1, A2, o1, o2, f1, f2 = external_counts(tb)
     if which == "chimera":
         sys.path.insert(0, str(K.REPO / "revision/tasks/T2_5_celltype_margin"))
@@ -152,10 +158,10 @@ def encode(which: str, seed: int):
 
 def t31b():
     a = C.read_adata("liv_hmouse", backed=True)
-    tb = gene_ids.load_table("liver").reindex(a.var_names)
+    tb = table_for(a.var_names)
     a.file.close()
     A1, A2, o1, o2, f1, f2 = external_counts(tb)
-    g = K.genes("liv_hmouse").set_index("var_name").reindex(tb.index)
+    g = K.genes("liv_hmouse").set_index("var_name").reindex(tb.var_name)
     sym = g.symbol.astype(str).to_numpy()
     chrom = g.chrom.astype(str).to_numpy()
     fa = o2.free_annotation.astype(str).to_numpy()
