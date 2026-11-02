@@ -351,6 +351,55 @@ def sec_G(D, CNT):
     print(t.sort_values("p").head(25).round(3).to_string(), flush=True)
 
 
+def sec_H(D, CNT):
+    """Added after A-G were read: S against B1 and against Sdir, jointly, in the larger pairwise universes, every gold."""
+    rows, inc = [], []
+    golds = {**CT.GOLDS, **NEW}
+    for gold, T in golds.items():
+        col = f"G_{gold}"
+        own, ownD = {k: [] for k in ("S", "B1", "Sdir")}, {k: [] for k in ("S", "B1", "Sdir")}
+        for t in ORDER:
+            if t == T:
+                continue
+            g = D.gold[col].dropna().index
+            m = D.sup.reindex(g)[[T, t]].astype(bool).all(axis=1) & D.raw["B1"].reindex(g)[[T, t]].notna().all(axis=1)
+            g = m[m].index
+            g = D.cov_T(T, g)[PAT].dropna().index
+            if col == "G_testis":
+                g = g[D.gold["H4_nsp"].reindex(g).notna()]
+            Z = CT.design_T(D, T, g, PAT, col)
+            cols = {f"{sc}|{x}": D.raw[sc][x].reindex(g) for sc in own for x in (T, t)}
+            nm, e_, d_ = CT.rho_table(D, col, g, cols, Z, CNT[:2000])
+            ix = {n: i for i, n in enumerate(nm)}
+            for sc in own:
+                own[sc].append(e_[ix[f"{sc}|{T}"]] - e_[ix[f"{sc}|{t}"]])
+                ownD[sc].append(d_[:, ix[f"{sc}|{T}"]] - d_[:, ix[f"{sc}|{t}"]])
+        m_ = {sc: (float(np.mean(own[sc])), np.mean(ownD[sc], axis=0)) for sc in own}
+        for sc in own:
+            rows.append(CT.summarise(f"Delta({sc}) pairwise", m_[sc][0], m_[sc][1], score=sc, gold=gold))
+        for a, b in (("S", "B1"), ("S", "Sdir")):
+            rows.append(CT.summarise(f"Delta({a})-Delta({b}) pairwise", m_[a][0] - m_[b][0], m_[a][1] - m_[b][1], score=f"{a}-{b}", gold=gold))
+        # own-tissue increment on the tissue's support (no requirement in other tissues)
+        g = D.gold[col].dropna().index
+        m = D.sup.reindex(g)[[T]].astype(bool).all(axis=1) & D.raw["B1"].reindex(g)[T].notna()
+        g = m[m].index
+        g = D.cov_T(T, g)[PAT].dropna().index
+        if col == "G_testis":
+            g = g[D.gold["H4_nsp"].reindex(g).notna()]
+        ex = pd.DataFrame(dict(S_T=D.raw["S"][T].reindex(g), B1_T=D.raw["B1"][T].reindex(g), Sdir_T=D.raw["Sdir"][T].reindex(g), D_T=D.raw["D"][T].reindex(g)))
+        for nm_, x, cond in (("S", "S_T", []), ("B1", "B1_T", []), ("Sdir", "Sdir_T", []), ("D", "D_T", []), ("S | B1", "S_T", ["B1_T"]), ("B1 | S", "B1_T", ["S_T"]), ("S | Sdir", "S_T", ["Sdir_T"]),
+                             ("Sdir | S", "Sdir_T", ["S_T"]), ("S | B1, Sdir", "S_T", ["B1_T", "Sdir_T"])):
+            Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
+            _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT[:2000])
+            inc.append(CT.summarise(nm_, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
+    t = pd.DataFrame(rows)
+    t.to_csv(OUT / "H_pairwise_joint.csv", index=False)
+    print(t.assign(v=t.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="gold", columns="score", values="v").to_string(), flush=True)
+    it = pd.DataFrame(inc)
+    it.to_csv(OUT / "H_own_tissue_incremental.csv", index=False)
+    print(it.assign(v=it.apply(lambda x: f"{x.est:.3f} ({x.lo:.3f},{x.hi:.3f})", axis=1)).pivot(index="gold", columns="name", values="v").to_string(), it.groupby("gold").n_genes.first().to_dict(), flush=True)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--sections", default="A,B,C,D,E,F,G")
@@ -359,7 +408,7 @@ def main():
     D = data()
     D.sup = D.sup.astype(bool)
     CNT = CT.block_counts(D, RU.N_DRAWS, RU.SEED)
-    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G)
+    fn = dict(A=sec_A, B=sec_B, C=sec_C, D=sec_D, E=sec_E, F=sec_F, G=sec_G, H=sec_H)
     for s in a.sections.split(","):
         print("==", s, flush=True)
         fn[s](D, CNT)
