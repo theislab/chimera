@@ -28,6 +28,7 @@ labels or their swap), with the fixed-scale prior only, for the H-D4 and H-D1 la
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py [--types pt,...] [--n-cpus 16]
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --perm 0 [--n-cpus 16]
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --perm-task <0..9k-1> --n-chunks k
+    PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --loo <type index>
 """
 
 from __future__ import annotations
@@ -167,6 +168,33 @@ def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int, chunk: int
     (out / f"DONE_{t}_c{chunk}").write_text("ok\n")
 
 
+def run_loo(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int) -> None:
+    """Leave-one-out primary fits (section 8c): each healthy DE-half donor (human), each mouse.
+
+    Fixed-scale prior only. Output ``de/loo/{human,mouse}_loo_<unit>_<type>.tsv`` and ``loo_<type>.tsv``.
+    """
+    out = OUT / "loo"
+    out.mkdir(parents=True, exist_ok=True)
+    jobs = {j[0]: j for j in jobs_for(pb_h, pb_m, t) if j[1] == "primary"}
+    rows = []
+    for species in ("human", "mouse"):
+        _, _, sub, covs = jobs[species]
+        units = sub.obs.loc[sub.obs["condition"] == "control", "unit"] if species == "human" else sub.obs["unit"]
+        for u in sorted(units.astype(str)):
+            s = sub[(sub.obs["unit"].astype(str) != u).to_numpy()].copy()
+            n = s.obs["condition"].value_counts()
+            if n.get("control", 0) < 2 or n.get("disease", 0) < 2:
+                continue
+            safe = u.replace("|", "_").replace(" ", "").replace("'", "")
+            r, design = fit(s, covs, n_cpus, adaptive=False)
+            r.to_csv(out / f"{species}_loo_{safe}_{t}.tsv", sep="\t", index=False)
+            rows.append(dict(cell_type=t, species=species, left_out=u, file=f"{species}_loo_{safe}_{t}.tsv",
+                             design=design, n_units=int(s.n_obs)))
+            pd.DataFrame(rows).to_csv(out / f"loo_{t}.tsv", sep="\t", index=False)
+            log.info("%s %s leave out %s done", t, species, u)
+    (out / f"DONE_{t}").write_text("ok\n")
+
+
 def jobs_for(pb_h: ad.AnnData, pb_m: ad.AnnData, t: str) -> list:
     h, m = pb_h.obs, pb_m.obs
     hde = h["role"].isin(["de_control", "de_disease"])
@@ -195,6 +223,7 @@ def main() -> int:
     p.add_argument("--perm-task", type=int, default=None,
                    help="array task: type = DE_ORDER[task // n_chunks], chunk = task % n_chunks")
     p.add_argument("--n-chunks", type=int, default=1)
+    p.add_argument("--loo", type=int, default=None, help="index into DE_ORDER: leave-one-out primary fits")
     a = p.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     types = pd.read_csv(RES / "gd1k_types.csv")
@@ -205,6 +234,9 @@ def main() -> int:
     pb_m = ad.read_h5ad(DATA / "kidney_pseudobulk_mouse.h5ad")
     if a.perm is not None:
         run_perm(DE_ORDER[a.perm], pb_h, pb_m, a.n_cpus)
+        return 0
+    if a.loo is not None:
+        run_loo(DE_ORDER[a.loo], pb_h, pb_m, a.n_cpus)
         return 0
     if a.perm_task is not None:
         run_perm(DE_ORDER[a.perm_task // a.n_chunks], pb_h, pb_m, a.n_cpus, a.perm_task % a.n_chunks, a.n_chunks)
