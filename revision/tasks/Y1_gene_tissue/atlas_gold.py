@@ -9,7 +9,7 @@ atlases. G = Pearson across the K types of the atlas-centred profiles (T4.3 ``pr
 Also written: atlas covariates (mean log2 CPM, detection, amplitude = SD across types, mean of the two atlases) and cell-half
 reliability (TS kidney has one donor, TS pancreas two usable, so donor halves do not exist; labelled technical).
 
-    PYTHONPATH=<repo> python -m revision.tasks.Y1_gene_tissue.atlas_gold
+    python -I revision/tasks/Y1_gene_tissue/launch.py revision.tasks.Y1_gene_tissue.atlas_gold
 """
 
 from __future__ import annotations
