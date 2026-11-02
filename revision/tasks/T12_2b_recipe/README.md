@@ -16,7 +16,7 @@ those fractions, no S_g, COE, baseline or biology readout was read.
 
 1. Latent collapse and NaN were a scale effect: at 452 steps per epoch every epoch-based
    schedule (KL and FQR warm-ups, adversary start, plateau LR decay) ran 4-6 times more updates
-   than in the canonical cohorts (78-113 steps). A proportional 25k draw of the same cells kept
+   than in the canonical cohorts (29-102 steps). A proportional 25k draw of the same cells kept
    10/10 dims with no NaN in all six diagnostic rows. Build 2 fixes this in the data.
 2. Saturation was not a scale effect: the same 25k draw with the base row still had 22% of genes
    at alpha > 0.95. It is a depth effect: thinning every count to 1/3 (mean species-median

@@ -23,7 +23,7 @@ Steps, in order:
    ``SIZE_REF`` = 28,854 cells, the size of the testis 3-species cohort
    (``data/processed/camex_testis_unified.h5ad``) on which the base recipe and its epoch-based
    schedule (KL and FQR warm-ups at epoch 20, adversary at 5, plateau LR decay) were set.
-   Reason: at 128,328 cells (build 1, 452 steps per epoch against 78-113 in the canonical
+   Reason: at 128,328 cells (build 1, 452 steps per epoch against 29-102 in the canonical
    cohorts) training collapsed the latent or went NaN, and a proportional 25k draw of the same
    cells did not (``ledgers/T12_2b_debug.md`` in chimera-private). One per-type cap also
    keeps any single type from dominating the cohort: after the spleen addition B and T, not
