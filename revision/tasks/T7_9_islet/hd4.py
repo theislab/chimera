@@ -3,16 +3,21 @@
 H-D4 (Family 2), per DE-able type:
   * universe: genes tested in the human T2D vs ND fit and, through an Ensembl Compara 110
     ``ortholog_one2one`` pair (both dumps), in the mouse primary (joint) fit; human symbols;
-  * preranked GSEA on apeglm log2FC, weighted KS (p = 1), 10,000 random gene sets of the same
-    size per set size (gene-set permutation), NES = ES / mean |null ES| of the same sign;
+  * preranked GSEA on fixed-scale apeGLM log2FC (``log2fc_fixed``, prior scale 1) in both species,
+    as T7.3: the adaptive prior collapses the human fits, and a weighted KS on values near zero has
+    no meaning. Weighted KS (p = 1), 10,000 random gene sets of the same size per set size
+    (gene-set permutation), NES = ES / mean |null ES| of the same sign;
   * sets: MSigDB Hallmark 2020 and Reactome 2024 (Enrichr GMT files), 15-500 genes in universe;
   * human p two-sided (same-sign null), BH over sets per type; mouse one-sided in the human
     direction, BH over the human-significant sets of that type;
-  * transfers = human q < 0.05 and mouse oriented q < 0.05.
+  * transfers = human q < 0.05 and mouse oriented q < 0.05; opposite = human q < 0.05 and the mouse
+    one-sided p against the human direction has q < 0.05 (T7.3's call);
+  * gene-set permutation ignores correlation between genes, so these calls are judged against the
+    fits with permuted condition labels (``hd4_null.py``), not on their own.
 
-Anchor (Family 3): A1 = beta Spearman(human log2FC, mouse log2FC) on the H-D1 gene universe
+Anchor (Family 3): A1 = beta Spearman(unshrunk human l^h, shrunken mouse m) on the H-D1 gene universe
 (testis-table 1:1 genes detected in >= 5% of cells of the type in both species' DE units);
-A2 = one-sided Wilcoxon, mouse log2FC of human T2D-up genes (padj < 0.1, log2FC > 0) vs the rest.
+A2 = one-sided Wilcoxon, mouse m of human T2D-up genes (padj < 0.1, l^h > 0) vs the rest.
 Both are also reported for every DE-able type and for the per-model mouse fits.
 
     PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/hd4.py [--n-perm 10000]
@@ -46,6 +51,7 @@ TABLE = ROOT / "data" / "processed" / "ortholog_table_testis.csv"
 MIN_SIZE, MAX_SIZE = 15, 500
 SEED = 20261101
 DET = 0.05
+STRESS = ["FOS", "FOSB", "JUN", "EGR1", "NR4A1", "ATF3", "DUSP1", "HSPA1A"]  # procurement stress, descriptive
 
 
 def read_gmt(path) -> dict:
@@ -135,28 +141,42 @@ def load_type(t: str, contrast: str, o2o: pd.DataFrame):
     return h, m, j
 
 
-def run_type(args):
-    t, sets, n_perm, o2o = args
-    _, _, j = load_type(t, "joint", o2o)
-    rh = pd.Series(j["log2fc_shrunk_h"].to_numpy(), index=j["gene_symbol_h"].to_numpy())
-    rm = pd.Series(j["log2fc_shrunk_m"].to_numpy(), index=j["gene_symbol_h"].to_numpy())
+def call_programs(rh: pd.Series, rm: pd.Series, sets: dict, n_perm: int) -> pd.DataFrame:
+    """GSEA in both species and the section 8b calls, per library, BH over all sets of the type."""
     out = []
-    for lib, s in sets.items():
-        gh = gsea(rh, s, n_perm, SEED).add_prefix("h_").rename(columns={"h_set": "set", "h_size": "size"})
-        gm = gsea(rm, s, n_perm, SEED + 1).add_prefix("m_").rename(columns={"m_set": "set", "m_size": "size"})
+    for lib, st in sets.items():
+        gh = gsea(rh, st, n_perm, SEED).add_prefix("h_").rename(columns={"h_set": "set", "h_size": "size"})
+        gm = gsea(rm, st, n_perm, SEED + 1).add_prefix("m_").rename(columns={"m_set": "set", "m_size": "size"})
         g = gh.merge(gm.drop(columns="size"), on="set")
         g.insert(0, "library", lib)
         out.append(g)
     g = pd.concat(out, ignore_index=True)
-    g.insert(0, "cell_type", t)
     g["h_q"] = multipletests(g["h_p"], method="fdr_bh")[1]
-    g["m_p_oriented"] = np.where(g["h_nes"] >= 0, g["m_p_up"], g["m_p_down"])
+    up = g["h_nes"] >= 0
+    g["m_p_oriented"] = np.where(up, g["m_p_up"], g["m_p_down"])
+    g["m_p_against"] = np.where(up, g["m_p_down"], g["m_p_up"])
     sig = g["h_q"] < 0.05
     g["m_q_oriented"] = np.nan
+    g["m_q_against"] = np.nan
     if sig.any():
         g.loc[sig, "m_q_oriented"] = multipletests(g.loc[sig, "m_p_oriented"], method="fdr_bh")[1]
-    g["transfers"] = sig & (g["m_q_oriented"] < 0.05)
-    g["call"] = np.where(~sig, "human_not_significant", np.where(g["transfers"], "transfers", "does_not_transfer"))
+        g.loc[sig, "m_q_against"] = multipletests(g.loc[sig, "m_p_against"], method="fdr_bh")[1]
+    g["call"] = np.select([~sig, g["m_q_oriented"] < 0.05, g["m_q_against"] < 0.05],
+                          ["human_not_significant", "transfers", "opposite"], default="does_not_transfer")
+    return g
+
+
+def type_universe(t: str, o2o: pd.DataFrame) -> pd.DataFrame:
+    return load_type(t, "joint", o2o)[2]
+
+
+def run_type(args):
+    t, sets, n_perm, o2o, col = args
+    j = type_universe(t, o2o)
+    rh = pd.Series(j[f"{col}_h"].to_numpy(), index=j["gene_symbol_h"].to_numpy()).dropna()
+    rm = pd.Series(j[f"{col}_m"].to_numpy(), index=j["gene_symbol_h"].to_numpy()).dropna()
+    g = call_programs(rh, rm, sets, n_perm)
+    g.insert(0, "cell_type", t)
     return t, g, len(j)
 
 
@@ -168,8 +188,8 @@ def anchor(t: str, o2o: pd.DataFrame, testis: pd.DataFrame) -> list:
         h, m, j = load_type(t, contrast, o2o)
         uni = j[j["human_id"].isin(testis["hsapiens_gene_id"]) & j["mouse_id"].isin(testis["mmusculus_gene_id"])
                 & (j["det_frac_h"] >= DET) & (j["det_frac_m"] >= DET)]
-        rho, prho = spearmanr(uni["log2fc_shrunk_h"], uni["log2fc_shrunk_m"])
-        up = (uni["padj_h"] < 0.1) & (uni["log2fc_shrunk_h"] > 0)
+        rho, prho = spearmanr(uni["log2fc_mle_h"], uni["log2fc_shrunk_m"])
+        up = (uni["padj_h"] < 0.1) & (uni["log2fc_mle_h"] > 0)
         if up.sum() >= 5:
             w = mannwhitneyu(uni.loc[up, "log2fc_shrunk_m"], uni.loc[~up, "log2fc_shrunk_m"], alternative="greater")
             a2 = dict(a2_n_up=int(up.sum()), a2_p=float(w.pvalue),
@@ -196,16 +216,31 @@ def main() -> int:
     an = [r for t in types for r in anchor(t, o2o, testis)]
     pd.DataFrame(an).to_csv(OUT / "anchor.tsv", sep="\t", index=False)
     with ProcessPoolExecutor(max_workers=a.jobs) as ex:
-        res = list(ex.map(run_type, [(t, sets, a.n_perm, o2o) for t in types]))
+        res = list(ex.map(run_type, [(t, sets, a.n_perm, o2o, "log2fc_fixed") for t in types]))
+        sens = {c: list(ex.map(run_type, [(t, sets, 2000, o2o, c) for t in types]))
+                for c in ("log2fc_shrunk", "stat")}
     allg, summ = [], []
     for t, g, n in res:
         allg.append(g)
         summ.append(dict(cell_type=t, n_universe=n, n_sets=len(g), n_human_sig=int((g["h_q"] < 0.05).sum()),
-                         n_transfer=int(g["transfers"].sum()),
+                         lowest_h_q=float(g["h_q"].min()), n_transfer=int((g["call"] == "transfers").sum()),
+                         n_opposite=int((g["call"] == "opposite").sum()),
                          n_not_transfer=int((g["call"] == "does_not_transfer").sum()),
                          nes_spearman_all_sets=float(spearmanr(g["h_nes"], g["m_nes"], nan_policy="omit")[0])))
     pd.concat(allg).to_csv(OUT / "hd4.tsv", sep="\t", index=False)
     pd.DataFrame(summ).to_csv(OUT / "hd4_summary.tsv", sep="\t", index=False)
+    pd.DataFrame([dict(rank_col=c, cell_type=t, n_human_sig=int((g["h_q"] < 0.05).sum()),
+                       n_transfer=int((g["call"] == "transfers").sum()),
+                       n_opposite=int((g["call"] == "opposite").sum()))
+                  for c, rows in sens.items() for t, g, _ in rows]).to_csv(
+        OUT / "hd4_rank_sensitivity.tsv", sep="\t", index=False)
+    stress = []
+    for t in types:
+        h = pd.read_csv(DE / f"human_t2d_vs_nd_{t}.tsv", sep="\t").set_index("gene_symbol")
+        for g in STRESS:
+            if g in h.index:
+                stress.append(dict(cell_type=t, gene=g, log2fc_mle=h.loc[g, "log2fc_mle"], padj=h.loc[g, "padj"]))
+    pd.DataFrame(stress).to_csv(OUT / "stress_genes.tsv", sep="\t", index=False)
     (OUT / "DONE").write_text("ok\n")
     return 0
 

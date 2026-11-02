@@ -10,18 +10,29 @@ Per DE-able type t (``results/revision/T7_9/gd1b_types.csv``), on the DE units o
 * mouse, per model (Family 3): one factor ``group`` = study x condition, so dispersion is shared;
   db/db = dbdb_disease vs dbdb_control, mSTZ = mstz_disease vs mstz_control (1 vs 1, descriptive).
 
-Wald tests; apeglm shrinkage of the tested coefficient (``lfc_shrink``). Mouse fits use only genes
+Wald tests; PyDESeq2's apeGLM prior on the tested coefficient (``lfc_shrink``), twice:
+``log2fc_shrunk`` with the adaptive prior and ``log2fc_fixed`` with prior scale 1 (T7.3). The adaptive
+prior collapses the human fits (92-99.8% of genes at |log2FC| < 0.001 in delta, ductal, endothelial
+and stellate), so l^h is the unshrunk ``log2fc_mle``, m stays adaptive as the plan says, and H-D4
+ranks on ``log2fc_fixed`` in both species. Mouse fits use only genes
 measured in both DE studies (``var['measured_dbdb']`` and ``var['measured_mstz']``; elsewhere the
 atlas pads a gene missing from a study's reference with zeros). Genes with < 10 counts summed over
 the units are not tested. ``det_frac`` = cells with count > 0 / cells, over the units
 used, for section 8b's 5% detection rule.
 
+Permuted labels (``--perm``, for the H-D4 calibration and the section 8b controls): human condition
+labels within sex x chemistry over the 26 DE donors, 20 draws, the same donor labels in every type;
+mouse labels within study, all 11 relabellings other than the true one. Only ``log2fc_fixed`` is
+shrunk there. Written to ``de/perm/``.
+
     PYTHONPATH=<chimera repo> python revision/tasks/T7_9_islet/de.py [--types beta,...] [--n-cpus 16]
+        [--perm]
 """
 
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import logging
 import sys
@@ -45,6 +56,8 @@ RES = ROOT / "results" / "revision" / "T7_9"
 OUT = RES / "de"
 MIN_CELLS_UNIT = 20
 MIN_COUNTS = 10
+N_PERM_HUMAN = 20
+SEED = 20261102
 STUDY = {"db/db": "dbdb", "mSTZ": "mstz", "human48": "human48"}
 
 
@@ -55,7 +68,8 @@ def units_for(pb: ad.AnnData, t: str) -> ad.AnnData:
     return pb[keep.to_numpy()].copy()
 
 
-def fit(sub: ad.AnnData, design: str, factor: str, test: str, ref: str, n_cpus: int) -> pd.DataFrame:
+def fit(sub: ad.AnnData, design: str, factor: str, test: str, ref: str, n_cpus: int,
+        adaptive: bool = True) -> pd.DataFrame:
     counts = pd.DataFrame(np.asarray(sub.X.toarray(), dtype=np.int64), index=sub.obs_names,
                           columns=sub.var_names)
     keep = counts.sum(axis=0) >= MIN_COUNTS
@@ -76,8 +90,18 @@ def fit(sub: ad.AnnData, design: str, factor: str, test: str, ref: str, n_cpus: 
         coeff = [c for c in ds.LFC.columns if c.startswith(factor) and test in c]
         if len(coeff) != 1:
             raise RuntimeError(f"coefficient for {factor}={test} not unique: {list(ds.LFC.columns)}")
-        ds.lfc_shrink(coeff=coeff[0])
-    res = ds.results_df.rename(columns={"log2FoldChange": "log2fc_shrunk", "lfcSE": "lfcse_shrunk"})
+        # lfc_shrink edits the LFC table in place, so each prior needs its own DeseqStats
+        ds2 = DeseqStats(dds, contrast=[factor, test, ref], inference=inf, quiet=True)
+        ds2.summary()
+        ds2.lfc_shrink(coeff=coeff[0], adapt=False)
+        if adaptive:
+            ds.lfc_shrink(coeff=coeff[0])
+    if adaptive:
+        res = ds.results_df.rename(columns={"log2FoldChange": "log2fc_shrunk", "lfcSE": "lfcse_shrunk"})
+    else:
+        res = mle[["baseMean"]].copy()
+    res["log2fc_fixed"] = ds2.results_df["log2FoldChange"]
+    res["lfcse_fixed"] = ds2.results_df["lfcSE"]
     res["log2fc_mle"] = mle["log2FoldChange"]
     res["lfcse_mle"] = mle["lfcSE"]
     res["stat"] = mle["stat"]
@@ -90,10 +114,64 @@ def fit(sub: ad.AnnData, design: str, factor: str, test: str, ref: str, n_cpus: 
     return res.reset_index()
 
 
+def human_label_draws(obs: pd.DataFrame) -> list:
+    """Per draw, donor -> condition, permuted within sex x chemistry over all DE donors."""
+    d = obs[obs["role"].isin(["de_control", "de_disease"])].drop_duplicates("donor").set_index("donor")
+    d = d[["sex", "chemistry", "condition"]].astype(str).sort_index()
+    rng = np.random.default_rng(SEED)
+    draws = []
+    for _ in range(N_PERM_HUMAN):
+        lab = d["condition"].copy()
+        for _, g in d.groupby(["sex", "chemistry"], sort=True):
+            lab[g.index] = rng.permutation(g["condition"].to_numpy())
+        draws.append(lab.to_dict())
+    return draws
+
+
+def mouse_label_draws(obs: pd.DataFrame) -> list:
+    """All within-study relabellings that keep each study's arm sizes, except the true labels."""
+    d = obs[obs["role"].isin(["de_control", "de_disease"])].drop_duplicates("sample").set_index("sample")
+    d = d[["study", "condition"]].astype(str).sort_index()
+    per = []
+    for _, g in d.groupby("study", sort=True):
+        k = int((g["condition"] == "disease").sum())
+        per.append([{u: ("disease" if u in c else "control") for u in g.index}
+                    for c in itertools.combinations(g.index, k)])
+    true = d["condition"].to_dict()
+    return [m for m in ({**a, **b} for a, b in itertools.product(*per)) if m != true]
+
+
+def run_perm(pb_h: ad.AnnData, pb_m: ad.AnnData, types: list, n_cpus: int) -> None:
+    out = OUT / "perm"
+    out.mkdir(parents=True, exist_ok=True)
+    hd, md = human_label_draws(pb_h.obs), mouse_label_draws(pb_m.obs)
+    pd.DataFrame(hd).assign(kind="human").to_csv(out / "labels_human.tsv", sep="\t", index_label="draw")
+    pd.DataFrame(md).assign(kind="mouse").to_csv(out / "labels_mouse.tsv", sep="\t", index_label="draw")
+    for t in types:
+        for species, draws, base, key, design in (
+                ("human", hd, units_for(pb_h, t), "donor", "~ sex + chemistry + condition"),
+                ("mouse", md, units_for(pb_m, t), "sample", "~ study + condition")):
+            for i, lab in enumerate(draws):
+                path = out / f"{species}_{i:02d}_{t}.tsv"
+                if path.exists():
+                    continue
+                sub = base.copy()
+                sub.obs["condition"] = sub.obs[key].astype(str).map(lab).to_numpy()
+                if sub.obs["condition"].nunique() < 2:
+                    continue
+                r = fit(sub, design, "condition", "disease", "control", n_cpus, adaptive=False)
+                tmp = path.with_name(path.name + ".tmp")
+                r.to_csv(tmp, sep="\t", index=False)
+                tmp.replace(path)
+                log.info("perm %s", path.name)
+    (out / f"DONE_{'_'.join(types)}").write_text("ok\n")
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--types", default=None)
     p.add_argument("--n-cpus", type=int, default=16)
+    p.add_argument("--perm", action="store_true")
     a = p.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     types = pd.read_csv(RES / "gd1b_types.csv")
@@ -106,6 +184,9 @@ def main() -> int:
     pb_h.obs["chemistry"] = pb_h.obs["assay"].astype(str).map({"10x 3' v2": "v2", "10x 3' v3": "v3"})
     pb_m.obs["study"] = pb_m.obs["study"].astype(str).map(STUDY)
     pb_m.obs["group"] = pb_m.obs["study"] + "_" + pb_m.obs["condition"].astype(str)
+    if a.perm:
+        run_perm(pb_h, pb_m, de_types, a.n_cpus)
+        return 0
     summary = []
     for t in de_types:
         hs = units_for(pb_h, t)
