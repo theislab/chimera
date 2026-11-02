@@ -81,7 +81,7 @@ def main():
     cells, failed = load_cells()
     failed.to_csv(RU.RES / "failed_runs.csv", index=False)
     cells.to_parquet(RU.RES / "per_cell.parquet")
-    cells["effect"] = cells["effect"].astype(str)
+    cells["effect"] = cells["effect"].astype(float).map(lambda v: f"{v:g}")
     out = []
     cache: dict = {}
     # settings: full cells and all marginals over cohort, effect, band, share

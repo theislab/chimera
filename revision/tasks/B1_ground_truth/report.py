@@ -13,7 +13,7 @@ from revision.tasks.B1_ground_truth.figures import ORDER, parse
 pd.set_option("display.width", 220)
 pd.set_option("display.max_columns", 40)
 pd.set_option("display.max_rows", 200)
-TOP = {"pattern": "1.0", "level": "8", "loss": "1.0"}
+TOP = {"pattern": "1", "level": "8", "loss": "1"}
 
 
 def main():

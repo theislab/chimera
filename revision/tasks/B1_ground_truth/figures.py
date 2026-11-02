@@ -119,7 +119,7 @@ def fig_low(t):
     tasks = ["level", "pattern", "loss"]
     fig, ax = plt.subplots(2, 3, figsize=(7.2, 3.8), sharex=True, constrained_layout=True)
     for j, task in enumerate(tasks):
-        top = {"level": 8, "pattern": 1.0, "loss": 1.0}[task]
+        top = {"level": 8, "pattern": 1, "loss": 1}[task]
         d = t[(t.task == task) & (t.effect == str(top)) & (t.share == "all") & (t.identity == "all") & (t.cohort == "all")]
         for m in ("S_g", "S_fwd", "Delta_alpha", "Sdir", "B1"):
             s = d[(d.metric == "power_05") & (d.method == m)].set_index("band").reindex(RU.BANDS)
@@ -160,7 +160,7 @@ def fig_share(t):
     fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.3), sharey=True, constrained_layout=True)
     for j, c in enumerate(COH):
         d = t[(t.task == "level") & (t.cohort == c) & (t.metric == "AUROC") & (t.effect == "8") & (t.band == "all") & (t.identity == "all") & (t.share != "all")]
-        d2 = t[(t.task == "pattern") & (t.cohort == c) & (t.metric == "AUROC") & (t.effect == "1.0") & (t.band == "all") & (t.identity == "all") & (t.share != "all")]
+        d2 = t[(t.task == "pattern") & (t.cohort == c) & (t.metric == "AUROC") & (t.effect == "1") & (t.band == "all") & (t.identity == "all") & (t.share != "all")]
         for m in ("S_g", "Delta_alpha", "B1"):
             for dd, ls, l in ((d, "-", "level 8"), (d2, ":", "pattern 1")):
                 s = dd[dd.method == m].assign(x=lambda x: x.share.astype(float)).sort_values("x")
@@ -245,9 +245,9 @@ def fig_trackd():
 def main():
     setup()
     t = parse(pd.read_csv(RU.RES / "B1_tidy.csv", dtype={"setting": str}))
-    fig_task(t, "pattern", [0.25, 0.5, 1.0], "1.0")
+    fig_task(t, "pattern", [0.25, 0.5, 1.0], "1")
     fig_task(t, "level", [2, 4, 8], "8")
-    fig_task(t, "loss", [0.5, 0.9, 1.0], "1.0")
+    fig_task(t, "loss", [0.5, 0.9, 1.0], "1")
     fig_low(t)
     fig_nulls(t)
     fig_share(t)
