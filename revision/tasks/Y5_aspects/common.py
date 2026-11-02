@@ -32,6 +32,9 @@ def scan(T: pd.DataFrame, x: str, ys: list[str], covs: list[str], draws: int = R
     sd = np.nanstd(B, axis=0)
     out = []
     for k, y in enumerate(ys):
+        if not np.isfinite(B[:, k]).any():
+            out.append(dict(x=x, y=y, rho_p=np.nan, ci_lo=np.nan, ci_hi=np.nan, p=np.nan, n=len(T), covs="+".join(covs)))
+            continue
         lo, hi = ST.pct_ci(B[:, k])
         p = float(2 * norm.sf(abs(est[k]) / sd[k])) if sd[k] > 0 else 1.0
         r = dict(x=x, y=y, rho_p=float(est[k]), ci_lo=lo, ci_hi=hi, p=p, n=len(T), covs="+".join(covs))

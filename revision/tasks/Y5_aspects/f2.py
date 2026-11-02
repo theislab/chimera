@@ -151,12 +151,12 @@ def programs():
     g["dS"] = g["Csp_Mouse"] - g["Csp_Monkey"]
     pe = pd.read_parquet(X7 / "baselines" / "liv_4sp__pair_E.parquet")
     print(pe.columns.tolist()[:10], flush=True)
-    g = g.merge(pe, on="var_name", how="left") if "var_name" in pe else g
+    g = g.merge(pe.drop(columns=[k for k in pe.columns if k in g.columns and k != "var_name"]), on="var_name", how="left") if "var_name" in pe else g
     T["liver"] = g
     g = table("test_3sp")
     g["dS"] = g["Csp_Mouse"] - g["Csp_Macaque"]
     pe = pd.read_parquet(X7 / "baselines" / "test_3sp__pair_E.parquet")
-    g = g.merge(pe, on="var_name", how="left") if "var_name" in pe else g
+    g = g.merge(pe.drop(columns=[k for k in pe.columns if k in g.columns and k != "var_name"]), on="var_name", how="left") if "var_name" in pe else g
     T["testis"] = g
     a = pd.read_parquet(K.REPO / "results/revision/T11/readout/genes_hmouse.parquet")
     b = pd.read_parquet(K.REPO / "results/revision/T11/readout/genes_hmmul.parquet")

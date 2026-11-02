@@ -21,8 +21,8 @@ def contrast_table(c):
 def f5():
     OUT.mkdir(parents=True, exist_ok=True)
     rows, within_rows = [], []
-    h3 = pd.read_parquet(X7 / "golds" / "h3_gene_type.parquet")
-    mu = pd.read_parquet(X7 / "golds" / "murat_gene_type.parquet")
+    h3 = pd.read_parquet(X7 / "golds" / "h3_gene_type.parquet").reset_index()
+    mu = pd.read_parquet(X7 / "golds" / "murat_gene_type.parquet").reset_index()
     for c in ("liv_4sp", "test_3sp", "liv_hmouse", "test_hmouse"):
         S, names = contrast_table(c)
         g = K.genes(c)
@@ -34,6 +34,8 @@ def f5():
             coarse.setdefault((s, lab(l)), []).append(f"{s}|{l}")
         M = pd.DataFrame({f"{s}|{k}": S[v].mean(1) for (s, k), v in coarse.items()})
         direct = pd.read_parquet(X7 / "baselines" / f"{c}__gene_type_direct.parquet")
+        if "hsapiens_gene_id" not in direct.columns and direct.index.name:
+            direct = direct.reset_index()
         print(c, direct.columns.tolist()[:12], flush=True)
         types = sorted({k for (s, k) in coarse})
         gm = g.set_index("var_name")
