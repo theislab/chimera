@@ -3,7 +3,7 @@
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
+#SBATCH --mem=12G
 #SBATCH --time=03:00:00
 #SBATCH --output=results/revision/Z2/logs/%x_%A_%a.out
 source revision/slurm/_body.sh

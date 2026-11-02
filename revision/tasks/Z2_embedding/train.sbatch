@@ -3,10 +3,10 @@
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=24G
+#SBATCH --mem=2G
 #SBATCH --time=06:00:00
 #SBATCH --output=results/revision/Z2/logs/%x_%A_%a.out
-# Throttle to about a sixth of the per-user CPU cap (coordinator): 8 tasks at 8 CPUs, with scVI at 2. Usage: sbatch --array=<rows>%8 revision/tasks/Z2_embedding/train.sbatch; row 0 = first line after the header of factorial.tsv. Never a GPU.
+# Throttle to about a sixth of the per-user CPU cap (coordinator): 8 tasks at 8 CPUs, with scVI at 2. Memory about 1.3 x observed peak (liver H+Mouse 1.4G); testis rows pass --mem on the command line. Usage: sbatch --array=<rows>%8
 source revision/slurm/_body.sh
 row=$(sed -n "$((SLURM_ARRAY_TASK_ID + 2))p" revision/tasks/Z2_embedding/factorial.tsv)
 name=$(cut -f1 <<<"$row"); mode=$(cut -f5 <<<"$row"); args=$(cut -f6- <<<"$row")
