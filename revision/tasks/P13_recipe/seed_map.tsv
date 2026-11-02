@@ -1,0 +1,6 @@
+run_name	seed	source
+rev-kid-s42	42	training/runs/rev-kid-grid3-s42 (selected grid run, grid_id 3)
+rev-kid-s43	43	training/runs/rev-kid-s43
+rev-kid-s44	44	training/runs/rev-kid-s44
+rev-kid-s45	45	training/runs/rev-kid-s45
+rev-kid-s46	46	training/runs/rev-kid-s46
