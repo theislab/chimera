@@ -37,6 +37,11 @@ Naming rule (item 4). A gene may be named only if all hold: T2.5 margin_support;
 consensus in every seed; S has the sign of its consensus in every seed; sign(D_raw) = sign(S); S unmasked;
 counts in every species of the cohort. mtDNA-encoded genes are never named on liver (X2 finding 3, assay).
 
+Amendment, 2026-11-02, after the first vignette table was read and before any gene was reported: on the
+residual scale a gene can sit in a low class with positive raw D and S (testis, where D_raw is about -pi), so S
+does not back its class. For a named gene in a class, sign(S) must also equal the class direction (low class
+S < 0, high class S > 0); column ``class_backed``. The first table is not used.
+
 Vignettes (item 5). Within each class of item 1 (constrained_lowD, relaxed_highD on rD) and item 3
 (B1bhigh_Dlow, B1blow_Dhigh), per cohort (liver H+Mouse, testis H+Mouse), genes passing the naming rule are
 ranked by |rD| then |S|; the top gene per class and cohort is the vignette, the top 5 are tabled.
@@ -52,6 +57,9 @@ Direct margin (item 9). Sdir is the T2.5 margin computed with no neural model: m
 (mean over species of each species' rate in the type; a species' own rate for a type it alone has) x library,
 mu0 = per-species rate x library, NB with gene-wise moment dispersion; same weights w_sk, so
 Sdir = sum_k Cdir_k exactly. It needs cell labels; S does not.
+
+Later additions, all after results were seen: disagree_head_to_head (symmetric test), species_direct and the zebrafish check,
+disease (read-only from T7.3), relations (owner), mechanism and mech_adds (tests of the mechanism notes), verify (independent check).
 """
 
 from __future__ import annotations
