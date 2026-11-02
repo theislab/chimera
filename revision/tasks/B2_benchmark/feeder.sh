@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Submit the lines of a queue file in order, keeping our tasks (names b2*, running and pending) within a CPU and a memory share, about a third of the per-user caps (512 CPUs, 2T), so other work of the same user keeps moving.
 # Usage (from chimera/): nohup setsid bash revision/tasks/B2_benchmark/feeder.sh <queue file> [cpu share] [memory share in G] &
-export SBATCH_EXCLUDE=cpusrv114
+sbatch() { command sbatch --exclude=cpusrv114 "$@"; }  # a failing node; the SBATCH_EXCLUDE variable is ignored here
 Q="$1"; SHARE="${2:-170}"; MEMS="${3:-680}"; DONE="$Q.done"; touch "$DONE"
 trap 'echo "$(date -Is) feeder exit, status $?"' EXIT
 trap 'echo "$(date -Is) feeder got a signal"; exit 143' TERM INT HUP
