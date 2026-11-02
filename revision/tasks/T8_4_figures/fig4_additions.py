@@ -7,8 +7,10 @@
                            of Delta-alpha and at least the cohort median |S_g|), i.e. imputed from features.
   fig4_celltype_drivers    Where each named gene's count-evidence margin S_g comes from: the exact
                            per-cell-type split C_gk (posterior-mean z) of T2.5, liver 4 species.
-  fig4_margin_support      Fraction of tail genes (|Delta-alpha| > 0.05) with margin support, per cohort
-                           and tail (T2.5 ``headline_margin_support.csv`` and gene tables).
+  fig4_margin_support      Fraction of tail genes (|Delta-alpha| > 0.05) with margin support, per cohort and
+                           tail, one trained run per cohort: T2.5 tables on the canonical s42 runs, and the same
+                           flag (``margin.margin_flag``) on the first kept run of every other cohort in H1
+                           ``runs.tsv``, so later cohorts join when H1 lists them. Checked against T2.5.
   fig4_cross_tissue        Corrected cross-tissue comparison (T2.3 primary version): Delta-alpha against
                            the raw prior, centred on the cohort median, same species pair, genes joined
                            on Ensembl ID. Replaces old Fig 7e (mean over cohorts, clamped prior).
@@ -16,6 +18,8 @@ Sources: ``results/revision/T2_5/`` (canonical s42 runs), ``results/revision/T2_
 """
 
 from __future__ import annotations
+
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,9 +66,10 @@ def named(g: pd.DataFrame) -> pd.DataFrame:
 def panel_landscape() -> plt.Figure:
     g = genes_4sp()
     nm = named(g)
-    fig = plt.figure(figsize=(3.8, 3.6))
-    gs = fig.add_gridspec(2, 2, width_ratios=[5, 1], height_ratios=[1, 5], hspace=0.05, wspace=0.05,
-                          left=0.16, right=0.98, top=0.98, bottom=0.12)
+    # Size of the original panel c beside the original panels a, b (F1).
+    fig = plt.figure(figsize=(2.76, 3.8))
+    gs = fig.add_gridspec(2, 2, width_ratios=[5.5, 1], height_ratios=[1, 6.5], hspace=0.03, wspace=0.03,
+                          left=0.155, right=0.995, top=0.995, bottom=0.215)
     ax = fig.add_subplot(gs[1, 0])
     top = fig.add_subplot(gs[0, 0], sharex=ax)
     right = fig.add_subplot(gs[1, 1], sharey=ax)
@@ -75,15 +80,15 @@ def panel_landscape() -> plt.Figure:
         handles.append(ax.scatter(s.prior, s.delta_alpha, s=16, color=col, edgecolor="white", linewidth=0.4,
                                   zorder=4, label=theme))
         for r in s.itertuples():
-            texts.append(ax.text(r.prior, r.delta_alpha, r.label, fontsize=4.8, ha="center", va="center",
+            texts.append(ax.text(r.prior, r.delta_alpha, r.label, fontsize=5, ha="center", va="center",
                                  color=cm.INK, zorder=5))
     ax.axhline(0, color="#888888", lw=0.5, ls="--", zorder=2)
     ax.set_xlabel("protein-identity prior π")
     ax.set_ylabel("Δα (liver, 4 species)")
     ax.set_xlim(0.15, 1.0)
     handles.append(Line2D([], [], ls="none", label=f"{DAGGER} no margin support: Δα not backed by counts"))
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.0), ncol=2, fontsize=5.5,
-               handletextpad=0.2, columnspacing=0.8)
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.01), ncol=1, fontsize=5.5, frameon=False,
+               handletextpad=0.1, labelspacing=0.15, borderpad=0)
     top.hist(g.prior, bins=60, color="#999999", edgecolor="none")
     right.hist(g.delta_alpha, bins=60, color="#999999", edgecolor="none", orientation="horizontal")
     for a, hide in ((top, ("top", "right", "left")), (right, ("top", "right", "bottom"))):
@@ -93,8 +98,8 @@ def panel_landscape() -> plt.Figure:
     top.tick_params(axis="x", bottom=False, labelbottom=False)
     right.set_xticks([])
     right.tick_params(axis="y", left=False, labelleft=False)
-    adjust_text(texts, x=nm.prior.to_numpy(), y=nm.delta_alpha.to_numpy(), ax=ax, expand=(1.35, 1.9),
-                force_text=(0.5, 0.8), force_static=(0.4, 0.7), force_explode=(0.3, 0.6),
+    adjust_text(texts, x=nm.prior.to_numpy(), y=nm.delta_alpha.to_numpy(), ax=ax, expand=(1.5, 2.2),
+                force_text=(0.7, 1.0), force_static=(0.5, 0.9), force_explode=(0.4, 0.8),
                 arrowprops=dict(arrowstyle="-", color="#999999", lw=0.3), min_arrow_len=1.0)
     return fig
 
@@ -112,7 +117,7 @@ def panel_drivers() -> plt.Figure:
     C = C[C.var_name.isin(nm.var_name)]
     named_types = {t for _, ts, _ in CT_GROUPS if ts for t in ts}
     W = C.groupby("cell_type").weight_k.first()
-    fig, ax = plt.subplots(figsize=(3.3, 4.1), layout="constrained")
+    fig, ax = plt.subplots(figsize=(3.25, 5.05), layout="constrained")
     for y, r in enumerate(nm.itertuples()):
         c = C[C.var_name == r.var_name].set_index("cell_type").C_gk_meanz
         pos = neg = 0.0
@@ -135,40 +140,82 @@ def panel_drivers() -> plt.Figure:
           for name, ts, col in CT_GROUPS]
     fig.legend(handles=hs, loc="outside lower center", ncol=2, fontsize=5.2, handlelength=1.0,
                columnspacing=0.8)
-    ax.text(0.99, 0.01, f"(Δα in brackets)   {DAGGER} no margin support", transform=ax.transAxes,
-            ha="right", va="bottom", fontsize=5, color=cm.MUTED)
+    ax.text(0.01, 0.01, f"(Δα in brackets)   {DAGGER} no margin support", transform=ax.transAxes,
+            ha="left", va="bottom", fontsize=5, color=cm.MUTED)
     return fig
 
 
 MS_COHORTS = ["liv_hmonkey", "liv_hmouse", "liv_hzeb", "liv_4sp", "test_hmac", "test_hmouse", "test_3sp"]
+TISSUES = ["liver", "testis", "bone marrow", "kidney", "islet", "eye"]
+
+
+def cohort_rows() -> pd.DataFrame:
+    """Every cohort of H1 in tissue order: cohort, tissue, label, first kept run."""
+    runs = pd.read_csv(cm.RES / "H1" / "runs.tsv", sep="\t")
+    runs = runs[runs.kept.astype(str) == "True"].sort_values("seed").groupby("cohort", sort=False).first().reset_index()
+    table = pd.read_csv(cm.RES / "H1" / "cohort_table.csv").set_index("cohort")
+    labels = table.label
+    runs = runs.set_index("cohort").reindex(table.index).reset_index()
+    runs["label"] = [cm.COHORT.get(c, labels[c].replace(" H+", ", human + ").lower().replace("m. mulatta", "M. mulatta")
+                                   .replace("marrow 3", "marrow, 3").replace("eye 5", "eye, 5").replace("eye primates", "eye, primates"))
+                     for c in runs.cohort]
+    runs["order"] = [TISSUES.index(t) for t in runs.tissue]
+    return runs.sort_values("order", kind="stable").reset_index(drop=True)
+
+
+def _run_tail(c: str, run: str) -> pd.DataFrame:
+    """One run: Delta-alpha against the prior it anchors on, S_g_ema, margin flag of T2.5."""
+    sys.path.insert(0, str(cm.REPO / "revision" / "tasks" / "T2_5_celltype_margin"))
+    import margin as MG
+
+    if c in MS_COHORTS:
+        g = pd.read_parquet(T25 / f"{c}__genes.parquet")
+        return g[g["tail"]][["delta_alpha", "margin_support"]]
+    with np.load(cm.REPO / "training" / "runs" / run / "final_state.npz", allow_pickle=True) as z:
+        da, S = z["alpha"] - z["prior"], z["S_g_ema"]
+    t = pd.DataFrame(dict(delta_alpha=da, margin_support=MG.margin_flag(da, S)))
+    return t[np.abs(da) > MG.TAIL]
 
 
 def panel_margin_support() -> plt.Figure:
     h = pd.read_csv(T25 / "headline_margin_support.csv")
     h = h[(h.run_label == h.cohort) & (h.group_key == "cell_type")].set_index("cohort")
-    fig, ax = plt.subplots(figsize=(3.3, 2.5), layout="constrained")
-    for i, c in enumerate(MS_COHORTS):
-        g = pd.read_parquet(T25 / f"{c}__genes.parquet")
-        t = g[g["tail"]]
+    rows = cohort_rows()
+    # Exact size and axes, shared with the sequence-axis panel below it in Fig 4 (F1).
+    pitch = 12.2 / 72
+    H = pitch * len(rows) + 0.66
+    fig = plt.figure(figsize=(3.4, H))
+    ax = fig.add_axes([1.06 / 3.4, 0.48 / H, 2.3 / 3.4, pitch * len(rows) / H])
+    source = []
+    for i, r0 in enumerate(rows.itertuples()):
+        c = r0.cohort
+        t = _run_tail(c, r0.run)
         neg, pos = t[t.delta_alpha < 0], t[t.delta_alpha > 0]
         for k, (sub, col, name) in enumerate([(neg, "#0072B2", "negative tail (Δα < −0.05)"),
                                                (pos, "#D55E00", "positive tail (Δα > +0.05)")]):
-            y = i + (k - 0.5) * 0.36
+            y = i + (k - 0.5) * 0.46
+            source.append(dict(cohort=c, run=r0.run, tail=name[:8], n=len(sub),
+                               frac=sub.margin_support.mean() if len(sub) else np.nan))
             if len(sub) == 0:
                 ax.text(0.01, y, "no genes", va="center", fontsize=5, color=cm.MUTED)
                 continue
             f = sub.margin_support.mean()
-            ax.barh(y, f, height=0.32, color=col, lw=0, label=name if i == 0 else None)
+            ax.barh(y, f, height=0.42, color=col, lw=0, label=name if not ax.containers or len(ax.containers) < 2 else None)
             ax.text(f + 0.01, y, f"{f:.2f}  (n {len(sub):,})", va="center", fontsize=5, color=cm.INK)
-        assert abs(h.loc[c, "frac_tail_with_margin_support"] - t.margin_support.mean()) < 1e-9
-    ax.set_yticks(range(len(MS_COHORTS)))
-    ax.set_yticklabels([cm.COHORT[c] for c in MS_COHORTS], fontsize=6)
-    ax.set_ylim(len(MS_COHORTS) - 0.4, -0.6)
-    ax.set_xlim(0, 1.18)
+        if c in MS_COHORTS:
+            assert abs(h.loc[c, "frac_tail_with_margin_support"] - t.margin_support.mean()) < 1e-9
+    pd.DataFrame(source).to_csv(cm.RES / "T8_4" / "fig4_margin_support_source.csv", index=False)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels(rows.label, fontsize=5.8)
+    ax.set_ylim(len(rows) - 0.5, -0.5)
+    for i in np.where(np.diff(rows.order))[0]:
+        ax.axhline(i + 0.5, color=cm.RULE, lw=0.4)
+    ax.set_xlim(0, 1.25)
     ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_xlabel("fraction of tail genes whose Δα is backed by\ncount evidence of the same sign (margin support)",
-                  fontsize=6.5)
-    fig.legend(loc="outside lower center", ncol=2, fontsize=5.5, handlelength=1.0)
+                  fontsize=6, labelpad=1)
+    fig.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=5.3, handlelength=1.0, frameon=False,
+               borderpad=0, columnspacing=0.8, handletextpad=0.3)
     return fig
 
 
@@ -186,7 +233,7 @@ def _centred(c: str) -> pd.DataFrame:
 def panel_cross_tissue() -> plt.Figure:
     ref = pd.read_csv(T23 / "tissue_comparison.csv")
     ref = ref[ref.version == "raw_centred"].set_index("pair")
-    fig, axes = plt.subplots(1, 2, figsize=(5.0, 2.45), layout="constrained")
+    fig, axes = plt.subplots(1, 2, figsize=(6.75, 1.95), layout="constrained")
     for ax, (lc, tc, key, title) in zip(axes, PAIRS):
         L, T = _centred(lc), _centred(tc)
         ix = L.index.intersection(T.index)
@@ -217,7 +264,7 @@ def main() -> list:
     out = []
     for name, fn in [("fig4c_prior_landscape", panel_landscape), ("fig4_celltype_drivers", panel_drivers),
                      ("fig4_margin_support", panel_margin_support), ("fig4_cross_tissue", panel_cross_tissue)]:
-        out.append(cm.save(fn(), name))
+        out.append(cm.save(fn(), name, exact=name == "fig4_margin_support"))
     return out
 
 

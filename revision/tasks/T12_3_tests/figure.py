@@ -25,6 +25,7 @@ import pandas as pd  # noqa: E402
 from revision.common import controls as K  # noqa: E402
 from revision.common import gene_ids  # noqa: E402
 from revision.tasks.T4_3_scoreboard import stats as S  # noqa: E402
+from revision.tasks.T8_4_figures import common as cm  # noqa: E402
 
 RES = gene_ids.REPO_ROOT / "results" / "revision" / "P12"
 T = RES / "t12_3"
@@ -48,7 +49,7 @@ def clean(ax, grid_axis="x"):
 
 
 def label(ax, s):
-    ax.text(-0.02, 1.06, s, transform=ax.transAxes, fontsize=8, fontweight="bold", va="bottom", ha="right")
+    """Panel letters are added by F1_figures/compose.py under each panel."""
 
 
 def panel_a(ax):
@@ -111,7 +112,7 @@ def main() -> int:
     e3 = pd.read_csv(T / "e3.tsv", sep="\t")
     e4 = pd.read_csv(T / "e4.tsv", sep="\t")
 
-    fig, axes = plt.subplots(2, 3, figsize=(7.2, 4.8), gridspec_kw=dict(wspace=0.95, hspace=0.7))
+    fig, axes = plt.subplots(2, 3, figsize=(7.2, 4.2), gridspec_kw=dict(wspace=0.95, hspace=0.6))
     a, b, c, d, e, f = axes.ravel()
     panel_a(a)
     label(a, "a")
@@ -167,6 +168,9 @@ def main() -> int:
         label(ax, lab)
     out = RES / "fig_t12_3_bone_marrow"
     fig.savefig(out.with_suffix(".pdf"), bbox_inches="tight")
+    # One PDF per panel for F1_figures/compose.py.
+    for k, ax in zip("abcdef", axes.ravel()):
+        cm.save_axes(fig, f"supp_bone_marrow_{k}", [ax])
     fig.savefig(out.with_suffix(".png"), dpi=300, bbox_inches="tight")
     print(out.with_suffix(".pdf"))
     return 0

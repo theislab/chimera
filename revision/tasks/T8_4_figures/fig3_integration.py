@@ -44,13 +44,14 @@ def heat(M: pd.DataFrame, label: str, show_rows: bool) -> plt.Figure:
     for i, m in enumerate(layout):
         if m is not None:
             A[i] = M[m].to_numpy()
-    # Fixed axes geometry in inches, so the heatmap has the same size in all three panels whatever
-    # the labels around it (the PDFs are cropped to their content when saved).
-    left = 1.35 if show_rows else 0.9
-    w, h = left + 1.75, 3.5
+    # Fixed axes geometry in inches, so the heatmap has the same size in all three panels and the row
+    # fills the text width at scale 1 (F1): 6.75 in = row labels + 3 heatmaps + 2 gaps of the grid.
+    left = 1.24 if show_rows else 0.0
+    mw, right = 1.75, 0.02
+    w, h = left + mw + right, 3.72
     fig = plt.figure(figsize=(w, h))
-    ax = fig.add_axes([left / w, 1.45 / h, 1.7 / w, 2.0 / h])
-    cax = fig.add_axes([left / w, 0.3 / h, 1.7 / w, 0.06 / h])
+    ax = fig.add_axes([left / w, 1.42 / h, mw / w, 2.28 / h])
+    cax = fig.add_axes([(left + 0.05) / w, 0.3 / h, (mw - 0.1) / w, 0.06 / h])
     cmap = plt.get_cmap("Blues").copy()
     cmap.set_bad("white")
     im = ax.imshow(np.ma.masked_invalid(A), cmap=cmap, vmin=0, vmax=1, aspect="auto")
@@ -60,7 +61,7 @@ def heat(M: pd.DataFrame, label: str, show_rows: bool) -> plt.Figure:
             continue
         for j in range(A.shape[1]):
             v = A[i, j]
-            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=5,
+            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=5.5,
                     color="white" if v > 0.6 else cm.INK, fontweight="bold" if best[j] == i else "normal")
             if m == "Chimera" and ROWS[j][1].startswith("test"):
                 ax.add_patch(plt.Rectangle((j - 0.45, i - 0.45), 0.9, 0.9, fill=False, ec=cm.INK, lw=0.6,
@@ -72,8 +73,7 @@ def heat(M: pd.DataFrame, label: str, show_rows: bool) -> plt.Figure:
             k += len(ms) + 1
     ax.axvline(3.5, color="white", lw=2.0)
     ax.set_xticks(range(len(ROWS)))
-    ax.set_xticklabels([cm.COHORT[c] for _, c in ROWS], rotation=50, ha="right", fontsize=5.5,
-                       rotation_mode="anchor")
+    ax.set_xticklabels([cm.COHORT[c] for _, c in ROWS], rotation=90, ha="center", va="top", fontsize=5.5)
     ax.set_yticks([i for i, m in enumerate(layout) if m is not None])
     ax.set_yticklabels([n for n, m in zip(names, layout) if m is not None] if show_rows else [], fontsize=6)
     ax.tick_params(length=0)
@@ -93,7 +93,7 @@ def main() -> list:
     for k, (col, label) in enumerate(SPECS):
         M = T.pivot(index="dataset", columns="model", values=col).loc[[d for d, _ in ROWS], COLS]
         fig = heat(M, label, show_rows=(k == 0))
-        out.append(cm.save(fig, f"fig3{'abc'[k]}_integration_{col.replace('total_score', 'composite')}"))
+        out.append(cm.save(fig, f"fig3{'abc'[k]}_integration_{col.replace('total_score', 'composite')}", exact=True))
     return out
 
 

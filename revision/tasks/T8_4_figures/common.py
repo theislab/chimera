@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 
 from revision.common import gene_ids
 
@@ -74,10 +75,35 @@ def setup() -> None:
     PREVIEW.mkdir(parents=True, exist_ok=True)
 
 
-def save(fig: plt.Figure, name: str) -> Path:
-    """PDF to the manuscript, PNG preview to results; returns the PDF path."""
+def save(fig: plt.Figure, name: str, exact: bool = False) -> Path:
+    """PDF to the manuscript, PNG preview to results; returns the PDF path.
+
+    ``exact``: keep the figure size instead of cropping to content, so a panel drawn with fixed axes
+    lines up with its neighbours when F1_figures/compose.py places it with ``ink=False``.
+    """
+    if exact:
+        pdf = FIG_OUT / f"{name.lower()}.pdf"
+        fig.savefig(pdf, format="pdf")
+        fig.savefig(PREVIEW / f"{name.lower()}.png", format="png", dpi=200)
+        plt.close(fig)
+        return pdf
     pdf = fd.save_figure(fig, name, formats=("pdf",), out_dir=FIG_OUT)[0]
     fd.save_figure(fig, name, formats=("png",), out_dir=PREVIEW, close=True)
+    return pdf
+
+
+def save_axes(fig: plt.Figure, name: str, axes: list, out_dir: Path | None = None, pad: float = 0.02) -> Path:
+    """One panel of a many-panel figure as its own PDF, for compose.py: only these axes, cropped to them."""
+    others = [a for a in fig.axes if a not in axes and a.get_visible()]
+    for a in others:
+        a.set_visible(False)
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    box = Bbox.union([a.get_tightbbox(r) for a in axes]).transformed(fig.dpi_scale_trans.inverted())
+    pdf = (out_dir or FIG_OUT) / f"{name.lower()}.pdf"
+    fig.savefig(pdf, format="pdf", bbox_inches=box.padded(pad))
+    for a in others:
+        a.set_visible(True)
     return pdf
 
 

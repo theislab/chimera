@@ -65,9 +65,10 @@ def main():
     idc = [c for c in lam.columns if "Ensembl" in c][0]
     tfc = [c for c in lam.columns if c.replace(" ", "").lower() in ("istf?", "istf")][0]
     tfs = set(lam.loc[lam[tfc].astype(str).str.lower().str.startswith("yes"), idc])
-    fig = plt.figure(figsize=(fd.DOUBLE_W, 10.6))
-    gs1 = fig.add_gridspec(1, 3, left=0.145, right=0.905, top=0.975, bottom=0.785, wspace=0.12)
-    gs2 = fig.add_gridspec(4, 3, left=0.085, right=0.985, top=0.655, bottom=0.04, wspace=0.27, hspace=0.42,
+    # Fits one page with its caption at scale 1 (F1).
+    fig = plt.figure(figsize=(fd.DOUBLE_W, 7.75))
+    gs1 = fig.add_gridspec(1, 3, left=0.145, right=0.905, top=0.975, bottom=0.735, wspace=0.12)
+    gs2 = fig.add_gridspec(4, 3, left=0.085, right=0.985, top=0.565, bottom=0.05, wspace=0.27, hspace=0.5,
                            height_ratios=[1.3, 1, 1, 1])
     rows, grp = [], []
     for j, (c, title) in enumerate(COHORTS):
@@ -82,12 +83,12 @@ def main():
         for a_ in range(len(keys)):
             for b_ in range(len(keys)):
                 if keys[a_] in ("D", "S") or keys[b_] in ("D", "S"):
-                    ax.text(b_, a_, f"{M[a_, b_]:.1f}".replace("0.", "."), ha="center", va="center", fontsize=4,
+                    ax.text(b_, a_, f"{M[a_, b_]:.1f}".replace("0.", "."), ha="center", va="center", fontsize=4.4,
                             color="white" if abs(M[a_, b_]) > 0.55 else "#222222")
         ax.set_title(title, fontsize=8)
         ax.grid(False)
         if j == 2:
-            cax = fig.add_axes([0.925, 0.81, 0.012, 0.15])
+            cax = fig.add_axes([0.925, 0.77, 0.012, 0.17])
             fig.colorbar(im, cax=cax)
             cax.set_title("$\\rho$", fontsize=7)
             cax.tick_params(labelsize=5.5)
@@ -118,7 +119,7 @@ def main():
             ax.set_ylabel("$\\Delta\\alpha$", fontsize=8)
         if j == 1:
             hl = ax.get_legend_handles_labels()
-            fig.legend(*hl, fontsize=6.5, frameon=False, loc="center", bbox_to_anchor=(0.53, 0.672), ncol=7,
+            fig.legend(*hl, fontsize=6.5, frameon=False, loc="center", bbox_to_anchor=(0.53, 0.59), ncol=7,
                        handletextpad=0.1, columnspacing=0.8)
         for i, (k, lab) in enumerate((("LOEUF", "LOEUF"), ("evee", "EVEE (−log variance)"), ("B1b", "profile correlation"))):
             ax = fig.add_subplot(gs2[1 + i, j])

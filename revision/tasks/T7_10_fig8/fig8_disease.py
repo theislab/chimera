@@ -1,6 +1,6 @@
 """Fig 8 (main, new in revision): which human disease responses the mouse model reproduces.
 
-One PDF, ``chimera-manuscript/figures/revision/fig8_disease.pdf``; PNG preview and the plotted values
+``chimera-manuscript/figures/revision/fig8_disease.pdf`` and one PDF per panel (``fig8_disease_a`` ...); PNG preview and the plotted values
 (``fig8_source.tsv``) in ``results/revision/T7_10/``. Every number is read from the result files below;
 nothing is typed in. Re-runnable: the islet H-D1 slot in panel c is filled when its output exists.
 
@@ -256,10 +256,6 @@ def cippa() -> pd.DataFrame:
 
 # ----------------------------------------------------------------------------- drawing
 
-def _letter(ax, s, x=-0.02):
-    ax.text(x, 1.0, s, transform=ax.transAxes, ha="right", va="bottom", fontsize=9, fontweight="bold")
-
-
 def _title(ax, s):
     ax.set_title(s, loc="left", fontsize=6.6, pad=3)
 
@@ -441,7 +437,8 @@ def draw_e(ax, ek):
     ax.set_xlabel("stratified AUROC,\nshared vs human-specific", fontsize=6.2)
     ax.legend(handles=[Line2D([], [], marker="o", ls="none", ms=4, color=C_D, label="Chimera Δα"),
                        Line2D([], [], marker="^", ls="none", ms=4, color=C_B1B, label="profile correlation (B1b)")],
-              loc="upper center", bbox_to_anchor=(0.5, -0.42), fontsize=5.4, frameon=False, handletextpad=0.2)
+              loc="center right", bbox_to_anchor=(1.02, 0.5), fontsize=5.4, frameon=False, handletextpad=0.2,
+              borderaxespad=0, borderpad=0)
     _clean(ax)
     ax.tick_params(axis="y", length=0)
 
@@ -455,17 +452,19 @@ def main() -> int:
     tvn = transfer_vs_null()
     ek = cippa()
 
-    fig = plt.figure(figsize=(7.0, 6.3))
-    outer = fig.add_gridspec(2, 1, height_ratios=[9.6, 18.4], hspace=0.42)
-    top = outer[0].subgridspec(1, 3, width_ratios=[2.5, 1.25, 1.1], wspace=0.10)
-    bot = outer[1].subgridspec(1, 3, width_ratios=[1.45, 1.45, 1.0], wspace=0.10)
-    ax_a = fig.add_subplot(top[0])
-    ax_b1 = fig.add_subplot(top[1], sharey=ax_a)
-    ax_b2 = fig.add_subplot(top[2], sharey=ax_a)
+    # At its size on the page (F1): panels do not overlap, both rows fill the text width at one scale.
+    fig = plt.figure(figsize=(6.9, 5.9))
+    outer = fig.add_gridspec(2, 1, height_ratios=[9.6, 17.0], hspace=0.42)
+    top_all = outer[0].subgridspec(1, 2, width_ratios=[2.45, 2.15], wspace=0.04)
+    top = top_all[1].subgridspec(1, 2, width_ratios=[1.2, 1.1], wspace=0.14)
+    bot_all = outer[1].subgridspec(1, 3, width_ratios=[2.85, 1.0, 0.3], wspace=0.36)
+    bot = bot_all[0].subgridspec(1, 2, wspace=0.08)
+    ax_a = fig.add_subplot(top_all[0])
+    ax_b1 = fig.add_subplot(top[0], sharey=ax_a)
+    ax_b2 = fig.add_subplot(top[1], sharey=ax_a)
     ax_c = fig.add_subplot(bot[0])
     ax_d = fig.add_subplot(bot[1], sharey=ax_c)
-    e_gs = bot[2].subgridspec(3, 1, height_ratios=[0.22, 0.42, 0.36])
-    ax_e = fig.add_subplot(e_gs[1])
+    ax_e = fig.add_subplot(bot_all[1])
 
     draw_a(ax_a, calls, null)
     draw_b(ax_b1, ax_b2, tc)
@@ -481,11 +480,12 @@ def main() -> int:
     _title(ax_c, "H-D1: does Δα predict transfer?")
     _title(ax_d, "Program transfer vs label null")
     _title(ax_e, "Cippà 2018 anchor")
-    for ax, s in ((ax_a, "a"), (ax_b1, "b"), (ax_c, "c"), (ax_d, "d"), (ax_e, "e")):
-        _letter(ax, s, x=-0.04 if ax in (ax_b1, ax_d) else -0.02)
     fig.align_xlabels([ax_a, ax_b1, ax_b2])
 
+    # One PDF per panel; F1_figures/compose.py places them and adds the bold (a) labels.
     pdf = cm.fd.save_figure(fig, NAME, formats=("pdf",), out_dir=cm.FIG_OUT)[0]
+    for k, axes in (("a", [ax_a]), ("b", [ax_b1, ax_b2]), ("c", [ax_c]), ("d", [ax_d]), ("e", [ax_e])):
+        cm.save_axes(fig, f"{NAME}_{k}", axes)
     png = cm.fd.save_figure(fig, NAME, formats=("png",), out_dir=OUT, close=True)[0]
     src = pd.DataFrame(src_rows)
     src.to_csv(OUT / "fig8_source.tsv", sep="\t", index=False)

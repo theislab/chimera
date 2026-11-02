@@ -20,6 +20,7 @@ from revision.common import controls as K
 from revision.common import gene_ids
 from revision.common.outputs import git_sha
 from revision.tasks.T4_3_scoreboard import stats as ST
+from revision.tasks.T8_4_figures import common as CM
 
 sys.path.insert(0, str(gene_ids.REPO_ROOT / "notebooks"))
 import _figure_design as FD  # noqa: E402
@@ -179,9 +180,12 @@ def main() -> None:
     panel_a(a)
     panel_b(b, b2)
     panel_c(c)
-    for ax, tag in ((a, "a  Pathway (coherence)"), (b, "b  Protein interaction (coherence)"),
-                    (b2, "b  Interolog retention (conservation)"), (c, "c  Regulatory (conservation)")):
+    for ax, tag in ((a, "Pathway (coherence)"), (b, "Protein interaction (coherence)"),
+                    (b2, "Interolog retention (conservation)"), (c, "Regulatory (conservation)")):
         ax.set_title(tag, fontsize=7.5, loc="left", pad=3)
+    # One PDF per panel for F1_figures/compose.py, which adds the panel letters.
+    for k, ax in (("a", a), ("b_left", b), ("b_right", b2), ("c", c)):
+        CM.save_axes(fig, f"supp_functional_layer_{k}", [ax], out_dir=dest.parent)
     tmp = dest.with_name(dest.name + ".tmp")
     fig.savefig(tmp, format="pdf", bbox_inches="tight", pad_inches=0.02)
     fig.savefig(OUT / "supp_functional_layer.png", format="png", dpi=200, bbox_inches="tight", pad_inches=0.02)

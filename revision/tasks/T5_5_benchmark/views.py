@@ -38,20 +38,20 @@ def panel(ax, M, title, cmap, vmin, vmax, mark, fd, lower_better=False):
         for j in range(M.shape[1]):
             v = M.iat[i, j]
             dark = (v - vmin) / (vmax - vmin) < 0.6
-            ax.text(j, i, f"{v:.2f}" + ("*" if j == best[i] else ""), ha="center", va="center", fontsize=5.5,
+            ax.text(j, i, f"{v:.2f}" + ("*" if j == best[i] else ""), ha="center", va="center", fontsize=5.2,
                     color="#222222" if dark else "#f5f5f5", fontweight="bold" if j == best[i] else "normal")
     ax.set_xticks(range(M.shape[1]))
     ax.set_xticklabels(M.columns, rotation=55, ha="right", fontsize=6)
     ax.set_yticks(range(M.shape[0]))
     ax.set_yticklabels(M.index, fontsize=6)
-    ax.set_title(title, fontsize=7, pad=24)
+    ax.set_title(title, fontsize=7, pad=22)
     x = 0
     for name, ms in TIERS:
         if x:
             ax.axvline(x - 0.5, color="#ffffff", lw=1.5)
         last = ms == TIERS[-1][1]
         ax.text(x - 0.45 if last else x + (len(ms) - 1) / 2, -0.6, name, ha="left" if last else "center",
-                va="bottom", fontsize=4.6, color="#333333")
+                va="bottom", fontsize=5, color="#333333")
         x += len(ms)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -63,7 +63,9 @@ def figure(T: pd.DataFrame, fd) -> None:
 
     lab = {ds: v[1] for ds, v in SE.DATASETS.items()}
     piv = lambda c: T.pivot(index="dataset", columns="model", values=c).loc[list(SE.DATASETS), ORDER].rename(index=lab)
-    fig, axes = plt.subplots(1, 4, figsize=(fd.DOUBLE_W * 1.45, 3.3), layout="constrained", sharey=True)
+    # Two by two at the text width (F1): one row of four only fits below the smallest type size.
+    fig, axes = plt.subplots(2, 2, figsize=(6.75, 5.0), layout="constrained", sharey=True)
+    axes = axes.ravel()
     specs = [("raw__knn_species_purity", "kNN species purity (raw; lower = more mixing)", "Greys", 0.5, 1.0, True),
              ("mixing", "Species mixing score (normalised)", "Blues", 0, 1, False),
              ("biology", "Cell-type conservation score (normalised)", "Blues", 0, 1, False),

@@ -324,8 +324,12 @@ def fig_main(C_long: pd.DataFrame, genes: pd.DataFrame, title_run: str):
 def fig_closure(gene_tables: dict):
     plt = _design()
     labs = [k for k in gene_tables if k in C.CANONICAL]
-    fig, axes = plt.subplots(1, len(labs), figsize=(1.25 * len(labs), 1.45), squeeze=False)
-    for ax, lab in zip(axes[0], labs):
+    # Four panels per row at the text width (F1): a single row of seven is too small to read.
+    nrow = int(np.ceil(len(labs) / 4))
+    fig, axes = plt.subplots(nrow, 4, figsize=(6.75, 1.72 * nrow), squeeze=False)
+    for ax in axes.ravel()[len(labs):]:
+        ax.set_visible(False)
+    for ax, lab in zip(axes.ravel(), labs):
         t = gene_tables[lab]
         x, y = t["ppass_S_samp"].to_numpy(), t["S_g_ema"].to_numpy()
         ax.scatter(x, y, s=1, color="#555555", linewidths=0, rasterized=True)
@@ -333,12 +337,13 @@ def fig_closure(gene_tables: dict):
         ax.plot([lo, hi], [lo, hi], color="#999999", linewidth=0.5, linestyle="--")
         ax.set_xlim(lo, hi)
         ax.set_ylim(lo, hi)
-        ax.set_title(C.LABELS[lab], fontsize=5)
-        ax.text(0.03, 0.97, f"r = {np.corrcoef(x, y)[0, 1]:.3f}", transform=ax.transAxes, fontsize=5, va="top")
-        ax.tick_params(labelsize=4, length=2)
-    axes[0][0].set_ylabel("trained S_g (EMA)", fontsize=5)
-    axes[0][len(labs) // 2].set_xlabel("pass rate × forward-pass S_g", fontsize=5)
-    fig.tight_layout()
+        ax.set_title(C.LABELS[lab], fontsize=6.5)
+        ax.text(0.03, 0.97, f"r = {np.corrcoef(x, y)[0, 1]:.3f}", transform=ax.transAxes, fontsize=6, va="top")
+        ax.tick_params(labelsize=5.5, length=2)
+        ax.set_xlabel("pass rate × forward-pass S_g", fontsize=6)
+    for row in axes:
+        row[0].set_ylabel("trained S_g (EMA)", fontsize=6)
+    fig.tight_layout(pad=0.2, h_pad=0.6, w_pad=0.5)
     return fig
 
 
