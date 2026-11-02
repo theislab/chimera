@@ -143,6 +143,10 @@ def main():
         for gold in golds:
             extra = [f"logn_{gold[2:]}"] if gold[2:] in RU.ASE_TYPES else []
             rows += CM.rho_unit(g, gold, covs + extra, scores, rows=support, ref="S_ema", draws=RU.DRAWS_RHO, label=dict(fit=fit, matched=gold == f"L_{d['match']}", context=d["match"]))
+        # Added after reading: allelic depth moves SD across types, so P_cis again with mean allelic depth held.
+        g["logn_mean"] = g[[f"logn_{t}" for t in RU.ASE_TYPES]].mean(axis=1)
+        g["P_cis_depth"] = g["P_cis"]
+        rows += CM.rho_unit(g, "P_cis_depth", covs + ["logn_mean"], scores, rows=support, ref="S_ema", draws=RU.DRAWS_RHO, label=dict(fit=fit, matched=False, context=d["match"]))
         if d["match"]:
             con += contrast(g, fit, d["match"], scores, covs, pd.Series(support, index=g.index))
     pd.DataFrame(rows).to_csv(OUT / "rho.csv", index=False)
