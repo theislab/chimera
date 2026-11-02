@@ -2,11 +2,11 @@
 #SBATCH --job-name=z2_train
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=24G
-#SBATCH --time=04:00:00
+#SBATCH --time=02:30:00
 #SBATCH --output=results/revision/Z2/logs/%x_%A_%a.out
-# Usage: sbatch --array=<rows>%N revision/tasks/Z2_embedding/train.sbatch; row 0 = first line after the header of factorial.tsv. Never a GPU.
+# At most 10 tasks in queue at once, 30 in total (coordinator). Usage: sbatch --array=<rows> revision/tasks/Z2_embedding/train.sbatch; row 0 = first line after the header of factorial.tsv. Never a GPU.
 source revision/slurm/_body.sh
 row=$(sed -n "$((SLURM_ARRAY_TASK_ID + 2))p" revision/tasks/Z2_embedding/factorial.tsv)
 name=$(cut -f1 <<<"$row"); mode=$(cut -f5 <<<"$row"); args=$(cut -f6- <<<"$row")
