@@ -1,0 +1,19 @@
+cohort	setting	family	rep	seed	run	fit	chimera_from
+liv_hmouse	depth25_law	sampling	0	142	b2-liv_hmouse-depth25_law-r0	1	
+liv_hmouse	depth25_law	sampling	1	143	b2-liv_hmouse-depth25_law-r1	1	
+liv_hmouse	depth25_law	sampling	2	144	b2-liv_hmouse-depth25_law-r2	1	
+liv_hmouse	depth50_law	sampling	0	142	b2-liv_hmouse-depth50_law-r0	1	
+liv_hmouse	depth50_law	sampling	1	143	b2-liv_hmouse-depth50_law-r1	1	
+liv_hmouse	depth50_law	sampling	2	144	b2-liv_hmouse-depth50_law-r2	1	
+test_hmouse	depth25_law	sampling	0	142	b2-test_hmouse-depth25_law-r0	1	
+test_hmouse	depth25_law	sampling	1	143	b2-test_hmouse-depth25_law-r1	1	
+test_hmouse	depth25_law	sampling	2	144	b2-test_hmouse-depth25_law-r2	1	
+test_hmouse	depth50_law	sampling	0	142	b2-test_hmouse-depth50_law-r0	1	
+test_hmouse	depth50_law	sampling	1	143	b2-test_hmouse-depth50_law-r1	1	
+test_hmouse	depth50_law	sampling	2	144	b2-test_hmouse-depth50_law-r2	1	
+kidney	depth25_law	sampling	0	142	b2-kidney-depth25_law-r0	1	
+kidney	depth25_law	sampling	1	143	b2-kidney-depth25_law-r1	1	
+kidney	depth25_law	sampling	2	144	b2-kidney-depth25_law-r2	1	
+kidney	depth50_law	sampling	0	142	b2-kidney-depth50_law-r0	1	
+kidney	depth50_law	sampling	1	143	b2-kidney-depth50_law-r1	1	
+kidney	depth50_law	sampling	2	144	b2-kidney-depth50_law-r2	1	

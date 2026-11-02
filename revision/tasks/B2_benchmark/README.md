@@ -59,3 +59,6 @@ The full grid stands, with three replicates per setting. Runs are ordered by `ma
 
 ## Tiers and the stopping rule
 `tiers.py`, committed while liver alone had been scored in Track B. Scoring takes whole tiers complete at 2026-11-04 14:00, by time alone. Feeder health: `feeder.sh` logs its exit and any signal, and a watcher reports a log older than ten minutes.
+
+## Depth law arm
+`depth50_law`, `depth25_law`: the same objects as `depth50`, `depth25`, recipe with lambda_anchor scaled by `revision/common/depth_anchor.py` (D1, chimera 0573e5d), from the object's depth by formula, no tuning on outcome. All three cohorts, three replicates, fit seeds as the rows beside them. Added before any of these rows ran, with depth failures already known from the recipe-unchanged rows and from D1. Depth rows report runs tried, finished, and finished with gate tails of at least 2%. D1 predicts the law restores tails, not the non-finite fits. My prediction: the same; S_g agreement and rho_p at 25% stay near the unchanged rows, since S_g is not the gate, and D regains some link to S_g.

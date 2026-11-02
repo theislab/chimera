@@ -16,8 +16,9 @@ h5=data/revision/B2/h5ad/$RUN.h5ad
 if [[ ! -f "$h5" ]]; then $PY -m revision.tasks.B2_benchmark.step --manifest "$M" --index "$I"; fi
 if [[ "$FIT" == "1" ]]; then
   set +e
+  EXTRA=$($PY -m revision.tasks.B2_benchmark.recipe --manifest "$M" --index "$I" --h5ad "$h5" | tail -n 1)
   # shellcheck disable=SC2086
-  train_run "$RUN" $ARGS --adata "$h5" --seed "$SEED"
+  train_run "$RUN" $ARGS $EXTRA --adata "$h5" --seed "$SEED"
   set -e
 fi
 $PY -m revision.tasks.B2_benchmark.score_run --manifest "$M" --index "$I" --h5ad "$h5"

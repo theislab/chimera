@@ -283,7 +283,7 @@ def build(row: dict, out_path=None, check: bool = True):
     cohort, setting, rep = row["cohort"], row["setting"], int(row["rep"])
     cfg = RU.ALL_COHORTS[cohort]
     st = RU.SETTINGS["full" if setting == "ref" else setting]
-    rng = np.random.default_rng(RU.useed("perturb", cohort, setting, rep))
+    rng = np.random.default_rng(RU.useed("perturb", cohort, RU.SETTINGS.get(setting, {}).get("object_of", setting), rep))
     a = read_base(cohort)
     X0 = csr(a.X)
     assert np.allclose(X0.data, np.round(X0.data)), "X is not integer"

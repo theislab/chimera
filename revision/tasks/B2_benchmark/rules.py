@@ -99,6 +99,10 @@ SETTINGS = {
     "depth50": dict(family="sampling", kind="depth", frac=0.50),
     "depth25": dict(family="sampling", kind="depth", frac=0.25),
     "few_donors": dict(family="sampling", kind="few_donors"),
+    # depth law arm: the same objects as depth50 and depth25 (object_of), recipe with lambda_anchor scaled by revision/common/depth_anchor.py; added at the coordinator's
+    # instruction before any of these rows ran. Direct methods read the same counts, so only Chimera is new. Reported beside the recipe-unchanged rows.
+    "depth50_law": dict(family="sampling", kind="depth", frac=0.50, object_of="depth50", depth_law=True),
+    "depth25_law": dict(family="sampling", kind="depth", frac=0.25, object_of="depth25", depth_law=True),
     # technical
     "extra_batch": dict(family="technical", kind="extra_batch"),
     "chemistry": dict(family="technical", kind="chemistry"),
