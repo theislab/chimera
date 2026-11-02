@@ -2,6 +2,8 @@
 # Submit the lines of a queue file in order, keeping our tasks (names b2*, running and pending) within a CPU and a memory share, about a third of the per-user caps (512 CPUs, 2T), so other work of the same user keeps moving.
 # Usage (from chimera/): nohup setsid bash revision/tasks/B2_benchmark/feeder.sh <queue file> [cpu share] [memory share in G] &
 Q="$1"; SHARE="${2:-170}"; MEMS="${3:-680}"; DONE="$Q.done"; touch "$DONE"
+trap 'echo "$(date -Is) feeder exit, status $?"' EXIT
+trap 'echo "$(date -Is) feeder got a signal"; exit 143' TERM INT HUP
 while :; do
   cpu=$(squeue -u "$USER" -r -h -o "%j %C" | awk '$1 ~ /^b2/ {s+=$2} END {print s+0}')
   mem=$(squeue -u "$USER" -r -h -o "%j %m" | awk '$1 ~ /^b2/ {v=$2; g=v+0; if (v ~ /M$/) g/=1024; s+=g} END {print int(s)}')

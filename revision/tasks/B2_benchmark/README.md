@@ -56,3 +56,6 @@ From `chimera/`, in `chimera_env` through SLURM: `make_grid`, `array.sbatch` per
 
 ## Compute (the plan's second amendment)
 The full grid stands, with three replicates per setting. Runs are ordered by `make_queue.py`: central settings and main effects first, replicates and other severities after, and `feeder.sh` holds about a third of the per-user CPU cap. Only cells that add no information are dropped: CAMEX and SAMap on label-only settings, because neither reads labels, so their reading there is that of `full` and is marked label-independent. SATURN runs one replicate on every setting and three on the main settings; GeneSpectra and CACIMAR one replicate on every setting (they are deterministic given the data, so their reference reading is `full`); SAMap one replicate on every setting that changes counts. Scoring uses `pool.sbatch`.
+
+## Tiers and the stopping rule
+`tiers.py`, committed while liver alone had been scored in Track B. Scoring takes whole tiers complete at 2026-11-04 14:00, by time alone. Feeder health: `feeder.sh` logs its exit and any signal, and a watcher reports a log older than ten minutes.
