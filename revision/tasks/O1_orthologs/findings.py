@@ -78,9 +78,29 @@ def x4(tier: str, jobs: int) -> None:
     CM.N_JOBS = jobs
     A.N_JOBS = jobs
     G = {c: A.prepare(c) for c in A.RU.COHORTS}
-    for s in ("adds", "x1", "x2", "mechanism"):
+    for s in ("adds", "x1", "x2"):
         print("==", s, flush=True)
         A.SECTIONS[s](G)
+    signature(A, CM, G, out)
+
+
+def signature(A, CM, G, out) -> None:
+    """The X2 programme block of X4 ``mechanism``, alone: the full section needs every gene in run order."""
+    lst = pd.read_csv(CM.RES / "X2/divergent_conserved.csv")
+    prog = sorted(set(lst[lst.cohort == "liv_4sp"].symbol) - {"MT-CO1"})
+    sets = {"prog63_noMT": prog, "core15": A.PROG_CORE, "fasting6": A.FASTING}
+    rows = []
+    for c in ("liv_4sp", "liv_hmouse"):
+        g = A.gdrv(A.atlas_columns(G[c].copy()))
+        d = pd.read_parquet(CM.CACHE / f"Sdir__{c}.parquet").set_index("var_name")
+        for k in ("Sdir", "Sdir_pattern", "Sdir_level"):
+            g[k] = g.var_name.map(d[k])
+        for k, names in sets.items():
+            f = g.symbol.isin(names).to_numpy()
+            pool = ~g.symbol.isin(prog).to_numpy()
+            for v in ("S", "Sdir", "Sdir_pattern", "Sdir_level", "B1b_raw"):
+                rows.append(dict(cohort=c, set=k, value=v, matching="C_hep", **CM.matched(g, f, pool, v, A.CP + ["hep_enrich"], key=f"sig{c}{k}{v}")))
+    pd.DataFrame(rows).to_csv(out / "mechanism_x2_signature.csv", index=False)
 
 
 def main():
