@@ -48,12 +48,12 @@ def args_for(cohort: str, form: str, anchor: float, seed: int, k: int) -> str:
             f"--lambda-mmd {mmd} --free-bits {fb} --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85")
 
 
-def manifest(cohort: str, rnd: int = 1, anchors: list[float] | None = None) -> Path:
+def manifest(cohort: str, rnd: int = 1, anchors: list[float] | None = None, forms: tuple = ("a", "b")) -> Path:
     r, k = depth_ratio(cohort)
     A = anchor_base(r, k)
     rows = []
     GRIDS.mkdir(exist_ok=True)
-    for form in ("a", "b"):
+    for form in forms:
         for lab, an in (("A", A), ("2A", round(2 * A, 5))) if anchors is None else [(f"x{an_}", an_) for an_ in anchors]:
             rows.append(dict(run_name=f"rev-c1-{tag(cohort)}-{form}{lab}-s42", args=args_for(cohort, form, an, 42, k)))
     p = GRIDS / f"{cohort}_r{rnd}.tsv"
@@ -133,9 +133,10 @@ def main() -> int:
     ap.add_argument("--round", type=int, default=1)
     ap.add_argument("--anchors", default=None)
     ap.add_argument("--row", default=None)
+    ap.add_argument("--forms", default="ab")
     a = ap.parse_args()
     if a.cmd == "manifest":
-        manifest(a.cohort, a.round, [float(x) for x in a.anchors.split(",")] if a.anchors else None)
+        manifest(a.cohort, a.round, [float(x) for x in a.anchors.split(",")] if a.anchors else None, tuple(a.forms))
     elif a.cmd == "seeds":
         print(seeds_manifest(a.cohort, a.row))
     else:

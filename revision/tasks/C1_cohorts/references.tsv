@@ -124,3 +124,6 @@ regen	proneurogenic	FOXN4	Muller	pro-neurogenic zebrafish	Hoang 2020
 regen	proneurogenic	OLIG2	Muller	pro-neurogenic zebrafish	Hoang 2020
 regen	proneurogenic	TGIF1	Muller	pro-neurogenic zebrafish	Hoang 2020
 regen	proneurogenic	LIN28A	Muller	zebrafish-specific	Hoang 2020
+muscle	ageing_up	CCL2	MuSC	up with age in muscle stem cell subsets and non-muscle cells	Kedlian 2024
+muscle	ageing_up	CCL2	FB	up with age in non-muscle cells	Kedlian 2024
+muscle	ageing_up	CCL2	Macrophage	up with age in non-muscle cells	Kedlian 2024

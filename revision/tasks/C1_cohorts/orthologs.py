@@ -15,7 +15,7 @@ per-cohort dN/dS beside the human-mouse gold.
 
 Filters on each human-partner pair, counted in the report (coordinator, after Y6 found wrong one-to-one pairs in older tables, PIN1 to Pin1rt1, GJA1 to Gja6, RPL36AL to Gm6525):
 `is_high_confidence == 1`; `protein_coding` biotype in both species (GTF); no retrocopy target, meaning a target with one exon against a human gene with at least
-three exons in their longest transcripts (Y6 shape); no target that differs in name from the human gene while a different gene of the partner species carries the
+three exons in their longest transcripts (Y6 shape) unless GOC and WGA are both above 50; no target that differs in name from the human gene while a different gene of the partner species carries the
 human name, case-insensitive (the shape of the wrong pairs above; flagged only when GOC and WGA are both above 50). GOC and WGA are kept as `<sp>_goc`, `<sp>_wga`.
 
 A group is kept only if every gene is in the measured feature list of its species (``measured``):
@@ -140,7 +140,11 @@ def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, di
     rep["removed_not_protein_coding_partner"] = int((bp != "protein_coding").sum())
     d = d[pc]
     eh, ep = d["gene_stable_id"].map(gh["max_exons"]), d["homology_gene_stable_id"].map(gp["max_exons"])
-    retro = (ep <= 1) & (eh >= 3)
+    weak0 = ~((d["goc_score"] > 50) & (d["wga_coverage"] > 50))
+    shape = (ep <= 1) & (eh >= 3)
+    # One exon against three is also the shape of genuine intronless genes with an extra annotated human isoform (JUN, KCNA3), so the shape removes only with weak synteny labels.
+    retro = shape & weak0
+    rep["retrocopy_shape_strong_labels_kept"] = int((shape & ~weak0).sum())
     rep["removed_retrocopy_shape"] = int(retro.sum())
     rep["removed_retrocopy_shape_examples"] = d.loc[retro, "homology_gene_stable_id"].map(gp["name"]).dropna().head(12).tolist()
     d = d[~retro]

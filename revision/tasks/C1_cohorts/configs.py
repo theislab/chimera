@@ -117,3 +117,14 @@ SOURCES["mtg"] = dict(
     species={"hsapiens": dict(name="Human", files=[MT / "224db6b4-2895-4c4e-8503-bb647fae9b29.h5ad"], source="Jorstad2023", filters={"assay": ["10x 3' v3"]}, filter_reason="Smart-seq reads are not on the UMI count scale"),
              "mmulatta": dict(name="Macaque", files=[MT / "261dd26f-1507-41a5-94e5-b96903de74a9.h5ad"], source="Jorstad2023"),
              "cjacchus": dict(name="Marmoset", files=[MT / "c556b8e8-e348-49b9-b4da-08b05cd43350.h5ad"], source="Jorstad2023")})
+
+
+# Model on young donors of the nucleus fraction, one chemistry per species; DE (prepare_de.py) on other donors, plan section 13f.
+SOURCES["muscle"] = dict(
+    reference="Kedlian 2024 Nature Aging, CELLxGENE collection 2d40e6a7; human intercostal nuclei 10x 3' v3, mouse hindlimb nuclei 10x 3' v2",
+    map=MAPS / "muscle_ageing.tsv", unit_col="donor_id",
+    species={"hsapiens": dict(name="Human", files=[MU / "5fd93c55-8047-48fb-905c-6ef2f7767483.h5ad"], source="Kedlian2024", label_col="annotation_level0",
+                              filters={"donor_id": ["529C", "566B"], "batch": ["nuclei"], "assay": ["10x 3' v3"]}, filter_reason="young donors kept out of the DE; one chemistry and fraction"),
+             "mmusculus": dict(name="Mouse", files=[MU / "7085b988-463e-4183-b33d-838e1f6ad739.h5ad"], source="Kedlian2024", label_col="annotation",
+                               filters={"donor_id": ["Donor1", "Donor2"]}, filter_reason="3-month donors kept out of the DE; the nucleus libraries")})
+COHORTS["muscle_ageing"] = dict(source="muscle", species=["hsapiens", "mmusculus"], tissue="skeletal muscle", label="Muscle human, mouse")

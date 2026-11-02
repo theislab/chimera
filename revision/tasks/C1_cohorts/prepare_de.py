@@ -162,6 +162,64 @@ def ad_mouse() -> None:
     pbm.write_h5ad(out_dir("ad") / "pb_mouse.h5ad")
 
 
+def stream_h5ad(path, keep_col_fn, cols):
+    """Rows selected by keep_col_fn(obs) from raw/X of one CELLxGENE file, integer check on what is read."""
+    with h5py.File(path, "r") as f:
+        o = f["obs"]
+        obs = pd.DataFrame({c: read_elem(o[c]) for c in cols}).astype(str)
+        var = f["raw/var"]
+        ids = pd.Index(read_elem(var[var.attrs["_index"]])).astype(str)
+        names = pd.Series(read_elem(var["feature_name"]).astype(str))
+        rows = np.flatnonzero(keep_col_fn(obs).to_numpy())
+        g = f["raw/X"]
+        indptr = g["indptr"][()]
+        bl = []
+        for p0 in range(0, len(rows), 20000):
+            rb = rows[p0:p0 + 20000]
+            lo, hi = int(indptr[rb[0]]), int(indptr[rb[-1] + 1])
+            dat, ind = g["data"][lo:hi], g["indices"][lo:hi]
+            st, ln = indptr[rb] - lo, indptr[rb + 1] - indptr[rb]
+            off = np.r_[0, np.cumsum(ln)]
+            sel = np.repeat(st - off[:-1], ln) + np.arange(off[-1])
+            d = dat[sel].astype(np.float32)
+            if (d != np.round(d)).any():
+                raise ValueError("not integers")
+            bl.append(sp.csr_matrix((d, ind[sel], off), shape=(len(rb), len(ids))))
+        X = sp.vstack(bl).tocsr()
+    return X, obs.iloc[rows].reset_index(drop=True), ids, names
+
+
+MUSCLE_DE_H = {"FB": "fb", "MuSC": "musc", "SMC": "smc", "Pericyte": "pericyte", "CapEC": "capec", "ArtEC": "artec", "VenEC": "venec", "Macrophage": "macrophage"}
+MUSCLE_DE_M = {"FB": "fb", "MuSC": "musc", "SMC": "smc", "Pericyte": "pericyte", "CapEC": "capec", "ArtEC": "artec", "VenEC": "venec", "Macrophage-LYVE1": "macrophage", "Macrophage-LAM": "macrophage"}
+MUS_H_OLD = ["seventh decade stage", "eighth decade stage"]
+MUS_H_YOUNG = ["young adult stage", "third decade stage", "fourth decade stage"]
+MUS_H_TRAIN = ["529C", "566B"]
+
+
+def muscle_human() -> None:
+    """Cells of the cell fraction, donors not in training; old (7th, 8th decade) vs young; 6th decade not used."""
+    f = CF.DATA / "muscle_ageing/5fd93c55-8047-48fb-905c-6ef2f7767483.h5ad"
+    X, o, ids, names = stream_h5ad(f, lambda ob: (ob["batch"] == "cells") & ob["development_stage"].isin(MUS_H_OLD + MUS_H_YOUNG) & ob["annotation_level0"].isin(MUSCLE_DE_H) & ~ob["donor_id"].isin(MUS_H_TRAIN), ["donor_id", "development_stage", "batch", "assay", "sex", "annotation_level0"])
+    qc = np.asarray((X > 0).sum(1)).ravel() >= CF.MIN_GENES
+    X, o = X[qc], o[qc]
+    o = o.assign(unit=o["donor_id"], cell_ontology_class=o["annotation_level0"].map(MUSCLE_DE_H), condition=np.where(o["development_stage"].isin(MUS_H_OLD), "disease", "control"))
+    v = pd.DataFrame({"gene_ids": ids}, index=unique_symbols(names))
+    a = pb(X, o, v, ["assay", "sex"])
+    a.write_h5ad(out_dir("muscle") / "pb_human.h5ad")
+
+
+def muscle_mouse() -> None:
+    """19-month donors 4, 6, 8 vs 3-month donors 3, 5, 7 (donors 1, 2 are in training)."""
+    f = CF.DATA / "muscle_ageing/7085b988-463e-4183-b33d-838e1f6ad739.h5ad"
+    X, o, ids, names = stream_h5ad(f, lambda ob: ob["donor_id"].isin(["Donor3", "Donor5", "Donor7", "Donor4", "Donor6", "Donor8"]) & ob["annotation"].isin(MUSCLE_DE_M), ["donor_id", "development_stage", "annotation"])
+    qc = np.asarray((X > 0).sum(1)).ravel() >= CF.MIN_GENES
+    X, o = X[qc], o[qc]
+    o = o.assign(unit=o["donor_id"], cell_ontology_class=o["annotation"].map(MUSCLE_DE_M), condition=np.where(o["development_stage"].str.startswith("19"), "disease", "control"))
+    v = pd.DataFrame({"gene_ids": ids}, index=unique_symbols(names))
+    a = pb(X, o, v, [])
+    a.write_h5ad(out_dir("muscle") / "pb_mouse.h5ad")
+
+
 def sym_ids(symbols: pd.Series, sp_short: str) -> pd.Series:
     n2 = pd.Series(OR.gtf_names(OR.SPECIES[sp_short]["gtf"]))
     u = n2[~n2.duplicated(keep=False)]
@@ -215,4 +273,4 @@ def lung_mouse() -> None:
 
 
 if __name__ == "__main__":
-    {"ad_human": ad_human, "ad_mouse": ad_mouse, "lung_human": lung_human, "lung_mouse": lung_mouse}[sys.argv[1]]()
+    {"ad_human": ad_human, "ad_mouse": ad_mouse, "lung_human": lung_human, "lung_mouse": lung_mouse, "muscle_human": muscle_human, "muscle_mouse": muscle_mouse}[sys.argv[1]]()

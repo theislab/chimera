@@ -338,6 +338,11 @@ def ad_case(n_perm: int, n_boot: int) -> None:
     t.to_csv(CF.RES / "ad" / "e_a4.tsv", sep="\t", index=False)
 
 
+def muscle_case(n_perm: int, n_boot: int) -> None:
+    h_d1("muscle", "muscle_ageing", ["fb", "musc", "smc", "pericyte", "capec", "artec", "venec", "macrophage"], n_perm, n_boot)
+    ref_de("muscle", "muscle", {"FB": "fb", "MuSC": "musc", "Macrophage": "macrophage", "CapEC": "capec"})
+
+
 def lung_case(n_perm: int, n_boot: int) -> None:
     h_d1("lung", "lung_healthy", ["macrophage", "at2", "endothelial", "t", "dc"], n_perm, n_boot)
     ref_de("lung", "lung", {"AT2": "at2", "Macrophage": "macrophage"})
@@ -429,11 +434,11 @@ def tumour(n_boot: int) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("which", choices=["brain", "ad", "lung", "tumour"])
+    ap.add_argument("which", choices=["brain", "ad", "lung", "tumour", "muscle"])
     ap.add_argument("--n-perm", type=int, default=10000)
     ap.add_argument("--n-boot", type=int, default=2000)
     a = ap.parse_args()
-    {"brain": lambda: brain(a.n_perm, a.n_boot), "ad": lambda: ad_case(a.n_perm, a.n_boot), "lung": lambda: lung_case(a.n_perm, a.n_boot), "tumour": lambda: tumour(a.n_boot)}[a.which]()
+    {"brain": lambda: brain(a.n_perm, a.n_boot), "ad": lambda: ad_case(a.n_perm, a.n_boot), "lung": lambda: lung_case(a.n_perm, a.n_boot), "tumour": lambda: tumour(a.n_boot), "muscle": lambda: muscle_case(a.n_perm, a.n_boot)}[a.which]()
     return 0
 
 

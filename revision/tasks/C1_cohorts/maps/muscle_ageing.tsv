@@ -1,0 +1,62 @@
+species	author_label	cell_ontology_class	note
+hsapiens	MF-I	MF_I	
+hsapiens	MF-II	MF_II	
+hsapiens	FB	FB	
+hsapiens	MuSC	MuSC	
+hsapiens	SMC	SMC	
+hsapiens	Pericyte	Pericyte	
+hsapiens	CapEC	CapEC	
+hsapiens	ArtEC	ArtEC	
+hsapiens	VenEC	VenEC	
+hsapiens	LymphEC	LymphEC	
+hsapiens	Macrophage	Macrophage	
+hsapiens	Monocyte	Monocyte	
+hsapiens	Tenocyte	Tenocyte	
+hsapiens	B-cell	B	
+hsapiens	nmSchwann	nmSchwann	
+hsapiens	Adipocyte	Adipocyte	
+hsapiens	EnFB	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Hyb	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	MF-IIsc(fg)	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	MF-IIsn(fg)	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	MF-Isc(fg)	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	MF-Isn(fg)	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Specialised MF	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	PnFB	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	T-cell	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	NK-cell	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	B-plasma	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Mast	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	cDC1	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	cDC2	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Eosinophil	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Neutrophil	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	RBC	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	Mesothelium	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	mSchwann	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+hsapiens	pDC	DROP	hybrid or fine-grained state, or absent from the mouse nucleus fraction
+mmusculus	MF-I	MF_I	
+mmusculus	MF-IIA	MF_II	
+mmusculus	MF-IIB	MF_II	
+mmusculus	MF-IIX	MF_II	
+mmusculus	FB	FB	
+mmusculus	MuSC	MuSC	
+mmusculus	SMC	SMC	
+mmusculus	Pericyte	Pericyte	
+mmusculus	CapEC	CapEC	
+mmusculus	ArtEC	ArtEC	
+mmusculus	VenEC	VenEC	
+mmusculus	LymphEC	LymphEC	
+mmusculus	Macrophage-LYVE1	Macrophage	
+mmusculus	Macrophage-LAM	Macrophage	
+mmusculus	Monocyte	Monocyte	
+mmusculus	Tenoc	Tenocyte	
+mmusculus	B cell	B	
+mmusculus	nmSchwann	nmSchwann	
+mmusculus	Adipocyte	Adipocyte	
+mmusculus	MF-other	DROP	specialised or unresolved state
+mmusculus	MTJ	DROP	specialised or unresolved state
+mmusculus	NMJ	DROP	specialised or unresolved state
+mmusculus	Neutrophil	DROP	specialised or unresolved state
+mmusculus	RBD	DROP	specialised or unresolved state
+mmusculus	mSchwann	DROP	specialised or unresolved state
