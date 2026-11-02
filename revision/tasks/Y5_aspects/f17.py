@@ -99,5 +99,40 @@ def f7():
     pd.DataFrame(rows).to_csv(K.OUT / "f7_paralogs.csv", index=False)
 
 
+def f1d():
+    """Properties against D in the existing control runs: is the relation learned from counts or from the features?"""
+    from revision.common import cohorts as C
+    arms = {"liv_hmouse": ["m", "rand", "zesm", "zexpr", "permC"], "liv_4sp": ["rand", "zesm", "zexpr", "permA"],
+            "test_hmouse": ["rand", "permC"], "test_3sp": ["nolab"]}
+    rows = []
+    props = list(RU.PROPERTIES)
+    for c, ar in arms.items():
+        g = K.genes(c).copy()
+        for arm in ar:
+            runs = sorted(p.name for p in C.RUNS_DIR.glob(f"rev-ctl-{c}-{arm}-s*"))
+            vals, Ss = [], []
+            for r in runs:
+                st = C.load_state(r)
+                if not (C.RUNS_DIR / r / "summary.json").exists() or not np.isfinite(st["alpha"]).all():
+                    continue
+                d = np.asarray(st["alpha"], float) - g.prior_raw.to_numpy()
+                vals.append(d - np.nanmedian(d))
+                Ss.append(np.asarray(st["S_g_ema"], float))
+            if not vals:
+                continue
+            g[f"D_{arm}"] = np.mean(vals, 0)
+            g[f"S_{arm}"] = np.mean(Ss, 0)
+            ys = [f"D_{arm}", f"S_{arm}", "D_raw", "S"]
+            for prop in props:
+                covs = K.C3 if prop == "log_length" else K.C4
+                for half in ("odd", "even"):
+                    m = (~g.masked.astype(bool)) & (g.half == half) & g[[prop, "block"] + covs + ys].notna().all(1)
+                    r2 = K.scan(g[m], prop, ys, covs, seed=K.useed(c, arm, prop, half), draws=200)
+                    r2["cohort"], r2["arm"], r2["n_runs"], r2["half"], r2["property"] = c, arm, len(vals), half, prop
+                    rows.append(r2)
+            print(c, arm, len(vals), flush=True)
+    pd.concat(rows, ignore_index=True).to_csv(K.OUT / "f1d_controls.csv", index=False)
+
+
 if __name__ == "__main__":
-    dict(f1c=f1c, f7=f7)[sys.argv[1]]()
+    dict(f1c=f1c, f7=f7, f1d=f1d)[sys.argv[1]]()
