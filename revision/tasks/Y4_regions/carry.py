@@ -112,5 +112,67 @@ def main():
     print(car[["cohort", "gold", "readout", "region", "axis", "tier", "n", "rho", "lo", "hi", "rho_rest", "T3", "T3_best", "T4"]].round(3))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and __import__("sys").argv[1:] != ["amended"]:
     main()
+
+
+# Amendment, written after the odd table and the decoy calibration were read and before any even gene is opened. See the ledger.
+# The mechanical list is kept as carried_mechanical.csv. Each unit below is eligible under the committed rule and beats every one
+# of the 30 same-size decoys of its cohort, gold and readout on its tier's statistic.
+CHOSEN = [
+    ("liv_hmouse", "G_H3", "S", "expr_T2__spread_T1"),
+    ("liv_hmouse", "G_H3", "S", "spread_T1"),
+    ("liv_hmouse", "G_H1", "S", "expr_T2__tau_T3"),
+    ("test_hmouse", "G_H2", "S", "tau_Q4"),
+    ("test_hmouse", "G_H4", "S", "absshift_T3__spread_T3"),
+    ("liv_hmouse", "G_H3", "D", "absshift_T3"),
+    ("liv_hmouse", "G_H3", "S", "pihi__tau_T2"),
+    ("liv_4sp", "G_H3", "D", "pihi__expr_T2"),
+    ("liv_hmouse", "G_H3", "D", "pilo__spread_T3"),
+    ("test_hmouse", "G_H4", "D", "peakmargin_T3"),
+]
+TIER_STAT = {"A": "T3", "B": "T4", "C": "T2"}
+
+
+def amended():
+    import shutil
+
+    if not (OUT / "carried_mechanical.csv").exists():
+        shutil.copy(OUT / "carried.csv", OUT / "carried_mechanical.csv")
+    df = pd.read_csv(OUT / "discovery_units.csv")
+    dec = pd.read_csv(OUT / "discovery_decoys.csv")
+    dec["size"] = dec.region.str.extract(r"decoy(\d+)")[0].astype(int)
+    sizes = np.array(RU.DECOY_SIZES)
+    ref = dec.groupby(["cohort", "gold", "readout", "size"])[["T2", "T3", "T4"]].max()
+    rows = []
+    for c, g, x, reg in CHOSEN:
+        r = df[(df.cohort == c) & (df.gold == g) & (df.readout == x) & (df.region == reg)].iloc[0]
+        assert r.tier in ("A", "B", "C"), (c, g, x, reg)
+        ns = int(sizes[np.argmin(np.abs(np.log(sizes) - np.log(r.n)))])
+        st = TIER_STAT[r.tier]
+        assert r[st] > ref.loc[(c, g, x, ns), st], (c, g, x, reg)
+        rows.append(r)
+    car = pd.DataFrame(rows)
+    # the committed overlap rule still holds
+    masks_ = masks()
+    for i, a in enumerate(rows):
+        for b in rows[i + 1:]:
+            if SC.tissue(a.cohort) == SC.tissue(b.cohort):
+                ta, tb = SC.table(a.cohort), SC.table(b.cohort)
+                ga = set(ta["hsapiens_gene_id"].to_numpy()[masks_[a.cohort][a.region] & ta["split"].eq("odd").to_numpy()])
+                gb = set(tb["hsapiens_gene_id"].to_numpy()[masks_[b.cohort][b.region] & tb["split"].eq("odd").to_numpy()])
+                j = len(ga & gb) / max(len(ga | gb), 1)
+                print(a.region, b.region, round(j, 3))
+                assert j <= RU.JACCARD, (a.region, b.region, j)
+    cols = ["cohort", "gold", "readout", "region", "axis", "mech", "seen", "tier", "n", "rho", "lo", "hi", "q_T1", "rho_rest", "T2", "T2_lo", "T2_hi", "q_T2",
+            "n_common", "rho_common", "T3", "T3_lo", "T3_hi", "q_T3", "T3_best", "T4", "T4_lo", "T4_hi", "q_T4", "T4_global", "J", "J_dropped",
+            "rho_B1b_raw", "rho_B1c_raw", "rho_B1z_raw", "rho_B2b", "rho_B3a", "rho_Sdir"]
+    car = car[cols]
+    car.to_csv(OUT / "carried.csv", index=False)
+    (OUT / "carried.json").write_text(json.dumps(car.to_dict("records"), indent=1, default=str))
+    pd.set_option("display.width", 250, "display.max_columns", 40)
+    print(car[["cohort", "gold", "readout", "region", "tier", "seen", "n", "rho", "lo", "hi", "rho_rest", "q_T2", "n_common", "rho_common", "T3", "T3_best", "T4", "rho_B1b_raw", "rho_B1c_raw", "rho_B1z_raw", "rho_B2b", "rho_B3a", "rho_Sdir"]].round(3).to_string())
+
+
+if __name__ == "__main__" and __import__("sys").argv[1:] == ["amended"]:
+    amended()
