@@ -49,7 +49,9 @@ def panel(ax, M, title, cmap, vmin, vmax, mark, fd, lower_better=False):
     for name, ms in TIERS:
         if x:
             ax.axvline(x - 0.5, color="#ffffff", lw=1.5)
-        ax.text(x + (len(ms) - 1) / 2, -0.6, name, ha="center", va="bottom", fontsize=4.6, color="#333333")
+        last = ms == TIERS[-1][1]
+        ax.text(x - 0.45 if last else x + (len(ms) - 1) / 2, -0.6, name, ha="left" if last else "center",
+                va="bottom", fontsize=4.6, color="#333333")
         x += len(ms)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
