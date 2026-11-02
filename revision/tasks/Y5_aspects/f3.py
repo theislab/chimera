@@ -544,7 +544,7 @@ def b1z_sweep(cohorts=("liv_hmouse", "test_3sp", "test_hmouse", "test_hmac", "li
 
 
 def b1z_sweep_tests():
-    rows = []
+    rows, common = [], []
     for c, gold in (("liv_hmouse", "G_H3"), ("liv_4sp", "G_H3"), ("test_3sp", "G_H4"), ("test_hmouse", "G_H4"), ("test_hmac", "G_H4")):
         f = OUT / f"b1z_sweep__{c}.parquet"
         if not f.exists():
@@ -575,8 +575,47 @@ def b1z_sweep_tests():
                 ref = [k for k in alive if k.startswith("chimera_")][0]
                 r = K.scan(T, gold, alive, covs, seed=K.useed(c, half, "common"), delta_to=ref, draws=1000)
                 r["cohort"], r["half"], r["universe"] = c, half, "common"
-                rows.append(r)
+                common.append(r)
     pd.DataFrame(rows).to_csv(OUT / "b1z_sweep_rho.csv", index=False)
+    pd.concat(common, ignore_index=True).to_csv(OUT / "b1z_sweep_common.csv", index=False)
+
+
+def b1z_extra():
+    """Comparators named in amendment 5: X6 damaged-label direct scores, hepatocyte enrichment, seed dose-response."""
+    rows, dose = [], []
+    for c, gold in (("liv_hmouse", "G_H3"), ("test_hmouse", "G_H4")):
+        g = K.genes(c)
+        z = pd.read_parquet(OUT / f"b1z__{c}.parquet").drop(columns=["var_name"])
+        chim = [k for k in z.columns if k.startswith("B1z_chimera") and z[k].notna().any()]
+        z["B1z_chimera_mean"] = z[chim].mean(1)
+        g = g.merge(z, on="hsapiens_gene_id")
+        d = pd.read_parquet(K.REPO / f"results/revision/X6/cache/degraded__{c}.parquet")
+        keep = ["var_name"] + [k for k in d.columns if k.startswith("B1b_raw__") and ("full" in k or "coarse3" in k or "leiden" in k)]
+        g = g.merge(d[keep], on="var_name", how="left")
+        covs = K.CPAT + (["H4_nsp"] if gold == "G_H4" else [])
+        if c == "liv_hmouse":
+            he = pd.read_parquet(K.REPO / f"results/revision/X2/genes/{c}.parquet")[["var_name", "hep_enrich"]]
+            g = g.merge(he, on="var_name", how="left")
+        scores = ["B1z_chimera_mean", chim[0], "B1z_camex", "B1z_sysvi"] + [k for k in keep[1:]] + ["S"]
+        scores = [k for k in scores if k in g and g[k].notna().mean() > .3]
+        for half in ("odd", "even"):
+            for label, cv in (("Cpat", covs), ("Cpat+hep", covs + ["hep_enrich"])):
+                if not set(cv) <= set(g.columns):
+                    continue
+                T = g[(g.half == half) & g[[gold, "block"] + cv + scores].notna().all(1)]
+                r = K.scan(T, gold, scores, cv, seed=K.useed(c, half, label), delta_to="B1z_chimera_mean", draws=1000)
+                r["cohort"], r["half"], r["cov"] = c, half, label
+                rows.append(r)
+        sh = pd.read_csv(OUT / "b1z_shared_clusters.csv")
+        for r in sh[sh.cohort == c].itertuples():
+            k = f"B1z_{r.latent}"
+            for half in ("odd", "even"):
+                T = g[(g.half == half) & g[[gold, "block", k] + covs].notna().all(1)]
+                if len(T) > 100:
+                    dose.append(dict(cohort=c, latent=r.latent, half=half, cells_in_shared=r.cells_in_shared, n_shared=r.n_shared,
+                                     rho_p=K.scan(T, gold, [k], covs, draws=2).rho_p.iloc[0], n=len(T)))
+    pd.concat(rows, ignore_index=True).to_csv(OUT / "b1z_extra.csv", index=False)
+    pd.DataFrame(dose).to_csv(OUT / "b1z_dose.csv", index=False)
 
 
 def clusters():
@@ -609,5 +648,5 @@ if __name__ == "__main__":
     p.add_argument("section")
     p.add_argument("--cohort", default=None)
     a = p.parse_args()
-    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, b1z_sweep=b1z_sweep, b1z_sweep_tests=b1z_sweep_tests, clusters=clusters)[a.section]
+    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, b1z_sweep=b1z_sweep, b1z_sweep_tests=b1z_sweep_tests, b1z_extra=b1z_extra, clusters=clusters)[a.section]
     fn((a.cohort,)) if a.cohort else fn()
