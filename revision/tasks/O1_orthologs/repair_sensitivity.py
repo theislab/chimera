@@ -4,7 +4,8 @@ Arms, each a whole scoreboard run with the frozen draws, seeds and golds:
   can3        canonical D of seeds 42, 43, 44, frozen covariates and baselines: the like-for-like comparator for a 3-seed D;
   rep3        repaired D of seeds 42, 43, 44, covariates, tau, ESM blocks and baselines recomputed on the repaired object;
   rep3_shared rep3 on the genes of the canonical object;
-  rep3_norep  rep3 without the repaired genes: their own contribution.
+  rep3_norep  rep3 without the repaired genes: their own contribution;
+  rep3_int    post hoc: rep3 with liver H+Mouse on its integrated repaired seeds only (42, 44), since can3 is all integrated.
 Testis 3-sp is not rebuilt: its rows stay canonical in every arm. Baseline split halves and ceilings are not computed here (no status uses them).
 
     PYTHONPATH=$PWD python -m revision.tasks.O1_orthologs.repair_sensitivity baselines
@@ -86,10 +87,12 @@ def shim() -> Path:
 
 def patch_arm(arm: str) -> None:
     repaired = arm.startswith("rep3")
+    R.INTEGRATED_SEEDS = {}  # its unit needs seeds 47, 48, 51; Family 3 only, not in a 3-seed D
     runs = {}
     for c in REP:
         can = {int(s): r for s, r in I.seed_runs_used(c).items()}
-        runs[c] = {s: (f"o2-{c}-s{s}" if repaired else can[s]) for s in SEEDS}
+        use = (42, 44) if (arm == "rep3_int" and c == "liv_hmouse") else SEEDS  # post hoc: repaired H+Mouse s43 is poorly mixed, canonical 42-44 are not
+        runs[c] = {s: (f"o2-{c}-s{s}" if repaired else can[s]) for s in use}
     o_load, o_used = I.load, I.seed_runs_available
     o_u, o_su = R.universe, R.set_universe
     I.seed_runs_available = lambda cohort: runs[cohort]
@@ -164,7 +167,7 @@ def subsets() -> None:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("what", choices=["baselines", "arm", "subsets"])
-    ap.add_argument("--arm", choices=["can3", "rep3", "rep3_shared", "rep3_norep"])
+    ap.add_argument("--arm", choices=["can3", "rep3", "rep3_shared", "rep3_norep", "rep3_int"])
     ap.add_argument("--workers", type=int, default=12)
     a = ap.parse_args()
     if a.what == "baselines":
