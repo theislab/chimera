@@ -182,13 +182,19 @@ def measured_table(table: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict, pd.Da
     ``table``, one column per species) of where each group is measured.
     """
     rep: dict = {"n_groups_source": int(len(table)), "per_species": {}}
-    genes = {}
+    genes, both_rows = {}, []
     for sp in sorted(ENSEMBL.values()):
         own = own_gene_list(OWN_MATRIX[sp])
         name, gid = table[f"{sp}_gene_name"], table[f"{sp}_gene_id"]
         name_unique = ~name.duplicated(keep=False) & name.notna()
-        by_name = name_unique & name.isin(own)
-        by_id = ~by_name & gid.isin(own)
+        # The Ensembl ID row is the table's gene; a symbol row is used only when the matrix has
+        # no row for the ID (audit R4 n1: in rhesus and pig a same-symbol row can be another gene).
+        by_id = gid.isin(own)
+        by_name = name_unique & name.isin(own) & ~by_id
+        both = by_id & name_unique & name.isin(own)
+        if both.any():
+            both_rows.append(pd.DataFrame({"species": sp, "source_ortholog_group_id": table.loc[both, "ortholog_group_id"],
+                                           "symbol_row": name[both], "id_row_used": gid[both]}))
         g = pd.Series(pd.NA, index=table.index, dtype=object)
         g[by_id] = gid[by_id]
         g[by_name] = name[by_name]
@@ -199,6 +205,7 @@ def measured_table(table: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict, pd.Da
             "n_genes_own_matrix": len(own), "n_by_name": int((by_name & ~clash).sum()),
             "n_by_id": int((by_id & ~clash).sum()), "n_clash_dropped": int(clash.sum()),
             "n_not_measured": int(g.isna().sum()), "n_ambiguous_name_rows": int((name.notna() & ~name_unique).sum()),
+            "n_symbol_and_id_rows_both_present_id_used": int(both.sum()),
         }
     measured = pd.DataFrame({sp: g.notna() for sp, g in genes.items()})
     keep = measured.all(axis=1).to_numpy()
@@ -210,6 +217,7 @@ def measured_table(table: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict, pd.Da
     maps = {sp: dict(zip(new["ortholog_group_id"], g.loc[new["_row"]])) for sp, g in genes.items()}
     new = new.drop(columns="_row")
     rep["n_groups"] = int(len(new))
+    rep["symbol_and_id_rows"] = (pd.concat(both_rows).to_dict(orient="records") if both_rows else [])
     return new, maps, rep, measured
 
 
