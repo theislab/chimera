@@ -104,6 +104,11 @@ def tables(one: str | None) -> None:
     for c, d in reg.items():
         for s, run in sorted(d["tried"].items()):
             h = TB.run_health(run)
+            a_ = ad.read_h5ad(d["h5ad"], backed="r")
+            anchored = float((a_.var["conservation_prior"].to_numpy() >= 0.90).mean()) > 0.5
+            a_.file.close()
+            if anchored and h.get("no_nan"):  # coordinator ruling: both tails against the anchored prior when most genes are near pi = 1
+                h["healthy"] = bool(h["n_active_z"] == 10 and h["tail_up_anch"] >= RU.TAIL_MIN and h["tail_dn_anch"] >= RU.TAIL_MIN and h["sat_hi"] <= RU.SAT_MAX and h["sat_lo"] <= RU.SAT_MAX)
             runs.append(dict(cohort=c, tissue=d["tissue"], role="new", seed=s, kept=bool(h["healthy"]), **h))
     rt = pd.DataFrame(runs)
     rt.to_csv(RU.OUT / "runs.tsv", sep="\t", index=False)

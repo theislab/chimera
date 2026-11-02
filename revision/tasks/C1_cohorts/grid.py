@@ -131,6 +131,13 @@ def select(t: pd.DataFrame, k: int, scvi: dict) -> dict:
     return dict(selected=pick["run"], rho_DS=float(pick["rho_DS"]), label_transfer=float(pick["emb_label_transfer_acc"]), floor=floor, flagged=bool(pick["flag_embedding"]), n_healthy=len(h), scvi=scvi)
 
 
+def anchored_tails(cohort: str) -> bool:
+    a = ad.read_h5ad(CF.h5ad(cohort), backed="r")
+    f = float((a.var["conservation_prior"].to_numpy() >= 0.90).mean())
+    a.file.close()
+    return f > 0.5
+
+
 def report(cohort: str) -> pd.DataFrame:
     sys.path.insert(0, str(ROOT / "revision/tasks/Z1_retune"))
     import diagnostics as ZD  # noqa: PLC0415
@@ -149,6 +156,10 @@ def report(cohort: str) -> pd.DataFrame:
         rows.append(r)
     t = pd.DataFrame(rows)
     t.insert(0, "cohort", cohort)
+    if anchored_tails(cohort):
+        # Coordinator ruling (amendment log): more than half of genes at pi >= 0.90: both tails against the anchored prior; saturation and every other criterion unchanged.
+        t["healthy_raw_rule"] = t["healthy"]
+        t["healthy"] = (t.get("no_nan") == True) & (t["n_active_z"] == 10) & (t["tail_up_tr"] >= ZD.TAIL_MIN) & (t["tail_dn_tr"] >= ZD.TAIL_MIN) & (t["sat_hi"] <= ZD.SAT_MAX) & (t["sat_lo"] <= ZD.SAT_MAX)  # noqa: E712
     out = CF.RES / cohort
     t.to_csv(out / "grid_report.tsv", sep="\t", index=False)
     k = int(depth_ratio(cohort)[1])
