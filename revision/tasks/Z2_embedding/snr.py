@@ -20,6 +20,9 @@ from sklearn.preprocessing import StandardScaler
 from revision.tasks.Z2_embedding import common as K, rules as RU
 
 
+TAG = "_".join(sys.argv[1:]) or "default"
+
+
 def species_auc(z, y):
     p = cross_val_predict(make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000)), z, y, cv=5, method="predict_proba")
     return roc_auc_score(y, p, multi_class="ovr") if p.shape[1] > 2 else roc_auc_score(y, p[:, 1])
@@ -49,7 +52,11 @@ def chimera_post(c, run):
     sys.path.insert(0, str(RU.REPO / "revision/tasks/T2_5_celltype_margin"))
     from chimera import ChimeraModel
     a = K.read(c)
-    m = ChimeraModel.load(str(RU.RUNS / run / "model"), adata=a, accelerator="cpu")
+    try:
+        m = ChimeraModel.load(str(RU.RUNS / run / "model"), adata=a, accelerator="cpu")
+    except Exception as exc:
+        print("load failed", run, type(exc).__name__, flush=True)
+        return None
     mod = m.module.eval()
     X = a.X
     zs, ls, kl = [], [], []
@@ -80,16 +87,19 @@ def main():
     rows, pcs = [], []
     for c in sys.argv[1:] or ("liv_hmouse", "test_hmouse"):
         for s, run in list(K.chimera_runs(c).items())[:10]:
-            r, p = stats(c, run, "Chimera", s, *chimera_post(c, run))
+            post = chimera_post(c, run)
+            if post is None:
+                continue
+            r, p = stats(c, run, "Chimera", s, *post)
             rows.append(r); pcs.append(p); print(c, run, flush=True)
-            pd.DataFrame(rows).to_csv(RU.OUT / "snr.csv", index=False)
+            pd.DataFrame(rows).to_csv(RU.OUT / f"snr_{TAG}.csv", index=False)
         for f in sorted((RU.REPO / "results/revision/Y5/scvi").glob(f"{c}_s*/model.pt")) + sorted((RU.OUT / "scvi").glob(f"{c}_s*/model.pt")):
             d = f.parent
             mu, lv, kl = scvi_post(c, str(d))
             r, p = stats(c, d.name, "scVI", int(d.name.rsplit("_s", 1)[1]), mu, lv, kl)
             rows.append(r); pcs.append(p); print(c, d.name, flush=True)
-            pd.DataFrame(rows).to_csv(RU.OUT / "snr.csv", index=False)
-    pd.concat(pcs).to_csv(RU.OUT / "snr_pcs.csv", index=False)
+            pd.DataFrame(rows).to_csv(RU.OUT / f"snr_{TAG}.csv", index=False)
+    pd.concat(pcs).to_csv(RU.OUT / f"snr_pcs_{TAG}.csv", index=False)
     pd.set_option("display.width", 200)
     t = pd.DataFrame(rows)
     print(t.groupby(["cohort", "method"])[["rate", "noise_ratio_all", "median_noise_ratio", "sp_auc_all", "sp_auc_biglabel"]].agg(["mean", "min", "max"]).round(3).to_string())
