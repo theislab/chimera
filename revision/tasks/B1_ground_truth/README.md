@@ -27,6 +27,7 @@ Discard rule, fixed now: non-finite α, z or S_g, or fewer than 10 active z dims
 | `placebo.py` | type I error on unaltered fits |
 | `qc.py` | realism of the altered objects, no method read |
 | `aggregate.py` | tidy tables for the overview |
+| `completion.py` | runs tried and finished per method and setting, `completion.csv` |
 | `tools.py`, `tool_array.sbatch` | SATURN and CAMEX on the main settings |
 | `track_d/` | runtime, memory, scaling |
 | `figures.py` | one figure per task |

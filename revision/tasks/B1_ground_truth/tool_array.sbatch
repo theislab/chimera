@@ -15,6 +15,10 @@ run=$(get run); stem=$(get stem); seed=$(get seed)
 out=results/revision/B1/tool_scores/${tool}__$run.parquet
 if [[ -f "$out" ]]; then echo "already scored $tool $run"; exit 0; fi
 W=data/revision/B1/tools/$tool/$run
+# attempt record for completion.py, once the tool itself starts; a node that cannot even start the job leaves none
+mkdir -p results/revision/B1/attempts/$tool
+record_rc() { local rc=$?; [[ -f "$out" ]] || echo "$rc" > "results/revision/B1/attempts/$tool/$run.rc"; }
+trap record_rc EXIT
 if [[ ! -f "$W/altered.h5ad" ]]; then mamba run --no-capture-output -n chimera_env python -m revision.tasks.B1_ground_truth.tools build --manifest "$M" --index "$I"; fi
 t0=$SECONDS
 if [[ $tool == genespectra || $tool == cacimar || $tool == samap ]]; then
