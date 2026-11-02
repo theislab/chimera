@@ -13,7 +13,10 @@ Definitions, fixed before any association below was computed:
               at least 20 cells per cluster, pooled_E over the species pair.
     golds     G_H3 (C_pat), G_H4 (C_pat + H4_nsp), G_H4_primates (C_pat + H4_npri), as X6; level golds G_H1, G_H2
               (C) reported beside them.
-    universe  one per gold: genes with the gold, covariates, D, S, the X6 panel and every B1z variant.
+    universe  one per gold and variant: genes with the gold, covariates, D, S, the X6 panel, B1z_chimera and that variant.
+              Amendment after the first run, in which no association was computed because the joint universe was
+              empty: scVI and SATURN latents leave at most 1-9 Leiden clusters holding both species, so B1z is
+              undefined for most genes on them. The cluster table is therefore itself a result.
     tests     (a) rho_p of each variant given covariates; delta to Chimera's B1z, joint block bootstrap.
               (b) each variant given covariates + the other simple baselines B1b, B1c, B2b, B3a (X6's 'other
               simple baselines'). (c) Chimera's B1z given the variant, and the variant given Chimera's B1z.
@@ -61,6 +64,10 @@ def latents(c: str, a) -> dict[str, np.ndarray]:
 
 def b1z(c: str) -> tuple[pd.DataFrame, list[dict]]:
     p = CACHE / f"b1z__{c}.parquet"
+    if p.exists() and (OUT / "b1z_clusters.csv").exists():
+        old = pd.read_csv(OUT / "b1z_clusters.csv")
+        keep = old[(old.cohort == c) & old.n_clusters.notna()][["cohort", "latent", "n_clusters", "n_clusters_all_species"]]
+        return pd.read_parquet(p), keep.to_dict("records")
     a = C.read_adata(c)
     X = (a.X.tocsr() if sp.issparse(a.X) else sp.csr_matrix(a.X)).astype(np.float64)
     spc = a.obs["species"].astype(str).to_numpy()
@@ -89,17 +96,17 @@ def main():
         print(c, "reproduction of T4.2 B1z_raw, max abs diff", delta, flush=True)
         infos[-1]["repro_max_abs_diff"] = float(delta)
         var = [f"B1z_{k}" for k in ("chimera", "scvi_species", "scvi_library", "saturn", "camex")]
-        ok = g[["D", "S"] + OTHERS + var].notna().all(1).to_numpy()
-        for gold, covs in GOLDS[c]:
-            base = dict(cohort=c)
-            rows += CM.rho_unit(g, gold, covs, var, rows=ok, label=dict(base, given="none"), ref="B1z_chimera")
-            for v in var:
-                rows += CM.rho_unit(g, gold, covs, [v], rows=ok, extra_spline=OTHERS,
-                                    label=dict(base, given="other simple baselines"))
-            for v in var[1:]:
+        for v in var[1:]:
+            ok = g[["D", "S"] + OTHERS + ["B1z_chimera", v]].notna().all(1).to_numpy()
+            infos.append(dict(cohort=c, latent=v, n_genes_defined=int(g[v].notna().sum()), n_genes_chimera=int(g["B1z_chimera"].notna().sum()),
+                              n_genes_common_panel=int(ok.sum())))
+            for gold, covs in GOLDS[c]:
+                base = dict(cohort=c, variant=v)
+                rows += CM.rho_unit(g, gold, covs, ["B1z_chimera", v], rows=ok, label=dict(base, given="none"), ref="B1z_chimera")
+                for w in ("B1z_chimera", v):
+                    rows += CM.rho_unit(g, gold, covs, [w], rows=ok, extra_spline=OTHERS, label=dict(base, given="other simple baselines"))
                 rows += CM.rho_unit(g, gold, covs, ["B1z_chimera"], rows=ok, extra_spline=[v], label=dict(base, given=v))
-                rows += CM.rho_unit(g, gold, covs, [v], rows=ok, extra_spline=["B1z_chimera"],
-                                    label=dict(base, given="B1z_chimera"))
+                rows += CM.rho_unit(g, gold, covs, [v], rows=ok, extra_spline=["B1z_chimera"], label=dict(base, given="B1z_chimera"))
     pd.DataFrame(rows).to_csv(OUT / "b1z_latents.csv", index=False)
     pd.DataFrame(infos).to_csv(OUT / "b1z_clusters.csv", index=False)
 
