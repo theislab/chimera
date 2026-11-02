@@ -98,7 +98,9 @@ pytest -q
 ```
 
 Versions of the core dependencies are pinned in [`pyproject.toml`](pyproject.toml) to those
-the checkpoints were trained with. Training defaults to `--accelerator mps`; on Linux pass
+the checkpoints were trained with. On Linux x86-64,
+`bash revision/envs/build_env_from_lock.sh chimera_env` builds the CPU environment with every
+package at the version of the lock file used for the revision analyses. Training defaults to `--accelerator mps`; on Linux pass
 `--accelerator cpu` or `--accelerator gpu`.
 
 ## Data

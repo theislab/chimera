@@ -6,8 +6,9 @@
 #   RUN_CHECKPOINT=1 bash revision/reproduce_smoke.sh   # also load one checkpoint on CPU
 #   RUN_FIGURE=1 bash revision/reproduce_smoke.sh       # also execute 03_alpha_master
 #
-# Expects the deposited bundles unpacked in place: data/processed/ and
-# training/runs/ (see REPRODUCE.md). Writes nothing outside a temporary folder,
+# Expects the deposited bundles unpacked in place (see REPRODUCE.md): data/processed/ and
+# training/runs/ always; the gene-table check runs when results/gene_tables/ is present and
+# then also needs the revision seed runs. Writes nothing outside a temporary folder,
 # except the figures that notebook 03 writes when RUN_FIGURE=1.
 # Exit code 0 means every check passed.
 set -euo pipefail
@@ -75,6 +76,44 @@ for cohort, stem in gene_ids.H5ADS.items():
     adata.file.close()
 PY
 
+if [[ -d results/gene_tables ]]; then
+  step "deposited gene tables against the deposited runs"
+  "$PY" - <<'PY'
+import csv, json
+import numpy as np
+import pandas as pd
+
+recipe = {r["cohort"]: r for r in csv.DictReader(open("configs/canonical_recipes.tsv"), delimiter="\t")}
+pooling = {p["cohort"]: p for p in json.load(open("results/gene_tables/seed_pooling.json"))}
+
+def run_dir(cohort, seed):
+    r = recipe[cohort]
+    if str(seed) in r["seeds"].split(","):
+        return "training/runs/" + r["run_name"].replace("{seed}", str(seed))
+    return f"training/runs/rev-{cohort}-s{seed}"   # revision seed runs (checkpoints_revision bundle)
+
+for cohort in recipe:
+    seeds = pooling[cohort]["used"]
+    st = [{k: np.asarray(v, dtype=float) for k, v in np.load(f"{run_dir(cohort, s)}/final_state.npz", allow_pickle=False).items()
+           if k in ("alpha", "prior", "correction", "S_g_ema")} for s in seeds]
+    M = np.column_stack([x["alpha"] - x["prior"] for x in st])
+    mean_da = M.mean(1)
+    got = {
+        "alpha": np.column_stack([x["alpha"] for x in st]).mean(1),
+        "correction": np.column_stack([x["correction"] for x in st]).mean(1),
+        "delta_alpha": mean_da,
+        "D": mean_da - np.median(mean_da),
+        "S_ema": np.column_stack([x["S_g_ema"] for x in st]).mean(1),
+        "sign_consistency": (np.sign(M) == np.sign(mean_da)[:, None]).mean(1),
+    }
+    table = pd.read_csv(f"results/gene_tables/{cohort}__consensus.csv")
+    assert len(table) == len(mean_da) and (table["n_seeds"] == len(seeds)).all(), cohort
+    worst = max(float(np.nanmax(np.abs(table[k].to_numpy(float) - v))) for k, v in got.items())
+    print(f"{cohort:12s} seeds={len(seeds):2d} genes={len(table):6d}  max |table - recomputed| = {worst:.1e}")
+    assert worst < 1e-9, (cohort, worst)
+PY
+fi
+
 if [[ ${RUN_CHECKPOINT:-0} == 1 ]]; then
   step "checkpoint load on CPU (liver H+Monkey s42)"
   "$PY" - <<'PY'
@@ -97,7 +136,7 @@ fi
 if [[ ${RUN_FIGURE:-0} == 1 ]]; then
   step "render notebook 03_alpha_master"
   "$PY" -m papermill notebooks/03_alpha_master.ipynb "$TMP/03_alpha_master.ipynb" \
-    --cwd notebooks -k "${KERNEL:-chimera_env}"
+    --cwd notebooks -k "${KERNEL:-python3}"
 fi
 
 step "all checks passed"
