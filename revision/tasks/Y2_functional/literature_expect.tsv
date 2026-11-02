@@ -1,0 +1,76 @@
+tissue	human_symbol	pmid	expect	type	zon_h	zon_m
+liver	FASN	41986723	zonation	Hepatocytes	1	-1
+liver	APOA5	41986723	zonation	Hepatocytes	1	-1
+liver	GPAM	41986723	zonation	Hepatocytes	1	-1
+liver	ACSL5	41986723	zonation	Hepatocytes	1	-1
+liver	DPP4	41986723	zonation	Hepatocytes	1	-1
+liver	NAGS	41986723	zonation	Hepatocytes	1	-1
+liver	OTC	41986723	zonation	Hepatocytes	1	-1
+liver	ASL	41986723	zonation	Hepatocytes	1	-1
+liver	CPS1	41986723	zonation	Hepatocytes	1	-1
+liver	VNN1	41986723	zonation	Hepatocytes	-1	1
+liver	THBD	41986723	zonation	Hepatocytes	-1	1
+liver	INMT	41986723	zonation	Hepatocytes	-1	1
+liver	IGFBP2	41986723	zonation	Hepatocytes	-1	0
+liver	HNF4A	41986723	zonation	Hepatocytes	1	-1
+liver	CD5L	41986723	sub_type	Macrophages		
+liver	CD163	41986723	sub_type	Macrophages		
+liver	C1QB	41986723	sub_type	Macrophages		
+liver	PCK2	41986723	sub_type	Hepatocytes		
+liver	SLC2A2	41986723	zonation	Hepatocytes	1	-1
+liver	SLC2A2	33332768	zonation	Hepatocytes	1	-1
+liver	FASN	33332768	zonation	Hepatocytes	1	-1
+liver	PCK2	23466304	human>mouse	Hepatocytes		
+liver	APOBEC1	7768898	mouse>human	Hepatocytes		
+liver	APOBEC1	8409768	mouse>human	Hepatocytes		
+liver	APOBEC1	8208612	mouse>human	Hepatocytes		
+liver	PPARA	9443928	mouse>human	Hepatocytes		
+liver	PPARA	9924174	mouse>human	Hepatocytes		
+liver	PNPLA3	29158695	human>mouse	Hepatocytes		
+liver	PNPLA3	31062641	human>mouse	Hepatocytes		
+liver	SHBG	8276140	human>mouse	Hepatocytes		
+liver	FMO1	9711811	mouse>human	Hepatocytes		
+liver	FMO1	8654418	mouse>human	Hepatocytes		
+liver	FMO3	9711811	uncodable	Hepatocytes		
+liver	CLEC4F	30590594	mouse>human	Macrophages		
+liver	ADGRE1	17823986	mouse>human	Macrophages		
+liver	CCR1	35021063	human>mouse	Macrophages		
+liver	FZD5	37562401	human>mouse	Hepatocytes		
+liver	WNT2	37562401	type_switch	Endothelial		
+testis	CXCL12	30315278	type_switch			
+testis	CXCL12	32504559	type_switch			
+testis	CSF1R	30315278	type_switch			
+testis	STRA8	30404016	mouse>human	SG		
+testis	STRA8	32504559	sub_type	SG		
+testis	KIT	32504559	sub_type	SG		
+testis	MKI67	32504559	sub_type	SG		
+testis	L1TD1	32504559	human>mouse	SG		
+testis	ERBB3	32504559	human>mouse	SG		
+testis	TGFBR1	32504559	mouse>human	SG		
+testis	FMR1	32504559	mouse>human	SG		
+testis	PHTF1	32504559	mouse>human	SG		
+testis	SWT1	32504559	mouse>human	SG		
+testis	DDX18	32504559	stage_peak			
+testis	DDX46	32504559	stage_peak			
+testis	DDX23	32504559	stage_peak			
+testis	DDX52	32504559	stage_peak			
+testis	GDNF	32504559	mouse>human	Other_somatic		
+testis	PDGFRA	32504559	human>mouse	Other_somatic		
+testis	EGFR	32504559	human>mouse	Other_somatic		
+testis	PTCH1	32504559	human>mouse	Other_somatic		
+testis	PPARA	32504559	human>mouse	Other_somatic		
+testis	SDC2	32504559	uncodable			
+testis	NANOS2	38727278	sub_type	SG		
+testis	GFRA1	38727278	sub_type	SG		
+testis	NEUROG3	38727278	mouse>human	SG		
+testis	RARG	38727278	sub_type	SG		
+testis	PIWIL4	38727278	sub_type	SG		
+testis	ID4	30726734	sub_type	SG		
+testis	ID4	24902969	sub_type	SG		
+testis	ZBTB16	30726734	sub_type	SG		
+testis	SHBG	12235141	type_switch			
+testis	SHBG	21613632	type_switch			
+testis	SHBG	16700003	type_switch			
+testis	SHBG	15574421	mouse>human	Sertoli		
+testis	LIN28A	22689537	mouse>human	SG		
+testis	LIN28A	32110705	mouse>human	SG		
