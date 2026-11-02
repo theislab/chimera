@@ -20,12 +20,14 @@ scale 1 (``adapt=False``). H-D1 uses ``log2fc_mle`` for l^h and ``log2fc_fixed``
 ``det_frac`` = nuclei with count > 0 / nuclei, over the units used (section 8c's 5% rule).
 
 ``--perm <type index>`` fits the primary models of one DE-able type on permuted condition labels
-(human within sex x collection, mouse within stage, ``N_PERM`` draws each, never the observed
+(human within sex x collection, mouse within stage, ``N_PERM`` = 200 draws each, or all distinct
+relabellings where fewer exist, never the observed
 labels or their swap), with the fixed-scale prior only, for the H-D4 and H-D1 label null. Output
 ``de/perm/{human,mouse}_perm<ii>_<type>.tsv``.
 
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py [--types pt,...] [--n-cpus 16]
     PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --perm 0 [--n-cpus 16]
+    PYTHONPATH=<chimera repo> python revision/tasks/P13_kidney/de.py --perm-task <0..9k-1> --n-chunks k
 """
 
 from __future__ import annotations
@@ -55,7 +57,7 @@ OUT = RES / "de"
 MIN_CELLS_UNIT = 20
 MIN_COUNTS = 10
 MULTIOME = "10x multiome"
-N_PERM, SEED = 20, 20261101
+N_PERM, SEED = 200, 20261101  # 20 at first; raised to 200 for precision only (same design)
 DE_ORDER = ["pt", "tal", "dct", "pc", "ic", "ec", "fib", "myeloid", "lymphoid"]
 
 
@@ -128,24 +130,41 @@ def permuted_labels(obs: pd.DataFrame, strata: list[str], rng, n: int) -> list:
     return out
 
 
-def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int) -> None:
+def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int, chunk: int = 0, n_chunks: int = 1) -> None:
+    """Permuted-label fits for type t, draws i with i % n_chunks == chunk.
+
+    The relabellings come from the same generator and rule as the first 20-draw run, so draws
+    0-19 are identical to it; an existing fit of the same draw (same controls) is kept.
+    """
     out = OUT / "perm"
     out.mkdir(parents=True, exist_ok=True)
     jobs = {j[0]: j for j in jobs_for(pb_h, pb_m, t) if j[1] == "primary"}
+    old = pd.read_csv(out / f"labels_{t}.tsv", sep="\t") if (out / f"labels_{t}.tsv").exists() else None
     rows = []
     for k, (species, strata) in enumerate((("human", ["sex", "collection"]), ("mouse", ["stage"]))):
         _, _, sub, covs = jobs[species]
         rng = np.random.default_rng([SEED, DE_ORDER.index(t), k])
-        for i, lab in enumerate(permuted_labels(sub.obs, strata, rng, N_PERM)):
+        labels = permuted_labels(sub.obs, strata, rng, N_PERM)
+        for i, lab in enumerate(labels):
+            if i % n_chunks != chunk:
+                continue
+            controls = ",".join(sub.obs["unit"].astype(str)[lab == "control"])
+            f = out / f"{species}_perm{i:02d}_{t}.tsv"
+            prev = None if old is None else old[(old.species == species) & (old.perm == i)]
+            if f.exists() and prev is not None and len(prev) == 1 and prev["controls"].iloc[0] == controls:
+                rows.append(dict(cell_type=t, species=species, perm=i, design=prev["design"].iloc[0],
+                                 controls=controls, n_draws_available=len(labels), reused=True))
+                continue
             s = sub.copy()
             s.obs["condition"] = lab
             r, design = fit(s, covs, n_cpus, adaptive=False)
-            r.to_csv(out / f"{species}_perm{i:02d}_{t}.tsv", sep="\t", index=False)
-            rows.append(dict(cell_type=t, species=species, perm=i, design=design,
-                             controls=",".join(s.obs["unit"].astype(str)[lab == "control"])))
-            pd.DataFrame(rows).to_csv(out / f"labels_{t}.tsv", sep="\t", index=False)
+            r.to_csv(f, sep="\t", index=False)
+            rows.append(dict(cell_type=t, species=species, perm=i, design=design, controls=controls,
+                             n_draws_available=len(labels), reused=False))
+            pd.DataFrame(rows).to_csv(out / f"labels_{t}_c{chunk}.tsv", sep="\t", index=False)
             log.info("%s %s perm %d done", t, species, i)
-    (out / f"DONE_{t}").write_text("ok\n")
+    pd.DataFrame(rows).to_csv(out / f"labels_{t}_c{chunk}.tsv", sep="\t", index=False)
+    (out / f"DONE_{t}_c{chunk}").write_text("ok\n")
 
 
 def jobs_for(pb_h: ad.AnnData, pb_m: ad.AnnData, t: str) -> list:
@@ -173,6 +192,9 @@ def main() -> int:
     p.add_argument("--n-cpus", type=int, default=16)
     p.add_argument("--primary-only", action="store_true")
     p.add_argument("--perm", type=int, default=None, help="index into DE_ORDER: permuted-label fits of that type")
+    p.add_argument("--perm-task", type=int, default=None,
+                   help="array task: type = DE_ORDER[task // n_chunks], chunk = task % n_chunks")
+    p.add_argument("--n-chunks", type=int, default=1)
     a = p.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     types = pd.read_csv(RES / "gd1k_types.csv")
@@ -183,6 +205,9 @@ def main() -> int:
     pb_m = ad.read_h5ad(DATA / "kidney_pseudobulk_mouse.h5ad")
     if a.perm is not None:
         run_perm(DE_ORDER[a.perm], pb_h, pb_m, a.n_cpus)
+        return 0
+    if a.perm_task is not None:
+        run_perm(DE_ORDER[a.perm_task // a.n_chunks], pb_h, pb_m, a.n_cpus, a.perm_task % a.n_chunks, a.n_chunks)
         return 0
     summary = []
     for t in de_types:
