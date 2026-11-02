@@ -618,6 +618,72 @@ def b1z_extra():
     pd.DataFrame(dose).to_csv(OUT / "b1z_dose.csv", index=False)
 
 
+def anchor(cohorts=("liv_hmouse", "test_3sp", "test_hmouse", "liv_4sp")):
+    """T3.4 without clusters. K-means centroids in each latent; the 50 nearest cells per species to each centroid are that species'
+    pseudobulk at the centroid, however far they lie. So a latent that keeps species apart is not penalised by Leiden. If Chimera's
+    lead is alignment it holds here; if it is the shared-cluster count it goes."""
+    from sklearn.cluster import MiniBatchKMeans
+    from revision.tasks.T4_2_gene_baselines import run as T42
+    rows = []
+    for c in cohorts:
+        gold = "G_H3" if c.startswith("liv") else "G_H4"
+        co = C.load_cohort(c, keep_adata=True, covariates=True)
+        a, g0 = co.adata, co.genes
+        X = sp.csr_matrix(a.X).astype(np.float64)
+        spc = a.obs["species"].astype(str).to_numpy()
+        S = sorted(set(spc))
+        cov = g0[["prior_raw", "log_cp10k_spmean", "detection_spmean"]]
+        L = latents(c)
+        chim = [k for k in L if k.startswith("chimera")]
+        use = {k: L[k] for k in chim}
+        for k in ("scvi_s42", "scanvi", "sysvi", "harmony", "pca", "saturn", "camex"):
+            if k in L:
+                use[k] = L[k]
+        res = pd.DataFrame({"hsapiens_gene_id": g0.hsapiens_gene_id.values})
+        for nm, z in use.items():
+            if z.shape[0] != X.shape[0]:
+                continue
+            z = np.asarray(z, np.float32)
+            cen = MiniBatchKMeans(n_clusters=60, random_state=0, n_init=3, batch_size=2048).fit(z).cluster_centers_
+            P, F = {}, {}
+            for s in S:
+                ix = np.flatnonzero(spc == s)
+                ind = NearestNeighbors(n_neighbors=min(50, len(ix))).fit(z[ix]).kneighbors(cen, return_distance=False)
+                pb, fr = [], []
+                for row in ind:
+                    M = X[ix[row]]
+                    cnt = np.asarray(M.sum(0)).ravel()
+                    pb.append(np.log2(1 + 1e6 * cnt / max(cnt.sum(), 1)))
+                    fr.append(np.asarray((M > 0).mean(0)).ravel())
+                P[s], F[s] = np.array(pb).T, np.array(fr).T
+            zs = []
+            for i, a1 in enumerate(S):
+                for a2 in S[i + 1:]:
+                    A, B_ = P[a1], P[a2]
+                    keep = (F[a1].max(1) >= .05) & (F[a2].max(1) >= .05)
+                    Ac, Bc = A - A.mean(1, keepdims=True), B_ - B_.mean(1, keepdims=True)
+                    with np.errstate(all="ignore"):
+                        r = (Ac * Bc).sum(1) / np.sqrt((Ac ** 2).sum(1) * (Bc ** 2).sum(1))
+                    r[~keep] = np.nan
+                    zs.append(np.arctanh(np.clip(r, -.999999, .999999)))
+            with np.errstate(all="ignore"):
+                E = np.tanh(np.nanmean(np.array(zs), 0))
+            res[nm] = T42.residualise(pd.Series(E, index=g0.index), cov).to_numpy()
+            print(c, nm, flush=True)
+        res.to_parquet(OUT / f"anchor__{c}.parquet")
+        g = K.genes(c).merge(res, on="hsapiens_gene_id")
+        covs = K.CPAT + (["H4_nsp"] if gold == "G_H4" else [])
+        keys = [k for k in use if k in g and g[k].notna().mean() > .2]
+        ref = [k for k in keys if k.startswith("chimera")][0]
+        g["chimera_mean"] = g[[k for k in keys if k.startswith("chimera")]].mean(1)
+        for half in ("odd", "even"):
+            T = g[(g.half == half) & g[[gold, "block", "chimera_mean", "B1b"] + covs + keys].notna().all(1)]
+            r = K.scan(T, gold, ["chimera_mean", "B1b"] + keys, covs, seed=K.useed(c, half, "anchor"), delta_to="chimera_mean", draws=1000)
+            r["cohort"], r["half"] = c, half
+            rows.append(r)
+    pd.concat(rows, ignore_index=True).to_csv(OUT / "anchor_rho.csv", index=False)
+
+
 def clusters():
     rows = []
     for c in ("liv_hmouse", "liv_4sp", "test_3sp"):
@@ -648,5 +714,5 @@ if __name__ == "__main__":
     p.add_argument("section")
     p.add_argument("--cohort", default=None)
     a = p.parse_args()
-    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, b1z_sweep=b1z_sweep, b1z_sweep_tests=b1z_sweep_tests, b1z_extra=b1z_extra, clusters=clusters)[a.section]
+    fn = dict(zone=zone, stage=stage, gold_zone=gold_zone, gold_stage=gold_stage, within=within, within_tests=within_tests, b1z=b1z, b1z_tests=b1z_tests, b1z_sweep=b1z_sweep, b1z_sweep_tests=b1z_sweep_tests, b1z_extra=b1z_extra, anchor=anchor, clusters=clusters)[a.section]
     fn((a.cohort,)) if a.cohort else fn()
