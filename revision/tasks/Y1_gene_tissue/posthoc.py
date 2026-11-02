@@ -109,7 +109,8 @@ def evee(D):
         out[f"evm_{t}"] = pd.Series(np.where(v > 0, mean[t].to_numpy(float), np.nan), index=m.ensg)[ok]
     E = pd.DataFrame(out)
     E = E[~E.index.duplicated()]
-    D.gold = D.gold.join(E, how="outer")
+    if "G_ev_liver" not in D.gold.columns:
+        D.gold = D.gold.join(E, how="outer")
     return list(out)
 
 
