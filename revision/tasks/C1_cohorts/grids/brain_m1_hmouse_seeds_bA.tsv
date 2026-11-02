@@ -1,0 +1,3 @@
+run_name	args
+rev-c1-brain-m1-hmouse-bA-s43	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/brain_m1_hmouse.h5ad --seed 43 --batch-key batch --adv-weight 200 --lambda-anchor 0.0105 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+rev-c1-brain-m1-hmouse-bA-s44	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/brain_m1_hmouse.h5ad --seed 44 --batch-key batch --adv-weight 200 --lambda-anchor 0.0105 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
