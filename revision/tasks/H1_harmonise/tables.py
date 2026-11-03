@@ -38,6 +38,10 @@ SOURCES = {
     "kidney": "KPMP v2.0 (Lake 2023 human; KPMP mouse), multiome nuclei",
     "islet": "Human 48-donor islet atlas; Hrovatin 2023 mouse atlas",
     "eye": "van Zyl 2020, outflow pathway",
+    "cortex": "Bakken 2021 (primary motor cortex, M1); Ma 2022 (dorsolateral prefrontal cortex, DLPFC)",
+    "lung": "Travaglini 2020, Tabula Microcebus, Tabula Muris Senis; lung",
+    "skeletal muscle": "Kedlian 2024 human and mouse muscle, cell fraction",
+    "tumour myeloid": "Zilionis 2019, lung tumour-infiltrating myeloid cells, human and KP mice",
 }
 RECIPE_SOURCE = {
     "liv_hmonkey": "canonical K = 2 recipe", "liv_hmouse": "canonical K = 2 recipe, adversary doubled", "liv_hzeb": "canonical K = 2 recipe, low MMD",
@@ -51,6 +55,38 @@ RECIPE_SOURCE = {
 def t33_seeds() -> dict:
     j = json.loads((RES / "T3_3" / "seed_pooling.json").read_text())
     return {r["cohort"]: [int(s) for s in r["used"]] for r in j}
+
+
+C1H1 = RES / "C1" / "h1"
+DLPFC = ("brain_dlpfc", "brain_dlpfc_hchimp", "brain_dlpfc_hmac", "brain_dlpfc_hmarm", "brain_dlpfc_hmac_own")
+C1_PARENT = {"brain_dlpfc_hchimp": "brain_dlpfc", "brain_dlpfc_hmac": "brain_dlpfc", "brain_dlpfc_hmarm": "brain_dlpfc"}
+C1_FLAG_NOTE = {"tumour_zilionis": "count support 33%: inDrop depth; per-gene claims few",
+                "brain_m1": "label transfer below the canonical K >= 3 floor (0.956), above scVI",
+                "brain_dlpfc": "label transfer below scVI on the same object", "brain_dlpfc_hchimp": "label transfer below scVI on the same object",
+                "brain_dlpfc_hmac": "label transfer below scVI on the same object", "brain_dlpfc_hmarm": "label transfer below scVI on the same object",
+                "brain_dlpfc_hmac_own": "label transfer below scVI on the same object", "lung_healthy": "label transfer below the canonical K >= 3 floor (0.956) and scVI"}
+
+
+def recipe_source(c: str, run: str) -> str:
+    if c in RECIPE_SOURCE:
+        return RECIPE_SOURCE[c]
+    row = run.split("-")[-2]
+    return f"blind grid of the plan (section 13.0), row {row}"
+
+
+def c1_flags(c: str, vn: pd.Index, sym: pd.Series) -> pd.DataFrame:
+    """C1 cohorts: the T2 ortholog rule was applied at build (so o1_T2 is False), counts joined by Ensembl ID or through the matrix's own release
+    (so no mapping flag); o1_zero_any = the gene is in C1's zero_genes.tsv for a species of this cohort (exact zero in training cells, never named)."""
+    z = RES / "C1" / C1_PARENT.get(c, c) / "zero_genes.tsv"
+    out = pd.DataFrame(dict(o1_T2=False, o1_M_wrong_row=False, o1_M_false_zero=False, o1_zero_any=False), index=vn).astype("boolean")
+    if z.exists():
+        t = pd.read_csv(z, sep="\t")
+        a = ad.read_h5ad(RU.cohorts()[c]["h5ad"], backed="r")
+        sp = set(map(str, a.obs["species"].unique()))
+        a.file.close()
+        hit = set(t.loc[t.species.astype(str).isin(sp), "symbol"].astype(str))
+        out["o1_zero_any"] = sym.astype(str).isin(hit).to_numpy()
+    return out
 
 
 def o1_flags(c: str, vn: pd.Index, ens: pd.Series) -> pd.DataFrame:
@@ -112,12 +148,17 @@ def task_table(c: str) -> pd.DataFrame | None:
          "islet": R / "T7_9/readout/islet_genes.parquet"}.get(c)
     if c.startswith("vz_"):
         p = R / f"T11/readout/genes_{c[3:]}.parquet"
+    if RU.cohorts()[c].get("source") == "C1":
+        p = C1H1 / "genes" / f"{c}.parquet"
+        return pd.read_parquet(p) if p.exists() else None
     if p is not None and p.exists():
         return pd.read_parquet(p).set_index("var_name")
     return None
 
 
 def b1_column(c: str, tt: pd.DataFrame | None, var_names) -> pd.Series:
+    if RU.cohorts()[c].get("source") == "C1":
+        return tt["B1"].reindex(var_names)
     if c == "bone_marrow":
         return tt["E_human_mouse"].reindex(var_names)
     if c in ("kidney", "islet"):
@@ -190,9 +231,22 @@ def build_cohort(args) -> dict:
             g[k] = cov[k]
     tt = task_table(c)
     g["B1"] = b1_column(c, tt, vn)
-    for k, v in o1_flags(c, vn, g["hsapiens_gene_id"]).items():
+    fl = c1_flags(c, vn, g["symbol"]) if d.get("source") == "C1" else o1_flags(c, vn, g["hsapiens_gene_id"])
+    for k, v in fl.items():
         g[k] = v
-    flagged = (g["o1_M_wrong_row"].fillna(False) | g["o1_M_false_zero"].fillna(False) | g["o1_zero_any"].fillna(False)).astype(bool)
+    # DLPFC: the lower tail is not read as biology. C1 checked its top genes on raw counts: single-species reference artefacts (chimpanzee PRNP,
+    # macaque PRSS55, marmoset SLC39A12). Every DLPFC gene below -0.05 is marked; the share with a 10-fold single-species level gap is recorded.
+    g["reference_artefact"] = False
+    if c in DLPFC:
+        X = a.X.tocsr().astype(np.float64)
+        lib = np.asarray(X.sum(1)).ravel()
+        cp = sp.diags(1e4 / np.maximum(lib, 1)).dot(X).tocsr()
+        spc = a.obs["species"].astype(str).to_numpy()
+        M = np.stack([np.asarray(cp[spc == s_].mean(0)).ravel() for s_ in sorted(set(spc))])
+        lg = np.log10(M + 0.01)
+        g["species_level_gap_log10"] = lg.max(0) - lg.min(0)
+        g["reference_artefact"] = (g["D"] < -RU.TAIL).to_numpy()
+    flagged = (g["o1_M_wrong_row"].fillna(False) | g["o1_M_false_zero"].fillna(False) | g["o1_zero_any"].fillna(False)).astype(bool) | g["reference_artefact"]
     g["nameable"] = g["strict_support"] & ~flagged
     gold = pd.read_csv(RES / "T4_3/golds/gold_table.csv", index_col=0)[["dNdS", "LOEUF"]]
     g = g.reset_index().merge(gold, how="left", left_on="hsapiens_gene_id", right_index=True).set_index("var_name").reindex(vn)
@@ -209,6 +263,15 @@ def build_cohort(args) -> dict:
               clamp=float(g.pi_clamped.max()), clamp_consistent=bool(np.allclose(g.pi_clamped, np.minimum(g.pi_raw, g.pi_clamped.max()), atol=1e-5)),
               frac_at_clamp=float((g.pi_raw >= g.pi_clamped.max() - 1e-6).mean()), n_seeds=len(seeds))
     ck["frac_alpha_table_join"] = float(g.symbol.notna().mean())
+    if c in DLPFC:
+        low = g["reference_artefact"]
+        ck["n_reference_artefact"] = int(low.sum())
+        ck["frac_reference_artefact_10fold_gap"] = float((g.loc[low, "species_level_gap_log10"] >= 1).mean()) if low.any() else np.nan
+        ck["frac_all_10fold_gap"] = float((g["species_level_gap_log10"] >= 1).mean())
+    if d.get("source") == "C1" and tt is not None:
+        ck["max_abs_diff_strict_C1"] = int((tt["strict_support"].reindex(vn).astype(bool) != g["strict_support"]).sum())
+        ck["n_saturated_flag_differs_C1"] = int((tt["saturated_flag"].reindex(vn).astype(bool) != g["saturated_flag"]).sum())
+        ck["max_abs_diff_B1_C1"] = float(np.nanmax(np.abs(tt["B1"].reindex(vn) - g["B1"]))) if g["B1"].notna().any() else np.nan
     if tt is not None and "D" in tt:
         ck["max_abs_diff_D_task_table"] = float(np.abs(g["D"] - tt["D"].reindex(vn)).max())
     ck["n_saturated_flag"] = int(g.saturated_flag.sum())
@@ -351,6 +414,15 @@ def within_tissue_agreement(cohorts: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def scvi_ref(c: str) -> dict:
+    """scVI(species) on the same object, as C1 computed it (k = 15, same labels); empty for cohorts without one."""
+    f = RES / "C1" / c / "scvi_reference.json"
+    if not f.exists():
+        return dict(scvi_mixing=np.nan, scvi_label_transfer=np.nan, scvi_silhouette=np.nan)
+    j = json.loads(f.read_text())
+    return dict(scvi_mixing=j["knn_mixing_entropy"], scvi_label_transfer=j["label_transfer_acc"], scvi_silhouette=j["sil_celltype"])
+
+
 def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audit: pd.DataFrame, cohorts: dict) -> pd.DataFrame:
     rows = []
     for c, d in cohorts.items():
@@ -367,7 +439,7 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
         ok = g.count_support & (np.sign(g.S_ema) == np.sign(g.delta_alpha)) & (g.S_ema.abs() >= np.median(g.S_ema.abs()[un]))
         rows.append(dict(
             cohort=c, tissue=d["tissue"], label=d["label"], role=d["role"], species=d["species"], n_species=int(aud.n_species), cells=int(aud.n_cells), genes=int(aud.n_genes),
-            source_datasets=SOURCES[d["tissue"]], cell_types=int(aud.n_cell_types), cell_types_all_species=int(aud.n_cell_types_all_species), recipe_source=RECIPE_SOURCE[c],
+            source_datasets=SOURCES[d["tissue"]], cell_types=int(aud.n_cell_types), cell_types_all_species=int(aud.n_cell_types_all_species), recipe_source=recipe_source(c, kept.run.iloc[0]),
             recipe=f"adv {aud.cfg_adv_weight:g}, MMD {aud.cfg_lambda_mmd if pd.notna(aud.cfg_lambda_mmd) else 'default'}, anchor {aud.cfg_lambda_anchor:g}, free bits {aud.cfg_free_bits if pd.notna(aud.cfg_free_bits) else 'default'}, "
                    f"clamp {aud.cfg_prior_clamp_max if pd.notna(aud.cfg_prior_clamp_max) else 'none'}, conditional MMD {'yes' if aud.cfg_use_celltype_conditional_mmd else 'no'}, {aud.cfg_max_epochs} epochs",
             runs_kept=int(kept.shape[0]), runs_trained=int(rr.shape[0]), seeds_kept=",".join(map(str, kept.seed)),
@@ -387,7 +459,8 @@ def cohort_table(runs: pd.DataFrame, integ: pd.DataFrame, z1: pd.DataFrame, audi
             n_o1_T2=int(g.o1_T2.fillna(False).sum()), n_o1_map=int((g.o1_M_wrong_row.fillna(False) | g.o1_M_false_zero.fillna(False)).sum()),
             mixing_entropy=float(i.knn_mixing_entropy.mean()), mixing_entropy_random=ref["entropy_random"], mixing_ratio=float(i.knn_mixing_entropy.mean() / ref["entropy_random"]),
             species_purity=float(i.knn_species_purity.mean()), label_transfer=float(i.label_transfer_acc.mean()), adv_acc=float(i.adv_acc.mean()), majority_rate=ref["majority_rate"],
-            sat_hi=float(kept.sat_hi.mean()),
+            sat_hi=float(kept.sat_hi.mean()), n_reference_artefact=int(g.get("reference_artefact", pd.Series(False, index=g.index)).sum()),
+            source=d.get("source", "H1"), flag_note=C1_FLAG_NOTE.get(c, ""), **scvi_ref(c),
         ))
     return pd.DataFrame(rows)
 

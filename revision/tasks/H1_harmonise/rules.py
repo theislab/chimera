@@ -128,9 +128,16 @@ PENDING = {
     "vz_hmfas": dict(tissue="eye", label="Eye H+M. fascicularis", species="human, M. fascicularis", h5ad=VZ / "van_zyl_hmfas.h5ad", table="van_zyl", ct="cell_ontology_class",
                      role="new", tried={}),
 }
-PRIMARY = {"liver": "liv_hmouse", "testis": "test_hmouse", "bone marrow": "bone_marrow", "kidney": "kidney", "islet": "islet", "eye": "vz_hmouse"}
-TISSUE_ORDER = ["liver", "testis", "bone marrow", "kidney", "islet", "eye"]
-NEW_TISSUES = ["bone marrow", "kidney", "islet", "eye"]
+PRIMARY = {"liver": "liv_hmouse", "testis": "test_hmouse", "bone marrow": "bone_marrow", "kidney": "kidney", "islet": "islet", "eye": "vz_hmouse",
+           "cortex": "brain_m1_hmouse", "lung": "lung_healthy"}
+# The thread: one human+mouse model per tissue, or the closest fit that holds both (bone marrow, lung: human, mouse lemur, mouse). Cortex and lung joined
+# with the C1 cohorts (2026-11-03); the six-tissue thread of the first H1 pass stays computed beside it (SIX). Muscle fits the rule and enters only as a
+# sensitivity (coordinator named cortex and lung); tumour is not healthy tissue and does not enter.
+TISSUE_ORDER = ["liver", "testis", "bone marrow", "kidney", "islet", "eye", "cortex", "lung"]
+SIX = ["liver", "testis", "bone marrow", "kidney", "islet", "eye"]
+SENS_EXTRA = {"skeletal muscle": "muscle_ageing"}
+NEW_TISSUES = ["bone marrow", "kidney", "islet", "eye", "cortex", "lung", "skeletal muscle", "tumour myeloid"]
+R_MIN_HALF = 4  # sensitivity on the eight-tissue thread: same direction in at least half of the tissues
 
 CLASSES = ["TF", "TF_homeodomain", "TF_C2H2_ZF", "TF_nuclear_rec", "protein_kinase", "receptor", "GPCR", "ion_channel", "SLC_transporter",
            "chromatin_reg", "enzyme", "mitochondrial"]
@@ -172,5 +179,54 @@ def load_extra():
     return out
 
 
+# C1 cohorts (plan section 13; ledger C1_cohorts.md): runs from results/revision/C1/kept_runs.tsv, all kept by C1's health rule.
+C1_LABELS = {
+    "brain_m1_hmouse": ("Cortex M1 H+Mouse", "human, mouse"),
+    "brain_m1": ("Cortex M1 3 species", "human, marmoset, mouse"),
+    "brain_dlpfc": ("Cortex DLPFC 4 primates", "human, chimpanzee, macaque, marmoset"),
+    "brain_dlpfc_hchimp": ("Cortex DLPFC H+Chimpanzee", "human, chimpanzee"),
+    "brain_dlpfc_hmac": ("Cortex DLPFC H+Macaque", "human, macaque"),
+    "brain_dlpfc_hmarm": ("Cortex DLPFC H+Marmoset", "human, marmoset"),
+    "brain_dlpfc_hmac_own": ("Cortex DLPFC H+Macaque, own table", "human, macaque"),
+    "lung_healthy": ("Lung 3 species", "human, mouse lemur, mouse"),
+    "muscle_ageing": ("Muscle H+Mouse", "human, mouse"),
+    "tumour_zilionis": ("Tumour myeloid H+Mouse", "human, mouse"),
+}
+C1_TISSUE = {"brain": "cortex"}
+C1_KEPT = RES / "C1" / "kept_runs.tsv"
+
+
+def _c1_lineage() -> dict:
+    """LINEAGE_C1 as committed in C1_cohorts/h1_c1.py, read as a literal (importing that module would reset H1_OUT)."""
+    import ast
+
+    src = (REPO / "revision" / "tasks" / "C1_cohorts" / "h1_c1.py").read_text()
+    for node in ast.parse(src).body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "LINEAGE_C1" for t in node.targets):
+            return ast.literal_eval(node.value)
+    return {}
+
+
+for _t, _v in _c1_lineage().items():
+    LINEAGE.setdefault(_t, _v)
+
+
+def load_c1(out: dict) -> dict:
+    """Join the C1 cohorts. H1_C1=0 leaves them out (runs that must reproduce the 16-cohort pass, or C1's own adapter)."""
+    import pandas as pd
+
+    if os.environ.get("H1_C1", "1") == "0" or not C1_KEPT.exists():
+        return out
+    t = pd.read_csv(C1_KEPT, sep="\t")
+    for c, g in t.groupby("cohort", sort=False):
+        if c not in C1_LABELS:
+            continue
+        lab, sp = C1_LABELS[c]
+        tissue = {"brain_m1_hmouse": "cortex", "brain_m1": "cortex", "lung_healthy": "lung", "muscle_ageing": "skeletal muscle", "tumour_zilionis": "tumour myeloid"}.get(c, "cortex")
+        out[c] = dict(tissue=tissue, label=lab, species=sp, h5ad=gene_ids.h5ad_path(c), table=c, ct="cell_ontology_class", role="new", source="C1",
+                      tried={int(r.seed): str(r.run) for r in g.itertuples()})
+    return out
+
+
 def cohorts():
-    return load_extra()
+    return load_c1(load_extra())

@@ -95,6 +95,17 @@ def main() -> int:
     meta = []
     for c, d in RU.cohorts().items():
         seeds = sorted(runs[(runs.cohort == c) & runs.kept].seed)
+        if d.get("source") == "C1":  # C1 ran H1's drivers code on its own forward passes; taken as written
+            src = RU.RES / "C1" / "h1" / "drivers"
+            if (src / f"{c}.parquet").exists():
+                pd.read_parquet(src / f"{c}.parquet").to_parquet(OUT / f"{c}.parquet")
+                pd.read_csv(src / f"{c}__shares.csv").to_csv(OUT / f"{c}__shares.csv", index=False)
+                mm = pd.read_csv(src / "meta.csv").set_index("cohort")
+                meta.append(dict(cohort=c, seeds_with_forward=str(mm.loc[c, "seeds_with_forward"]), n_types=int(mm.loc[c, "n_types"]),
+                                 closure_C_sum_vs_S_ema_pearson=float(mm.loc[c, "closure_C_sum_vs_S_ema_pearson"]), note="C1 forward passes"))
+            else:
+                meta.append(dict(cohort=c, seeds_with_forward="", note="no forward pass yet"))
+            continue
         m = canonical(c) if d["role"] == "reference" else new_cohort(c, seeds)
         if m is None:
             meta.append(dict(cohort=c, seeds_with_forward="", note="no forward pass yet"))

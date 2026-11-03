@@ -170,7 +170,8 @@ def one(args):
     if readout.endswith("_block"):
         v = (v - pd.Series(v).groupby(st).transform("mean").to_numpy()).astype(np.float32)
         tissue = RU.cohorts()[c]["tissue"].replace(" ", "_")
-        tb = pd.read_parquet(RU.RES / "Y1" / "cache" / f"tissue__{ {'eye': 'eye'}.get(tissue, tissue) }.parquet")
+        yf = RU.RES / "Y1" / "cache" / f"tissue__{tissue}.parquet"
+        tb = pd.read_parquet(yf) if yf.exists() else pd.read_parquet(OUT / "cache" / f"blocks__{c}.parquet")  # cortex, lung: ESM modules of the cohort
         blk = pd.Series(tb.block.to_numpy(), index=tb.hsapiens_gene_id).groupby(level=0).first().reindex(ix)
         codes = pd.factorize(blk.fillna(-1).astype(str))[0]
         obs = np.asarray(M @ v).ravel() / np.maximum(sizes, 1)
@@ -188,7 +189,7 @@ def one(args):
     return t, zn.astype(np.float32), sets
 
 
-def recurrence_table(Z: dict[str, tuple], tissues: list[str], sets: list[str], fam: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
+def recurrence_table(Z: dict[str, tuple], tissues: list[str], sets: list[str], fam: dict, rmin: int = RU.R_MIN) -> tuple[pd.DataFrame, pd.DataFrame]:
     """R over the tissues for one readout, permutation p, BH; tissue-specific candidates."""
     zo = np.stack([Z[t][0] for t in tissues], 1)  # sets x tissues
     zn = np.stack([Z[t][1] for t in tissues], 2)  # draws x sets x tissues
@@ -206,7 +207,7 @@ def recurrence_table(Z: dict[str, tuple], tissues: list[str], sets: list[str], f
     qrec = bh(prec)
     rows = pd.DataFrame(dict(key=sets, family=[fam[s] for s in sets], n_tissues=np.isfinite(zo).sum(1), n_up=up, n_down=dn, R=R, direction=np.where(up > dn, "above", np.where(dn > up, "below", "mixed")),
                              p_rec=prec, q_rec=qrec, mean_z=np.nanmean(zo, 1), stouffer=np.nansum(zo, 1) / np.sqrt(np.maximum(np.isfinite(zo).sum(1), 1))))
-    rows["recurrent"] = (rows.R >= RU.R_MIN) & (rows.q_rec < 0.05)
+    rows["recurrent"] = (rows.R >= rmin) & (rows.q_rec < 0.05)
     for j, t in enumerate(tissues):
         rows[f"z_{t}"] = zo[:, j]
         rows[f"q_{t}"] = qv[:, j]
@@ -269,6 +270,25 @@ def axis_table(cohorts: dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def ensure_blocks(c: str) -> None:
+    """ESM modules for a thread tissue without a Y1 cache: T4.3 esm_blocks on the cohort's 64 ESM PCs, as every other tissue's blocks."""
+    import anndata as ad
+
+    from revision.tasks.T4_3_scoreboard import inputs as I
+
+    f = OUT / "cache" / f"blocks__{c}.parquet"
+    if f.exists():
+        return
+    a = ad.read_h5ad(RU.cohorts()[c]["h5ad"], backed="r")
+    F = np.asarray(a.varm["gene_features"], dtype=float)[:, :I.N_PCS]
+    vn = np.asarray(a.var_names)
+    a.file.close()
+    g = pd.read_parquet(OUT / "genes" / f"{c}.parquet").reindex(vn)
+    b, _ = I.esm_blocks(F)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(dict(hsapiens_gene_id=g.hsapiens_gene_id.to_numpy(), block=b)).to_parquet(f)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=int, default=10)
@@ -284,11 +304,16 @@ def main() -> int:
     ls.to_csv(OUT / "lineage_membership.csv", index=False)
     mem = pd.concat([gs[["key", "hsapiens_gene_id"]], lin], ignore_index=True)
     primary = [RU.PRIMARY[t] for t in RU.TISSUE_ORDER]
+    for t in RU.TISSUE_ORDER:
+        if not (RU.RES / "Y1" / "cache" / f"tissue__{t.replace(' ', '_')}.parquet").exists():
+            ensure_blocks(RU.PRIMARY[t])
+    sens = list(RU.SENS_EXTRA.values())
     jobs = [(c, r, mem, a.n_perm) for c in primary for r in ("D", "S", "B1", "pi", "dNdS", "D_allgenes", "D_raw", "D_hmid")]
     jobs += [("liv_hmouse", "D_integrated", mem, a.n_perm)]
     jobs += [(c, r, mem, a.n_perm) for c in primary for r in ("D_tau", "S_tau", "D_nosat", "S_nosat")]
     jobs += [(c, r, mem, 2000) for c in primary for r in ("D_block", "S_block")]
-    jobs += [(c, r, mem, 2000) for c in cohorts if c not in primary for r in ("D", "S")]
+    jobs += [(c, r, mem, a.n_perm) for c in sens for r in ("D", "S")]
+    jobs += [(c, r, mem, 2000) for c in cohorts if c not in primary and c not in sens for r in ("D", "S")]
     with ProcessPoolExecutor(a.jobs) as ex:
         res = list(ex.map(one, jobs))
     long = pd.concat([x[0] for x in res], ignore_index=True)
@@ -300,14 +325,20 @@ def main() -> int:
     sets_all = res[0][2]
     keep = [s for s in sets_all if not s.startswith("lineage|")]
     ki = [sets_all.index(s) for s in keep]
-    for name, r in list(tests.items()) + [("D_integrated_liver", None)]:
+    prim = {**RU.PRIMARY, **RU.SENS_EXTRA}
+    runs_ = [(name, r, RU.TISSUE_ORDER, RU.R_MIN) for name, r in list(tests.items()) + [("D_integrated_liver", None)]]
+    # The six-tissue thread of the first pass, beside it, so what changes can be read off one file; all of its tests.
+    runs_ += [(f"six_{name}", r, RU.SIX, RU.R_MIN) for name, r in tests.items()]
+    runs_ += [("D_r4", "D", RU.TISSUE_ORDER, RU.R_MIN_HALF), ("S_r4", "S", RU.TISSUE_ORDER, RU.R_MIN_HALF)]
+    runs_ += [("D_with_muscle", "D", RU.TISSUE_ORDER + list(RU.SENS_EXTRA), RU.R_MIN), ("S_with_muscle", "S", RU.TISSUE_ORDER + list(RU.SENS_EXTRA), RU.R_MIN)]
+    for name, r, tissues, rmin in runs_:
         Z = {}
-        for t in RU.TISSUE_ORDER:
-            c = RU.PRIMARY[t]
+        for t in tissues:
+            c = prim[t]
             rr = "D_integrated" if (r is None and t == "liver") else ("D" if r is None else r)
             tab, zn, _ = res[idx[(c, rr)]]
             Z[t] = (tab.z.to_numpy()[ki], zn[:, ki], tab.p.to_numpy()[ki])
-        rec, ts = recurrence_table(Z, RU.TISSUE_ORDER, keep, fam)
+        rec, ts = recurrence_table(Z, tissues, keep, fam, rmin)
         rec.insert(0, "readout", name)
         allrec.append(rec)
         if len(ts):
@@ -320,7 +351,8 @@ def main() -> int:
     axis_table(cohorts).to_csv(OUT / "axis.csv", index=False)
     rec = pd.concat(allrec, ignore_index=True)
     piv = rec.pivot(index="key", columns="readout", values="mean_z")
-    sa = [dict(a="D", b=b, spearman_over_sets=float(spearmanr(piv["D"], piv[b], nan_policy="omit")[0])) for b in ("S", "B1", "pi", "dNdS", "D_tau", "D_block", "D_raw", "D_allgenes", "D_hmid")]
+    sa = [dict(a="six_D", b="six_" + b, spearman_over_sets=float(spearmanr(piv["six_D"], piv["six_" + b], nan_policy="omit")[0])) for b in ("S", "B1", "pi", "dNdS")]
+    sa += [dict(a="D", b=b, spearman_over_sets=float(spearmanr(piv["D"], piv[b], nan_policy="omit")[0])) for b in ("S", "B1", "pi", "dNdS", "D_tau", "D_block", "D_raw", "D_allgenes", "D_hmid")]
     sa += [dict(a="pi", b="dNdS", spearman_over_sets=float(spearmanr(piv["pi"], piv["dNdS"], nan_policy="omit")[0])), dict(a="S", b="B1", spearman_over_sets=float(spearmanr(piv["S"], piv["B1"], nan_policy="omit")[0]))]
     pd.DataFrame(sa).to_csv(OUT / "set_axis.csv", index=False)
     print(pd.DataFrame(sa).round(3).to_string())
