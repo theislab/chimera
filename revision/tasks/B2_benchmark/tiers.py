@@ -134,7 +134,8 @@ def queue(path):
 
 
 def freeze():
-    """At the stopping time: write which settings and replicates enter scoring, from whole tiers only, by time alone."""
+    """NOT USED: the owner withdrew the stopping time (plan amendment, 2026-11-04); every tier runs to completion and is scored whole as it completes.
+    At the stopping time: write which settings and replicates enter scoring, from whole tiers only, by time alone."""
     import json
     import time
 
