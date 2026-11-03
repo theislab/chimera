@@ -33,6 +33,21 @@ def tidy_c(c: pd.DataFrame) -> pd.DataFrame:
                              metric="rho_p", value=d.rho_p, ci_lo=d.ci_lo, ci_hi=d.ci_hi, n=d.n, rank_direction="higher"))
 
 
+def tidy_l(d: pd.DataFrame) -> pd.DataFrame:
+    d = d[d.rho_p.notna()].copy()
+    return pd.DataFrame(dict(track="D1L", task="L|" + d.kind + "|" + d.cohort + "|" + d.set + "|" + d.split, cohort=d.cohort, gold=d.gold, setting=d.set,
+                             method=d.score, metric="rho_p", value=d.rho_p, ci_lo=d.ci_lo, ci_hi=d.ci_hi, n=d.n, rank_direction="higher"))
+
+
+def tidy_completion(d: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for r in d.itertuples():
+        for m in ("tried", "finished", "finished_gate_tail"):
+            rows.append(dict(track="D1b", task=f"completion|{r.cohort}|{r.setting}", cohort=r.cohort, gold="", setting=r.setting, method=r.method, metric=m,
+                             value=getattr(r, m), ci_lo=float("nan"), ci_hi=float("nan"), n=r.tried, rank_direction="higher"))
+    return pd.DataFrame(rows)
+
+
 def signal(a: pd.DataFrame) -> pd.DataFrame:
     m = a[(a.stratum == "masked") & (a.universe == "clean") & (a.group == "always")]
     out = []
@@ -95,7 +110,7 @@ def target(a: pd.DataFrame) -> pd.DataFrame:
 def main():
     a = pd.read_csv(RU.RES / "a_rho.csv")
     parts = [tidy_a(a)]
-    for f, fn in (("b_rho.csv", tidy_b), ("c_rho.csv", tidy_c)):
+    for f, fn in (("b_rho.csv", tidy_b), ("c_rho.csv", tidy_c), ("L_rho.csv", tidy_l), ("completion.csv", tidy_completion)):
         p = RU.RES / f
         if p.exists() and p.stat().st_size > 5:
             parts.append(fn(pd.read_csv(p, low_memory=False)))
