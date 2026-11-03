@@ -61,7 +61,9 @@ Properties (one row per human gene; Ensembl 110 canonical transcript unless stat
   prc2_targets      BENPORATH_PRC2_TARGETS (Suz12, Eed and H3K27me3 bound in hESC)
   es_h3k27me3       BENPORATH_ES_WITH_H3K27ME3
   bivalent_es       MIKKELSEN_ES_HCP_WITH_H3K4ME3_AND_H3K27ME3 when present, else the closest ES HCP bivalent set (named
-                    in the output)
+                    in the output). Amendment before any association: absent in MSigDB 2025.1 (truncated Mikkelsen sets);
+                    union of MIKKELSEN_ES_HCP_WITH_H3K27ME3, _ICP_ and _LCP_WITH_H3K4ME3_AND_H3K27ME3 (180 genes);
+  bivalent_npc      added with the amendment: MEISSNER_NPC_HCP_WITH_H3K4ME2_AND_H3K27ME3 (351 genes)
  Genomic context:
   gene_density      protein-coding canonical TSSs within +-500 kb (log1p)
 
@@ -132,7 +134,8 @@ CONTINUOUS = {
 BINARY = {
     "promoter_cgi": "CpG-island promoter", "tata": "TATA box (EPDnew)", "housekeeping": "housekeeping (Eisenberg-Levanon)",
     "bidirectional": "bidirectional promoter", "are_class2": "class II ARE nonamer",
-    "prc2_targets": "PRC2 targets in hESC", "es_h3k27me3": "H3K27me3 in hESC", "bivalent_es": "bivalent HCP in ES",
+    "prc2_targets": "PRC2 targets in hESC", "es_h3k27me3": "H3K27me3 in hESC", "bivalent_es": "bivalent in ES (Mikkelsen)",
+    "bivalent_npc": "bivalent HCP in NPC (Meissner)",
 }
 # sensitivity covariate sets beyond C and Ctau, per property
 EXTRA_COVS = {
@@ -144,7 +147,7 @@ EXTRA_FOR = {
     "Cbrd": list(CONTINUOUS) + list(BINARY),
     "Cgc": ["phylop_promoter", "phylop_utr5", "tata", "promoter_cgi", "housekeeping"],
     "Cpub": ["n_transcripts", "n_pc_transcripts", "n_tss", "n_tes", "tf_indegree", "tf_indegree_ct", "prc2_targets",
-             "es_h3k27me3", "bivalent_es", "housekeeping", "abc_links_mean", "mir_cons_sites"],
+             "es_h3k27me3", "bivalent_es", "bivalent_npc", "housekeeping", "abc_links_mean", "mir_cons_sites"],
 }
 CLASS_COVS = ["tf", "tf_homeodomain", "hpa_loc_mitochondria", "enzyme"]
 JOINT = ["promoter_cgi", "housekeeping", "tata", "phylop_promoter", "log_length_utr3", "mir_cons_sites", "are_density",
