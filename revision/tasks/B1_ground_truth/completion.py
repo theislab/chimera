@@ -5,8 +5,8 @@ Direct, sequence and control readouts are computed on the same altered object: s
 Tools: tried = a score file or a recorded attempt (results/revision/B1/attempts/<tool>/<run>.rc); finished = a score file with at least one finite score.
 Not counted as tried: a row still in the queue or not reached, and a job lost to a bad node (it stops before a run folder or an attempt record exists).
 
-Scope: tiers 0, 1, 2, 3, 10, 11 run (status "run"); tiers 4-6 planned, not run (status "planned, not run", tried = finished = 0). SAMap: no
-BLAST graph was available, so it was not run on any row (status "not run: no BLAST graph").
+Scope: tiers 0, 1, 2, 3, 10, 11 run (status "run"); tiers 4-6 planned, not run (status "planned, not run", tried = finished = 0). SAMap runs on tier 3 only if
+B2's BLAST graph exists before tier 3 is scored; otherwise every SAMap row is "not run: no BLAST graph".
 
 Writes results/revision/B1/completion.csv: track, task, setting, method, tried, finished, status; setting as in B1_tidy.csv, full cells and the marginals per cohort,
 per task and per task x band.   python -m revision.tasks.B1_ground_truth.completion
@@ -96,10 +96,12 @@ def table() -> pd.DataFrame:
                 for c in cols:
                     pl.append(dict(task=r["alt"], setting=base["setting"], method=c, tried=0, finished=0, status="planned, not run"))
             continue
-        for c in TOOL_COL["samap"]:
-            pl.append(dict(task=r["alt"], setting=base["setting"], method=c, tried=0, finished=0, status="not run: no BLAST graph"))
+        samap_ran = any((RU.RES / "tool_scores").glob("samap__*.parquet")) or (RU.RES / "attempts" / "samap").exists()
+        if not samap_ran:
+            for c in TOOL_COL["samap"]:
+                pl.append(dict(task=r["alt"], setting=base["setting"], method=c, tried=0, finished=0, status="not run: no BLAST graph"))
         for tool, cols in TOOL_COL.items():
-            if tool == "samap":
+            if tool == "samap" and not samap_ran:
                 continue
             f, a = RU.RES / "tool_scores" / f"{tool}__{r['run']}.parquet", RU.RES / "attempts" / tool / f"{r['run']}.rc"
             d = pd.read_parquet(f) if f.exists() else None
