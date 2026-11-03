@@ -29,7 +29,7 @@ FREE = {
     "liv_hmouse": {42: "rev-ctl-liv_hmouse-m-s42", 45: "rev-ctl-liv_hmouse-m-s45", 46: "rev-ctl-liv_hmouse-m-s46",
                    **{s: f"z3-liv_hmouse-m-s{s}" for s in (47, 48, 49, 50, 51, 52, 53)}},
     "test_hmouse": {s: f"z3-test_hmouse-m-s{s}" for s in (42, 43, 44, 45, 46)},
-    "liv_4sp": {s: f"z3-liv_4sp-m-s{s}" for s in (42, 43, 44, 45, 46)},
+    "liv_4sp": {s: f"z3-liv_4sp-m-s{s}" for s in (42, 43, 44, 45, 46, 47, 48, 49)},  # 47-49 after s44, s46 went NaN
 }
 # Canonical recipe on CPU by seed number (T3.1 s42 CPU runs, T3.2 seeds); 4-sp has no CPU s42, so its s42 is the MPS run.
 CAN_CPU = {

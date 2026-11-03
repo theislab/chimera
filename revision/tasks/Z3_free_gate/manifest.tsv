@@ -16,3 +16,6 @@ z3-liv_hmouse-m-s50	liv_hmouse	50	4G	--config M --max-epochs 150 --adata data/pr
 z3-liv_hmouse-m-s51	liv_hmouse	51	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 51
 z3-liv_hmouse-m-s52	liv_hmouse	52	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 52
 z3-liv_hmouse-m-s53	liv_hmouse	53	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 53
+z3-liv_4sp-m-s47	liv_4sp	47	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 47
+z3-liv_4sp-m-s48	liv_4sp	48	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 48
+z3-liv_4sp-m-s49	liv_4sp	49	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 49

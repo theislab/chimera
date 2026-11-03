@@ -71,6 +71,8 @@ def integ(run: str, sp_, ct) -> dict:
     if f.exists():
         return json.loads(f.read_text())
     z = np.load(C.RUNS_DIR / run / "final_state.npz")["z_mean"]
+    if not np.isfinite(z).all():
+        return {"int_note": "non-finite z: not computed"}
     m = compute_integration_metrics(z, sp_, ct, k=15, seed=42)["global"]
     out = {f"int_{k}": float(m[k]) for k in ("knn_mixing_entropy", "knn_species_purity", "label_transfer_acc", "sil_celltype")}
     f.write_text(json.dumps(out))
