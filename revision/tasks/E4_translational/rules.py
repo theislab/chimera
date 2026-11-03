@@ -184,19 +184,20 @@ ORGAN_DO = {
     "skeletal muscle": {"DOID:0080000": "muscular disease"},
 }
 
-# Open Targets therapeutic ancestors for tissue-indicated targets (names fixed here; IDs checked against the disease index names).
+# Open Targets therapeutic ancestors for tissue-indicated targets. Amendment 1 (before any association): the 2026-09 disease index is
+# MONDO-based and has none of the EFO names first written here, so each is replaced by the MONDO term of the same name ("disorder").
 TA_OT = {
-    "liver": {"EFO_0001421": "liver disease"},
-    "kidney": {"EFO_0003086": "kidney disease", "EFO_0009690": "urinary system disease"},
-    "islet": {"EFO_0000400": "diabetes mellitus"},
-    "eye": {"EFO_0003966": "eye disease"},
-    "bone marrow": {"EFO_0005803": "hematologic disease", "EFO_0000540": "immune system disease"},
-    "lung": {"EFO_0000684": "respiratory system disease"},
-    "cortex": {"EFO_0000618": "nervous system disease", "EFO_0000677": "mental or behavioural disorder"},
-    "testis": {"EFO_0000512": "reproductive system disease"},
+    "liver": {"MONDO_0005154": "liver disorder"},
+    "kidney": {"MONDO_0005240": "kidney disorder", "MONDO_0002118": "urinary system disorder"},
+    "islet": {"MONDO_0005015": "diabetes mellitus"},
+    "eye": {"MONDO_0005328": "eye disorder"},
+    "bone marrow": {"MONDO_0005570": "hematologic disorder", "MONDO_0005046": "immune system disorder"},
+    "lung": {"MONDO_0005087": "respiratory system disorder"},
+    "cortex": {"MONDO_0005071": "nervous system disorder", "MONDO_0002025": "psychiatric disorder"},
+    "testis": {"MONDO_0003150": "male reproductive system disorder"},
     "skeletal muscle": {"EFO_0002970": "muscular disease"},
 }
-ONCOLOGY_OT = {"MONDO_0004992", "EFO_0000616"}
+ONCOLOGY_OT = {"MONDO_0045024", "MONDO_0004992", "MONDO_0005070"}  # cancer or benign tumor, cancer, neoplasm
 APPROVED_STAGES = {"APPROVAL", "PHASE_4"}
 CLINICAL_STAGES = {"PHASE_1", "PHASE_1_2", "PHASE_2", "PHASE_2_3", "PHASE_3", "EARLY_PHASE_1", "PREAPPROVAL"}
 

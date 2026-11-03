@@ -11,7 +11,7 @@ get() {
   local url="$1" f="$2" ver="$3"
   mkdir -p "$(dirname "$D/$f")"
   if [ -s "$D/$f" ]; then return 0; fi
-  curl -fsSL --retry 5 --retry-delay 5 -o "$D/$f" "$url"
+  curl -fsSL --retry 8 --retry-delay 10 --retry-connrefused -o "$D/$f" "$url"
   echo -e "$f\t$url\t$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$ver\t$(stat -c %s "$D/$f")\t$(sha256sum "$D/$f" | cut -d' ' -f1)" >> "$M"
 }
 MGI=https://www.informatics.jax.org/downloads/reports
@@ -31,8 +31,9 @@ OT=https://ftp.ebi.ac.uk/pub/databases/opentargets/platform/latest/output
 get $OT/clinical_target/00000000.parquet opentargets/clinical_target/00000000.parquet "Open Targets Platform latest (2026-09 build)"
 get $OT/disease/00000000.parquet opentargets/disease/00000000.parquet "Open Targets Platform latest"
 get $OT/drug_molecule/00000000.parquet opentargets/drug_molecule/00000000.parquet "Open Targets Platform latest"
+get $OT/clinical_indication/00000000.parquet opentargets/clinical_indication/00000000.parquet "Open Targets Platform latest"
 for d in evidence_orphanet evidence_gene2phenotype evidence_clingen evidence_genomics_england evidence_impc; do
-  for f in $(curl -fsSL --retry 5 "$OT/$d/" | grep -o 'href="part-[^"]*parquet"' | sed 's/href="//;s/"//' | sort -u); do
+  for f in $(curl -fsSL --retry 8 --retry-delay 10 --retry-connrefused "$OT/$d/" | grep -o 'href="part-[^"]*parquet"' | sed 's/href="//;s/"//' | sort -u); do
     get "$OT/$d/$f" "opentargets/$d/$f" "Open Targets Platform latest"
   done
 done
