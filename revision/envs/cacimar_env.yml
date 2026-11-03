@@ -1,0 +1,30 @@
+# CACIMAR env: Seurat 4 (the tool writes the v4 assay slots and calls Seurat::ExpMean).
+# Python is only the adapter driver.
+name: cacimar_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3
+  - r-seurat=4.4.0
+  - r-seuratobject=4.1.4
+  - r-matrix
+  - r-tidyverse
+  - bioconductor-ggtree
+  - bioconductor-biomart
+  - r-pheatmap
+  - r-pbapply
+  - r-psych
+  - r-rocr
+  - r-gridextra
+  - r-reshape2
+  - r-viridislite
+  - r-ape
+  - r-igraph
+  - r-purrr
+  - r-stringr
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - h5py

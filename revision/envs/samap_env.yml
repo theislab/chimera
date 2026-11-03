@@ -1,0 +1,14 @@
+# SAMap env: Python and BLAST as in the tool's README. The tool itself is installed from the
+# pinned clone by revision/tasks/B2_benchmark/tools/build_envs.sh.
+name: samap_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - pip
+  - blast
+  - hnswlib
+  - leidenalg
+  - python-igraph
+  - pandas<3     # samap.core.homology._coarsen_blast_graph indexes a str-indexed Series by position, which pandas 3 removed
