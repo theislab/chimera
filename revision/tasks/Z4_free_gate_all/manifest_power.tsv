@@ -1,0 +1,4 @@
+run_name	cohort	seed	mem	peak_canonical_gb	canonical_hours	recipe_from	args	why
+z4-liv_hmonkey-m-s44	liv_hmonkey	44	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 150 --adata data/processed/camex_human_monkey.h5ad --seed 44	added for power (coordinator, I1 replication), before reading
+z4-liv_hmonkey-m-s45	liv_hmonkey	45	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 150 --adata data/processed/camex_human_monkey.h5ad --seed 45	added for power (coordinator, I1 replication), before reading
+z4-liv_hmonkey-m-s46	liv_hmonkey	46	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 150 --adata data/processed/camex_human_monkey.h5ad --seed 46	added for power (coordinator, I1 replication), before reading
