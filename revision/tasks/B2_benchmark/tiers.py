@@ -133,5 +133,27 @@ def queue(path):
     print(t.groupby("tier").size().to_dict())
 
 
+def freeze():
+    """At the stopping time: write which settings and replicates enter scoring, from whole tiers only, by time alone."""
+    import json
+    import time
+
+    t = table()
+    t = t[t.output != ""]
+    done = {k: bool(g.output.map(lambda p: (RU.RES / p).exists()).all()) for k, g in t.groupby("tier")}
+    sett, reps = [], []
+    if done.get(0):
+        sett += MAIN
+        reps = [0]
+    if done.get(0) and done.get(2):
+        reps = list(RU.REPS)
+    if done.get(0) and done.get(3):
+        sett += REST
+    out = dict(time=time.strftime("%Y-%m-%dT%H:%M:%S"), tiers_complete={int(k): v for k, v in done.items()}, settings=sett, reps=reps,
+               tools_note="tools enter where their tier is complete; tier 1 holds SATURN, CAMEX, GeneSpectra, CACIMAR on main settings and the integration track")
+    (RU.RES / "tiers_used.json").write_text(json.dumps(out, indent=1))
+    print(out)
+
+
 if __name__ == "__main__":
-    queue(sys.argv[2]) if sys.argv[1] == "queue" else status()
+    {"queue": lambda: queue(sys.argv[2]), "freeze": freeze}.get(sys.argv[1], status)()

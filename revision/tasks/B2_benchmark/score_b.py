@@ -32,6 +32,10 @@ FOCAL = ["S_g", "D", "B1z"]
 
 def task_list() -> list[tuple[str, str]]:
     g = pd.DataFrame(RU.grid())
+    f = RU.RES / "tiers_used.json"
+    if f.exists():  # stopping rule: settings of the complete tiers only, liver whole
+        keep = set(json.loads(f.read_text())["settings"])
+        g = g[(g.cohort == "liv_hmouse") | g.setting.isin(keep)]
     return sorted(set(zip(g.cohort, g.setting)), key=lambda x: (x[0], list(RU.SETTINGS).index(x[1])))
 
 
@@ -60,7 +64,8 @@ def consensus(frames: list[pd.Series], index, min_reps: int = RU.MIN_REPS) -> tu
 LABEL_BLIND_TOOLS = ("CAMEX", "SAMap")  # read no labels: on label-only settings their reading is that of `full`, marked label-independent, as Chimera on liver
 
 
-def tool_scores(tool: str, cohort: str, setting: str, index, reps=RU.REPS):
+def tool_scores(tool: str, cohort: str, setting: str, index, reps=None):
+    reps = allowed_reps(cohort) if reps is None else reps
     if tool in LABEL_BLIND_TOOLS and setting in RU.SETTINGS and RU.SETTINGS[setting]["family"] == "label":
         setting = "full"
     fr = []
@@ -71,9 +76,17 @@ def tool_scores(tool: str, cohort: str, setting: str, index, reps=RU.REPS):
     return consensus(fr, index, min_reps=1) if fr else (None, None)  # tools: SATURN on one replicate per setting, CAMEX on three, by budget; n_reps in the tool's sidecar
 
 
+def allowed_reps(cohort: str) -> list[int]:
+    """Stopping rule: replicates of the complete tiers only (tiers.freeze writes tiers_used.json). Liver ran every tier before the rule."""
+    f = RU.RES / "tiers_used.json"
+    if not f.exists() or cohort == "liv_hmouse":
+        return RU.REPS
+    return json.loads(f.read_text())["reps"]
+
+
 def gather(cohort: str, setting: str, index) -> dict:
     """method -> dict(consensus, reps matrix, reference), for one setting."""
-    grid = [r for r in RU.grid([cohort]) if r["setting"] == setting]
+    grid = [r for r in RU.grid([cohort]) if r["setting"] == setting and int(r["rep"]) in allowed_reps(cohort)]
     out, n_fits, n_disc = {}, 0, 0
     d_frames, c_frames = [], {}
     for r in grid:
