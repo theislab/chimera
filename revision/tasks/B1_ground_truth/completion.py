@@ -5,7 +5,10 @@ Direct, sequence and control readouts are computed on the same altered object: s
 Tools: tried = a score file or a recorded attempt (results/revision/B1/attempts/<tool>/<run>.rc); finished = a score file with at least one finite score.
 Not counted as tried: a row still in the queue or not reached, and a job lost to a bad node (it stops before a run folder or an attempt record exists).
 
-Writes results/revision/B1/completion.csv: track, task, setting, method, tried, finished; setting as in B1_tidy.csv, full cells and the marginals per cohort,
+Scope: tiers 0, 1, 2, 3, 10, 11 run (status "run"); tiers 4-6 planned, not run (status "planned, not run", tried = finished = 0). SAMap: no
+BLAST graph was available, so it was not run on any row (status "not run: no BLAST graph").
+
+Writes results/revision/B1/completion.csv: track, task, setting, method, tried, finished, status; setting as in B1_tidy.csv, full cells and the marginals per cohort,
 per task and per task x band.   python -m revision.tasks.B1_ground_truth.completion
 """
 
@@ -51,8 +54,14 @@ def setting(r) -> str:
 def table() -> pd.DataFrame:
     g = pd.read_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", keep_default_na=False)
     g = g[(g.alt != "none") & (g.duplicate_of == "")]
+    planned = g[~g["tier"].astype(int).isin(RU.RUN_TIERS)]
+    g = g[g["tier"].astype(int).isin(RU.RUN_TIERS)]
     active = active_runs()
     rows = []
+    pl = []
+    for _, r in planned.iterrows():
+        for m in CHIMERA + [m for m, (_, _, grp) in MT.METHODS.items() if m not in CHIMERA and grp != "chimera_exploratory"] + sorted(SEQ_METHODS - set(MT.METHODS)):
+            pl.append(dict(task=r["alt"], setting=setting(r), method=m, tried=0, finished=0, status="planned, not run"))
     if (RU.TASK_DIR / "grid_arms.tsv").exists():
         ga = pd.read_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", keep_default_na=False)
         for _, r in ga[ga.alt != "none"].iterrows():
@@ -82,7 +91,16 @@ def table() -> pd.DataFrame:
     t = t[t.alt != "none"]
     for _, r in t.iterrows():
         base = dict(task=r["alt"], setting=setting(r), cohort=r["cohort"], effect=f"{float(r['effect']):g}", band=r["band"], share=r["share"])
+        if int(r["tier"]) not in RU.RUN_TIERS:
+            for tool, cols in TOOL_COL.items():
+                for c in cols:
+                    pl.append(dict(task=r["alt"], setting=base["setting"], method=c, tried=0, finished=0, status="planned, not run"))
+            continue
+        for c in TOOL_COL["samap"]:
+            pl.append(dict(task=r["alt"], setting=base["setting"], method=c, tried=0, finished=0, status="not run: no BLAST graph"))
         for tool, cols in TOOL_COL.items():
+            if tool == "samap":
+                continue
             f, a = RU.RES / "tool_scores" / f"{tool}__{r['run']}.parquet", RU.RES / "attempts" / tool / f"{r['run']}.rc"
             d = pd.read_parquet(f) if f.exists() else None
             for c in cols:
@@ -99,6 +117,8 @@ def table() -> pd.DataFrame:
         x["setting"] = [fmt(k) for k in x[keys].itertuples(index=False)]
         out.append(x[["task", "setting", "method", "tried", "finished"]])
     res = pd.concat(out, ignore_index=True)
+    res["status"] = "run"
+    res = pd.concat([res, pd.DataFrame(pl)], ignore_index=True)
     res.insert(0, "track", "A")
     return res
 
@@ -107,7 +127,8 @@ def main():
     t = table()
     t.to_csv(RU.RES / "completion.csv", index=False)
     print(len(t), "rows")
-    print(t[t.tried > t.finished].to_string())
+    print(t.groupby("status").size())
+    print(t[(t.status == "run") & (t.tried > t.finished)].to_string())
 
 
 if __name__ == "__main__":

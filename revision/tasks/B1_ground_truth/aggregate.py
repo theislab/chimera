@@ -6,7 +6,8 @@ draws (fit-wise draws share an index, independent across fits). n sums the alter
 rank_direction: higher for detection metrics on real alterations; closer_to_0.5 for AUROC and dir_acc on nulls; closer_to_0.05 for reject05 and power_05 on nulls.
 
 Files: results/revision/B1/B1_tidy.csv (every setting), B1_overview.csv (the rows the overview needs: per task x cohort, and per task, for each primary metric; plus Track D),
-per_cell.parquet (one row per method x fit x subset x metric), failed_runs.csv.
+per_cell.parquet (one row per method x fit x subset x metric), failed_runs.csv. Only tiers in rules.RUN_TIERS are read; tiers 4-6 are planned, not run,
+so the six liver seed-43 fits of the first pass (tier 5) are not scored.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ def direction(task: str, metric: str) -> str:
 def load_cells() -> tuple[pd.DataFrame, pd.DataFrame]:
     rows, failed = [], []
     g = pd.read_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", keep_default_na=False)
-    g = g[(g.alt != "none") & (g.duplicate_of == "")]
+    g = g[(g.alt != "none") & (g.duplicate_of == "") & g["tier"].astype(int).isin(RU.RUN_TIERS)]
     if (RU.TASK_DIR / "grid_arms.tsv").exists():
         ga = pd.read_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", keep_default_na=False)
         g = pd.concat([g, ga[ga.alt != "none"]], ignore_index=True)
