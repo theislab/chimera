@@ -52,3 +52,10 @@ EPS = 1e-6
 # lower tail; it is reported beside.) Poorly mixed but healthy seeds stay in D, with mixing reported.
 SAT_MAX, ZVAR_MIN, N_ACTIVE, TAIL_DELTA, TAIL_MIN = 0.10, 0.01, 10, 0.05, 0.02
 SAT_MAX_GV = 0.05
+# Amendment (2026-11-03, gold-blind, before any gold was read on a free-gate D): for free-gate (Config M) seeds the tail
+# criterion is replaced. It tests that the GIN left the prior (E9.2); a free per-gene gate cannot be stuck that way, and
+# its spread is set by |S_g| (c ~ S_g at equilibrium): every testis free seed has tails of 0.2-0.3% with the gate
+# tracking counts at rho .96. Free seeds pass if the other criteria hold and the gate follows its own count evidence:
+# Spearman(alpha - prior, S_g_ema) >= FREE_RHO_MIN on count-supported genes. Canonical seeds keep the rule above.
+FREE_RHO_MIN = 0.5
+# Labelled sensitivity, liver H+Mouse only: integrated seeds of each line (free_int, can_int: seeds 42, 47, 48 on CPU).

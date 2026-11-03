@@ -53,6 +53,10 @@ def gate(run: str, praw: np.ndarray) -> dict:
     sup = np.abs(S) >= RU.EPS
     r["frac_count_supported"] = float(sup.mean())
     r["rho_D_S_supported"] = float(spearmanr(D[sup], S[sup])[0])
+    r["healthy_committed_rule"] = r["healthy"]
+    if st["config"].get("ablation_config") == "M":  # amendment in rules.py
+        r["healthy"] = bool(base and r["sat_high"] <= RU.SAT_MAX and r["sat_low"] <= RU.SAT_MAX
+                            and r["rho_D_S_supported"] >= RU.FREE_RHO_MIN)
     r["rho_alpha_prior"] = float(spearmanr(a, p)[0])
     r["sd_D"] = float(np.std(D))
     r["sd_D_masked"] = float(np.std(D[~sup])) if (~sup).any() else np.nan
@@ -147,14 +151,20 @@ def main():
                 pick.update({int(s): r for s, r in zip(x.seed, x.run)})
             lines.setdefault("can_state", {})[c] = dict(sorted(pick.items()))
             lines.setdefault("free_state_counts", {})[c] = need
+            fi = H[(H.cohort == c) & (H.kind == "free") & H.healthy & (H.state_markers == "integrated")].sort_values("seed")
+            lines.setdefault("free_int", {})[c] = {int(s): r for s, r in zip(fi.seed, fi.run) if int(s) in free}
+            lines.setdefault("can_int", {})[c] = {s: r for s, r in lines["can5"][c].items()
+                                                  if H[(H.cohort == c) & (H.run == r)].state_T33.iloc[0] == "integrated"}
         else:
             lines.setdefault("can_state", {})[c] = lines["can5"][c]
+            lines.setdefault("free_int", {})[c] = free
+            lines.setdefault("can_int", {})[c] = lines["can5"][c]
     lines["complete"] = complete
     lines["cuts_liv_hmouse"] = cut
     (RU.OUT / "lines.json").write_text(json.dumps(lines, indent=1, default=str))
     for c in RU.COHORTS:
         out = pd.DataFrame(dict(var_name=vns[c], prior_raw=praws[c]))
-        for line in ("free5", "can5", "can_state"):
+        for line in ("free5", "can5", "can_state", "free_int", "can_int"):
             runs = lines[line][c]
             if not runs:
                 continue
@@ -170,7 +180,7 @@ def main():
             out[f"n_seeds_{line}"] = len(R)
         out.to_csv(RU.OUT / "consensus" / f"{c}.csv", index=False)
     pd.set_option("display.width", 260, "display.max_columns", 40)
-    cols = ["cohort", "kind", "seed", "finished", "healthy", "pass_GV_literal", "sat_high", "tail_up_raw", "tail_dn_raw",
+    cols = ["cohort", "kind", "seed", "finished", "healthy", "healthy_committed_rule", "pass_GV_literal", "sat_high", "tail_up_raw", "tail_dn_raw",
             "adversary", "int_knn_mixing_entropy", "int_label_transfer_acc", "rho_D_S_supported", "rho_alpha_prior", "sd_D",
             "sd_D_masked", "state_markers", "state_T33"]
     print(H[cols].round(3).to_string())

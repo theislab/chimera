@@ -50,7 +50,7 @@ def healthy_runs(line: str) -> dict:
         raise SystemExit("lines.json: a cohort has fewer than 5 healthy free seeds")
     out = {c: {int(s): r for s, r in L[line][c].items()} for c in RU.COHORTS}
     for c, v in out.items():
-        if len(v) != 5:
+        if len(v) != 5 and not line.endswith("_int"):
             raise SystemExit(f"{c} {line}: {len(v)} seeds, need 5")
     return out
 
@@ -68,7 +68,7 @@ def support_masks() -> dict:
 def patch(line: str) -> None:
     R.INTEGRATED_SEEDS = {}  # its unit needs canonical seeds 47, 48, 51 on the frozen 10-seed set; not part of a 5-seed line
     runs = None if line == "frozen" else healthy_runs(line)
-    sup = support_masks()
+    sup = {} if line == "frozen" else support_masks()
     o_load = I.load
     if runs is not None:
         I.seed_runs_available = lambda cohort: runs[cohort]
@@ -82,7 +82,9 @@ def patch(line: str) -> None:
             t["count_supported"] = cs == True  # noqa: E712
             t["masked_either"] = cs == False  # noqa: E712
             cons = pd.read_csv(RU.OUT / "consensus" / f"{cohort}.csv").set_index("var_name")
-            for k in ("free5", "can5", "can_state"):
+            for k in ("free5", "can5", "can_state", "free_int", "can_int"):
+                if f"D_{k}" not in cons:
+                    continue
                 t[f"D_{k}"] = cons[f"D_{k}"].reindex(t["var_name"]).to_numpy()
                 t[f"S_{k}"] = cons[f"S_{k}"].reindex(t["var_name"]).to_numpy()
             fz = pd.read_csv(RU.RES / f"T3_3/{cohort}__consensus.csv").set_index("var_name")
@@ -130,6 +132,7 @@ def patch(line: str) -> None:
                     U.append(R.unit(f"{h}:pair_{tag}:frozen", "F3", f"free_vs_frozen_{tag}", h, c, g, cov, ["D_free5", "D_frozen"], subset=uni))
                     U.append(R.unit(f"{h}:pair_{tag}:S_free5", "F3", f"free_vs_own_S_{tag}", h, c, g, cov, ["D_free5", "S_free5"], subset=uni))
                     if c == "liv_hmouse":
+                        U.append(R.unit(f"{h}:pair_{tag}:int", "F3", f"free_int_vs_can_int_{tag}", h, c, g, cov, ["D_free_int", "D_can_int"], subset=uni))
                         U.append(R.unit(f"{h}:pair_{tag}:can_state", "F3", f"free_vs_can_state_{tag}", h, c, g, cov, ["D_free5", "D_can_state"], subset=uni))
                     if R.MULTI[h] == "liv_4sp":
                         U.append(R.unit(f"{h}:multi_pair_{tag}:can5", "F3", f"multi_free_vs_can5_{tag}", h, "liv_4sp", g, cov, ["D_free5", "D_can5"], subset=uni))
@@ -149,7 +152,7 @@ def patch(line: str) -> None:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--line", choices=["frozen", "free5", "can5", "can_state"], required=True)
+    ap.add_argument("--line", choices=["frozen", "free5", "can5", "can_state", "free_int", "can_int"], required=True)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--only", default=None)
     a = ap.parse_args()
