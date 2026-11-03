@@ -109,12 +109,15 @@ def score_unit(u: dict) -> None:
     if U.sum() < RU.STRATUM_MIN:
         U = ok0 & np.isfinite(scores["S_g"]) & np.isfinite(scores["D"])
         in_core = ["S_g", "D"]
-    task.add("main", U, G, {**{k: scores[k] for k in in_core}, "random": scores["random"], "D_raw": scores["D_raw"]}, covs)
+    main_extra = {}
+    if "D_free" in t and np.isfinite(t["D_free"].to_numpy(dtype=float)[U]).all():  # free gate defined on every gene of U: scored on the same genes as D (Z4's universe)
+        main_extra["D_free"] = t["D_free"].to_numpy(dtype=float)
+    task.add("main", U, G, {**{k: scores[k] for k in in_core}, **main_extra, "random": scores["random"], "D_raw": scores["D_raw"]}, covs)
     task.add("pi", U, G, dict(pi=t["pi_score"].to_numpy(dtype=float)), [x for x in covs if x != "prior_raw"])
     side = {"dNdS": t["dNdS_score"].to_numpy(dtype=float), "LOEUF": t["LOEUF_score"].to_numpy(dtype=float)}
     side.update({k: scores[k] for k in CORE if k not in in_core})
     side.update({k: scores[k] for k in RU.TOOLS if k in scores})
-    if "D_free" in t:
+    if "D_free" in t and not main_extra:
         side["D_free"] = t["D_free"].to_numpy(dtype=float)
     sides = []
     for k, v in side.items():
@@ -136,7 +139,9 @@ def score_unit(u: dict) -> None:
                      "flag": "given C without pi" if m == "pi" else "", "rank_direction": "" if m in ("random", "D_raw") else "higher"})
     (OUT / "units").mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_parquet(out)
-    h = task.h2h(FOCAL, ["B1", "B1b", "B1c", "B2b", "B3a", "Sdir", "Lfc"], "main") + task.h2h(["S_g", "D"], ["B1z"], "main")
+    h = task.h2h(FOCAL + list(main_extra), ["B1", "B1b", "B1c", "B2b", "B3a", "Sdir", "Lfc"], "main") + task.h2h(["S_g", "D"] + list(main_extra), ["B1z"], "main")
+    if main_extra:
+        h += task.h2h(["D_free"], ["D", "S_g"], "main")
     for k in sides:
         foc = [f for f in FOCAL if f in in_core]
         h += EN.side_h2h(task, k, k, foc)
