@@ -95,8 +95,23 @@ def add_b1(c: str) -> None:
     units.to_csv(RU.OUT / "genes" / f"{c}__b1_units.csv", index=False)
 
 
+def exact_table_match(adata, table) -> float:
+    """Stronger than gene_ids.assert_table_matches, whose Spearman bar fails when most genes sit at the 0.95 cap (DLPFC, ties): the prior must equal
+    the clamped table identity gene by gene."""
+    from scipy.stats import spearmanr
+
+    ids = pd.Index(adata.var_names).str.replace("ortho_", "", regex=False).astype(int)
+    want = np.clip(table.loc[ids, "mean_identity"].to_numpy(float) / 100, 0.05, 0.95)
+    got = adata.var["conservation_prior"].to_numpy(float)
+    if not np.allclose(got, want, atol=1e-5):
+        raise AssertionError(f"prior differs from clamped table identity: max {np.abs(got - want).max()}")
+    return float(spearmanr(got, want)[0])
+
+
 def tables(one: str | None) -> None:
     from revision.tasks.H1_harmonise import tables as TB
+
+    gene_ids.assert_table_matches = exact_table_match
 
     reg = install()
     (RU.OUT / "genes").mkdir(parents=True, exist_ok=True)
