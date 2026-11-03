@@ -136,7 +136,9 @@ def runs_table() -> pd.DataFrame:
     for c, d in RU.cohorts().items():
         for s, run in sorted(d["tried"].items()):
             h = run_health(run)
-            keep = (s in t33.get(c, [])) if d["role"] == "reference" else h["healthy"]
+            # C1 cohorts: kept by C1's rule, which for DLPFC reads tails on the anchored prior (coordinator ruling: with 98% of genes at the clamp the
+            # raw-prior upper tail cannot form); the H1 rule's verdict stays in the column `healthy`.
+            keep = (s in t33.get(c, [])) if d["role"] == "reference" else (True if d.get("source") == "C1" else h["healthy"])
             rows.append(dict(cohort=c, tissue=d["tissue"], role=d["role"], seed=s, kept=bool(keep), **h))
     return pd.DataFrame(rows)
 
