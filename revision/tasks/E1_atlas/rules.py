@@ -151,7 +151,7 @@ MULTI = {"liv_4sp": "zebrafish", "test_3sp": "mouse", "vz_primates": "M. mulatta
 TISSUE_PROGRAMMES = {
     "liver": ["R-HSA-211859", "R-HSA-174824", "GO:0006629", "hallmark:Bile Acid Metabolism", "hallmark:Xenobiotic Metabolism"],
     "testis": ["R-HSA-1500620", "GO:0022414", "GO:0044782", "hallmark:Spermatogenesis"],
-    "bone marrow": ["R-HSA-168256", "GO:0002376", "GO:0030097", "hallmark:Heme Metabolism"],
+    "bone marrow": ["R-HSA-168256", "GO:0002376", "GO:0030097", "hallmark:heme Metabolism"],
     "kidney": ["R-HSA-382551", "R-HSA-425407", "GO:0055085", "GO:0005215"],
     "islet": ["R-HSA-422356", "R-HSA-2980736", "GO:0005179", "GO:0030141", "hallmark:Pancreas Beta Cells"],
     "eye": ["R-HSA-1474244", "R-HSA-397014", "GO:0003012", "GO:0031012", "R-HSA-2187338"],
