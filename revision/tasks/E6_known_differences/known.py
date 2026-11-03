@@ -93,6 +93,11 @@ def read_list(a):
 
 
 _NUM = r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?"
+def is_control(name):
+    """Control sets: names starting with conserved or text_conserved (nonconserved_zonation is truth, not a control)."""
+    return bool(re.match(r"(conserved|text_conserved)", str(name)))
+
+
 NO_CORE = {"shami2020"}  # cluster labels only, no gene-level strength: full sets are the reading
 
 
@@ -118,7 +123,7 @@ def add_core(lst):
     gene-level score and no cell types: its core is the paper's own top-3% tier (note field `tier=top3pct`)."""
     extra = []
     for st, sub in lst.dropna(subset=["hsapiens_gene_id"]).groupby("set"):
-        if "conserved" in st or sub.hsapiens_gene_id.nunique() <= RU.CORE_N or (sub.source_id.isin(NO_CORE)).all():
+        if is_control(st) or sub.hsapiens_gene_id.nunique() <= RU.CORE_N or (sub.source_id.isin(NO_CORE)).all():
             continue
         if (sub.source_id == "hodge2019").all():
             core = sub[sub.note.str.contains("tier=top3pct")]
@@ -234,11 +239,11 @@ def run_one(job):
     universe_all = g.D_can.notna().to_numpy()
     universe_sup = (g.supp_both & g.B1.notna()).to_numpy()
     st_tau = strata(g, True)
-    ctrl_all = set(lst[lst.set.str.contains("conserved")].hsapiens_gene_id.dropna())
+    ctrl_all = set(lst[lst.set.map(is_control)].hsapiens_gene_id.dropna())
     for setname, sub in lst.groupby("set"):
         ids = set(sub.hsapiens_gene_id.dropna())
         member = g.hsapiens_gene_id.isin(ids).to_numpy()
-        ctrl_ids = ctrl_all if "conserved" not in setname else set()
+        ctrl_ids = ctrl_all if not is_control(setname) else set()
         for uname, uni in [("supported", universe_sup), ("all", universe_all)]:
             gu = g[uni].reset_index(drop=True)
             mu = member[uni]
