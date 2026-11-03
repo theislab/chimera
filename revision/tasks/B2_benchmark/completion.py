@@ -43,6 +43,11 @@ def table() -> pd.DataFrame:
 
 def main():
     t = table()
+    from revision.tasks.B2_benchmark import tiers as T
+
+    main_set = set(T.MAIN) | {"ref", "depth25_law", "depth50_law"}
+    t["tier_status"] = "run"
+    t.loc[(t.cohort != "liv_hmouse") & ~t.setting.isin(main_set), "tier_status"] = "planned, not run (tier 3; owner's scope decision)"
     t.to_csv(RU.RES / "completion.csv", index=False)
     print(t[t.tried > t.finished].to_string())
 

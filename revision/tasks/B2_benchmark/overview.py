@@ -74,6 +74,12 @@ def read_tidy() -> pd.DataFrame:
     if not fr:
         raise SystemExit("no tidy tables yet")
     t = pd.concat(fr, ignore_index=True)
+    # final scope (owner): B2 tiers 0-2, so Track B main settings only, every cohort; the other liver settings ran before the tiers and stay in the tables; the depth
+    # law arm is a second Chimera reading beside depth25 and is tabled, not ranked
+    from revision.tasks.B2_benchmark.tiers import MAIN
+
+    isB = t["track"] == "B"
+    t = t[~isB | t["setting"].isin(MAIN)]
     return t[(t["method"].isin(ORDER) | t["method"].astype(str).str.startswith("I:")) & t["rank_direction"].isin(["higher", "lower"]) & t["value"].notna()]
 
 
