@@ -63,9 +63,9 @@ def table_a(P, C):
                 v = T[(T.dataset == RU.FIG3[c]) & (T.model == m)][key]
                 cells.append(fmt(float(v.iloc[0])) if len(v) else "--")
                 csv.append(dict(score=key, row=m if m != "Chimera" else "Chimera, canonical gate, Fig. 3 run (s42)", cohort=c, value=float(v.iloc[0]) if len(v) else np.nan))
-            name = m if m != "Chimera" else "\\textit{Chimera}, canonical gate, Fig.~3 run"
+            name = m if m != "Chimera" else "\\textit{Chimera}, canonical, Fig.~3 run"
             block.append(f"{name} & " + " & ".join(cells) + " \\\\")
-        for gate, name in (("canonical", "\\textit{Chimera}, canonical gate, seeds"), ("free", "\\textit{Chimera}, per-gene gate, seeds")):
+        for gate, name in (("canonical", "\\textit{Chimera}, canonical, seeds"), ("free", "\\textit{Chimera}, per-gene, seeds")):
             cells = []
             for c in cohorts:
                 g = P[(P.cohort == c) & (P.gate == gate) & (P.metric == f"fig3|{key}")].value
@@ -93,13 +93,13 @@ def write_a(cohorts, rows, seeds, caption_extra: str):
          "% @@REV1:NEW@@ New: table of both gates on the Fig. 3 cohorts. Why: both readouts side by side. [I1]",
          "\\begin{table*}[!t]", "\\centering", "\\scriptsize", "\\setlength{\\tabcolsep}{3pt}", "\\renewcommand{\\arraystretch}{1.08}",
          "\\caption[Supplementary table]{" + caption_extra + "}", "\\label{tab:integration-per-gene-gate}",
-         f"\\begin{{tabularx}}{{\\textwidth}}{{@{{}}>{{\\raggedright\\arraybackslash}}X *{{{n}}}{{c}}@{{}}}}", "\\toprule",
+         "\\resizebox{\\textwidth}{!}{%", f"\\begin{{tabular}}{{@{{}}>{{\\raggedright\\arraybackslash}}p{{3.3cm}} *{{{n}}}{{c}}@{{}}}}", "\\toprule",
          f"\\textbf{{Method}} & {head} \\\\", f" & {sub} \\\\"]
     for i, (title, block) in enumerate(rows):
         L.append("\\midrule")
         L.append(f"\\multicolumn{{{n + 1}}}{{@{{}}l}}{{\\textbf{{{title}}}}} \\\\")
         L += block
-    L += ["\\bottomrule", "\\end{tabularx}", "\\end{table*}", ""]
+    L += ["\\bottomrule", "\\end{tabular}}", "\\end{table*}", ""]
     TEX_A.write_text("\n".join(L))
 
 
@@ -192,13 +192,16 @@ def caption_a(C, cohorts) -> str:
                 "cell-type conservation and composite scores of \\textit{Chimera} with one free gate offset per gene stay within the range of its "
                 "canonical seeds. ")
     else:
-        parts = [f"{t.lower()} better on {x[0]} and worse on {x[1]} of {x[2]} cohorts" for (k, t), x in zip(SCORES, b)]
-        head = "\\textbf{Integration with the per-gene gate beside the canonical gate.} Beyond the canonical seed range, the per-gene gate is " + "; ".join(parts) + ". "
+        parts = [f"{t.lower()} {x[0]} and {x[1]}" for (k, t), x in zip(SCORES, b)]
+        head = ("\\textbf{The per-gene gate integrates about as the canonical gate does.} Of the cohort and score pairs, "
+                f"{sum(x[2] - x[0] - x[1] for x in b)} of {sum(x[2] for x in b)} lie within the range of the canonical seeds; the per-gene gate "
+                f"is better and worse than every canonical seed on, respectively: " + "; ".join(parts) + f" of {n} cohorts. ")
     return (head + "Scores as in \\cref{fig:integration}: scIB-style metrics, min--max scaled within each cohort, composite $0.4$ mixing $+$ $0.6$ "
             "conservation. Rows of the other methods and of the \\textit{Chimera} run shown in \\cref{fig:integration} are unchanged (seed 42); "
             "the seed rows give mean (range) over the healthy fits of each gate, with the number of seeds under each cohort (canonical / "
             "per-gene). Liver H+Mouse and testis H+Mouse use the same seed numbers and platform under both gates; elsewhere the per-gene fits "
-            "are new seeds of the same recipe with only the gate switched. Seed rows are scaled with the bounds of the ten-method panel, so no "
+            "are new seeds of the same recipe with only the gate switched (liver H+Zebrafish and testis H+Macaque have one kept canonical "
+            "run; on liver H+Zebrafish one of two per-gene seeds passed health). Seed rows are scaled with the bounds of the ten-method panel, so no "
             "other value moves; a seed outside the panel's range scores below $0$ or above $1$ (poorly mixed liver H+Mouse seeds of both gates "
             "fall below the panel's narrow label-transfer range). $^{\\uparrow}$, $^{\\downarrow}$: every per-gene seed above, below every "
             "canonical seed.")
@@ -209,9 +212,11 @@ def caption_b(C, rb) -> str:
     bm, wm, nm = counts(C, "h1|knn_mixing_entropy", cs)
     bl, wl, nl = counts(C, "h1|label_transfer_acc", cs)
     bw, ww, nw = counts(C, "z2|within_auroc", cs)
+    lt = C[(C.metric == "h1|label_transfer_acc") & C.cohort.isin(cs)]
+    lower = f"Label transfer is lower under the per-gene gate in {int((lt.delta < 0).sum())} of {len(lt)} cohorts (median difference {fmt(lt.delta.median(), 3)}). "
     return ("\\textbf{Cell embedding of every harmonised cohort under both gates.} "
             f"Beyond the canonical seed range, the per-gene gate mixes species better in {bm} and worse in {wm} of {nm} cohorts, transfers "
-            f"labels better in {bl} and worse in {wl}, and resolves states inside a label better in {bw} and worse in {ww} of {nw}. "
+            f"labels better in {bl} and worse in {wl}, and resolves states inside a label better in {bw} and worse in {ww} of {nw}. " + lower +
             "Mixing entropy, cross-species label transfer and kNN cell-type purity use the function, $k$ and cell-type key of "
             "Supplementary~\\cref{tab:harmonised-cohorts}. Within-label AUROC: mean cross-validated AUROC of known substates inside a cell "
             "type (hepatocyte zonation; kidney proximal tubule segment and state, thick ascending limb and endothelial state; beta-cell stress; "
