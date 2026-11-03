@@ -17,6 +17,7 @@ from revision.tasks.G1_guard.step3_prepare import RES
 
 GUARD = {"liv_hmouse": {45: "rev-g1-liv_hmouse-s45", 46: "rev-g1-liv_hmouse-s46"},
          "test_hmouse": {45: "rev-g1-test_hmouse-s45", 46: "rev-g1-test_hmouse-s46"}}
+FORMS = {"symmetric": "rev-g1-", "upper_only": "rev-g1u-"}  # upper-only: revision/tasks/G1_guard/upper_only.py
 
 
 def main():
@@ -31,15 +32,15 @@ def main():
         Z = K.design(cov.loc[ok])
         sets = {"five": K.SEED_SETS[cohort],
                 "ten": {int(r.seed): r.run for r in h1[(h1.cohort == cohort) & h1.kept].itertuples()}}
-        G = {s: K.read_run(r) for s, r in guard.items() if K.run_finished(r)}
+        G = {(f, s): (r.replace("rev-g1-", p), K.read_run(r.replace("rev-g1-", p))) for f, p in FORMS.items() for s, r in guard.items() if K.run_finished(r.replace("rev-g1-", p))}
         for name, ss in sets.items():
             M = pd.DataFrame({s: K.read_run(r)["D"] for s, r in ss.items()}).iloc[ok.nonzero()[0]].reset_index(drop=True)
             F = K.floor(M, Z)
-            for s, g in G.items():
+            for (form, s), (gname, g) in G.items():
                 fin = bool(np.isfinite(g["D"]).all())
                 d = g["D"][ok]
                 ref = K.consensus_excluding(M, s)
-                r = dict(cohort=cohort, seed_set=name, n_canonical=M.shape[1], guard_seed=s, guard_run=guard[s], finite=fin)
+                r = dict(cohort=cohort, seed_set=name, n_canonical=M.shape[1], form=form, guard_seed=s, guard_run=gname, finite=fin)
                 if fin:
                     rp = K.rho_pair(d, ref, Z)
                     r.update(rho_raw=rp["spearman"], rho_resid=rp["residual"])
@@ -53,6 +54,11 @@ def main():
                     r["inside_raw"] = bool(r["rho_raw"] >= r["F_min_raw"])
                     r["inside_resid"] = bool(r["rho_resid"] >= r["F_min_resid"])
                 rows.append(r)
+    # symmetric against upper-only of the same seed number (splits differ, so this is two more seeds, not a pair)
+    for cohort, guard in GUARD.items():
+        for s, r in guard.items():
+            a, b = K.read_run(r)["D"], K.read_run(r.replace("rev-g1-", "rev-g1u-"))["D"]
+            rows.append(dict(cohort=cohort, seed_set="sym_vs_upper", guard_seed=s, guard_run=r, form="sym_vs_upper", rho_raw=float(pd.Series(a).corr(pd.Series(b), method="spearman"))))
     d = pd.DataFrame(rows)
     K.write_csv(d, RES / "d_full_depth.csv")
     pd.set_option("display.width", 250)

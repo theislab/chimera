@@ -24,8 +24,10 @@ import scvi  # noqa: E402
 
 import chimera  # noqa: E402
 
-PIN = int(os.environ.get("G1_PIN_SPLIT_SEED", "0"))
-scvi.settings.seed = PIN
+_pin = os.environ.get("G1_PIN_SPLIT_SEED", "0")
+PIN = None if _pin == "none" else int(_pin)  # "none": leave the split to the tree under test
+if PIN is not None:
+    scvi.settings.seed = PIN
 from training import run_experiment  # noqa: E402
 
 if not str(Path(chimera.__file__).resolve()).startswith(str(tree)):

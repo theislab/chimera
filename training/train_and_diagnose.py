@@ -422,6 +422,13 @@ def dump_final_state(model: ChimeraModel, adata: ad.AnnData, out_path: Path) -> 
 
 
 def set_seed(seed: int) -> None:
+    # scvi-tools draws the train/validation split from scvi.settings.seed
+    # (DataSplitter.setup); left None it is a fresh OS-entropy draw in every
+    # process, so --seed did not fix a fit. Its setter also calls Lightning
+    # seed_everything(seed); the seeds below then set the same states again.
+    import scvi
+
+    scvi.settings.seed = seed
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
