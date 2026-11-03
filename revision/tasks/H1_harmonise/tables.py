@@ -180,7 +180,14 @@ def build_cohort(args) -> dict:
     a.obs["cell_type"] = a.obs[d["ct"]].astype(str).values  # tau on the harmonised classes; expr and detection do not use it
     vn = pd.Index(a.var_names, name="var_name")
     table = gene_ids.load_table(d["table"])
-    rho_table = gene_ids.assert_table_matches(a, table)
+    if d.get("source") == "C1":  # exact gene-by-gene check (C1): the Spearman bar fails on ties when most genes sit at the 0.95 cap
+        ids_ = vn.str.replace("ortho_", "", regex=False).astype(int)
+        want = np.clip(table.loc[ids_, "mean_identity"].to_numpy(float) / 100, 0.05, 0.95)
+        if not np.allclose(a.var["conservation_prior"].to_numpy(float), want, atol=1e-5):
+            raise AssertionError(f"{c}: prior differs from the clamped table identity")
+        rho_table = 1.0
+    else:
+        rho_table = gene_ids.assert_table_matches(a, table)
     g = pd.DataFrame(index=vn)
     g["hsapiens_gene_id"] = gene_ids.ensembl(d["table"], vn).values
     g["symbol"] = gene_ids.symbols(d["table"], vn).values
