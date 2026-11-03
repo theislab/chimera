@@ -1,0 +1,18 @@
+run_name	cohort	seed	mem	args
+z3-liv_hmouse-m-s47	liv_hmouse	47	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 47
+z3-liv_hmouse-m-s48	liv_hmouse	48	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 48
+z3-test_hmouse-m-s42	test_hmouse	42	8G	--config M --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 42
+z3-test_hmouse-m-s43	test_hmouse	43	8G	--config M --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 43
+z3-test_hmouse-m-s44	test_hmouse	44	8G	--config M --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 44
+z3-test_hmouse-m-s45	test_hmouse	45	8G	--config M --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 45
+z3-test_hmouse-m-s46	test_hmouse	46	8G	--config M --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 46
+z3-liv_4sp-m-s42	liv_4sp	42	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 42
+z3-liv_4sp-m-s43	liv_4sp	43	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 43
+z3-liv_4sp-m-s44	liv_4sp	44	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 44
+z3-liv_4sp-m-s45	liv_4sp	45	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 45
+z3-liv_4sp-m-s46	liv_4sp	46	5G	--config M --max-epochs 200 --adata data/processed/camex_pancreas_unified.h5ad --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0 --seed 46
+z3-liv_hmouse-m-s49	liv_hmouse	49	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 49
+z3-liv_hmouse-m-s50	liv_hmouse	50	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 50
+z3-liv_hmouse-m-s51	liv_hmouse	51	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 51
+z3-liv_hmouse-m-s52	liv_hmouse	52	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 52
+z3-liv_hmouse-m-s53	liv_hmouse	53	4G	--config M --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 53
