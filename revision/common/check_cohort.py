@@ -20,14 +20,22 @@ import numpy as np
 
 
 def check(path: str, batch_key: str = "species", celltype_key: str | None = "cell_ontology_class",
-          n_rows: int = 5000) -> list[str]:
+          n_rows: int = 20000) -> list[str]:
     import anndata as ad
 
     a = ad.read_h5ad(path, backed="r")
     errs = []
-    X = a.X[: min(n_rows, a.n_obs)]
-    X = X.toarray() if hasattr(X, "toarray") else np.asarray(X)
-    if not np.allclose(X, np.round(X)) or X.min() < 0:
+    # Check integer counts on rows spread across the whole matrix (every species), in chunks.
+    n = a.n_obs
+    idx = np.unique(np.linspace(0, n - 1, num=min(n_rows, n)).astype(int)) if n_rows else np.arange(n)
+    bad = False
+    for start in range(0, len(idx), 2000):
+        X = a.X[idx[start:start + 2000]]
+        X = X.toarray() if hasattr(X, "toarray") else np.asarray(X)
+        if not np.allclose(X, np.round(X)) or X.min() < 0:
+            bad = True
+            break
+    if bad:
         errs.append("X is not raw non-negative integer counts")
     if len(a.layers):
         errs.append(f"layers not empty: {list(a.layers)}")
