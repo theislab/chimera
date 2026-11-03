@@ -69,6 +69,8 @@ def lines() -> pd.DataFrame:
             gate_ok = bool(r.healthy_gate) and bool(r.no_nan)
             rows.append(dict(cohort=r.cohort, gate="free", seed=int(r.seed), run=r.run, line="main", source="Z4", included=gate_ok,
                              included_mix=gate_ok and bool(r.healthy)))
+    from revision.tasks.I1_free_gate_integration import replication  # amendment 1: liver H+Monkey replication line
+    rows += replication.lines()
     return pd.DataFrame(rows)
 
 
