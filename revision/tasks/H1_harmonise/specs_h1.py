@@ -20,12 +20,18 @@ def tissue(stem: str) -> Figure:
 
 
 FIGS = {
-    "fig_h1": Figure(Col(P("fig_h1_axis", "a"), P("fig_h1_recurrence", "b"), gap=3)),
-    "fig_h1_cont": Figure(Col(y((0, 0, 512, 119), c=150, d=400), y((0, 120, 512, 283), e=150, f=395), y((0, 283, 512, 429), g=145, h=385), P("fig_h1_genes", "i"), gap=3)),
+    # Three floats of one figure (eight tissues no longer fit two pages): (a) axis and (b) named genes; (c) programmes; (d)-(i) Y1, gene by tissue.
+    "fig_h1": Figure(Col(P("fig_h1_axis", "a"), P("fig_h1_genes", "b"), gap=3)),
+    "fig_h1_cont": Figure(P("fig_h1_recurrence", "c"), width=470),
+    "fig_h1_cont2": Figure(Col(y((0, 0, 512, 119), d=150, e=400), y((0, 120, 512, 283), f=150, g=395), y((0, 283, 512, 429), h=145, i=385), gap=3)),
     "supp_h1_bone_marrow": tissue("supp_h1_bone_marrow"),
     "supp_h1_kidney": tissue("supp_h1_kidney"),
     "supp_h1_islet": tissue("supp_h1_islet"),
     "supp_h1_eye": tissue("supp_h1_eye"),
+    "supp_h1_cortex": tissue("supp_h1_cortex"),
+    "supp_h1_lung": tissue("supp_h1_lung"),
+    "supp_h1_muscle": tissue("supp_h1_muscle"),
+    "supp_h1_tumour": tissue("supp_h1_tumour"),
     "supp_h1_recurrence_all": Figure(P("supp_h1_recurrence_all"), width=440),
     "supp_h1_lineage": Figure(P("supp_h1_lineage")),
 }

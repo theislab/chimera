@@ -19,6 +19,8 @@ Run from `chimera/`, in `chimera_env`:
 
 ## Cohorts and flags
 
+26 cohorts: the 16 of the first passes and the ten C1 cohorts (`results/revision/C1/kept_runs.tsv`, joined by `rules.load_c1`; `H1_C1=0` leaves them out). The reading runs on eight tissues (`rules.TISSUE_ORDER`); the six-tissue thread is recomputed beside it (`six_*` readouts); muscle enters as a sensitivity (`D_with_muscle`). Names need `nameable`: strict support, no zero or quiet species, no mapping flag, not in a DLPFC lower tail (`reference_artefact`).
+
 `rules.py` holds the registry; Van Zyl 5 species is grid 2 (`rev-vz-grid2-s42` to `s44`, T11_2c); grid 1 (`full_g1`) is not a row. H+Pig and H+M. fascicularis come from `extra_runs.tsv` (`cohort`, `seed`, `run`). `tables.py` stops if D or the saturated flag differ from the T11 tidy table.
 Per-gene tables carry O1's flags as columns (`o1_T2`, `o1_M_wrong_row`, `o1_M_false_zero`, `o1_zero_any`); no gene is dropped. `nameable` is what figures and captions may name.
 

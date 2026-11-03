@@ -37,8 +37,12 @@ UP, DOWN = "#D55E00", "#0072B2"  # fig4_margin_support
 THEME_COL = ["#0072B2", "#5B3E80", "#D55E00", "#7F7F7F"]  # fig4c
 CT_COL = ["#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#BBBBBB"]  # fig4_celltype_drivers
 YLIM_D = (-0.32, 0.32)
-TISSUE_LABEL = {"liver": "Liver", "testis": "Testis", "bone marrow": "Bone marrow", "kidney": "Kidney", "islet": "Islet", "eye": "Eye"}
-FIG_NAME = {"bone marrow": "supp_h1_bone_marrow", "kidney": "supp_h1_kidney", "islet": "supp_h1_islet", "eye": "supp_h1_eye"}
+TISSUE_LABEL = {"liver": "Liver", "testis": "Testis", "bone marrow": "Bone marrow", "kidney": "Kidney", "islet": "Islet", "eye": "Eye", "cortex": "Cortex", "lung": "Lung",
+                "skeletal muscle": "Muscle", "tumour myeloid": "Tumour myeloid"}
+FIG_NAME = {"bone marrow": "supp_h1_bone_marrow", "kidney": "supp_h1_kidney", "islet": "supp_h1_islet", "eye": "supp_h1_eye", "cortex": "supp_h1_cortex", "lung": "supp_h1_lung",
+            "skeletal muscle": "supp_h1_muscle", "tumour myeloid": "supp_h1_tumour"}
+SUPP_PRIMARY = {**RU.PRIMARY, **RU.SENS_EXTRA, "tumour myeloid": "tumour_zilionis"}
+MODEL_COL = ["#D55E00", "#0072B2", "#009E73", "#222222", "#CC79A7", "#E69F00", "#56B4E9"]
 SET_LABEL = {"heme Metabolism": "Heme Metabolism", "Pperoxisome": "Peroxisome", "TF": "Transcription factors", "TF_homeodomain": "Homeodomain TFs", "TF_C2H2_ZF": "C2H2 zinc-finger TFs", "TF_nuclear_rec": "Nuclear receptors", "protein_kinase": "Protein kinases",
              "receptor": "Receptors", "GPCR": "GPCRs", "ion_channel": "Ion channels", "SLC_transporter": "SLC transporters", "chromatin_reg": "Chromatin regulators", "enzyme": "Enzymes",
              "mitochondrial": "Mitochondrial proteins"}
@@ -326,12 +330,13 @@ def p_support(ax, g):
     ax.set_xlabel("fraction of tail genes backed by\ncount evidence of the same sign", fontsize=6)
 
 
-def p_eye_models(ax):
-    cols = {"vz_hmouse": "#D55E00", "vz_hmmul": "#0072B2", "vz_primates": "#009E73", "vz_full": "#222222", "vz_hpig": "#CC79A7", "vz_hmfas": "#E69F00"}
-    for c, d in RU.cohorts().items():
-        if d["tissue"] != "eye":
-            continue
-        ax.hist(genes(c).D, bins=fd.DELTA_ALPHA_BINS, histtype="step", color=cols[c], lw=0.9, density=True, label=d["label"].replace("Eye ", ""))
+def p_models(ax, tissue):
+    """Delta-alpha of every model of one tissue (eye, cortex): the model of the thread first."""
+    cs = [c for c, d in RU.cohorts().items() if d["tissue"] == tissue]
+    cs = sorted(cs, key=lambda c: (c != RU.PRIMARY[tissue], c))
+    for c, col in zip(cs, MODEL_COL):
+        ax.hist(genes(c).D, bins=fd.DELTA_ALPHA_BINS, histtype="step", color=col, lw=0.9, density=True,
+                label=RU.cohorts()[c]["label"].replace("Eye ", "").replace("Cortex ", "").replace(", own table", " own"))
     fd.style_delta_alpha_axis(ax, "x")
     ax.set_xlabel(r"$\Delta\alpha$ (centred)")
     ax.set_ylabel(fd.LABEL["density"])
@@ -362,8 +367,8 @@ def supp_panels(tissue: str, c: str, stem: str) -> None:
     psave(one(p_top, (2.2, 1.7), g, c, 8), f"{stem}_h")
     psave(one(p_archetypes, (2.2, 1.05), c), f"{stem}_i")
     psave(one(p_count, (2.2, 1.05), g), f"{stem}_j")
-    if tissue == "eye":
-        psave(one(p_eye_models, (2.2, 1.05)), f"{stem}_k")
+    if tissue in ("eye", "cortex"):
+        psave(one(p_models, (2.2, 1.05), tissue), f"{stem}_k")
     else:
         psave(one(p_support, (2.2, 1.05), g), f"{stem}_k")
 
@@ -382,7 +387,7 @@ def cloud(ax, x, y, sup):
 
 def main_axis() -> plt.Figure:
     ax_t = pd.read_csv(OUT / "axis.csv")
-    fig, axes = plt.subplots(3, 6, figsize=(fd.DOUBLE_W + 0.15, 2.85), sharey="row", layout="constrained", gridspec_kw=dict(height_ratios=[0.7, 1, 1]))
+    fig, axes = plt.subplots(3, len(RU.TISSUE_ORDER), figsize=(fd.DOUBLE_W + 0.15, 2.85), sharey="row", layout="constrained", gridspec_kw=dict(height_ratios=[0.7, 1, 1]))
     for j, t in enumerate(RU.TISSUE_ORDER):
         c = RU.PRIMARY[t]
         g = genes(c)
@@ -464,12 +469,13 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
     M = D.loc[rows, [f"z_{t}" for t in cols]].to_numpy(float)
     Q = D.loc[rows, [f"q_{t}" for t in cols]].to_numpy(float)
     rh = 0.112
-    w_label, w_col, w_side = 1.78, 0.5, 0.36
-    W_in = w_label + 6 * w_col + 0.08 + 5 * w_side
+    w_label, w_col, w_side = 1.78, 0.43, 0.36
+    nc = len(RU.TISSUE_ORDER)
+    W_in = w_label + nc * w_col + 0.08 + 5 * w_side
     top_in, bot_in = 0.42, 0.04
     H = rh * len(rows) + top_in + bot_in
     fig = plt.figure(figsize=(W_in, H))
-    ax = fig.add_axes([w_label / W_in, bot_in / H, 6 * w_col / W_in, rh * len(rows) / H])
+    ax = fig.add_axes([w_label / W_in, bot_in / H, nc * w_col / W_in, rh * len(rows) / H])
     vmax = 8.0
     ax.imshow(M, cmap="RdBu_r", vmin=-vmax, vmax=vmax, aspect="auto", interpolation="nearest")
     for i in range(M.shape[0]):
@@ -494,7 +500,7 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
         ax.axhline(len(keys) + len(spec) - 0.5, color="#222222", lw=0.8)
     if 0 < n_ab < len(keys):
         ax.axhline(n_ab - 0.5, color="#ffffff", lw=2)
-    ax2 = fig.add_axes([(w_label + 6 * w_col + 0.08) / W_in, bot_in / H, 5 * w_side / W_in, rh * len(rows) / H], sharey=ax)
+    ax2 = fig.add_axes([(w_label + nc * w_col + 0.08) / W_in, bot_in / H, 5 * w_side / W_in, rh * len(rows) / H], sharey=ax)
     ax2.set_xlim(-0.5, 4.5)
     for j, hd in enumerate(["$q$", "$S_g$", "B1", "π", "dN/dS"]):
         ax2.text(j, -1.0, hd, fontsize=5.6, ha="center", va="bottom", color=cm.INK)
@@ -533,7 +539,7 @@ def main_lineage() -> plt.Figure:
                     ax.text(j, i, f"{M[i, j]:+.1f}", ha="center", va="center", fontsize=5, color="#ffffff" if abs(M[i, j]) > 5 else "#222222")
                 else:
                     ax.text(j, i, "—", ha="center", va="center", fontsize=5, color=cm.MUTED)
-        ax.set_xticks(range(6))
+        ax.set_xticks(range(len(RU.TISSUE_ORDER)))
         ax.set_xticklabels([TISSUE_LABEL[t] for t in RU.TISSUE_ORDER], fontsize=6, rotation=30, ha="right")
         ax.tick_params(length=0)
         ax.set_title(ttl, fontsize=7, pad=3)
@@ -545,8 +551,10 @@ def main_lineage() -> plt.Figure:
 
 
 def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
-    fig, axes = plt.subplots(1, 6, figsize=(fd.DOUBLE_W + 0.15, 1.95), layout="constrained", sharex=True)
-    for ax, t in zip(axes, RU.TISSUE_ORDER):
+    nr = 2 if len(RU.TISSUE_ORDER) > 6 else 1
+    nc = int(np.ceil(len(RU.TISSUE_ORDER) / nr))
+    fig, axes = plt.subplots(nr, nc, figsize=(fd.DOUBLE_W + 0.15, 1.95 * nr), layout="constrained", sharex=True)
+    for ax, t in zip(np.ravel(axes), RU.TISSUE_ORDER):
         c = RU.PRIMARY[t]
         n = named(genes(c))
         n = n[~n.symbol.str.startswith("MT-")]  # mitochondrially encoded genes are not measured in every tissue and track RNA retention; see the caption
@@ -564,7 +572,8 @@ def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
         ax.set_xlim(-0.6, 0.6)
         ax.set_xticks([-0.4, 0, 0.4])
         ax.tick_params(labelsize=5.5, length=2)
-        ax.set_xlabel("Δα (centred)", fontsize=6)
+        if t in RU.TISSUE_ORDER[-nc:]:
+            ax.set_xlabel("Δα (centred)", fontsize=6)
         ax.set_title(TISSUE_LABEL[t], fontsize=7.5, fontweight="bold", pad=3)
         ax.spines["left"].set_visible(False)
         for yy, r in zip(y, sel.itertuples()):
@@ -595,7 +604,7 @@ def main() -> int:
     cm.setup()
     panel_rc()
     for t in RU.NEW_TISSUES:
-        supp_panels(t, RU.PRIMARY[t], FIG_NAME[t])
+        supp_panels(t, SUPP_PRIMARY[t], FIG_NAME[t])
     if a.reference:
         for t in ("liver", "testis"):
             supp_panels(t, RU.PRIMARY[t], f"h1_reference_{t.replace(' ', '_')}")

@@ -234,6 +234,7 @@ SEQ_TISSUE = {"liver": ("o", "#0072B2"), "testis": ("^", "#D55E00"), "bone marro
 def panel_sequence_axis() -> plt.Figure:
     ax_t = pd.read_csv(cm.RES / "H1" / "axis.csv")
     x5 = pd.read_csv(cm.RES / "X5" / "sequence_axis_rho.csv").set_index(["cohort", "panel"])
+    ax_t = ax_t[ax_t.tissue.isin(SEQ_TISSUE)]  # H1 also lists the C1 cohorts; Fig 4g keeps the 16 until its layout is extended
     A, E = ax_t[ax_t.universe == "all"].set_index("cohort"), ax_t[ax_t.universe == "count_support"].set_index("cohort")
     for (coh, panel), r in x5.iterrows():  # the same statistic as X5 on the cohorts both have
         col = dict((k, c) for k, c, _ in SEQ_ROWS)[panel]

@@ -159,6 +159,7 @@ def cohort_rows() -> pd.DataFrame:
     runs["label"] = [cm.COHORT.get(c, labels[c].replace(" H+", ", human + ").lower().replace("m. mulatta", "M. mulatta")
                                    .replace("marrow 3", "marrow, 3").replace("eye 5", "eye, 5").replace("eye primates", "eye, primates"))
                      for c in runs.cohort]
+    runs = runs[runs.tissue.isin(TISSUES)]  # H1 also lists the C1 cohorts (cortex, lung, muscle, tumour); Fig 4e keeps the 16 until its layout is extended
     runs["order"] = [TISSUES.index(t) for t in runs.tissue]
     return runs.sort_values("order", kind="stable").reset_index(drop=True)
 
