@@ -131,9 +131,26 @@ def higher_better(metric: str) -> bool:
     return m not in RU.LOWER_BETTER and not m.startswith("outside")
 
 
+def kept_json() -> dict:
+    """Z4's kept.json: cohort -> set of kept free runs (gate health and Z4's mixing criterion)."""
+    f = RU.RES / "Z4" / "kept.json"
+    return {c: set(v.values()) for c, v in json.loads(f.read_text()).items()} if f.exists() else {}
+
+
 def comparisons(P: pd.DataFrame) -> pd.DataFrame:
     out = []
+    K = kept_json()
     P = P[P.included]
+    for (c, line, m), g in P[P.line == "main"].groupby(["cohort", "line", "metric"]):
+        # variant: free seeds restricted to Z4's kept.json (coordinator), canonical side unchanged
+        if m.endswith(("outside_bounds", "wins_vs_pca")) or c not in K:
+            continue
+        fr = g[(g.gate == "free") & g.run.isin(K[c])].set_index("seed").value
+        ca = g[g.gate == "canonical"].set_index("seed").value
+        if len(fr) and len(ca) and len(fr) < (g.gate == "free").sum():
+            same = set(fr.index) == set(ca.index)
+            out.append(dict(cohort=c, line=line, metric=m, analysis="free_kept_json", seeds_free=",".join(map(str, fr.index)),
+                            seeds_can=",".join(map(str, ca.index))) | RU.compare(fr.to_numpy(), ca.to_numpy(), same, higher_better(m)))
     for (c, line, m), g in P.groupby(["cohort", "line", "metric"]):
         if m.endswith(("outside_bounds", "wins_vs_pca")):
             continue

@@ -76,9 +76,13 @@ def one_sided(d: np.ndarray) -> dict:
     return dict(n_pairs=n, mean=float(d.mean()), lower95=float(d.mean() - t.ppf(0.95, n - 1) * se), p_one_sided=float(t.sf(tt, n - 1)))
 
 
-def test() -> dict:
+def test(variant: str = "spec") -> dict:
+    """variant 'spec': amendment 1 (Z4 gate health); 'kept_json': per-gene seeds also in Z4's kept.json (adds Z4's mixing criterion)."""
     P = pd.read_csv(RU.OUT / "per_seed.csv")
     P = P[(P.line == "replication_hmonkey") & P.included]
+    if variant == "kept_json":
+        kept = set(json.loads((RU.RES / "Z4" / "kept.json").read_text()).get(COHORT, {}).values())
+        P = P[(P.gate == "canonical") | P.run.isin(kept)]
     W = P.pivot_table(index="seed", columns=["gate", "metric"], values="value")
     pairs = [s for s in SEEDS if ("free", PRIMARY) in W and ("canonical", PRIMARY) in W and s in W.index
              and np.isfinite(W.loc[s, ("free", PRIMARY)]) and np.isfinite(W.loc[s, ("canonical", PRIMARY)])]
@@ -96,14 +100,16 @@ def test() -> dict:
             r = dict(metric=m, pairs=name, seeds=",".join(map(str, ss))) | one_sided(f - c) | RU.compare(f, c, True)
             rows.append(r)
     T = pd.DataFrame(rows)
-    T.to_csv(RU.OUT / "replication.csv", index=False)
+    sfx = "" if variant == "spec" else f"_{variant}"
+    T.to_csv(RU.OUT / f"replication{sfx}.csv", index=False)
     p = T[(T.metric == PRIMARY) & (T.pairs == "all_pairs")]
     res = dict(n_pairs=len(pairs), entropy_cut=ent_cut, integrated_pairs=integ,
                replicated=bool(len(p) and p.lower95.iloc[0] > 0) if len(pairs) >= 3 else None,
                note="" if len(pairs) >= 3 else "fewer than 3 healthy pairs: not tested")
     if len(p):
         res |= {k: float(p[k].iloc[0]) for k in ("mean", "lower95", "p_one_sided", "mean_free", "mean_can")} | dict(call=p.call.iloc[0])
-    (RU.OUT / "replication.json").write_text(json.dumps(res, indent=1, default=str))
+    res["variant"] = variant
+    (RU.OUT / f"replication{sfx}.json").write_text(json.dumps(res, indent=1, default=str))
     pd.set_option("display.width", 250)
     print(T.round(3).to_string(index=False))
     print(json.dumps(res, indent=1, default=str))
@@ -111,4 +117,7 @@ def test() -> dict:
 
 
 if __name__ == "__main__":
-    {"health": health, "test": test}[sys.argv[1]]()
+    if sys.argv[1] == "health":
+        health()
+    else:
+        test(sys.argv[2] if len(sys.argv) > 2 else "spec")

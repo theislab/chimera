@@ -48,7 +48,31 @@ def mark(call: str) -> str:
 def load():
     P = pd.read_csv(RU.OUT / "per_seed.csv")
     C = pd.read_csv(RU.OUT / "compare.csv")
+    global KEPT
+    KEPT = C[(C.analysis == "free_kept_json") & (C.line == "main")]
     return P[P.included & (P.line == "main")], C[(C.analysis == "primary") & (C.line == "main")]
+
+
+KEPT = pd.DataFrame()
+NAMES = {"h1|knn_mixing_entropy": "mixing", "h1|label_transfer_acc": "label transfer", "h1|knn_celltype_purity": "cell-type purity",
+         "z2|within_auroc": "within-label AUROC", "fig3|mixing": "mixing score", "fig3|biology": "conservation score", "fig3|total_score": "composite"}
+
+
+def kept_note(metrics) -> str:
+    """Footnote: the variant with per-gene seeds restricted to the integration-filtered list of the per-gene training (mixing criterion)."""
+    q = KEPT[KEPT.metric.isin(metrics)]
+    if not len(q):
+        return ""
+    from revision.tasks.H1_harmonise import rules as H1R
+    H = H1R.cohorts()
+    parts = []
+    for c, g in q.groupby("cohort", sort=False):
+        lab = SHORT.get(c, H[c]["label"]) if c in SHORT else H[c]["label"]
+        vals = "; ".join(f"{NAMES[r.metric]} {fmt(r.mean_free)} against {fmt(r.mean_can)}" + (" (" + {"better": "above", "worse": "below"}[r.call] + " every canonical seed)" if r.call in ("better", "worse") else "")
+                         for r in g.itertuples())
+        parts.append(f"{lab}, per-gene seeds {g.seeds_free.iloc[0].replace(',', ', ')}: {vals}")
+    return (" Selecting per-gene seeds also on species mixing (half the canonical median mixing entropy) would drop only "
+            "poorly mixed seeds and gives: " + "; ".join(parts) + ".")
 
 
 def table_a(P, C):
@@ -204,7 +228,7 @@ def caption_a(C, cohorts) -> str:
             "run; on liver H+Zebrafish one of two per-gene seeds passed health). Seed rows are scaled with the bounds of the ten-method panel, so no "
             "other value moves; a seed outside the panel's range scores below $0$ or above $1$ (poorly mixed liver H+Mouse seeds of both gates "
             "fall below the panel's narrow label-transfer range). $^{\\uparrow}$, $^{\\downarrow}$: every per-gene seed above, below every "
-            "canonical seed.")
+            "canonical seed. Per-gene seeds are selected by the health of the gate only, not by mixing." + kept_note([f"fig3|{k}" for k, _ in SCORES]))
 
 
 def caption_b(C, rb) -> str:
@@ -223,7 +247,8 @@ def caption_b(C, rb) -> str:
             "marrow maturation and progression; testis stages), from the latent of the model. Values are mean (range) over seeds; canonical "
             "fits are the kept runs of Supplementary~\\cref{tab:harmonised-cohorts}, per-gene fits pass the same health rule for the gate "
             "(species mixing is not used to select them). scVI on the same object, unchanged: mixing; label transfer; within-label AUROC. "
-            "$^{\\uparrow}$, $^{\\downarrow}$: every per-gene seed above, below every canonical seed.")
+            "$^{\\uparrow}$, $^{\\downarrow}$: every per-gene seed above, below every canonical seed."
+            + kept_note(["h1|knn_mixing_entropy", "h1|label_transfer_acc", "h1|knn_celltype_purity", "z2|within_auroc"]))
 
 
 def main():
