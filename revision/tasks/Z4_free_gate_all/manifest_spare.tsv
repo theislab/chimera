@@ -1,0 +1,4 @@
+run_name	cohort	seed	mem	peak_canonical_gb	canonical_hours	recipe_from	args	why
+z4-liv_hzeb-m-s44	liv_hzeb	44	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 100 --adata data/processed/camex_human_zebrafish.h5ad --lambda-mmd 10 --seed 44	third seed: s42 fails health (7 of 10 active z)
+z4-liv_hzeb-m-s45	liv_hzeb	45	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 100 --adata data/processed/camex_human_zebrafish.h5ad --lambda-mmd 10 --seed 45	fourth and fifth seed: s42, s44 fail health (latent collapse, 7 and 5 of 10 active z)
+z4-liv_hzeb-m-s46	liv_hzeb	46	6G	1.5	1.0	configs/canonical_recipes.tsv	--config M --max-epochs 100 --adata data/processed/camex_human_zebrafish.h5ad --lambda-mmd 10 --seed 46	fourth and fifth seed: s42, s44 fail health (latent collapse, 7 and 5 of 10 active z)
