@@ -5,7 +5,7 @@ task: the alteration (pattern, level, loss) or null (sham_swap, thin_both, place
 draws (fit-wise draws share an index, independent across fits). n sums the altered genes. Discarded fits leave.
 rank_direction: higher for detection metrics on real alterations; closer_to_0.5 for AUROC and dir_acc on nulls; closer_to_0.05 for reject05 and power_05 on nulls.
 
-Files: results/revision/B1/B1_tidy.csv (every setting), B1_overview.csv (the rows the overview needs: per task x cohort, and per task, for each primary metric),
+Files: results/revision/B1/B1_tidy.csv (every setting), B1_overview.csv (the rows the overview needs: per task x cohort, and per task, for each primary metric; plus Track D),
 per_cell.parquet (one row per method x fit x subset x metric), failed_runs.csv.
 """
 
@@ -130,7 +130,11 @@ def main():
     tidy = pd.DataFrame(out)
     tidy.to_csv(RU.RES / "B1_tidy.csv", index=False)
     is_cohort = tidy["setting"].str.contains(r"effect=all;band=all;share=all;identity=all$", regex=True)
-    tidy[is_cohort & tidy["metric"].isin(PRIMARY)].to_csv(RU.RES / "B1_overview.csv", index=False)
+    ov = tidy[is_cohort & tidy["metric"].isin(PRIMARY)]
+    d = RU.RES / "B1_trackD_tidy.csv"
+    if d.exists():  # Track D rows in the same schema (track_d/collect.py)
+        ov = pd.concat([ov, pd.read_csv(d)], ignore_index=True)
+    ov.to_csv(RU.RES / "B1_overview.csv", index=False)
     print(len(tidy), "rows", flush=True)
 
 
