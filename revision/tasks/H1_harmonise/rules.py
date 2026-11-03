@@ -21,6 +21,8 @@ Per-gene readouts, one schema (tables.py):
               whole upper tail near the ceiling (pi_clamped 0.85 + 0.10), including most lineage genes; their sign is backed by counts, only their rank among themselves is capped;
   nameable    strict_support, no exact zero count in a species of the cohort and no mapping flag of the ortholog audit (O1). Amendment, after O1: a false zero
               costs level and put renamed genes at the bottom of liver (BABAM2, MINDY1-3); such genes stay in the tables, flagged, and are not named;
+              second amendment, with the C1 cohorts: also not quiet in one species (detection < 0.5%) while at least 5% in another, C1's naming rule, applied to
+              every cohort; in DLPFC models the lower tail (D < -0.05) is marked `reference_artefact` (C1: single-species reference artefacts) and not named;
   o1_T2, o1_M_wrong_row, o1_M_false_zero, o1_zero_any  O1 flags on the cohort's own species (flags_by_cohort.parquet); columns only, no gene is dropped;
   expr, detection  species-balanced mean log1p CP10K and detection on the training object (cohorts.gene_covariates).
 

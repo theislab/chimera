@@ -256,7 +256,11 @@ def build_cohort(args) -> dict:
         g["species_level_gap_log10"] = lg.max(0) - lg.min(0)
         g["reference_artefact"] = (g["D"] < -RU.TAIL).to_numpy()
     flagged = (g["o1_M_wrong_row"].fillna(False) | g["o1_M_false_zero"].fillna(False) | g["o1_zero_any"].fillna(False)).astype(bool) | g["reference_artefact"]
-    g["nameable"] = g["strict_support"] & ~flagged
+    # Quiet in one species (detection < 0.5%) while at least 5% in another: C1's rule for names, applied to every cohort. The reading of such a gene is a
+    # level gap or a pair that misses the expressed paralog (tumour LYZ, mouse Lyz2 not the 1:1 partner); flagged, kept, never named.
+    det = g[[k for k in g.columns if k.startswith("detection_") and k not in ("detection_spmean", "detection_sprange")]].astype(float)
+    g["quiet_in_species"] = ((det.min(1) < 0.005) & (det.max(1) >= 0.05)).to_numpy()
+    g["nameable"] = g["strict_support"] & ~flagged & ~g["quiet_in_species"]
     gold = pd.read_csv(RES / "T4_3/golds/gold_table.csv", index_col=0)[["dNdS", "LOEUF"]]
     g = g.reset_index().merge(gold, how="left", left_on="hsapiens_gene_id", right_index=True).set_index("var_name").reindex(vn)
     g.insert(0, "cohort", c)
