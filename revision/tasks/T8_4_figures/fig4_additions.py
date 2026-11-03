@@ -45,8 +45,9 @@ THEMES = {
 DAGGER = "†"
 # Not drawn (ortholog audit O1): OTC has no human counts in the source matrix (a source zero); COL17A1 and
 # CD40LG have wrong zebrafish one-to-one targets (col19a1, identity 5; tnfsf10l4, identity 18); SELE's
-# zebrafish target is selp and it has no mouse counts. Applies to panels c and d alike.
-O1_DROPPED = {"OTC", "COL17A1", "CD40LG", "SELE"}
+# zebrafish target is selp and it has no mouse counts; SELP's zebrafish target is an unnamed low-confidence
+# gene (identity 13). Applies to panels c and d alike.
+O1_DROPPED = {"OTC", "COL17A1", "CD40LG", "SELE", "SELP"}
 
 
 def genes_4sp() -> pd.DataFrame:

@@ -25,6 +25,23 @@ SRC = cm.RES / "T2_2" / "before_after.csv"
 # Notes that name internal task identifiers, reworded for the reader; meaning unchanged.
 NOTE_MAP = {"05 is not in the T2.2 rerun list; the flip table is regenerated when 05 reruns":
             "notebook 05 was not part of the corrected rerun; its flip table is regenerated when it reruns"}
+# Ortholog audit (O1): notes beneath rows whose corrected gene rests on species without counts, each
+# with its manuscript change label. Key: (cohort, quantity, corrected value).
+O1_NOTES = {
+    ("test H+Mac", "top_F", "SPINK2 (Δα=+0.29)"): (
+        "% @@REV1:NEW@@ Note: SPINK2 has no macaque counts. Why: ortholog audit, the macaque matrix has no "
+        "SPINK2 row, so this value rests on a macaque zero. [O1]",
+        "no macaque counts: the macaque matrix has no SPINK2 row, so this value rests on a macaque zero; "
+        "the label is correct"),
+    ("test 3-sp", "top_M", "RPL26 (Δα=-0.12)"): (
+        "% @@REV1:NEW@@ Note: RPL26 has no human or macaque counts. Why: ortholog audit, the value rests on "
+        "mouse counts alone. [O1]",
+        "no human or macaque counts: the value rests on mouse counts alone; the label is correct"),
+    ("test 3-sp", "top_F", "SPINK2 (Δα=+0.39)"): (
+        "% @@REV1:NEW@@ Note: SPINK2 has no macaque counts. Why: ortholog audit, the macaque matrix has no "
+        "SPINK2 row. [O1]",
+        "no macaque counts: the macaque matrix has no SPINK2 row, so this value rests on human and mouse"),
+}
 
 
 def tex(s: object) -> str:
@@ -94,6 +111,11 @@ def corrections_table() -> Path:
         if isinstance(r.note, str) and r.note.strip():
             lines.append(r"\multicolumn{7}{@{}p{0.84\linewidth}@{}}{\hspace{0.045\linewidth}\emph{Note:} "
                          + tex(NOTE_MAP.get(r.note, r.note)) + r"} \\")
+        if (r.cohort, r.quantity, r.new_value) in O1_NOTES:
+            label, note = O1_NOTES[(r.cohort, r.quantity, r.new_value)]
+            lines += [label, r"\multicolumn{7}{@{}p{0.84\linewidth}@{}}{\hspace{0.045\linewidth}\emph{Note:} "
+                      + tex(note) + r"} \\"]
+    assert sum(any(k == (r.cohort, r.quantity, r.new_value) for r in d.itertuples()) for k in O1_NOTES) == len(O1_NOTES)
     lines += [r"\end{longtable}", "}"]
     out = cm.TAB_OUT / "corrections-before-after.tex"
     out.write_text("\n".join(lines) + "\n")
