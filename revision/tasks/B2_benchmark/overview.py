@@ -45,15 +45,28 @@ def read_tidy() -> pd.DataFrame:
     if b1.exists():
         d = pd.read_csv(b1)
         d["method"] = d["method"].replace({"Delta_alpha": "D", "Delta_alpha_free": "D_free", "S_deploy": "SATURN", "C_cos": "CAMEX"})  # B1's names to the overview's
+        a = d[d["track"] == "A"].copy()
         # one column per task x cohort x metric; the all-cohort rows repeat them and stay out, so that nothing counts twice
-        coh = d["setting"].astype(str).str.extract(r"cohort=([^;]+)")[0]
-        d = d[coh.notna() & (coh != "all")].copy()
-        d["task"] = "A|" + d["task"].astype(str) + "|" + coh[coh.notna() & (coh != "all")] + "|" + d["metric"].astype(str)
+        coh = a["setting"].astype(str).str.extract(r"cohort=([^;]+)")[0]
+        a = a[coh.notna() & (coh != "all")].copy()
+        a["task"] = "A|" + a["task"].astype(str) + "|" + coh[coh.notna() & (coh != "all")] + "|" + a["metric"].astype(str)
         for tag, x in (("closer_to_0.5", 0.5), ("closer_to_0.05", 0.05)):
-            m = d["rank_direction"] == tag
-            d.loc[m, "value"] = -(d.loc[m, "value"] - x).abs()  # distance from the nominal value, ranked higher = closer
-            d.loc[m, "rank_direction"] = "higher"
-        fr.append(d)
+            m = a["rank_direction"] == tag
+            a.loc[m, "value"] = -(a.loc[m, "value"] - x).abs()  # distance from the nominal value, ranked higher = closer
+            a.loc[m, "rank_direction"] = "higher"
+        fr.append(a)
+        # Track D: B1's rows are per tool or per family of readouts. One fit gives every Chimera readout; the direct family gives every direct score.
+        dd = d[d["track"] == "D"].copy()
+        expand = {"Chimera": RU.CHIMERA, "Chimera (one fit)": RU.CHIMERA, "Direct (B1, B1b, B1c, B2b, Sdir, B3a)": ["B1", "B1b", "B1c", "B2b", "Sdir", "B3a"],
+                  "SATURN + direct": ["SATURN"], "CAMEX + direct": ["CAMEX"], "SATURN": ["SATURN"], "CAMEX": ["CAMEX"]}
+        rows = []
+        for r in dd.itertuples(index=False):
+            for m in expand.get(r.method, []):
+                rows.append({**r._asdict(), "method": m, "task": f"D|{r.task}|{r.setting}|{r.metric}"})
+        dd = pd.DataFrame(rows)
+        if len(dd):
+            k = dd.groupby("task")["method"].transform(lambda x: x.map(lambda m: "chimera" if m in RU.CHIMERA else m).nunique())
+            fr.append(dd[k >= 2])  # a task with one competitor (scaling with species, Chimera alone) ranks nothing; it is in the table
     for pat in ("track_B/*.parquet", "track_C/units/*.parquet", "track_C/lists/*.parquet", "integration/tidy.parquet"):
         for f in glob.glob(str(RU.RES / pat)):
             if not f.endswith("__h2h.parquet"):
