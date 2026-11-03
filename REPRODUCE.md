@@ -82,6 +82,7 @@ snapshots are left out of the competitor bundle.
 
 [`configs/canonical_recipes.tsv`](configs/canonical_recipes.tsv) lists, per cohort, the AnnData
 file, ortholog table, epochs, overrides, seeds and run directory. All runs use `--config A`.
+Canonical recipes run without the latent guard `--clamp-z-logvar` (off by default; see the README, "Training on a new cohort").
 To train one again (the command is printed before it runs; `PRINT_ONLY=1` prints only):
 
 ```bash

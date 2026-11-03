@@ -85,7 +85,7 @@ def panel_pattern_vs_level():
         for k, (cp, sg) in R.type_map(REG[c]["tissue"]).items():
             comp[(c, sg)] = cp
     t["comp"] = [comp.get((c, g), "immune") for c, g in zip(t.cohort, t.group)]
-    fig, ax = plt.subplots(figsize=(2.9, 2.6))
+    fig, ax = plt.subplots(figsize=(3.65, 3.2))  # drawn near its printed width (280 bp) so its type matches (a)
     for cp in COMP[:-1]:
         s = t[t.comp == cp]
         ax.scatter(-s.DL, s.D_free, s=12, color=COMP_COL[cp], lw=0, label=COMP_LAB[cp], alpha=0.9)
@@ -97,14 +97,18 @@ def panel_pattern_vs_level():
     for (c, g), txt in lab.items():
         r = t[(t.cohort == c) & (t.group == g)]
         if len(r):
-            off = {"trabecular\nmeshwork": (4, 4), "excitatory\nneuron": (-38, -14), "kidney thin limb": (4, 2), "muscle stem cell": (4, -5), "spermatid": (6, -9)}.get(txt, (3, 2))
-            ax.annotate(txt, (-r.DL.iloc[0], r.D_free.iloc[0]), fontsize=5.5, xytext=off, textcoords="offset points", color=cm.INK)
+            off = {"trabecular\nmeshwork": (-2, 7), "excitatory\nneuron": (-4, -4), "kidney thin limb": (4, 2), "muscle stem cell": (4, -5), "spermatid": (5, -1),
+                   "hepatocyte": (3, -9)}.get(txt, (3, 2))
+            # three close points (spermatid, trabecular meshwork, excitatory neuron): labels right, above and left of them
+            ha = "right" if txt == "excitatory\nneuron" else "left"
+            ax.annotate(txt, (-r.DL.iloc[0], r.D_free.iloc[0]), fontsize=5.5, xytext=off, textcoords="offset points", color=cm.INK, ha=ha)
     ax.axhline(0, color=cm.RULE, lw=0.6, zorder=0)
     ax.axvline(0, color=cm.RULE, lw=0.6, zorder=0)
     ax.set_xlabel("direct level gap at the home type,\nexcess over matched genes (SD)", fontsize=6)
     ax.set_ylabel("Δα per-gene read-out,\nexcess over matched genes (SD)", fontsize=6)
     ax.set_title("Cell-type programmes keep pattern\nwhere their level moves", loc="left", fontsize=6.5)
-    ax.legend(frameon=False, fontsize=5.5, loc="upper left", handletextpad=0.2, borderaxespad=0.1)
+    # upper right is empty; upper left collided with the liver sinusoidal endothelium label
+    ax.legend(frameon=False, fontsize=5.5, loc="upper right", handletextpad=0.2, borderaxespad=0.1)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
     return cm.save(fig, "e3b_pattern_vs_level")

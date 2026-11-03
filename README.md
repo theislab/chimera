@@ -128,6 +128,19 @@ artefacts. The canonical training recipes are listed in
 [`revision/reproduce_smoke.sh`](revision/reproduce_smoke.sh) checks a checkout against the
 archived runs.
 
+### Training on a new cohort
+
+Start from the canonical recipe closest to your cohort and train without extra options first.
+`--clamp-z-logvar` bounds the log-variance of the sampled latent to the range the VAMP KL term
+already uses ([-10, 10]). It is off by default and in every canonical model. Use it only if an
+unguarded fit becomes non-finite, or from the start when a cohort has many more training steps
+per epoch than the canonical cohorts (29-102) or much lower sequencing depth. It keeps such fits
+finite but is not a cure for a flat gate (Δα near zero for almost every gene, too little count
+evidence), so check the gate as for any fit, and report the flag with the recipe (each run
+records `clamp_z_logvar` in its `config.json`). Since commit abd6a08, `--seed` also fixes the
+train/validation split, so a fit repeats with the same seed on one CPU thread; earlier runs drew
+the split at random.
+
 ## Citation
 
 If you use Chimera, please cite the paper (reference added on publication) and the software;
