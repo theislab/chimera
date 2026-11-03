@@ -38,7 +38,7 @@ def main():
     p.add_argument("--root", default=None, help="input folder; default data/revision/B2/tool_inputs/<run>")
     p.add_argument("--latent-out", default=None, help="integration benchmark: write the cell latent there and stop; no gene score")
     a = p.parse_args()
-    root = Path(a.root) if a.root else C.REPO / "data/revision/B2/tool_inputs" / a.run
+    root = Path(a.root).resolve() if a.root else C.REPO / "data/revision/B2/tool_inputs" / a.run  # absolute: train-saturn.py runs from its own folder
     out = C.REPO / "results/revision/B2/tool_scores/CAMEX" / f"{a.run}.csv"
     if out.exists() or (a.latent_out and (Path(a.latent_out) / "z_mean.npy").exists()):
         return
