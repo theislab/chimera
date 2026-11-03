@@ -132,10 +132,10 @@ def select(t: pd.DataFrame, k: int, scvi: dict) -> dict:
 
 
 def anchored_tails(cohort: str) -> bool:
-    a = ad.read_h5ad(CF.h5ad(cohort), backed="r")
-    f = float((a.var["conservation_prior"].to_numpy() >= 0.90).mean())
-    a.file.close()
-    return f > 0.5
+    """The ruling's row names primate cortex. Its threshold (more than half of genes at pi >= 0.90) also catches lung (0.54) and M1 (0.59),
+    where the raw upper tail is reachable (5-11% of genes) and both raw tails pass; the rule is applied as the row states it, to the DLPFC cohorts
+    (0.89-0.94), where it is out of reach."""
+    return cohort.startswith("brain_dlpfc")
 
 
 def report(cohort: str) -> pd.DataFrame:
