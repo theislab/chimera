@@ -1,0 +1,4 @@
+file	url	date_utc	bytes	sha256
+supplementaryFiles	https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7263190/supplementaryFiles	2026-11-03T16:21:16Z	73282896	9946a32e46fa83429dfff11fcc97298f23f7e9bc27f609cf570aef07cd9cc563
+PMC7263190.1.txt	https://pmc-oa-opendata.s3.amazonaws.com/PMC7263190.1/PMC7263190.1.txt	2026-11-03T16:21:18Z	78383	b40be384b8b946a805e411f79f0abe66eeb98497cee24bd30d5f4ef6f3f8c722
+hgnc_complete_set.txt	https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt	2026-11-03T16:23:56Z	16986126	d93ce6b22d01dc1e1ded28857246951d605ead47ed17ef973ad1142b1d13bed0

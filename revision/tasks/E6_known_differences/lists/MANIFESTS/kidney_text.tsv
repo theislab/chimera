@@ -1,0 +1,5 @@
+file	url	date_utc	bytes	sha256
+he2021_PMC8035407_fullText.xml	https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8035407/fullTextXML	2026-11-03T16:25:30Z	179784	82ef42e6bdc523e86d54a190856da25565ade6ba61145d522942cb42a8eed2dd
+kim2023_biorxiv_v1_full.html	https://www.biorxiv.org/content/10.1101/2023.05.16.540880v1.full	2026-11-03T16:25:30Z	591062	39f21031043744f3efb86878e804322f633344951c77ce5832c4a07f55467fa1
+lindstrom2018_PMC5827606.html	https://pmc.ncbi.nlm.nih.gov/articles/PMC5827606/	2026-11-03T16:25:31Z	263582	7a1c13bb5fe432158af7e9043a5d855e47d018b64311a8d11dfd456f051b6ce0
+mcevoy2022_PMC9741629_fullText.xml	https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9741629/fullTextXML	2026-11-03T16:25:40Z	232717	6de9d922618a8db823efbb2f476372cebd110b4559f2d29b4312b33e4b6e23e6

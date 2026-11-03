@@ -1,0 +1,8 @@
+file	url	date_utc	bytes	sha256
+PMC8809252_supplementaryFiles.zip	https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8809252/supplementaryFiles	2026-11-03T16:20:15Z	19341042	8ac5d8abf896d2eae96f2fe2a659833aa5641ab3cfd116e6b4e45cabab4cce56
+extracted/mmc9.xlsx	unzipped from PMC8809252_supplementaryFiles.zip	2026-11-03T16:22:05Z	2309809	1229d2e059e68668c3a362e78dffb4b220f0504dc9cc4fccc1d14842a13f0689
+extracted/mmc2.xlsx	unzipped from PMC8809252_supplementaryFiles.zip	2026-11-03T16:22:05Z	696041	917de3c6ce1d14696a3770e1bffe7b177f60065cc218c20e16da348a695ea79a
+extracted/figs7.jpg	unzipped from PMC8809252_supplementaryFiles.zip	2026-11-03T16:22:05Z	429348	2a1d95eed873cb646a27c25ab9938aa36393ea24b392cfcadf58e038239cc315
+extracted/figs6.jpg	unzipped from PMC8809252_supplementaryFiles.zip	2026-11-03T16:22:05Z	379345	438510b5b4e028d32ffee63dab322aa19ce0347af851c59faf5183d3b61ec4d6
+extracted/gr4.jpg	unzipped from PMC8809252_supplementaryFiles.zip	2026-11-03T16:22:05Z	745840	be72877fdb674dbc678cf4c8f0241ef7a82b3e012f21761cf7b0f38afce2a527
+extracted/tsv/	xlsx_to_tsv.py conversion of extracted/mmc2.xlsx and mmc9.xlsx	2026-11-03T16:22:05Z	-	-

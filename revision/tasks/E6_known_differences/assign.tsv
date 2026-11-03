@@ -1,0 +1,31 @@
+# E6 assignment of literature lists to cohorts, fixed before any Chimera value of a list gene was read.
+# cohorts: primary first; other_species: the non-human species of the paper's contrast (for the LVL baseline); sets empty = all.
+assign_id	source_id	tissue	sets	ct_regex	contrast_regex	cohorts	primary	other_species	circular
+jor_hs	jorstad2023	cortex	human_specific			brain_dlpfc,brain_dlpfc_hchimp,brain_dlpfc_hmac_own,brain_dlpfc_hmarm	brain_dlpfc	chimpanzee,macaque,marmoset	no
+jor_hc	jorstad2023	cortex	human_vs_chimp_divergent			brain_dlpfc_hchimp,brain_dlpfc	brain_dlpfc_hchimp	chimpanzee	no
+cag_hs	caglayan2023	cortex	human_specific			brain_dlpfc,brain_dlpfc_hchimp	brain_dlpfc	chimpanzee,macaque	no
+cag_am	caglayan2023	cortex	ape_vs_macaque_divergent			brain_dlpfc_hmac_own,brain_dlpfc	brain_dlpfc_hmac_own	macaque	no
+khr_hs	khrameeva2020	cortex	human_specific	^AC		brain_dlpfc,brain_dlpfc_hchimp,brain_dlpfc_hmac_own	brain_dlpfc	chimpanzee,macaque	no
+ma_circ	ma2022	cortex				brain_dlpfc,brain_dlpfc_hchimp	brain_dlpfc	chimpanzee,macaque,marmoset	yes
+hodge	hodge2019	cortex				brain_m1_hmouse,brain_m1	brain_m1_hmouse	mouse	no
+krienen	krienen2020	cortex				brain_m1,brain_m1_hmouse	brain_m1	mouse	no
+bakken_circ	bakken2021	cortex	human_only_marker,mouse_only_marker,primate_not_mouse_marker,conserved_control			brain_m1_hmouse,brain_m1	brain_m1_hmouse	mouse	yes
+aiz_hep	aizarani2019	liver	nonconserved_zonation,conserved_control	hepatocyte		liv_hmouse,liv_4sp	liv_hmouse	mouse	no
+aiz_endo	aizarani2019	liver	nonconserved_zonation,conserved_control	endothelial		liv_hmouse,liv_4sp	liv_hmouse	mouse	no
+wang_fetal	wang2020_fetal_liver	liver				liv_hmouse,liv_4sp	liv_hmouse	mouse	no
+guil_circ	guilliams2022	liver				liv_hmouse,liv_4sp	liv_hmouse	mouse	yes
+he2021	kidney_he2021	kidney				kidney	kidney	mouse	no
+kim2024	kidney_kim2024	kidney				kidney	kidney	mouse	no
+lind2018	kidney_lindstrom2018	kidney				kidney	kidney	mouse	no
+kid_text	kidney_text	kidney				kidney	kidney	mouse	no
+benner	benner2014	islet				islet	islet	mouse	no
+islet_text	islet_text	islet				islet	islet	mouse	no
+baron	baron2016	islet				islet	islet	mouse	no
+shami_hm	shami2020	testis	species_specific,species_divergent,conserved_control		human_vs_mouse	test_hmouse,test_3sp	test_hmouse	mouse	no
+shami_hq	shami2020	testis	species_specific,species_divergent,conserved_control		human_vs_macaque	test_hmac,test_3sp	test_hmac	macaque	no
+shami_text	shami2020	testis	text_known_difference,text_conserved,primate_msci_escapee,conserved_marker_spg			test_3sp,test_hmouse,test_hmac	test_3sp	mouse,macaque	no
+mestas	mestas2004	immune				bone_marrow,lung_healthy,tumour_zilionis	bone_marrow	mouse	no
+ingersoll	ingersoll2010	immune				bone_marrow,lung_healthy,tumour_zilionis	bone_marrow	mouse	no
+trav_circ	travaglini2020	lung	species_divergent,conserved_control			lung_healthy	lung_healthy	mouse	yes
+ezran_lung_circ	ezran2025a_tmc	lung		^Lung		lung_healthy	lung_healthy	mouse	yes
+ezran_bm_circ	ezran2025a_tmc	immune		^Marrow		bone_marrow	bone_marrow	mouse	yes
