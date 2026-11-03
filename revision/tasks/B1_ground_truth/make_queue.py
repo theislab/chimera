@@ -9,6 +9,8 @@ from revision.tasks.B1_ground_truth import rules as RU
 MEM = {"liv_hmouse": "7G", "test_hmouse": "10G", "kidney": "16G"}  # about 1.3 x observed peak; the per-user cap of 2T is the limit
 WALL = {"liv_hmouse": "04:00:00", "test_hmouse": "08:00:00", "kidney": "16:00:00"}
 TOOL_MEM = {"camex": "14G", "saturn": "20G"}
+# CACIMAR: 4 GB peak on liver and testis; kidney reached the 8 GB request and failed (2026-11-03), so kidney gets 32 GB.
+CACIMAR_MEM = {"liv_hmouse": "8G", "test_hmouse": "8G", "kidney": "32G"}
 
 
 def main():
