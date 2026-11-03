@@ -28,10 +28,12 @@ COL = {"S": CS, "B1": CB, "D": CD, "Sdir": CDIR}
 NAME = {"S": r"$S_g$", "B1": "B1", "D": r"$\Delta\alpha$", "Sdir": "direct margin"}
 TIS = ["liver", "testis", "kidney", "islet", "bone_marrow", "eye"]
 TL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "islet": "islet", "bone_marrow": "marrow", "eye": "eye"}
+# Display name of each gold: the "pancreas" gold is the islet reference (keys stay as in the result files).
+GL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "pancreas": "islet"}
 
 
 def lettered(ax, s):
-    ax.text(-0.02, 1.05, s, transform=ax.transAxes, fontweight="bold", fontsize=9, ha="right", va="bottom", color=INK)
+    return ax.text(-0.02, 1.05, s, transform=ax.transAxes, fontweight="bold", fontsize=9, ha="right", va="bottom", color=INK)
 
 
 def panel_a(ax):
@@ -60,7 +62,7 @@ def panel_b(axs):
     for ax, sc in zip(axs, ("S", "B1")):
         M = r[r.score == sc].pivot(index="source", columns="gold", values="est").reindex(TIS)[golds]
         im = ax.imshow(M.to_numpy(), cmap="RdBu_r", vmin=-vm, vmax=vm, aspect="auto")
-        ax.set_xticks(range(4), golds, rotation=30, ha="right")
+        ax.set_xticks(range(4), [GL[g] for g in golds], rotation=30, ha="right")
         ax.set_yticks(range(6), [TL[t] for t in TIS] if sc == "S" else [""] * 6)
         ax.tick_params(length=0)
         for s in ax.spines.values():
@@ -93,13 +95,14 @@ def panel_c(ax):
     d = pd.read_csv(OUT / "contrast_delta.csv")
     d = d[d.score.isin(["S", "B1", "D"])].assign(key=lambda x: x.gold)
     forest(ax, d, ["liver", "testis", "kidney", "pancreas"], ["S", "B1", "D"], "$\\Delta_T$: same tissue minus other tissues, $\\rho_p$")
+    ax.set_yticks(range(4), [GL[g] for g in ["liver", "testis", "kidney", "pancreas"]])
     ax.legend(frameon=False, fontsize=6, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3, handletextpad=0.1, columnspacing=1.0)
 
 
 def panel_d(ax):
     w = pd.read_csv(OUT / "within_gene.csv")
     a = pd.read_csv(OUT / "posthoc" / "A_within_matched.csv")
-    lab = {"liver|testis": "liver, testis", "liver|kidney": "liver, kidney", "liver|pancreas": "liver, pancreas", "testis|kidney": "testis, kidney", "testis|pancreas": "testis, pancreas", "kidney|pancreas": "kidney, pancreas"}
+    lab = {"liver|testis": "liver, testis", "liver|kidney": "liver, kidney", "liver|pancreas": "liver, islet", "testis|kidney": "testis, kidney", "testis|pancreas": "testis, islet", "kidney|pancreas": "kidney, islet"}
     w["key"], a["key"] = w.pair.map(lab), a.pair.map(lab)
     ls = list(lab.values())
     for sc, of in (("S", -0.2), ("B1", 0.2)):
@@ -160,7 +163,9 @@ def panel_f(ax):
     ax.legend(h, [NAME["S"], "B1"], frameon=False, fontsize=6, loc="lower left", handletextpad=0.1, ncol=2, bbox_to_anchor=(0, 1.0), columnspacing=0.8)
 
 
-def main():
+def main(slot: bool = False):
+    """slot=True: also write fig_y1_gene_tissue_slot.pdf, the same page without the panel letters (for a composed
+    figure that draws its own), saved with the lettered page's tight box so every panel keeps its position."""
     fd.apply_design()
     plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42, "font.size": 7, "axes.labelsize": 7, "xtick.labelsize": 6.5, "ytick.labelsize": 6.5})
     fig = plt.figure(figsize=(7.2, 6.2))
@@ -177,13 +182,21 @@ def main():
     panel_d(d)
     panel_e(e)
     panel_f(f)
-    for ax, s in zip((a, b1, c, d, e, f), "abcdef"):
-        lettered(ax, s)
+    letters = [lettered(ax, s) for ax, s in zip((a, b1, c, d, e, f), "abcdef")]
     d_ = OUT / "figures"
     d_.mkdir(exist_ok=True)
     fig.savefig(d_ / "fig_y1_gene_tissue.pdf")
     fig.savefig(d_ / "fig_y1_gene_tissue.png", dpi=220)
+    if slot:
+        from matplotlib.transforms import Bbox
+        fig.canvas.draw()
+        bb = fig.get_tightbbox(fig.canvas.get_renderer())
+        pad = plt.rcParams["savefig.pad_inches"]
+        bb = Bbox.from_extents(bb.x0 - pad, bb.y0 - pad, bb.x1 + pad, bb.y1 + pad)
+        for t in letters:
+            t.remove()
+        fig.savefig(d_ / "fig_y1_gene_tissue_slot.pdf", bbox_inches=bb)
 
 
 if __name__ == "__main__":
-    main()
+    main(slot="--slot" in sys.argv)

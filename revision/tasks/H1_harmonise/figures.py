@@ -582,18 +582,29 @@ def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
 
 
 def y1_masked() -> None:
-    """Y1's panel with its own letters covered, so that compose labels its six panels in sequence. Vector kept; the source file is not changed."""
-    src = cm.FIG_OUT / "fig_h1_y1_slot.pdf"
-    W, H = 511.914, 429.135
-    boxes = [(41.0, 1.8, 48.2, 13.1), (297.6, 1.8, 305.1, 13.1), (41.8, 125.0, 48.2, 136.2), (295.1, 125.0, 302.6, 136.2), (41.0, 288.1, 48.2, 299.4), (297.6, 288.1, 302.6, 299.4)]
-    rules = "\n".join(f"\\put({x0},{H - y1:.2f}){{\\color{{white}}\\rule{{{x1 - x0:.2f}\\unitlength}}{{{y1 - y0:.2f}\\unitlength}}}}" for x0, y0, x1, y1 in boxes)
-    tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx,xcolor}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
-           "\\begin{document}\\setlength{\\unitlength}{1bp}\\begin{picture}(%s,%s)(0,0)\\put(0,0){\\includegraphics[width=%sbp]{%s}}\n%s\n\\end{picture}\\end{document}" % (W, H, W, H, W, src, rules))
+    """Y1's page without its own letters, so that compose labels its six panels in sequence. Y1 writes the page twice
+    (``figure.py --slot``): with letters (the page box everyone reads; also copied to the manuscript as
+    fig_h1_y1_slot.pdf) and without them, saved with a box that differs only by a margin on the left and bottom. That
+    margin is trimmed here so every panel keeps the position the regions in specs_h1.py were read on. No letter is
+    covered or hidden: the letters are not drawn."""
+    y1 = cm.RES / "Y1" / "figures"
+    ref, slot = y1 / "fig_y1_gene_tissue.pdf", y1 / "fig_y1_gene_tissue_slot.pdf"
+
+    def size(p):
+        o = subprocess.run([str(cm.POPPLER / "pdfinfo"), str(p)], capture_output=True, text=True).stdout
+        w, h = re.search(r"Page size:\s+([\d.]+) x ([\d.]+)", o).groups()
+        return float(w), float(h)
+
+    (W, H), (Ws, Hs) = size(ref), size(slot)
+    trim = f"{Ws - W:.4f}bp {Hs - H:.4f}bp 0bp 0bp"
+    tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
+           "\\begin{document}\\noindent\\includegraphics[trim=%s,clip]{%s}\\end{document}" % (W, H, trim, slot))
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / "m.tex").write_text(tex)
         subprocess.run(["pdflatex", "-interaction=nonstopmode", "m.tex"], cwd=td, capture_output=True, check=True)
         PANELS.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(Path(td) / "m.pdf", PANELS / "y1_masked.pdf")
+    shutil.copyfile(ref, cm.FIG_OUT / "fig_h1_y1_slot.pdf")
 
 
 def main() -> int:

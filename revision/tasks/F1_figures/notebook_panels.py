@@ -43,6 +43,30 @@ def notebook_namespace(path, stop_after: int, dataset_order: list) -> dict:
     return ns
 
 
+# Display names for the category keys of the gene-category vocabulary (keys stay as in the notebooks).
+CATEGORY_DISPLAY = {
+    "apoptosis": "Apoptosis", "autophagy": "Autophagy", "cell_cycle": "Cell cycle", "chaperones_hsp": "Chaperones (HSP)",
+    "coagulation_serum": "Coagulation and serum", "complement": "Complement", "cytochrome_p450": "Cytochrome P450",
+    "cytokines_chemokines": "Cytokines and chemokines", "cytoskeleton_actin": "Actin cytoskeleton",
+    "cytoskeleton_intermediate": "Intermediate filaments", "cytoskeleton_microtubule": "Microtubules",
+    "dna_replication_repair": "DNA replication and repair", "ecm_collagen": "ECM: collagens", "ecm_other": "ECM: other",
+    "glutathione_redox": "Glutathione and redox", "hedgehog_signaling": "Hedgehog signalling", "histone": "Histones",
+    "housekeeping": "Housekeeping", "immediate_early": "Immediate early genes", "interferon_response": "Interferon response",
+    "kinases_signaling": "Signalling kinases", "metabolism_glycolysis": "Glycolysis", "metabolism_lipid": "Lipid metabolism",
+    "mitochondrial_dna_encoded": "Mitochondrially encoded", "notch_signaling": "Notch signalling",
+    "nuclear_receptors": "Nuclear receptors", "oxphos_nuclear_encoded": "OXPHOS, nuclear-encoded", "proteasome": "Proteasome",
+    "ribosomal_mt": "Mitochondrial ribosome", "ribosomal_structural": "Cytosolic ribosome", "ribosome_biogenesis": "Ribosome biogenesis",
+    "splicing_factors": "Splicing factors", "tf_forkhead_etc": "Forkhead and other TFs", "tf_homeobox": "Homeobox TFs",
+    "tf_zinc_finger": "Zinc-finger TFs", "tgfb_bmp_signaling": "TGF-β/BMP signalling",
+    "translation_elongation": "Translation elongation", "translation_initiation": "Translation initiation",
+    "wnt_signaling": "Wnt signalling", "mhc_class_I": "MHC class I", "mhc_class_II": "MHC class II",
+}
+
+
+def display(key: str) -> str:
+    return CATEGORY_DISPLAY.get(key, key.replace("_", " ").capitalize())
+
+
 def testis_categories() -> list:
     ns = notebook_namespace(NB / "04_delta_alpha_biology.ipynb", 13, ["test_hmac"])
     key = "test_hmac"
@@ -69,7 +93,7 @@ def testis_categories() -> list:
     ax.set_xlabel(f"{fd.LABEL['delta_alpha']}  ({label})", fontsize=6.5, labelpad=1)
     ax.set_ylim(-0.5, n - 0.5)  # largest median at the top, as in (b)
     ax.set_yticks(range(n))
-    ax.set_yticklabels([f"{c}  ($n${int((sub['category'] == c).sum())})" for c in order], fontsize=5.5)
+    ax.set_yticklabels([f"{display(c)}  ($n${int((sub['category'] == c).sum())})" for c in order], fontsize=5.5)
     ax.set_ylabel("Gene category", fontsize=6.5, labelpad=1)
     ax.tick_params(axis="x", labelsize=6)
     ax.spines["top"].set_visible(False)
@@ -110,7 +134,7 @@ def testis_categories() -> list:
     ax.set_xticks([0, 1], ["shift", "amplitude"], fontsize=6)
     ax.set_xlabel(r"Cohen's $d$ on $\Delta\alpha$ / signed $|\Delta\alpha|$" + f"\n({label})", fontsize=6, labelpad=1)
     ax.set_yticks(range(n))
-    ax.set_yticklabels(enr.index, fontsize=5.5)
+    ax.set_yticklabels([display(c) for c in enr.index], fontsize=5.5)
     ax.tick_params(length=0)
     cax = fig.add_axes([2.3 / 2.72, 0.42 / H + 0.33 * pitch * n / H, 0.09 / 2.72, 0.34 * pitch * n / H])
     cb = fig.colorbar(im, cax=cax, label="effect size")
@@ -186,8 +210,8 @@ def hallmark() -> list:
                       delta_only=int((sd & ~sp).sum()), both_opp=int((sd & sp & ~same).sum())))
     q = pd.DataFrame(q).set_index("label")
     print(q.to_string())
-    styles = {"prior_only": ("prior-only  (Δα misses)", "#bdbdbd"), "both_same": ("both  (same direction — confirms)", "#737373"),
-              "delta_only": ("Δα-only  (Chimera adds)", "#b2182b"), "both_opp": ("both  (opposite — regulatory rewiring)", "#542788")}
+    styles = {"prior_only": ("prior ranking only", "#bdbdbd"), "both_same": ("both, same sign", "#737373"),
+              "delta_only": ("Δα ranking only", "#b2182b"), "both_opp": ("both, opposite sign", "#542788")}
     fig, ax = plt.subplots(figsize=(3.92, 2.5), layout="constrained")
     x = np.r_[np.arange(4), 4.7 + np.arange(3)]
     bottom = np.zeros(7)
@@ -219,8 +243,8 @@ def hallmark() -> list:
     ns = x[~x.sig]
     ax.scatter(ns.NES, ns.nl, s=11, c="#cccccc", alpha=0.7, linewidths=0, zorder=1)
     sp, sn = x[x.sig & (x.NES > 0)], x[x.sig & (x.NES < 0)]
-    ax.scatter(sp.NES, sp.nl, s=24, c="#b2182b", alpha=0.9, linewidths=0.3, edgecolor="#222222", zorder=2, label="NES > 0  (more liver-conserved)")
-    ax.scatter(sn.NES, sn.nl, s=24, c="#2166ac", alpha=0.9, linewidths=0.3, edgecolor="#222222", zorder=2, label="NES < 0  (more testis-conserved)")
+    ax.scatter(sp.NES, sp.nl, s=24, c="#b2182b", alpha=0.9, linewidths=0.3, edgecolor="#222222", zorder=2, label="NES > 0  (higher Δα in liver)")
+    ax.scatter(sn.NES, sn.nl, s=24, c="#2166ac", alpha=0.9, linewidths=0.3, edgecolor="#222222", zorder=2, label="NES < 0  (higher Δα in testis)")
     ax.axhline(-np.log10(FDR), color="#888888", linewidth=0.5, linestyle="--", zorder=0)
     ax.axvline(0, color="#444444", linewidth=0.5, zorder=0)
     texts = [ax.text(r.NES, r.nl, _nice(r.pathway, 30), fontsize=5.3, ha="center", va="center", color="#222222")
