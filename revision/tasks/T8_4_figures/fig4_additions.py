@@ -43,6 +43,10 @@ THEMES = {
     "housekeeping": (["DDX4", "RPL3", "EEF1A1", "EEF2", "ACTB", "TUBA1A", "COX4I1", "NDUFA1", "HNF4A"], "#7F7F7F"),
 }
 DAGGER = "†"
+# Not drawn (ortholog audit O1): OTC has no human counts in the source matrix (a source zero); COL17A1 and
+# CD40LG have wrong zebrafish one-to-one targets (col19a1, identity 5; tnfsf10l4, identity 18); SELE's
+# zebrafish target is selp and it has no mouse counts. Applies to panels c and d alike.
+O1_DROPPED = {"OTC", "COL17A1", "CD40LG", "SELE"}
 
 
 def genes_4sp() -> pd.DataFrame:
@@ -52,7 +56,7 @@ def genes_4sp() -> pd.DataFrame:
 def named(g: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for theme, (genes, col) in THEMES.items():
-        s = g[g.symbol.isin(genes)].copy()
+        s = g[g.symbol.isin(set(genes) - O1_DROPPED)].copy()
         s["theme"], s["color"] = theme, col
         rows.append(s)
     out = pd.concat(rows)
