@@ -27,13 +27,13 @@ def main():
             st = r.setting + ("law" if r.arm == "L" else "")
             rows.append(dict(cohort=r.cohort, setting=st, rep=r.rep, method="Chimera", tried=1, finished=int(not d["discard"]), finished_gate_tail=int((not d["discard"]) and tails >= 0.02), source="D1", run=r.run, finite=d.get("finite")))
     for c in RU.DEPTH_COHORTS + ["kidney"]:
-        for s in ("depth25", "depth50"):
+        for s in ("depth25", "depth50", "depth25_law", "depth50_law"):
             for rep in range(3):
                 h = B2.RES / "health" / f"b2-{c}-{s}-r{rep}.json"
                 if h.exists() and (c, s, rep) not in seen:
                     d = json.loads(h.read_text())
                     tails = max(d.get("tail_pos") or 0.0, d.get("tail_neg") or 0.0)
-                    rows.append(dict(cohort=c, setting=s, rep=rep, method="Chimera", tried=1, finished=int(not d["discard"]), finished_gate_tail=int((not d["discard"]) and tails >= 0.02), source="B2", run=h.stem, finite=d.get("finite")))
+                    rows.append(dict(cohort=c, setting=s.replace("_law", "law"), rep=rep, method="Chimera", tried=1, finished=int(not d["discard"]), finished_gate_tail=int((not d["discard"]) and tails >= 0.02), source="B2", run=h.stem, finite=d.get("finite")))
     d = pd.DataFrame(rows)
     d.to_csv(RU.RES / "completion_runs.csv", index=False)
     t = d.groupby(["cohort", "setting", "method"], as_index=False)[["tried", "finished", "finished_gate_tail"]].sum()

@@ -27,8 +27,8 @@ def load_runs(c: str, setting: str):
     fr, used = [], []
     for r in range(3):
         cand = [(RU.RES / "scores" / f"d1-{c}-{setting}-r{r}.parquet", RU.RES / "health" / f"d1-{c}-{setting}-r{r}.json")]
-        if not setting.endswith("law"):
-            cand.append((B2.RES / "scores" / f"b2-{c}-{setting}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{setting}-r{r}.json"))
+        b2s = setting.replace("law", "_law")  # B2 runs depth25_law on the same objects and seeds; D1 does not duplicate it
+        cand.append((B2.RES / "scores" / f"b2-{c}-{b2s}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{b2s}-r{r}.json"))
         for p, h in cand:
             if p.exists() and h.exists():
                 hh = json.loads(h.read_text())
