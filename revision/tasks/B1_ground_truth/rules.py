@@ -57,6 +57,7 @@ SPECIES = ("Human", "Mouse")
 #   4 the remaining shares, seed 42
 #   5 seed 43
 # Tier 3 is the tools' main settings, tier 6 their other rows (make_queue.py).
+# Scope: tiers 0, 1, 2, 3, 10, 11 run and scored; 4, 5, 6 planned, not run (owner decision, BENCHMARK_PLAN.md).
 # ---------------------------------------------------------------------------
 ALTERATIONS = {
     # q: share of the move from the observed profile to the swapped profile
@@ -156,3 +157,5 @@ def arm_grid() -> list[dict]:
             c0 = r["effect"] == CENTRAL_EFFECT[r["alt"]] and r["band"] == CENTRAL_BAND and r["share"] == CENTRAL_SHARE
             rows.append({**r, "tier": 10 if c0 else 11, "arm": arm, "run": arm_run(arm, r["run"]), "recipe": rec(COHORTS[r["cohort"]]["recipe"])})
     return rows
+
+RUN_TIERS = {0, 1, 2, 3, 10, 11}

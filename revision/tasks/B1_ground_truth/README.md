@@ -9,6 +9,8 @@ Grid: the full factorial on every cohort (`BENCHMARK_PLAN.md`, second amendment)
 
 The only cells left out add no information: a row whose gene set would equal that of a smaller share (the band has too few alterable genes for the larger share; a gene needs 20 counts in each species to be alterable) is listed with `duplicate_of` in `grid_all.tsv` and not trained; the achieved share is reported.
 
+Scope (owner decision, recorded in BENCHMARK_PLAN.md before any of tiers 4-6 was scored): tiers 0, 1, 2, 3, 10 and 11 are run and scored; tiers 4 (remaining shares), 5 (seed 43) and 6 (tools' other rows) are planned, not run. `queue_full_planned.tsv` keeps the full planned queue; `queue.tsv` ends with tier 11. Six liver seed-43 fits run in the first pass belong to tier 5 and are not scored, because scoring takes whole tiers.
+
 Submission order (`tier` in the grids, `make_queue.py`, `feeder.sh`): central setting first (strongest effect of each alteration, band midhigh, share 5%, seed 42), then main effects one factor at a time, effect x band, the tools' main settings, the remaining shares, seed 43, the tools' other rows. Results are reported for what has finished at each stage. A run of the grid was briefly reduced under a compute budget and restored; no reduction was driven by a result.
 
 Chimera is retrained with the canonical recipe unchanged, no tuning on results. p_null and the three expression feature columns follow the data as in the pipeline; sequence features and π stay. An unaltered object gets exactly the canonical features, because the canonical liver and testis expression columns come from the larger multi-species object: only the change in the statistic is added.
