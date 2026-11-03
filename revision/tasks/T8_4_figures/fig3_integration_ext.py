@@ -12,7 +12,7 @@ from revision.tasks.T8_4_figures import common as cm
 from revision.tasks.T8_4_figures import fig3_integration as F3
 
 SRC = cm.REPO / "results" / "revision" / "B2" / "integration" / "master_table_extended.csv"
-ADDED = [("bone_marrow", "Bone marrow 3-sp"), ("kidney", "Kidney H+Mouse"), ("islet", "Islet H+Mouse"), ("vz_hmouse", "Eye H+Mouse")]
+ADDED = [("bone_marrow", "bone marrow, 3 species"), ("kidney", "kidney, human + mouse"), ("islet", "islet, human + mouse"), ("vz_hmouse", "eye, human + mouse")]
 
 
 def heat(M: pd.DataFrame, label: str, show_rows: bool, xlabels: list[str], n_orig: int) -> plt.Figure:
@@ -50,10 +50,11 @@ def heat(M: pd.DataFrame, label: str, show_rows: bool, xlabels: list[str], n_ori
     if show_rows:
         k = 0
         for tier, ms in F3.TIERS:
+            tier = "no labels on liver; labels elsewhere (dashed)" if ms == ["Chimera"] else tier
             ax.text(-0.45, k + 0.1, tier, ha="left", va="center", fontsize=5.3, style="italic", color=cm.MUTED)
             k += len(ms) + 1
     ax.axvline(3.5, color="white", lw=2.0)
-    ax.axvline(n_orig - 0.5, color=cm.INK, lw=0.8)
+    ax.axvline(n_orig - 0.5, color="white", lw=3.0)  # original seven | added cohorts
     ax.set_xticks(range(M.shape[0]))
     ax.set_xticklabels(xlabels, rotation=90, ha="center", va="top", fontsize=5.5)
     ax.set_yticks([i for i, m in enumerate(layout) if m is not None])
@@ -76,7 +77,7 @@ def main() -> list:
     out = []
     for k, (col, label) in enumerate(F3.SPECS):
         M = T.pivot(index="dataset", columns="model", values=col).reindex(index=rows, columns=F3.COLS)
-        fig = heat(M, label, k == 0, lab, len(F3.ROWS))
+        fig = heat(M, label, k in (0, 2), lab, len(F3.ROWS))
         out.append(cm.save(fig, f"fig3{'abc'[k]}_ext_integration_{col.replace('total_score', 'composite')}", exact=True))
     return out
 
