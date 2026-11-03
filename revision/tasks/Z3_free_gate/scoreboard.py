@@ -44,31 +44,31 @@ def shim() -> Path:
     return d
 
 
-def healthy_runs(line: str) -> dict:
+def healthy_runs(line: str, canonical_4sp: bool = False) -> dict:
+    """canonical_4sp: interim run before the 4-sp free seeds exist; 4-sp rows stay canonical (labelled)."""
     L = json.loads((RU.OUT / "lines.json").read_text())
-    if not L["complete"]:
-        raise SystemExit("lines.json: a cohort has fewer than 5 healthy free seeds")
-    out = {c: {int(s): r for s, r in L[line][c].items()} for c in RU.COHORTS}
+    coh = [c for c in RU.COHORTS if not (canonical_4sp and c == "liv_4sp")]
+    out = {c: {int(s): r for s, r in L[line][c].items()} for c in coh}
     for c, v in out.items():
         if len(v) != 5 and not line.endswith("_int"):
             raise SystemExit(f"{c} {line}: {len(v)} seeds, need 5")
     return out
 
 
-def support_masks() -> dict:
+def support_masks(cohorts=RU.COHORTS) -> dict:
     out = {}
-    for c in RU.COHORTS:
+    for c in cohorts:
         t = pd.read_csv(RU.OUT / "consensus" / f"{c}.csv")
         if not {"S_free5", "S_can5"} <= set(t.columns):
             continue  # frozen check before the free lines exist
-        out[c] = pd.Series((t.S_free5.abs() >= RU.EPS) & (t.S_can5.abs() >= RU.EPS), index=t.var_name.values)
+        out[c] = pd.Series(((t.S_free5.abs() >= RU.EPS) & (t.S_can5.abs() >= RU.EPS)).to_numpy(), index=t.var_name.values)
     return out
 
 
-def patch(line: str) -> None:
+def patch(line: str, canonical_4sp: bool = False) -> None:
     R.INTEGRATED_SEEDS = {}  # its unit needs canonical seeds 47, 48, 51 on the frozen 10-seed set; not part of a 5-seed line
-    runs = None if line == "frozen" else healthy_runs(line)
-    sup = {} if line == "frozen" else support_masks()
+    runs = None if line == "frozen" else healthy_runs(line, canonical_4sp)
+    sup = {} if line == "frozen" else support_masks(tuple(runs))
     o_load = I.load
     if runs is not None:
         I.seed_runs_available = lambda cohort: runs[cohort]
@@ -134,9 +134,9 @@ def patch(line: str) -> None:
                     if c == "liv_hmouse":
                         U.append(R.unit(f"{h}:pair_{tag}:int", "F3", f"free_int_vs_can_int_{tag}", h, c, g, cov, ["D_free_int", "D_can_int"], subset=uni))
                         U.append(R.unit(f"{h}:pair_{tag}:can_state", "F3", f"free_vs_can_state_{tag}", h, c, g, cov, ["D_free5", "D_can_state"], subset=uni))
-                    if R.MULTI[h] == "liv_4sp":
+                    if R.MULTI[h] == "liv_4sp" and not canonical_4sp:
                         U.append(R.unit(f"{h}:multi_pair_{tag}:can5", "F3", f"multi_free_vs_can5_{tag}", h, "liv_4sp", g, cov, ["D_free5", "D_can5"], subset=uni))
-            if R.MULTI[h] == "liv_4sp":
+            if R.MULTI[h] == "liv_4sp" and not canonical_4sp:
                 U.append(R.unit(f"{h}:multi_cs:D", "F3", "multi_species_estimate_count_supported", h, "liv_4sp", g, cov,
                                 ["D"], subset="count_supported", perm="one"))
         for tis, sets in R.SETS.items():
@@ -155,14 +155,15 @@ def main():
     ap.add_argument("--line", choices=["frozen", "free5", "can5", "can_state", "free_int", "can_int"], required=True)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--only", default=None)
+    ap.add_argument("--canonical-4sp", action="store_true", help="interim: 4-sp rows canonical (free 4-sp not trained yet)")
     a = ap.parse_args()
-    patch(a.line)
-    out = RU.OUT / f"scoreboard_{a.line}"
+    patch(a.line, a.canonical_4sp)
+    out = RU.OUT / (f"scoreboard_{a.line}" + ("_c4sp" if a.canonical_4sp else ""))
     argv = ["--mode", "real", "--outdir", str(out), "--workers", str(a.workers)]
     if a.only:
         argv += ["--only", a.only]
     R.main(argv)
-    (out / "z3_line.json").write_text(json.dumps(dict(line=a.line, seeds={c: R.DATA[c]["meta"]["seeds"] for c in RU.COHORTS},
+    (out / "z3_line.json").write_text(json.dumps(dict(line=a.line, canonical_4sp=a.canonical_4sp, seeds={c: R.DATA[c]["meta"]["seeds"] for c in RU.COHORTS},
                                                       D3={c: R.DATA[c]["meta"].get("D3_seeds") for c in ("liv_hmouse", "test_hmouse")}),
                                                  indent=1, default=str))
 

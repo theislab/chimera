@@ -26,7 +26,8 @@ from revision.tasks.Z3_free_gate import rules as RU
 
 OUT = RU.OUT
 FROZEN = RU.RES / "T5_6/scoreboard"
-LINES = {"frozen": FROZEN, "free5": OUT / "scoreboard_free5", "can5": OUT / "scoreboard_can5", "can_state": OUT / "scoreboard_can_state"}
+SUFFIX = "_c4sp" if "--c4sp" in sys.argv else ""  # interim: 4-sp rows canonical in every line
+LINES = {"frozen": FROZEN, **{k: OUT / f"scoreboard_{k}{SUFFIX}" for k in ("free5", "can5", "can_state", "free_int", "can_int")}}
 HYP = ["H1", "H2", "H3", "H4"]
 KEYS = ["id", "score", "subset"]
 
@@ -51,7 +52,7 @@ def check():
         worst = max((float(np.nanmax(np.abs(m[f"{c}_a"] - m[f"{c}_b"]))) if m[f"{c}_a"].notna().any() else 0.0) for c in num)
         rows.append(dict(file=name, n_frozen=len(a), n_harness=len(b), unmatched=int((m["_merge"] != "both").sum()), max_abs_diff=worst))
     t = pd.DataFrame(rows)
-    t.to_csv(OUT / "compare_check.csv", index=False)
+    t.to_csv(OUT / "compare_check.csv", index=False)  # frozen line only, no suffix
     print(t.to_string())
 
 
@@ -88,22 +89,22 @@ def tables():
                 r["status_rule"] = status(x.rho_p, x.ci_lo, x.ci_hi, p if pd.notna(p) else None)
                 rows.append(r)
     T = pd.DataFrame(rows)
-    T.to_csv(OUT / "compare_hyp.csv", index=False)
+    T.to_csv(OUT / f"compare_hyp{SUFFIX}.csv", index=False)
     # head-to-heads (J), all and count-supported, and tools
     hh = H[H.id.str.match(r"^H\d:(h2h|cs:h2h)$") | H.id.str.contains(r":(?:cs:)?tool:")].copy()
     hh["universe"] = np.where(hh.id.str.contains(":cs:"), "count_supported", "all")
     hh = hh[["line", "hyp", "universe", "id", "focal", "comparator", "n_pair", "rho_p_focal", "rho_p_comparator", "delta", "pc_lo", "pc_hi", "sim95_lo", "sim95_hi"]]
     hh["call"] = np.where((hh.delta >= 0.03) & (hh.pc_lo > 0), "win", np.where((hh.delta <= -0.03) & (hh.sim95_hi < 0), "loss", "tie"))
-    hh.to_csv(OUT / "compare_h2h.csv", index=False)
+    hh.to_csv(OUT / f"compare_h2h{SUFFIX}.csv", index=False)
     # paired free vs canonical
     pr = H[(H.line == "free5") & H.id.str.contains("pair_")].copy()
     pr["universe"] = np.where(pr.id.str.contains("pair_cs"), "count_supported", "all")
     pr["multi"] = pr.id.str.contains("multi_")
     pr["call"] = np.where((pr.delta >= 0.03) & (pr.pc_lo > 0), "free better", np.where((pr.delta <= -0.03) & (pr.pc_hi < 0), "free worse", "no difference shown"))
     pr = pr[["hyp", "cohort", "universe", "multi", "focal", "comparator", "n_pair", "rho_p_focal", "rho_p_comparator", "delta", "pc_lo", "pc_hi", "call"]]
-    pr.to_csv(OUT / "compare_pairs.csv", index=False)
+    pr.to_csv(OUT / f"compare_pairs{SUFFIX}.csv", index=False)
     verdict = {}
-    for comp in ("D_can5", "D_can_state", "D_frozen"):
+    for comp in ("D_can5", "D_can_state", "D_frozen", "D_can_int", "S_free5"):
         for uni in ("count_supported", "all"):
             x = pr[(pr.comparator == comp) & (pr.universe == uni) & ~pr.multi]
             if comp == "D_can_state":
@@ -114,11 +115,11 @@ def tables():
     rowj = {k: json.loads((LINES[k] / "row.json").read_text()) for k in LINES if (LINES[k] / "row.json").exists()}
     verdict["decide"] = {k: dict(status=v["step1_status"], h2h=v["step2_head_to_head"], row=v["step3"]["row"],
                                  modifiers=v["modifiers_applied"]) for k, v in rowj.items()}
-    (OUT / "verdict.json").write_text(json.dumps(verdict, indent=1, default=str))
+    (OUT / f"verdict{SUFFIX}.json").write_text(json.dumps(verdict, indent=1, default=str))
     # sets (Family 2 D and count-supported)
     ss = S[S.id.str.match(r"^set:(liver|testis):[CV]\d:(D|D:cs|D3|S_deploy_native|S_deploy_1to1|C_cos)$")]
     ss = ss[["line", "id", "tissue", "set", "score", "subset", "n_set", "auroc", "auroc_ci_lo", "auroc_ci_hi", "p_perm", "q_bh", "pass_predicted_direction"]]
-    ss.to_csv(OUT / "compare_sets.csv", index=False)
+    ss.to_csv(OUT / f"compare_sets{SUFFIX}.csv", index=False)
     pd.set_option("display.width", 250, "display.max_columns", 30, "display.max_rows", 400)
     print(T.round(3).to_string())
     print(pr.round(3).to_string())
@@ -126,10 +127,10 @@ def tables():
 
 
 def reversal():
-    T = pd.read_csv(OUT / "compare_hyp.csv")
+    T = pd.read_csv(OUT / f"compare_hyp{SUFFIX}.csv")
     x = T[(T.hyp == "H2") & T.universe.isin(["all", "count_supported", "masked", "all_S_ema", "count_supported_S_ema"])]
     x = x[["universe", "line", "n", "spearman", "rho_pi", "rho_p", "ci_lo", "ci_hi", "status_rule"]]
-    x.to_csv(OUT / "compare_reversal.csv", index=False)
+    x.to_csv(OUT / f"compare_reversal{SUFFIX}.csv", index=False)
     print(x.round(3).to_string())
 
 
@@ -143,7 +144,7 @@ def x5():
         assert (ids.var_name.to_numpy() == cons.var_name.to_numpy()).all() and (fz.var_name.to_numpy() == cons.var_name.to_numpy()).all()
         cons["hsapiens_gene_id"] = ids.hsapiens_gene_id.to_numpy()
         cons["D_frozen"], cons["alpha_frozen"], cons["S_frozen"] = fz.D.to_numpy(), fz.alpha.to_numpy(), fz.S_ema.to_numpy()
-        lines = ["frozen", "free5", "can5"] + (["can_state"] if c == "liv_hmouse" else [])
+        lines = [k for k in ["frozen", "free5", "can5", "can_state", "free_int", "can_int"] if f"D_{k}" in cons.columns]
         d0 = cons.set_index("hsapiens_gene_id")
         d0 = d0[~d0.index.duplicated()].join(gold)
         for line in lines:
@@ -162,7 +163,7 @@ def x5():
     print("X5 frozen reproduction, max abs diff", err)
     if err > 1e-9:
         raise SystemExit("X5 frozen not reproduced")
-    t.to_csv(OUT / "compare_x5.csv", index=False)
+    t.to_csv(OUT / f"compare_x5{SUFFIX}.csv", index=False)
     print(t.pivot_table(index=["cohort", "panel"], columns="line", values=["rho", "rho_count_evidence"]).round(3).to_string())
 
 
@@ -184,12 +185,14 @@ def y3():
 
     def cs_mask(g, c):
         cons = pd.read_csv(RU.OUT / "consensus" / f"{c}.csv").set_index("var_name")
+        if "S_free5" not in cons:
+            return np.zeros(len(g), bool)
         return ((cons.S_free5.abs() >= RU.EPS) & (cons.S_can5.abs() >= RU.EPS)).reindex(g.var_name).to_numpy()
 
     c = "test_hmouse"
     g0 = A.prepare(c)
     cs = cs_mask(g0, c)
-    for line in ("frozen", "free5", "can5"):
+    for line in ("frozen", "free5", "can5", "free_int", "can_int"):
         g = swap(g0, c, line)
         ms = g.margin_support.to_numpy()
         for k, f in (("SC", (g.peak == "SC").to_numpy()), ("SC_strict", (g.peak_strict == "SC").to_numpy())):
@@ -207,7 +210,8 @@ def y3():
         g0 = A.prepare(c)
         cs = cs_mask(g0, c)
         chep = A.CP + ["hep_enrich"]
-        for line in ("frozen", "free5", "can5") + (("can_state",) if c == "liv_hmouse" else ()):
+        have = pd.read_csv(RU.OUT / "consensus" / f"{c}.csv", nrows=1).columns
+        for line in [k for k in ("frozen", "free5", "can5", "can_state", "free_int", "can_int") if k == "frozen" or f"D_{k}" in have]:
             g = swap(g0, c, line)
             for k, names in sets.items():
                 f = g.symbol.isin(names).to_numpy()
@@ -226,11 +230,11 @@ def y3():
     print("Y3 frozen reproduction (X4), rows", len(a), len(b), "max abs diff", err)
     if err > 1e-9:
         raise SystemExit("X4 frozen not reproduced")
-    t.to_csv(OUT / "compare_y3.csv", index=False)
+    t.to_csv(OUT / f"compare_y3{SUFFIX}.csv", index=False)
     print(t[["item", "cohort", "line", "group", "value", "subset", "n_set", "excess_d", "ci_lo", "ci_hi", "p"]].round(3).to_string())
 
 
 if __name__ == "__main__":
-    for s in sys.argv[1:]:
+    for s in [a for a in sys.argv[1:] if not a.startswith("--")]:
         print(f"== {s}", flush=True)
         dict(check=check, tables=tables, reversal=reversal, x5=x5, y3=y3)[s]()
