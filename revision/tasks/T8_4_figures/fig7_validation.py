@@ -80,7 +80,7 @@ def panel_forest() -> plt.Figure:
             fontsize=6, color=cm.MUTED)
     fig.legend(handles=[Line2D([], [], marker="o", color=cm.STY["D"][0], ls="none", ms=4, label="primary cohort"),
                         Line2D([], [], marker="o", color=cm.STY["D"][0], mfc="white", ls="none", ms=4,
-                               label="multi-species cohort (Figs 4-6)")],
+                               label="multi-species cohort")],
                loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=2, fontsize=5.8, handletextpad=0.2, frameon=False,
                borderpad=0)
     return fig
