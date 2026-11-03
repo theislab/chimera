@@ -33,3 +33,7 @@ g1-d1-liv_4sp-depth5-r0	d1	liv_4sp	depth5	0	142	unchanged	d1-liv_4sp-depth5-r0	4
 g1-d1-liv_4sp-depth5-r1	d1	liv_4sp	depth5	1	143	unchanged	d1-liv_4sp-depth5-r1	4G	
 g1-d1-liv_4sp-depth5law-r0	d1	liv_4sp	depth5	0	142	law	d1-liv_4sp-depth5law-r0	4G	
 g1-d1-liv_4sp-depth5law-r1	d1	liv_4sp	depth5	1	143	law	d1-liv_4sp-depth5law-r1	4G	
+rev-g1u-liv_hmouse-s45	full_upper	liv_hmouse	full		45	upper_only	rev-liv_hmouse-s45	4G	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 45
+rev-g1u-liv_hmouse-s46	full_upper	liv_hmouse	full		46	upper_only	rev-liv_hmouse-s46	4G	--config A --max-epochs 150 --adata data/processed/camex_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --seed 46
+rev-g1u-test_hmouse-s45	full_upper	test_hmouse	full		45	upper_only	rev-test_hmouse-s45	6G	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 45
+rev-g1u-test_hmouse-s46	full_upper	test_hmouse	full		46	upper_only	rev-test_hmouse-s46	6G	--config A --max-epochs 200 --adata data/processed/camex_testis_human_mouse.h5ad --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --seed 46

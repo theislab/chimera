@@ -21,7 +21,7 @@ if [[ -f "training/runs/$RUN/summary.json" ]]; then echo "finished: $RUN"; else
   # shellcheck disable=SC2086
   provenance "$RUN" $ARGS $ADATA
   # shellcheck disable=SC2086
-  $PY revision/tasks/T12_2b_debug/nan_probe.py --run-name "$RUN" --accelerator cpu $ARGS $ADATA
+  $PY "$TRAIN" --run-name "$RUN" --accelerator cpu $ARGS $ADATA
   echo "train exit $?"
 fi
 $PY -m revision.tasks.G1_guard.step3_health --index "$I"

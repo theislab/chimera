@@ -42,6 +42,8 @@ def main():
     h = dict(run=r["run"], kind=r["kind"], cohort=r["cohort"], setting=r["setting"], rep=r["rep"], seed=r["seed"], form=r["form"], base=r["base"], arm="guard")
     cfg = json.loads((d / "config.json").read_text()) if (d / "config.json").exists() else {}
     h["clamp_z_logvar"] = cfg.get("clamp_z_logvar")
+    if (d / "g1_mode.json").exists():
+        h["mode"] = json.loads((d / "g1_mode.json").read_text())["mode"]
     if (d / "final_state.npz").exists():
         with np.load(d / "final_state.npz", allow_pickle=False) as f:
             al, pr, z, sg = (np.asarray(f[k], dtype=float) for k in ("alpha", "prior", "z_mean", "S_g_ema"))

@@ -29,7 +29,10 @@ def main():
     a = ap.parse_args()
     r = row(a.index)
     if r["kind"] in ("bm", "full"):
-        print(f"RUN={shlex.quote(r['run'])}; ARGS={shlex.quote(r['args'] + ' --clamp-z-logvar')}; H5=")
+        print(f"RUN={shlex.quote(r['run'])}; ARGS={shlex.quote(r['args'] + ' --clamp-z-logvar')}; H5=; TRAIN=revision/tasks/T12_2b_debug/nan_probe.py")
+        return
+    if r["kind"] == "full_upper":  # upper-only clamp, experiment through upper_only.py, package option off
+        print(f"RUN={shlex.quote(r['run'])}; ARGS={shlex.quote(r['args'])}; H5=; TRAIN=revision/tasks/G1_guard/upper_only.py")
         return
     from revision.tasks.B2_benchmark import perturb as P
     from revision.tasks.B2_benchmark import rules as B2
@@ -66,7 +69,7 @@ def main():
         (RES / "law" / f"{r['run']}.json").write_text(json.dumps(dict(run=r["run"], recipe_anchor=DA.recipe_anchor(recipe) or DA.DEFAULT_ANCHOR, depth_ratio=ratio, anchor=v), indent=1))
         args += f" --lambda-anchor {v:.8g}"
     args += f" --seed {int(r['seed'])} --clamp-z-logvar"
-    print(f"RUN={shlex.quote(r['run'])}; ARGS={shlex.quote(args)}; H5={shlex.quote(str(h5))}")
+    print(f"RUN={shlex.quote(r['run'])}; ARGS={shlex.quote(args)}; H5={shlex.quote(str(h5))}; TRAIN=revision/tasks/T12_2b_debug/nan_probe.py")
 
 
 if __name__ == "__main__":
