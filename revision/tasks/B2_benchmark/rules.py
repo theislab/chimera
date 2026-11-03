@@ -149,7 +149,10 @@ DIRECT = ["B1", "B1b", "B1c", "B2b", "B3a", "Sdir", "Lfc"]
 STATIC = ["pi", "dNdS", "LOEUF"]
 TOOLS = ["SATURN", "CAMEX", "GeneSpectra", "CACIMAR", "SAMap"]
 CONTROLS = ["expr", "random"]
-OVERVIEW_METHODS = CHIMERA + DIRECT + STATIC + TOOLS
+# Free per-gene gate (Z3, Z4; added at the coordinator's instruction after Track B and C values were seen): Delta-alpha of the free-gate fits where they exist (Track A arms of B1,
+# Track C cohorts with Z4 fits). No free-gate fit is trained on Track B objects, so it is absent there, not failed.
+CHIMERA_FREE = ["D_free"]
+OVERVIEW_METHODS = CHIMERA + CHIMERA_FREE + DIRECT + STATIC + TOOLS
 J_H2H = ["B1b", "B1c", "B2b", "B3a", "Sdir"]  # direct comparators; B1z is Chimera's own latent and is compared separately
 N_DRAWS_B = 2_000          # as X6
 N_DRAWS_C = 10_000         # as T4.3 and Y1

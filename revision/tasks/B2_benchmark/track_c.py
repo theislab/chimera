@@ -39,6 +39,9 @@ def table(cohort: str) -> pd.DataFrame:
     t["B1"] = b["B1"].reindex(t.index)
     t["S_g"] = t["S_ema"]
     t["var_name"] = b["var_name"].reindex(t.index)
+    z4 = RU.REPO / "results/revision/Z4/h1/genes" / f"{cohort}.parquet"
+    if z4.exists():  # free-gate Delta-alpha (Z4, H1 format), a Chimera readout beside D
+        t["D_free"] = pd.read_parquet(z4).set_index("hsapiens_gene_id")["D"].reindex(t.index)
     rng = np.random.default_rng(RU.useed("random", cohort))
     t["random"] = rng.random(len(t))
     if cohort in TOOL_COHORTS:
@@ -111,6 +114,8 @@ def score_unit(u: dict) -> None:
     side = {"dNdS": t["dNdS_score"].to_numpy(dtype=float), "LOEUF": t["LOEUF_score"].to_numpy(dtype=float)}
     side.update({k: scores[k] for k in CORE if k not in in_core})
     side.update({k: scores[k] for k in RU.TOOLS if k in scores})
+    if "D_free" in t:
+        side["D_free"] = t["D_free"].to_numpy(dtype=float)
     sides = []
     for k, v in side.items():
         foc = {f: scores[f] for f in FOCAL if f in in_core}
@@ -161,7 +166,7 @@ def score_lists(c: str) -> None:
     rows = []
     cov_ok = t[RU.COV_C].notna().all(1).to_numpy()
     pi, ex = t["prior_raw"].to_numpy(dtype=float), t["log_cp10k_spmean"].to_numpy(dtype=float)
-    methods = CORE + ["pi", "dNdS", "LOEUF"] + [x for x in RU.TOOLS if x in t]
+    methods = CORE + ["pi", "dNdS", "LOEUF"] + [x for x in RU.TOOLS + ["D_free"] if x in t]
     col = {"pi": "pi_score", "dNdS": "dNdS_score", "LOEUF": "LOEUF_score"}
     for name in RC.COHORTS_C[c]["lists"]:
         s = list_sets(t, name)

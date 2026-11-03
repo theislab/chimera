@@ -32,7 +32,7 @@ import pandas as pd
 from revision.tasks.B2_benchmark import rules as RU
 
 OUT = RU.RES / "overview"
-METHOD_LABEL = {"S_g": "S_g", "D": "Δα", "B1z": "B1z (Chimera latent)", "B1": "B1 profile corr.", "B1b": "B1b resid.", "B1c": "B1c rank level", "B2b": "B2b specificity", "B3a": "B3a features",
+METHOD_LABEL = {"S_g": "S_g", "D": "Δα", "D_free": "Δα, free gate", "B1z": "B1z (Chimera latent)", "B1": "B1 profile corr.", "B1b": "B1b resid.", "B1c": "B1c rank level", "B2b": "B2b specificity", "B3a": "B3a features",
                 "Sdir": "Sdir direct margin", "Lfc": "Lfc fold change", "pi": "π identity", "dNdS": "dN/dS", "LOEUF": "LOEUF", "SATURN": "SATURN", "CAMEX": "CAMEX", "GeneSpectra": "GeneSpectra",
                 "CACIMAR": "CACIMAR", "SAMap": "SAMap"}
 ORDER = RU.OVERVIEW_METHODS
@@ -44,6 +44,7 @@ def read_tidy() -> pd.DataFrame:
     b1 = RU.REPO / "results/revision/B1/B1_overview.csv"  # B1's rows for the overview: tracks A and D
     if b1.exists():
         d = pd.read_csv(b1)
+        d["method"] = d["method"].replace({"Delta_alpha": "D", "Delta_alpha_free": "D_free", "S_deploy": "SATURN", "C_cos": "CAMEX"})  # B1's names to the overview's
         # one column per task x cohort x metric; the all-cohort rows repeat them and stay out, so that nothing counts twice
         coh = d["setting"].astype(str).str.extract(r"cohort=([^;]+)")[0]
         d = d[coh.notna() & (coh != "all")].copy()
