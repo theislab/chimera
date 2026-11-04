@@ -99,8 +99,19 @@ def tool_ran(method: str, task: str) -> bool:
     return (RU.RES / "tool_scores" / method / f"{RU.run_name(p[3], p[2], 0)}.csv").exists()
 
 
+def tabled_not_ranked() -> set:
+    """(task, method) of Track B rows that exist but are not ranked (identity, exploratory): neither ranked nor counted as undefined."""
+    fr = [pd.read_parquet(f) for f in glob.glob(str(RU.RES / "track_B/*.parquet")) if not f.endswith("__h2h.parquet")]
+    if not fr:
+        return set()
+    b = pd.concat(fr)
+    b = b[b["rank_direction"].fillna("") == ""]
+    return set(zip(b["task"], b["method"]))
+
+
 def rank_tasks(t: pd.DataFrame) -> pd.DataFrame:
     rows = []
+    skip = tabled_not_ranked()
     for (track, task, metric), g in t.groupby(["track", "task", "metric"], sort=False):
         d = g.drop_duplicates("method").set_index("method")
         v = d["value"].astype(float) * (1 if (d["rank_direction"] == "higher").all() else -1)
@@ -108,8 +119,8 @@ def rank_tasks(t: pd.DataFrame) -> pd.DataFrame:
         n_def = len(v)
         missing = []
         if track == "B":  # the committed rule acts where every method has a reading to give
-            missing = [m for m in RU.CHIMERA + RU.DIRECT if m not in v.index and applicable(track, task, m)]
-            missing += [m for m in RU.TOOLS if m not in v.index and tool_ran(m, task)]
+            missing = [m for m in RU.CHIMERA + RU.DIRECT if m not in v.index and applicable(track, task, m) and (task, m) not in skip]
+            missing += [m for m in RU.TOOLS if m not in v.index and tool_ran(m, task) and (task, m) not in skip]
         n = n_def + len(missing)
         for m in v.index:
             rows.append(dict(track=track, task=task, metric=metric, method=m, value=float(d.loc[m, "value"]), rank=float(r[m]), n_methods=n, scaled=(float(r[m]) - 1) / max(n - 1, 1),
