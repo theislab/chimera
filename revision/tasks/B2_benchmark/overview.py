@@ -208,6 +208,9 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
             ax.text(x_over + 2.5, i, f"{A.loc[m, 'overall']:.2f} / {A.loc[m, 'overall_excl_undefined']:.2f}", va="center", ha="left", fontsize=5.5, color="#333333")
         ax.set_yticks(range(len(methods)))
         ax.set_yticklabels([METHOD_LABEL.get(m, m) for m in methods])
+        grp = {**{m: "#1b4f8f" for m in RU.CHIMERA + RU.CHIMERA_FREE}, **{m: "#333333" for m in RU.DIRECT}, **{m: "#8a6d1f" for m in RU.STATIC}, **{m: "#7a3b69" for m in RU.TOOLS}}
+        for tl, m in zip(ax.get_yticklabels(), methods):
+            tl.set_color(grp.get(m, "#333333"))
         ax.set_ylim(len(methods) - 0.5, -2.2)
         ax.set_xlim(-0.8, x_over + 3.4)
         ax.set_xticks(range(len(cols)))
@@ -222,8 +225,9 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
             ax.plot([prev - 0.4, cu - 0.6], [-1.0, -1.0], color="#333333", lw=1)
             ax.text((prev + cu - 1) / 2, -1.25, f"Track {tr}", ha="center", va="bottom", fontsize=7)
             prev = cu
-        ax.text(x_over, -1.25, "overall, committed / undefined cells excluded (lower is better)", ha="left", va="bottom", fontsize=6)
-        fig.tight_layout()
+        ax.text(x_over, -1.25, "overall scaled rank, committed / undefined excluded\n(0 = best; bar = 1 - committed)", ha="left", va="bottom", fontsize=6)
+        fig.text(0.01, 0.01, "Row labels: blue Chimera readouts, black direct baselines, ochre sequence scores, purple other tools. Circle size and colour: mean within-task scaled rank (large, dark = better); hatched: not applicable or not run; red f/t: runs finished of tried.", fontsize=5.5, color="#444444")
+        fig.tight_layout(rect=(0, 0.03, 1, 1))
         pdf.savefig(fig)
         fig.savefig(OUT / "overview.png", dpi=220)
         plt.close(fig)
