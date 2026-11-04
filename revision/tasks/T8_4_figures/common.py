@@ -36,17 +36,18 @@ import _figure_design as fd  # noqa: E402
 # Poppler tools for the font and text checks (any env that ships them; override with POPPLER_BIN).
 POPPLER = Path(os.environ.get("POPPLER_BIN", Path.home() / "tools/apps/mamba/envs/tardis_env/bin"))
 
-# One colour and marker per readout, shared with X6 so every validation panel reads the same.
+# One colour and marker per readout, shared with X6 so every validation panel reads the same. Labels are the
+# reader names of the manuscript; the internal codes (keys) never reach a figure.
 # Okabe-Ito hues; markers differ as well, so identity never rests on colour alone.
 STY = {
     "D": ("#D55E00", "o", "Δα (Chimera)"),
     "S": ("#0072B2", "s", "count-evidence margin $S_g$ (Chimera)"),
     "Sdir": ("#009E73", "D", "direct margin, cell-type labels, no model"),
-    "B1b": ("#222222", "^", "profile correlation (B1b)"),
-    "B1c": ("#666666", "v", "level match per cell type (B1c)"),
-    "B2b": ("#999999", "<", "specificity similarity (B2b)"),
-    "B1z": ("#CC79A7", "P", "profile correlation, clusters of Chimera latent (B1z)"),
-    "B3a": ("#E69F00", "X", "gene features alone (B3a)"),
+    "B1b": ("#222222", "^", "profile correlation"),
+    "B1c": ("#666666", "v", "rank-matched level per cell type"),
+    "B2b": ("#999999", "<", "specificity similarity"),
+    "B1z": ("#CC79A7", "P", "profile correlation, clusters of Chimera's latent"),
+    "B3a": ("#E69F00", "X", "gene features alone"),
 }
 INK = "#222222"
 MUTED = "#777777"

@@ -161,7 +161,7 @@ def cohort_rows() -> pd.DataFrame:
     table = pd.read_csv(cm.RES / "H1" / "cohort_table.csv").set_index("cohort")
     labels = table.label
     runs = runs.set_index("cohort").reindex(table.index).reset_index()
-    runs["label"] = [cm.COHORT.get(c, labels[c].replace(" H+", ", human + ").lower().replace("m. mulatta", "M. mulatta")
+    runs["label"] = [cm.COHORT.get(c, labels[c].replace(" H+", ", human + ").lower().replace("m. mulatta", "M. mulatta").replace("m. fascicularis", "M. fascicularis")
                                    .replace("marrow 3", "marrow, 3").replace("eye 5", "eye, 5").replace("eye primates", "eye, primates"))
                      for c in runs.cohort]
     runs = runs[runs.tissue.isin(TISSUES)]  # H1 also lists the C1 cohorts (cortex, lung, muscle, tumour); Fig 4e keeps the 16 until its layout is extended

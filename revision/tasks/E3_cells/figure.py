@@ -50,8 +50,9 @@ def excess(universe="count_supported"):
 def panel_compartments():
     e = excess()
     e = e[e.level == "compartment"]
-    cols = [("D_free", "Δα, per-gene read-out", FREE, "o"), ("D", "Δα, canonical (main model)", FREE, "o"),
-            ("B1", "profile correlation (B1)", B1C, "^"), ("DL", "level similarity at\nthe home type (direct)", LVL, "v")]
+    # the default gate (main model) first, then the per-gene read-out, then the direct baselines; a count on every panel
+    cols = [("D", "Δα, protein-feature\ngate (default)", FREE, "o"), ("D_free", "Δα, per-gene\nread-out", FREE, "o"),
+            ("B1", "pseudobulk profile\ncorrelation", B1C, "^"), ("DL", "level similarity at\nthe home type (direct)", LVL, "v")]
     fig, axes = plt.subplots(1, 4, figsize=(6.6, 2.15), sharey=True)
     rng = np.random.default_rng(0)
     for ax, (sc, title, col, mk) in zip(axes, cols):
@@ -63,9 +64,8 @@ def panel_compartments():
             ax.scatter(x.excess_d[~sig], y[~sig], s=9, facecolor="none", edgecolor=col, marker=mk, lw=0.6, alpha=0.85)
             med = x.excess_d.median()
             ax.plot([med, med], [len(COMP) - 1 - i - 0.32, len(COMP) - 1 - i + 0.32], color=cm.INK, lw=1.2)
-            if sc in ("D_free", "DL"):
-                npos, n = int((x.excess_d > 0).sum()), len(x)
-                ax.text(1.02, len(COMP) - 1 - i, f"{npos}/{n} > 0", transform=ax.get_yaxis_transform(), fontsize=5.5, va="center", color=cm.MUTED)
+            npos, n = int((x.excess_d > 0).sum()), len(x)
+            ax.text(1.02, len(COMP) - 1 - i, f"{npos}/{n} > 0", transform=ax.get_yaxis_transform(), fontsize=5.5, va="center", color=cm.MUTED)
         ax.set_title(title, loc="left", fontsize=6.5)
         ax.set_xlabel("excess over matched genes (SD)", fontsize=6)
         ax.set_xlim(-0.65, 1.25)
@@ -142,7 +142,7 @@ def panel_lineages():
             ax.set_xticks([-0.2, 0.2])
         _clean(ax)
     axes[0].scatter([], [], color=FREE, marker="o", s=8, label="Δα, per-gene read-out")
-    axes[0].scatter([], [], color=B1C, marker="^", s=8, label="profile correlation (B1)")
+    axes[0].scatter([], [], color=B1C, marker="^", s=8, label="profile correlation")
     fig.legend(frameon=False, fontsize=6, loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.06))
     fig.subplots_adjust(bottom=0.27)
     return cm.save(fig, "e3c_lineages")
@@ -190,7 +190,7 @@ def panel_branch():
             x = np.array([bl[s] for s in t.index])
             o = np.argsort(x)
             ax.plot(x[o], t.rate.to_numpy()[o] * 100, ls=ls, color=col, marker=mk, ms=3.2, lw=0.8,
-                    mfc=col if ls == "-" else "white", label={"per-gene": "Chimera, per-gene", "canonical": "Chimera, canonical", "direct": "direct pseudobulk"}[rd])
+                    mfc=col if ls == "-" else "white", label={"per-gene": "Chimera, per-gene gate", "canonical": "Chimera, protein-feature gate", "direct": "direct pseudobulk"}[rd])
         t = r.loc["per-gene"].reindex(list(lab))
         for s in t.index:
             ax.annotate(lab[s], (bl[s], t.rate[s] * 100), fontsize=5.5, xytext=(3, -7 if s in ("Human", "macaca_fascicularis") else 3), textcoords="offset points")

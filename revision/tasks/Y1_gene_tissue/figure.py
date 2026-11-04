@@ -25,7 +25,7 @@ INK, MUTED, GRID = "#0b0b0b", "#52514e", "#d8d7d2"
 CS, CB, CD, CDIR = "#2a78d6", "#eb6834", "#1baf7a", "#6250d6"  # S, B1, D, direct margin; each with its own marker
 MK = {"S": "o", "B1": "s", "D": "^", "Sdir": "D"}
 COL = {"S": CS, "B1": CB, "D": CD, "Sdir": CDIR}
-NAME = {"S": r"$S_g$", "B1": "B1", "D": r"$\Delta\alpha$", "Sdir": "direct margin"}
+NAME = {"S": r"$S_g$", "B1": "profile correlation", "D": r"$\Delta\alpha$", "Sdir": "direct margin"}  # reader names
 TIS = ["liver", "testis", "kidney", "islet", "bone_marrow", "eye"]
 TL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "islet": "islet", "bone_marrow": "marrow", "eye": "eye"}
 # Display name of each gold: the "pancreas" gold is the islet reference (keys stay as in the result files).
@@ -46,7 +46,7 @@ def panel_a(ax):
             ax.barh(i, w - 0.004, left=left, color=c, height=0.62)
             left += w
         ax.text(r.gene_share + 0.012, i, f"{r.gene_share:.2f}", va="center", ha="left", fontsize=6.5, color=INK)
-    ax.set_yticks(range(3), [NAME[s] for s in v.index])
+    ax.set_yticks(range(3), [NAME[s].replace(" ", "\n") if s == "B1" else NAME[s] for s in v.index])  # two lines: page box unchanged
     ax.invert_yaxis()
     ax.set_xlim(0, 1)
     ax.set_xlabel("share of variance of z, given expression and detection per tissue")
@@ -73,7 +73,7 @@ def panel_b(axs):
                 ax.text(j, i, f"{v:.2f}".replace("0.", "."), ha="center", va="center", fontsize=5.8, color="white" if abs(v) > 0.15 else INK)
                 if match[g] == t:
                     ax.add_patch(plt.Rectangle((j - .5, i - .5), 1, 1, fill=False, ec=INK, lw=1.1))
-        ax.set_xlabel(f"gold; readout {NAME[sc]}", fontsize=7)
+        ax.set_xlabel(f"gold; readout {NAME[sc]}", fontsize=7, loc="center" if sc == "S" else "right")  # long name: into the gap, page box unchanged
     axs[0].set_ylabel("tissue of the readout")
 
 
@@ -109,14 +109,18 @@ def panel_d(ax):
         d = a[a.score == sc].set_index("key").reindex(ls)
         y = np.arange(6) + of
         ax.hlines(y, d.lo, d.hi, color=COL[sc], lw=1.2)
-        ax.plot(d.est, y, MK[sc], color=COL[sc], ms=4, mec="white", mew=0.5, ls="", label=f"{NAME[sc]}, matched variability")
+        ax.plot(d.est, y, MK[sc], color=COL[sc], ms=4, mec="white", mew=0.5, ls="")
         e = w[w.score == sc].set_index("key").reindex(ls)
-        ax.plot(e.est, y, MK[sc], mfc="white", mec=COL[sc], ms=3.5, mew=0.7, ls="", label=f"{NAME[sc]}, $C$ only")
+        ax.plot(e.est, y, MK[sc], mfc="white", mec=COL[sc], ms=3.5, mew=0.7, ls="")
     ax.axvline(0, color=GRID, lw=0.8, zorder=0)
     ax.set_yticks(range(6), ls)
     ax.invert_yaxis()
     ax.set_xlabel("tissue difference in readout vs in gold, within gene, $\\rho$")
-    ax.legend(frameon=False, fontsize=5.6, loc="lower center", bbox_to_anchor=(0.5, 0.98), ncol=2, handletextpad=0.1, columnspacing=0.8, labelspacing=0.15)
+    # readouts by colour and marker, the two adjustments by fill (column-wise: readouts left, fill right)
+    h = [plt.Line2D([], [], marker=MK[sc], color=COL[sc], ls="", ms=4, mec="white", mew=0.5) for sc in ("S", "B1")]
+    h += [plt.Line2D([], [], marker="o", color=INK, ls="", ms=3.5), plt.Line2D([], [], marker="o", mfc="white", mec=INK, ls="", ms=3.5, mew=0.7)]
+    ax.legend(h, [NAME["S"], NAME["B1"], "filled, matched variability", "open, $C$ only"], frameon=False, fontsize=5.6, loc="lower center",
+              bbox_to_anchor=(0.5, 0.98), ncol=2, handletextpad=0.1, columnspacing=0.8, labelspacing=0.15)
 
 
 def panel_e(ax):
@@ -160,7 +164,7 @@ def panel_f(ax):
     ax.set_ylim(len(genes) - 0.15, -0.6)
     ax.set_xlabel("z within tissue, count-supported tissues")
     h = [plt.Line2D([], [], marker="o", color=CS, ls="", ms=4), plt.Line2D([], [], marker="s", color=CB, ls="", ms=3)]
-    ax.legend(h, [NAME["S"], "B1"], frameon=False, fontsize=6, loc="lower left", handletextpad=0.1, ncol=2, bbox_to_anchor=(0, 1.0), columnspacing=0.8)
+    ax.legend(h, [NAME["S"], NAME["B1"]], frameon=False, fontsize=6, loc="lower left", handletextpad=0.1, ncol=2, bbox_to_anchor=(0, 1.0), columnspacing=0.8)
 
 
 def main(slot: bool = False):
@@ -196,6 +200,15 @@ def main(slot: bool = False):
         for t in letters:
             t.remove()
         fig.savefig(d_ / "fig_y1_gene_tissue_slot.pdf", bbox_inches=bb)
+        # One page per row, same box, other rows not drawn: a composed figure that crops a row from this page then
+        # carries no hidden text of the other rows.
+        rows = [[a, b1, b2], [c, d], [e, f]]
+        for k, keep in enumerate(rows, 1):
+            for ax in fig.axes:
+                ax.set_visible(ax in keep)
+            fig.savefig(d_ / f"fig_y1_gene_tissue_slot_row{k}.pdf", bbox_inches=bb)
+        for ax in fig.axes:
+            ax.set_visible(True)
 
 
 if __name__ == "__main__":

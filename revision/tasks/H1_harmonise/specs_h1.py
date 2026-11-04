@@ -11,7 +11,8 @@ D = RU.OUT / "panels"
 P = lambda name, label=None, **kw: Panel(D / f"{name}.pdf", label=label, **kw)  # noqa: E731
 
 # Y1's six panels, row by row from its page; its letters are masked, ours run on from (b). Rows stay whole: the labels of (f) reach over the axes of (e).
-y = lambda region, **lab: Row(P("y1_masked", lab, region=region), same_scale=True, width=425)  # noqa: E731
+# Each row is cropped from a page on which only that row is drawn (same box), so no hidden text of other rows is embedded.
+y = lambda k, region, **lab: Row(P(f"y1_masked_row{k}", lab, region=region), same_scale=True, width=425)  # noqa: E731
 
 
 def tissue(stem: str) -> Figure:
@@ -23,7 +24,7 @@ FIGS = {
     # Three floats of one figure (eight tissues no longer fit two pages): (a) axis and (b) named genes; (c) programmes; (d)-(i) Y1, gene by tissue.
     "fig_h1": Figure(Col(P("fig_h1_axis", "a"), P("fig_h1_genes", "b"), gap=3)),
     "fig_h1_cont": Figure(P("fig_h1_recurrence", "c"), width=470),
-    "fig_h1_cont2": Figure(Col(y((0, 0, 512, 119), d=150, e=400), y((0, 120, 512, 283), f=150, g=395), y((0, 283, 512, 429), h=145, i=385), gap=3)),
+    "fig_h1_cont2": Figure(Col(y(1, (0, 0, 512, 119), d=150, e=400), y(2, (0, 120, 512, 283), f=150, g=395), y(3, (0, 283, 512, 429), h=145, i=385), gap=3)),
     "supp_h1_bone_marrow": tissue("supp_h1_bone_marrow"),
     "supp_h1_kidney": tissue("supp_h1_kidney"),
     "supp_h1_islet": tissue("supp_h1_islet"),

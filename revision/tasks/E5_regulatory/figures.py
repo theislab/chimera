@@ -81,7 +81,8 @@ def panel_properties():
     ax.set_xlabel("Partial Spearman with Δα (median over tissues)")
     ax.set_title("Regulatory and gene architecture", pad=9)
     h = [plt.Line2D([], [], marker=m, ls="", color=c, ms=4) for _, _, m, c in SERIES]
-    ax.legend(h, ["Δα, canonical gate", "Δα, per-gene gate", "Pseudobulk profile corr."], loc="lower left", fontsize=5.6,
+    ax.legend(h, ["Δα, protein-feature gate", "Δα, per-gene gate", "pseudobulk profile\ncorrelation"], loc="lower left",
+              fontsize=5.6,
               bbox_to_anchor=(0, .36),
               handletextpad=.2, borderaxespad=.1)
     ax.text(0.295, n - .45, "same sign", ha="right", va="bottom", fontsize=5.2, color="#555555")
@@ -93,9 +94,9 @@ def panel_dose():
     fig, axs = plt.subplots(1, 2, figsize=(3.2, 2.0), sharey=True)
     for ax, (p, lab) in zip(axs, (("n_dels_domain", "Distal enhancers in domain"), ("tf_indegree", "Regulating TFs"))):
         d = q[q.property == p].groupby(["tissue", "quintile"])[["D_can", "D_free", "B1", "rt_D_free"]].median().reset_index()
-        for y, mk, c, ls, nm in (("D_can", "o", COL["can"], "-", "Δα, canonical"), ("D_free", "^", COL["free"], "-", "Δα, per-gene"),
+        for y, mk, c, ls, nm in (("D_can", "o", COL["can"], "-", "Δα, protein-feature gate"), ("D_free", "^", COL["free"], "-", "Δα, per-gene gate"),
                                  ("rt_D_free", "^", COL["free"], ":", "per-gene, equal cell-type τ"),
-                                 ("B1", "D", COL["b1"], "-", "Pseudobulk profile corr.")):
+                                 ("B1", "D", COL["b1"], "-", "pseudobulk profile\ncorrelation")):
             s = d.groupby("quintile")[y].agg(med="median", lo=lambda v: np.quantile(v, .25), hi=lambda v: np.quantile(v, .75))
             x = s.index.to_numpy()
             if ls == "-":

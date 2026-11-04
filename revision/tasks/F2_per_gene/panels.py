@@ -5,7 +5,8 @@ independent golds. Exploratory (decided after the pre-specified test); every num
 Panels, one PDF each at its exact size (``figures/revision/fig_per_gene_{a..e}.pdf``):
   a  forest: rho_p with 95% block-bootstrap CI on H1-H4 and the 4-species liver estimates, per-gene gate (free5) vs
      protein-feature gate (can5, same seeds), all genes and genes with count evidence; pre-specified value marked;
-     paired difference with its CI (Z3 compare_hyp.csv, compare_pairs.csv)
+     paired difference with its CI (Z3 compare_hyp.csv, compare_pairs.csv); status letters only for the frozen
+     pre-specified test of the protein-feature gate (Table 1), with their key on the panel; the default gate is drawn first
   b  testis level: Δα rank against EVEE testis level, raw and given the covariates C, binned (data.py; the reversal)
   c  Δα against the count evidence S_g of the same fit, per gene, liver and testis (Z3 consensus)
   d  named findings: spermatocyte-peak genes (C42) and hepatocyte catabolic genes (C43), matched excess under each gate
@@ -66,14 +67,20 @@ UNI = {("all", "all"): "all", ("all", "cs"): "count_supported", ("multi", "all")
        ("multi", "cs"): "multi_4sp_count_supported"}
 
 
+STATUS_KEY = "pre-specified status (Table 1): V supported, N null, R reversed; –, estimate outside the test"
+PANEL_H, PANEL_BOTTOM, PANEL_TOP = 2.48, 0.74, 0.26  # forest and testis-level panels share one height and axes bottom (one row)
+
+
 def panel_forest() -> plt.Figure:
+    """Points with CIs for both gates; the only status letters are the frozen pre-specified ones of the
+    protein-feature gate (Table 1), in their own column with a key. The per-gene gate gets no status."""
     T = pd.read_csv(Z3 / "compare_hyp.csv")
     P = pd.read_csv(Z3 / "compare_pairs.csv")
-    H = 2.3
-    left, bottom, top = 1.15, 0.62, 0.2
+    H = PANEL_H
+    left, bottom, top = 1.15, PANEL_BOTTOM, PANEL_TOP
     ah = H - bottom - top
     aw = [0.98, 0.98, 0.78]
-    gaps = [0.4, 0.12]
+    gaps = [0.5, 0.12]
     W = left + sum(aw) + sum(gaps) + 0.14
     fig = plt.figure(figsize=(W, H))
     axes, x = [], left
@@ -94,22 +101,25 @@ def panel_forest() -> plt.Figure:
         for yy, (h, kind, _) in zip(ys, ROWS):
             u = UNI[(kind, sub)]
             f, c = get(h, u, "free5"), get(h, u, "can5")
-            _ci(ax, yy + 0.17, c.rho_p, c.ci_lo, c.ci_hi, CAN)
-            _ci(ax, yy - 0.17, f.rho_p, f.ci_lo, f.ci_hi, FREE)
+            _ci(ax, yy - 0.17, c.rho_p, c.ci_lo, c.ci_hi, CAN)  # the default gate on top
+            _ci(ax, yy + 0.17, f.rho_p, f.ci_lo, f.ci_hi, FREE)
             if sub == "all" and kind == "all":
                 fz = get(h, "all", "frozen")
-                ax.plot([fz.rho_p], [yy + 0.17], marker="|", ms=7, mew=1.0, color=cm.INK, zorder=6, ls="none")
-            if sub == "all":
-                ax.text(1.03, yy, f"{c.status_rule} → {f.status_rule}", transform=ax.get_yaxis_transform(),
-                        ha="left", va="center", fontsize=FS, color=cm.INK, fontweight="bold")
+                ax.plot([fz.rho_p], [yy - 0.17], marker="|", ms=7, mew=1.0, color=cm.INK, zorder=6, ls="none")
+            if sub == "all":  # frozen ten-seed status of the protein-feature gate; H1-H4 Human+Mouse only
+                lab = get(h, "all", "frozen").status_rule if kind == "all" else "–"
+                ax.text(1.0 + gaps[0] / 2 / aw[0], yy - 0.17, lab, transform=ax.get_yaxis_transform(),
+                        ha="center", va="center", fontsize=FS, color=cm.INK if kind == "all" else cm.MUTED,
+                        fontweight="bold" if kind == "all" else "normal")
         ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
         ax.axvline(0.10, color=cm.RULE, lw=0.6, ls=(0, (2, 2)), zorder=1)
         ax.set_xlim(-0.29, 0.21)
         ax.set_xticks([-0.2, -0.1, 0, 0.1, 0.2])
         ax.set_xticklabels(["−0.2", "", "0", "", "0.2"])
         ax.set_title(["all genes", "count evidence only"][j], fontsize=FL, pad=2)
-    axes[0].text(1.03, -0.62, "status", transform=axes[0].get_yaxis_transform(), ha="left", va="bottom",
-                 fontsize=5.6, color=cm.MUTED)
+    axes[0].text(1.0 + gaps[0] / 2 / aw[0], -0.62, "pre-specified\ntest\n(default gate)",
+                 transform=axes[0].get_yaxis_transform(), ha="center", va="bottom", fontsize=5.2, color=cm.MUTED,
+                 linespacing=1.0)
     # paired difference
     ax = axes[2]
     for yy, (h, kind, _) in zip(ys, ROWS):
@@ -137,17 +147,18 @@ def panel_forest() -> plt.Figure:
             t.set_color(cm.MUTED)
     axes[1].set_yticks([])
     axes[2].set_yticks([])
-    fig.text((left + aw[0] + gaps[0] / 2 + aw[1] / 2 - 0.2) / W, 0.205 / H,
+    fig.text((left + aw[0] + gaps[0] / 2 + aw[1] / 2 - 0.2) / W, 0.325 / H,
              "Δα vs independent measure, $\\rho_p$ (95% CI)", fontsize=FL, ha="center", va="bottom")
     x2 = left + aw[0] + gaps[0] + aw[1] + gaps[1] + aw[2] / 2
-    fig.text(x2 / W, 0.205 / H, "difference (95% CI)", fontsize=FL, ha="center", va="bottom")
-    h = [Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.6, label="per-gene gate"),
-         Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=3.1, label="protein-feature gate"),
-         Line2D([], [], marker="|", color=cm.INK, ls="none", ms=6, mew=1.0, label="pre-specified test, 10 seeds"),
+    fig.text(x2 / W, 0.325 / H, "difference (95% CI)", fontsize=FL, ha="center", va="bottom")
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=3.1, label="protein-feature gate (default)"),
+         Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.6, label="per-gene gate"),
+         Line2D([], [], marker="|", color=cm.INK, ls="none", ms=6, mew=1.0, label="pre-specified, 10 seeds"),
          Line2D([], [], marker="o", color=cm.INK, ls="none", ms=3.3, label="difference: all genes"),
          Line2D([], [], marker="o", color=cm.INK, mfc="white", ls="none", ms=3.3, label="count evidence only")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=5, fontsize=5.2, handletextpad=0.1,
-               columnspacing=0.45, frameon=False, borderpad=0)
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.13 / H), ncol=5, fontsize=5.2,
+               handletextpad=0.1, columnspacing=0.45, frameon=False, borderpad=0)
+    fig.text(0.5, 0.03 / H, STATUS_KEY, fontsize=5.2, ha="center", va="bottom", color=cm.MUTED)
     return fig
 
 
@@ -164,9 +175,9 @@ def _binned(x, y, nb=20):
 def panel_testis_level() -> plt.Figure:
     d = pd.read_csv(F2 / "testis_level_residuals.csv")
     rev = pd.read_csv(Z3 / "compare_reversal.csv")
-    W, H = 2.45, 2.3
+    W, H = 2.45, PANEL_H
     fig = plt.figure(figsize=(W, H))
-    left, bottom, top, gap = 0.5, 0.62, 0.2, 0.16
+    left, bottom, top, gap = 0.5, PANEL_BOTTOM, PANEL_TOP, 0.16
     aw = (W - left - gap - 0.12) / 2
     ah = H - bottom - top
     axes = [fig.add_axes([left / W, bottom / H, aw / W, ah / H]),
@@ -190,7 +201,7 @@ def panel_testis_level() -> plt.Figure:
         _style(ax)
         r = rev[(rev.universe == "all")].set_index("line")
         s = rev[(rev.universe == "all_S_ema")].set_index("line")
-        vals = [(FREE, r.loc["free5", stat]), (CAN, r.loc["can5", stat]), (SG, s.loc["free5", stat])]
+        vals = [(CAN, r.loc["can5", stat]), (FREE, r.loc["free5", stat]), (SG, s.loc["free5", stat])]
         x0 = 0.62 if pre == "rank" else 0.05  # the empty corner: lower right of the raw panel, lower left given C
         y0 = 0.30
         ax.text(x0, y0, "ρ" if stat == "spearman" else "$\\rho_p$", transform=ax.transAxes, fontsize=5.6,
@@ -210,12 +221,12 @@ def panel_testis_level() -> plt.Figure:
         ax.set_ylim(-lim, lim)
     axes[0].set_ylabel("Δα, mean rank in bin (centred)", fontsize=FL, labelpad=1)
     axes[1].set_yticklabels([])
-    fig.text((left + aw + gap / 2) / W, 0.205 / H, "EVEE testis expression level, rank\n(right: residual rank given covariates)", fontsize=FL, linespacing=1.05, ha="center",
+    fig.text((left + aw + gap / 2) / W, 0.325 / H, "EVEE testis expression level, rank\n(right: residual rank given covariates)", fontsize=FL, linespacing=1.05, ha="center",
              va="bottom")
-    h = [Line2D([], [], marker=FREE[1], color=FREE[0], ms=2.6, mew=0, lw=1, label="per-gene"),
-         Line2D([], [], marker=CAN[1], color=CAN[0], ms=2.2, mew=0, lw=1, label="protein-feature"),
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ms=2.2, mew=0, lw=1, label="protein-feature"),
+         Line2D([], [], marker=FREE[1], color=FREE[0], ms=2.6, mew=0, lw=1, label="per-gene"),
          Line2D([], [], color=SG[0], lw=0.8, ls=(0, (2.5, 1.5)), label="$S_g$")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.55, 0.0), ncol=3, fontsize=5.4, handletextpad=0.3,
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.55, 0.115 / H), ncol=3, fontsize=5.4, handletextpad=0.3,
                columnspacing=0.8, frameon=False, borderpad=0, handlelength=1.6)
     return fig
 
@@ -230,7 +241,7 @@ def panel_gate_vs_s() -> plt.Figure:
     fig = plt.figure(figsize=(W, H))
     pos = {}
     for i, coh in enumerate(("liv_hmouse", "test_hmouse")):
-        for j, gate in enumerate(("free5", "can5")):
+        for j, gate in enumerate(("can5", "free5")):
             pos[(coh, gate)] = fig.add_axes([(left + j * (a + gap)) / W, (bottom + (1 - i) * (a + vg)) / H, a / W, a / H])
     for (coh, gate), ax in pos.items():
         d = g[(g.cohort == coh) & g.count_supported]
@@ -247,7 +258,7 @@ def panel_gate_vs_s() -> plt.Figure:
         ax.set_yticks([0, 0.5, 1])
         ax.set_aspect("equal")
         _style(ax)
-        if gate == "can5":
+        if gate == "free5":
             ax.set_yticklabels([])
         else:
             ax.set_yticklabels(["0", "0.5", "1"])
@@ -288,12 +299,12 @@ def panel_named() -> plt.Figure:
                  & (t.subset == subset)].iloc[0]
 
     for k, (grp, sub, _) in enumerate(C42_ROWS):
-        for off, line, val, sty in ((-0.26, "free5", "D", FREE), (0.0, "can5", "D", CAN), (0.26, "free5", "S", SG)):
+        for off, line, val, sty in ((-0.26, "can5", "D", CAN), (0.0, "free5", "D", FREE), (0.26, "free5", "S", SG)):
             r = get("C42", "test_hmouse", line, grp, val, sub)
             _ci(ax1, k + off, r.excess_d, r.ci_lo, r.ci_hi, sty, size=3.0, lw=0.9)
     for k, (coh, grp, _) in enumerate(C43_ROWS):
         y = C43_Y[k]
-        for off, line, val, sty in ((-0.26, "free5", "D_raw", FREE), (0.0, "can5", "D_raw", CAN), (0.26, "free5", "S", SG)):
+        for off, line, val, sty in ((-0.26, "can5", "D_raw", CAN), (0.0, "free5", "D_raw", FREE), (0.26, "free5", "S", SG)):
             r = get("C43", coh, line, grp, val, "all")
             _ci(ax2, y + off, r.excess_d, r.ci_lo, r.ci_hi, sty, size=3.0, lw=0.9)
     ax1.set_yticks(range(4))
@@ -322,8 +333,8 @@ def panel_named() -> plt.Figure:
         ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
         _style(ax)
     fig.text(0.5, 0.205 / H, "matched excess, SD units (95% CI)", fontsize=FL, ha="center", va="bottom")
-    h = [Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.0, label="per-gene"),
-         Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=2.6, label="protein-feature"),
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=2.6, label="protein-feature"),
+         Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.0, label="per-gene"),
          Line2D([], [], marker=SG[1], color=SG[0], ls="none", ms=3.0, label="$S_g$")]
     fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=3, fontsize=5.4, handletextpad=0.15,
                columnspacing=0.7, frameon=False, borderpad=0)
@@ -345,7 +356,7 @@ def panel_axes() -> plt.Figure:
     axs = [fig.add_axes([left / W, (bottom + ah + gap) / H, aw / W, ah / H]), fig.add_axes([left / W, bottom / H, aw / W, ah / H])]
     for ax, (pan, title) in zip(axs, X5_PANELS):
         for k, (coh, _) in enumerate(X5_COH):
-            for off, line, sty in ((-0.16, "free5", FREE), (0.16, "can5", CAN)):
+            for off, line, sty in ((-0.16, "can5", CAN), (0.16, "free5", FREE)):
                 r = x[(x.cohort == coh) & (x.line == line) & (x.panel == pan)].iloc[0]
                 ms = 3.0 if sty[1] == "o" else 2.6
                 ax.plot([r.rho], [k + off], marker=sty[1], color=sty[0], ms=ms, mew=0.8, ls="none", zorder=3)

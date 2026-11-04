@@ -335,7 +335,7 @@ def _bottom_rows(islet_types):
     rows, y = [], 0.0
     for tissue, head, types, lab in (
             ("kidney", "kidney: AKI vs IRI", K_TYPES, K_LAB),
-            ("liver", "liver: MASH vs western diet", ["hepatocyte"], {"hepatocyte": "hepatocyte"}),
+            ("liver", "liver: MASH vs Western diet", ["hepatocyte"], {"hepatocyte": "hepatocyte"}),
             ("islet", "islet: T2D vs db/db, mSTZ", islet_types, I_LAB)):
         rows.append(dict(kind="head", tissue=tissue, label=head, y=y))
         y += 1
@@ -344,6 +344,9 @@ def _bottom_rows(islet_types):
             y += 1
         y += 0.4
     return rows, y - 0.4
+
+
+LEGEND_ROWS = 2.6  # empty rows under the last cell type: the legend of (d) sits there, clear of the points
 
 
 def _bottom_axis(ax, rows, ymax, labels=True):
@@ -358,7 +361,7 @@ def _bottom_axis(ax, rows, ymax, labels=True):
     else:
         ax.tick_params(axis="y", labelleft=False)
     ax.tick_params(axis="y", length=0)
-    ax.set_ylim(ymax + 0.5, -0.6)
+    ax.set_ylim(ymax + LEGEND_ROWS + 0.5, -0.6)  # free rows at the bottom hold the legend of (d)
     _clean(ax)
 
 
@@ -384,7 +387,7 @@ def draw_c(ax, rows, hd1, islet_done):
     if ymin_islet is not None:
         ax.add_patch(Rectangle((-0.075, ymin_islet - 0.45), 0.15, ymax_islet - ymin_islet + 0.9, fill=False,
                                ec=cm.RULE, lw=0.7, ls=(0, (3, 2)), zorder=1))
-        ax.text(0.0, (ymin_islet + ymax_islet) / 2, "islet H-D1 pending\n(seeds still training)", ha="center",
+        ax.text(0.0, (ymin_islet + ymax_islet) / 2, "islet test pending\n(seeds still training)", ha="center",
                 va="center", fontsize=5.6, color=cm.MUTED)
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
     lim = max([0.08] + [abs(v) + 0.005 for h in hd1 for v in (h["lo"], h["hi"])])
@@ -421,7 +424,7 @@ def draw_d(ax, rows, tvn):
 
 
 def draw_e(ax, ek):
-    groups = [("acute", "acute lists (S3)\nprimary"), ("late", "late lists (S9)")]
+    groups = [("acute", "acute lists\n(primary)"), ("late", "late lists")]
     for i, (tab, lab) in enumerate(groups):
         for dy, score, col, mk in ((-0.16, "D", C_D, "o"), (0.16, "B1b_raw", C_B1B, "^")):
             r = ek[(ek.table == tab) & (ek.score == score)].iloc[0]
@@ -436,7 +439,7 @@ def draw_e(ax, ek):
     ax.set_xticks([0.4, 0.5, 0.6, 0.7, 0.8])
     ax.set_xlabel("stratified AUROC,\nshared vs human-specific", fontsize=6.2)
     ax.legend(handles=[Line2D([], [], marker="o", ls="none", ms=4, color=C_D, label="Chimera Δα"),
-                       Line2D([], [], marker="^", ls="none", ms=4, color=C_B1B, label="profile correlation (B1b)")],
+                       Line2D([], [], marker="^", ls="none", ms=4, color=C_B1B, label="profile correlation")],
               loc="center right", bbox_to_anchor=(1.02, 0.5), fontsize=5.4, frameon=False, handletextpad=0.2,
               borderaxespad=0, borderpad=0)
     _clean(ax)
@@ -477,9 +480,9 @@ def main() -> int:
 
     _title(ax_a, "Kidney: AKI programs in mouse IRI")
     _title(ax_b1, "IRI 2 d vs 4–20 wk")
-    _title(ax_c, "H-D1: does Δα predict transfer?")
+    _title(ax_c, "Healthy-tissue test: does Δα predict transfer?")
     _title(ax_d, "Program transfer vs label null")
-    _title(ax_e, "Cippà 2018 anchor")
+    _title(ax_e, "Cippà 2018 injury genes")
     fig.align_xlabels([ax_a, ax_b1, ax_b2])
 
     # One PDF per panel; F1_figures/compose.py places them and adds the bold (a) labels.

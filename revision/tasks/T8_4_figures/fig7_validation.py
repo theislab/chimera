@@ -58,10 +58,10 @@ def panel_forest() -> plt.Figure:
                 fontsize=7.5, fontweight="bold", color=cm.INK)
         y += 1
         _ci(ax, y, m.rho_p, m.ci_lo, m.ci_hi, cm.STY["D"][0], "o", False)
-        holds = (np.sign(m.rho_p) == np.sign(p.rho_p)) and (m.ci_lo > 0 or m.ci_hi < 0)
         yt.append(y)
         yl.append(f"{cm.COHORT[m.cohort]}")
-        ax.text(1.02, y, "holds" if (holds and status[h] in ("V", "W")) else "–",
+        # multi-species estimates sit outside the decision procedure: no status of their own
+        ax.text(1.02, y, "–",
                 transform=ax.get_yaxis_transform(), ha="left", va="center", fontsize=6, color=cm.MUTED)
         y += 1.6
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)

@@ -502,8 +502,8 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
         ax.axhline(n_ab - 0.5, color="#ffffff", lw=2)
     ax2 = fig.add_axes([(w_label + nc * w_col + 0.08) / W_in, bot_in / H, 5 * w_side / W_in, rh * len(rows) / H], sharey=ax)
     ax2.set_xlim(-0.5, 4.5)
-    for j, hd in enumerate(["$q$", "$S_g$", "B1", "π", "dN/dS"]):
-        ax2.text(j, -1.0, hd, fontsize=5.6, ha="center", va="bottom", color=cm.INK)
+    for j, hd in enumerate(["$q$", "$S_g$", "profile\ncorrelation", "π", "dN/dS"]):
+        ax2.text(j, -1.0, hd, fontsize=5.6, ha="center", va="bottom", color=cm.INK, linespacing=1.0)
     for i, k in enumerate(rows):
         q = D.q_rec[k]
         ax2.text(0, i, f"{q:.3f}" if q >= 0.001 else "<.001", fontsize=4.9, ha="center", va="center", color=cm.INK if k in keys else cm.MUTED)
@@ -597,13 +597,18 @@ def y1_masked() -> None:
 
     (W, H), (Ws, Hs) = size(ref), size(slot)
     trim = f"{Ws - W:.4f}bp {Hs - H:.4f}bp 0bp 0bp"
-    tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
-           "\\begin{document}\\noindent\\includegraphics[trim=%s,clip]{%s}\\end{document}" % (W, H, trim, slot))
-    with tempfile.TemporaryDirectory() as td:
-        (Path(td) / "m.tex").write_text(tex)
-        subprocess.run(["pdflatex", "-interaction=nonstopmode", "m.tex"], cwd=td, capture_output=True, check=True)
-        PANELS.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(Path(td) / "m.pdf", PANELS / "y1_masked.pdf")
+    PANELS.mkdir(parents=True, exist_ok=True)
+    # the whole page, and one page per row (the other rows not drawn), all on the same box: the composed figure
+    # crops each row from its own page, so no row carries hidden text of another
+    pages = [(slot, "y1_masked")] + [(y1 / f"fig_y1_gene_tissue_slot_row{k}.pdf", f"y1_masked_row{k}") for k in (1, 2, 3)]
+    for src, dst in pages:
+        assert size(src) == (Ws, Hs), (src, size(src), (Ws, Hs))
+        tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
+               "\\begin{document}\\noindent\\includegraphics[trim=%s,clip]{%s}\\end{document}" % (W, H, trim, src))
+        with tempfile.TemporaryDirectory() as td:
+            (Path(td) / "m.tex").write_text(tex)
+            subprocess.run(["pdflatex", "-interaction=nonstopmode", "m.tex"], cwd=td, capture_output=True, check=True)
+            shutil.copyfile(Path(td) / "m.pdf", PANELS / f"{dst}.pdf")
     shutil.copyfile(ref, cm.FIG_OUT / "fig_h1_y1_slot.pdf")
 
 
