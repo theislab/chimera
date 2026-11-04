@@ -39,7 +39,9 @@ MARKERS = {  # symbol: (testis-table ortho ID, Ensembl ID, expected peak cell ty
     "TNP1": ("ortho_14566", "ENSG00000118245", "Elongated_spermatids"),
 }
 
-_tables = [PROCESSED / f for f in sorted(set(gene_ids.TABLES.values()))]
+# The tables these tests read: those of the canonical cohorts (liver, testis). The registry also names tables of
+# cohorts that were planned and never built (C1 regen_hoang), which must not switch every test off.
+_tables = [PROCESSED / f for f in sorted({gene_ids.TABLES[c] for c in COHORTS})]
 _h5ads = [PROCESSED / f"{s}.h5ad" for s in gene_ids.H5ADS.values()]
 needs_data = pytest.mark.skipif(
     not all(p.exists() for p in _tables + _h5ads),
