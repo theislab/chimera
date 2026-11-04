@@ -23,9 +23,19 @@ import _figure_design as fd  # noqa: E402
 OUT = RU.RES / "figures"
 COH = {"liv_hmouse": "liver", "test_hmouse": "testis", "kidney": "kidney"}
 ORDER = ["S_g", "Delta_alpha", "Delta_alpha_free", "Delta_alpha_hybrid", "B1z", "S_fwd", "Sdir", "B1", "B1b", "B1c", "B2b", "Lfc", "B3a", "S_deploy", "S_cos", "C_cos", "GeneSpectra", "CACIMAR", "SAMap", "pi", "dNdS", "LOEUF", "expr", "random"]
-NAME = {"S_g": "$S_g$ (Chimera)", "Delta_alpha": "Δα (Chimera)", "Delta_alpha_free": "Δα, free gate (Chimera)", "Delta_alpha_hybrid": "Δα, gate + per-gene bias", "c_g_free": "c_g, free gate", "B1z": "B1z (Chimera latent)", "S_fwd": "$S_{fwd}$, no mask (exploratory)", "Sdir": "Sdir (labels, no model)",
-        "B1": "B1 profile correlation", "B1b": "B1b residualised", "B1c": "B1c rank level", "B2b": "B2b specificity", "Lfc": "Lfc fold change", "B3a": "B3a features only",
-        "S_deploy": "SATURN S_deploy", "S_cos": "SATURN S_cos", "C_cos": "CAMEX C_cos", "GeneSpectra": "GeneSpectra", "CACIMAR": "CACIMAR", "SAMap": "SAMap", "pi": "identity π", "dNdS": "dN/dS", "LOEUF": "LOEUF", "expr": "expression", "random": "random"}
+# Reader names, as in the main figures (T8_4 common.STY); the internal codes are only keys and never reach a figure.
+NAME = {"S_g": "$S_g$ (Chimera)", "Delta_alpha": "Δα, protein-feature gate", "Delta_alpha_free": "Δα, per-gene gate",
+        "Delta_alpha_hybrid": "Δα, gate + per-gene bias", "c_g_free": "$c_g$, per-gene gate",
+        "B1z": "profile correlation, clusters of Chimera's latent", "S_fwd": "$S_g$ without masking (exploratory)",
+        "Sdir": "labelled direct margin", "B1": "profile correlation", "B1b": "profile correlation (residual)",
+        "B1c": "rank-matched level per cell type", "B2b": "specificity similarity", "Lfc": "fold change",
+        "B3a": "gene features alone", "S_deploy": "SATURN gene score", "S_cos": "SATURN weight cosine",
+        "C_cos": "CAMEX gene-embedding cosine", "GeneSpectra": "GeneSpectra", "CACIMAR": "CACIMAR", "SAMap": "SAMap",
+        "pi": "identity π", "dNdS": "dN/dS", "LOEUF": "LOEUF", "expr": "expression", "random": "random"}
+IDENT = {"id_low": "low identity", "id_mid": "mid identity", "id_high": "high identity"}
+# Kidney cell types in upper-case abbreviations, as in Fig 7 (no lower-case "fi" pair for the text check)
+KTYPE = {"atl": "ATL", "cnt": "CNT", "dct": "DCT", "dtl": "DTL", "ec": "EC", "fib": "FIB", "ic": "IC", "lymphoid": "LYM",
+         "myeloid": "MYE", "pape": "PapE", "pc": "PC", "pec": "PEC", "pod": "POD", "pt": "PT", "tal": "TAL", "vsm_p": "VSM/P"}
 STY = {"S_g": ("#0072B2", "s"), "Delta_alpha": ("#D55E00", "o"), "Delta_alpha_free": ("#882255", "h"), "SAMap": ("#44AA99", "d"), "B1z": ("#CC79A7", "P"), "Sdir": ("#009E73", "D"), "B1": ("#222222", "^"), "B1c": ("#666666", "v"), "Lfc": ("#E69F00", "X"),
         "S_fwd": ("#56B4E9", "*"), "expr": ("#999999", "<")}
 EFFECT_LABEL = {"pattern": "share of swap q", "level": "fold f", "loss": "share removed e"}
@@ -87,12 +97,21 @@ def fig_task(t: pd.DataFrame, task: str, effects: list, top_effect):
     M = pd.DataFrame({f"{COH[c][:3]}\n{b}": d[(d.cohort == c) & (d.band == b)].set_index("method")["value"].reindex(methods) for c, b in cols})
     M.index = [NAME[m] for m in methods]
     heat_panel(axh, M)
+    # expression bands as rotated ticks, cohorts once above their four columns (the two-line ticks overlapped)
+    axh.set_xticks(range(len(cols)), [b for _, b in cols], rotation=90)
+    for k in range(1, len(COH)):
+        axh.axvline(k * len(bands) - 0.5, color="white", lw=1.5)
+    top = axh.secondary_xaxis("top")
+    top.set_xticks([k * len(bands) + (len(bands) - 1) / 2 for k in range(len(COH))], list(COH.values()))
+    top.tick_params(length=0)
+    top.spines["top"].set_visible(False)
     axh.set_title(f"{task} {top_effect}: AUROC vs matched controls", loc="left")
     axp = fig.add_subplot(gs[0, 2])
     d = tt[(tt.metric == "power_05") & (tt.effect == str(top_effect)) & (tt.share == "all") & (tt.identity == "all") & (tt.cohort == "all")]
     P = pd.DataFrame({b: d[d.band == b].set_index("method")["value"].reindex(methods) for b in bands})
     P.index = [NAME[m] for m in methods]
     heat_panel(axp, P, vmin=0.05, vmax=1.0)
+    axp.set_xticks(range(len(bands)), bands, rotation=90)
     axp.set_yticklabels([])
     axp.set_title("power at 5% FPR, 3 cohorts", loc="left")
     show = [m for m in ("S_g", "Delta_alpha", "Delta_alpha_free", "B1z", "Sdir", "B1", "B1c", "Lfc") if m in methods]
@@ -152,7 +171,7 @@ def fig_nulls(t):
         ax[j].set_xlabel("rejection rate at α = 0.05")
         ax[j].invert_yaxis() if j == 0 else None
     ax[0].set_yticks(range(len(methods)), [NAME[m] for m in methods])
-    ax[2].legend(frameon=False)
+    ax[2].legend(frameon=False, loc="center right", bbox_to_anchor=(1.0, 0.29))  # rows of the tools: empty in this panel
     save(fig, "b1_type1")
 
 
@@ -181,6 +200,7 @@ def fig_identity_cells():
     for j, task in enumerate(("level", "pattern", "loss")):
         M = c[c.alt == task].groupby(["method", "subset"])["value"].mean().unstack().reindex(methods)[RU.IDENTITY_BANDS]
         M.index = [NAME[m] for m in methods]
+        M.columns = [IDENT[b].replace(" ", "\n") for b in M.columns]
         heat_panel(ax[j], M)
         ax[j].set_title(f"{task}, all effects, bands, cohorts", loc="left")
         if j:
@@ -201,6 +221,7 @@ def fig_identity(t):
     fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.0), constrained_layout=True)
     for j, task in enumerate(("level", "pattern", "loss")):
         M = r[r.task == task].pivot(index="method", columns="identity", values="value").loc[[NAME[m] for m in methods], RU.IDENTITY_BANDS]
+        M.columns = [IDENT[b].replace(" ", "\n") for b in M.columns]
         heat_panel(ax[j], M)
         ax[j].set_title(task, loc="left")
         if j:
@@ -212,6 +233,9 @@ def fig_examples():
     e = pd.read_parquet(RU.RES / "qc" / "example_counts.parquet")
     e = e[(e.cohort == "kidney") & (e.band == "high") & e.alt.isin(["pattern", "level", "loss"])]
     picks = e.groupby("alt")["gene"].first()
+    from revision.common import gene_ids
+    sym = gene_ids.symbols("kidney", list(picks.values))
+    sym = {g: (v if isinstance(v, str) and v else g) for g, v in zip(picks.values, list(sym))}
     fig, ax = plt.subplots(3, 2, figsize=(7.2, 5.0), constrained_layout=True, sharex="col")
     for i, (alt, gene) in enumerate(picks.items()):
         d = e[(e.alt == alt) & (e.gene == gene)]
@@ -223,8 +247,8 @@ def fig_examples():
             x = np.arange(len(types))
             ax[i, j].bar(x - 0.2, bb, width=0.38, color="#BBBBBB", label="before")
             ax[i, j].bar(x + 0.2, aa, width=0.38, color="#0072B2", label="after")
-            ax[i, j].set_title(f"{alt}, {gene}, {s} ({'altered' if j == 0 else 'untouched'})", loc="left")
-            ax[i, j].set_xticks(x, types, rotation=60, ha="right")
+            ax[i, j].set_title(f"{alt}, {sym[gene]}, {s} ({'altered' if j == 0 else 'untouched'})", loc="left")
+            ax[i, j].set_xticks(x, [KTYPE.get(t, t) for t in types], rotation=90)
             if j == 0:
                 ax[i, j].set_ylabel("mean raw count per cell")
     ax[0, 1].legend(frameon=False)
