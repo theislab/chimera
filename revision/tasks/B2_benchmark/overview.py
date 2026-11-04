@@ -12,6 +12,10 @@ never as a low score. `undefined_cells.csv` lists every such cell, with the grou
 Runs tried and finished (coordinator, same reason). A failed fit or a tool that crashes or returns nothing stays out of the scores; `completion.py` counts them per method and setting, joined here as tried and finished. A cell with fewer finished than tried carries a small
 "f/t"; a cell where nothing finished is a failure, drawn with a cross, not a blank, and it ranks last under the committed rule.
 
+Identity cells (found when the overview was first read; applies to every method alike). An agreement value that compares a reading with itself (a deterministic method on
+`full`, a label-blind deterministic tool on a label-only setting) is 1 by identity, not a measurement. score_b flags these rows and they are tabled, not ranked. The aggregate with
+them ranked, as the committed rule first read, is written to aggregate_with_identity.csv.
+
 Track I (integration, added by the coordinator's instruction before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
 keeps its committed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
 
@@ -268,6 +272,14 @@ def draw(R: pd.DataFrame, A: pd.DataFrame) -> None:
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     t = read_tidy()
+    ti = t.copy()
+    fr = [pd.read_parquet(f) for f in glob.glob(str(RU.RES / "track_B/*.parquet")) if not f.endswith("__h2h.parquet")]
+    if fr:
+        b = pd.concat(fr)
+        b = b[b.get("identity", False).fillna(False).astype(bool) & b.method.isin(ORDER)].assign(rank_direction="higher")
+        from revision.tasks.B2_benchmark.tiers import MAIN
+        ti = pd.concat([ti, b[b.setting.isin(MAIN)]], ignore_index=True)
+        aggregate(rank_tasks(ti)).to_csv(OUT / "aggregate_with_identity.csv")
     R = rank_tasks(t)
     R.to_csv(OUT / "ranks_long.csv", index=False)
     U = R[R.undefined].copy()

@@ -192,7 +192,8 @@ def score_task(cohort: str, setting: str) -> None:
             continue
         task.add(f"agreement|{k}", rows, ref[k], {k: scores[k]}, RU.COV_C)
         rs = pd.Series(ref[k][rows]).corr(pd.Series(scores[k][rows]), method="spearman")
-        agree_raw[k] = (float(rs), float(rows.sum() / max(np.isfinite(ref[k]).sum(), 1)))
+        ident = bool(np.array_equal(ref[k][rows], scores[k][rows]))  # the setting's reading is the reference itself: 1 by identity, not a measurement
+        agree_raw[k] = (float(rs), float(rows.sum() / max(np.isfinite(ref[k]).sum(), 1)), ident)
     task.run()
     rows = []
     base = dict(track="B", setting=setting, family=fam, cohort=cohort, n_reps=S["n_reps"], n_fits=S["n_fits"], n_discarded=S["n_discarded"])
@@ -202,7 +203,7 @@ def score_task(cohort: str, setting: str) -> None:
         m = r["method"]
         if kind == "agreement":
             d = dict(task=f"B|{fam}|{setting}|{cohort}|agreement", metric="agreement_partial", gold="full_data_reading", rank_direction="higher")
-            d.update(raw_spearman=agree_raw[m][0], share_kept=agree_raw[m][1])
+            d.update(raw_spearman=agree_raw[m][0], share_kept=agree_raw[m][1], identity=agree_raw[m][2])
         else:
             if g != "main" and m in FOCAL and g not in ("pi",):
                 continue  # focal readouts on a side group's genes go to the head-to-head table only
@@ -214,6 +215,8 @@ def score_task(cohort: str, setting: str) -> None:
             d["rank_direction"] = ""  # exploratory or control: tabled, not ranked
         if kind == "agreement" and m in ("S_fwd", "D_raw"):
             d["rank_direction"] = ""
+        if kind == "agreement" and agree_raw[m][2]:
+            d["rank_direction"], d["flag"] = "", "identity: the setting's reading is the reference; tabled, not ranked"
         if kind != "agreement" and m == "pi":
             d["flag"] = "given C without pi"
         rows.append({**base, **d})
