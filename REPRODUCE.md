@@ -136,7 +136,9 @@ python revision/check_gene_tables.py     # exit 0 when every table of both gates
 A per-gene gate fit uses the cohort's recipe with `--config A` replaced by `--config M`
 (`CONFIG=M bash revision/retrain_from_recipe.sh <cohort> <seed> <run> cpu` for the seven canonical
 cohorts; the argv of every fit is in `revision/tasks/Z3_free_gate/manifest.tsv` and
-`revision/tasks/Z4_free_gate_all/manifest.tsv`). The latent guard `--clamp-z-logvar` is a
+`revision/tasks/Z4_free_gate_all/manifest.tsv`). Load a saved per-gene gate model with
+`revision.common.load_run.load_run(run_dir, adata)`: `ChimeraModel.load` rebuilds the canonical gate
+only and refuses the extra `per_gene_correction` of these fits (the helper loads canonical runs too). The latent guard `--clamp-z-logvar` is a
 per-cohort recipe flag for cohorts whose fits go non-finite; the runs that used it are named
 `rev-g1-*` and `g1-*` and record it in `config.json` (`clamp_z_logvar`).
 
@@ -154,8 +156,11 @@ Each notebook renders its panels into `notebooks/figures/<notebook>/`. Run a not
 headless with
 
 ```bash
-papermill notebooks/<notebook>.ipynb notebooks/<notebook>.ipynb --cwd notebooks -k chimera_env
+papermill notebooks/<notebook>.ipynb notebooks/<notebook>.ipynb --cwd notebooks -k python3
 ```
+
+`-k python3` is the kernel of the active environment; `00_environment.ipynb` also registers it
+as `chimera_env`, the lock-file script does not.
 
 | Figure | Notebooks |
 |---|---|
