@@ -22,11 +22,11 @@ import _figure_design as fd  # noqa: E402
 
 OUT = RU.RES / "figures"
 COH = {"liv_hmouse": "liver", "test_hmouse": "testis", "kidney": "kidney"}
-ORDER = ["S_g", "Delta_alpha", "B1z", "S_fwd", "Sdir", "B1", "B1b", "B1c", "B2b", "Lfc", "B3a", "S_deploy", "S_cos", "C_cos", "GeneSpectra", "CACIMAR", "SAMap", "pi", "dNdS", "LOEUF", "expr", "random"]
-NAME = {"S_g": "$S_g$ (Chimera)", "Delta_alpha": "Δα (Chimera)", "B1z": "B1z (Chimera latent)", "S_fwd": "$S_{fwd}$, no mask (exploratory)", "Sdir": "Sdir (labels, no model)",
+ORDER = ["S_g", "Delta_alpha", "Delta_alpha_free", "Delta_alpha_hybrid", "B1z", "S_fwd", "Sdir", "B1", "B1b", "B1c", "B2b", "Lfc", "B3a", "S_deploy", "S_cos", "C_cos", "GeneSpectra", "CACIMAR", "SAMap", "pi", "dNdS", "LOEUF", "expr", "random"]
+NAME = {"S_g": "$S_g$ (Chimera)", "Delta_alpha": "Δα (Chimera)", "Delta_alpha_free": "Δα, free gate (Chimera)", "Delta_alpha_hybrid": "Δα, gate + per-gene bias", "c_g_free": "c_g, free gate", "B1z": "B1z (Chimera latent)", "S_fwd": "$S_{fwd}$, no mask (exploratory)", "Sdir": "Sdir (labels, no model)",
         "B1": "B1 profile correlation", "B1b": "B1b residualised", "B1c": "B1c rank level", "B2b": "B2b specificity", "Lfc": "Lfc fold change", "B3a": "B3a features only",
         "S_deploy": "SATURN S_deploy", "S_cos": "SATURN S_cos", "C_cos": "CAMEX C_cos", "GeneSpectra": "GeneSpectra", "CACIMAR": "CACIMAR", "SAMap": "SAMap", "pi": "identity π", "dNdS": "dN/dS", "LOEUF": "LOEUF", "expr": "expression", "random": "random"}
-STY = {"S_g": ("#0072B2", "s"), "Delta_alpha": ("#D55E00", "o"), "B1z": ("#CC79A7", "P"), "Sdir": ("#009E73", "D"), "B1": ("#222222", "^"), "B1c": ("#666666", "v"), "Lfc": ("#E69F00", "X"),
+STY = {"S_g": ("#0072B2", "s"), "Delta_alpha": ("#D55E00", "o"), "Delta_alpha_free": ("#882255", "h"), "SAMap": ("#44AA99", "d"), "B1z": ("#CC79A7", "P"), "Sdir": ("#009E73", "D"), "B1": ("#222222", "^"), "B1c": ("#666666", "v"), "Lfc": ("#E69F00", "X"),
         "S_fwd": ("#56B4E9", "*"), "expr": ("#999999", "<")}
 EFFECT_LABEL = {"pattern": "share of swap q", "level": "fold f", "loss": "share removed e"}
 SEQ = LinearSegmentedColormap.from_list("seq", ["#f7f7f5", "#a6c8e4", "#2a78d6", "#08306b"])
@@ -87,18 +87,18 @@ def fig_task(t: pd.DataFrame, task: str, effects: list, top_effect):
     M = pd.DataFrame({f"{COH[c][:3]}\n{b}": d[(d.cohort == c) & (d.band == b)].set_index("method")["value"].reindex(methods) for c, b in cols})
     M.index = [NAME[m] for m in methods]
     heat_panel(axh, M)
-    axh.set_title(f"{task}: AUROC against matched controls, strongest effect ({top_effect}), mean over shares", loc="left")
+    axh.set_title(f"{task} {top_effect}: AUROC vs matched controls", loc="left")
     axp = fig.add_subplot(gs[0, 2])
     d = tt[(tt.metric == "power_05") & (tt.effect == str(top_effect)) & (tt.share == "all") & (tt.identity == "all") & (tt.cohort == "all")]
     P = pd.DataFrame({b: d[d.band == b].set_index("method")["value"].reindex(methods) for b in bands})
     P.index = [NAME[m] for m in methods]
     heat_panel(axp, P, vmin=0.05, vmax=1.0)
     axp.set_yticklabels([])
-    axp.set_title("power at 5% FPR, all cohorts", loc="left")
-    show = [m for m in ("S_g", "Delta_alpha", "B1z", "Sdir", "B1", "B1c", "Lfc") if m in methods]
+    axp.set_title("power at 5% FPR, 3 cohorts", loc="left")
+    show = [m for m in ("S_g", "Delta_alpha", "Delta_alpha_free", "B1z", "Sdir", "B1", "B1c", "Lfc") if m in methods]
     for i, c in enumerate(COH):
         ax = fig.add_subplot(gs[1, i])
-        d = tt[(tt.metric == "AUROC") & (tt.cohort == c) & (tt.band == "all") & (tt.share == "all") & (tt.identity == "all") & (tt.effect != "all")]
+        d = tt[(tt.metric == "AUROC") & (tt.cohort == c) & (tt.band == "midhigh") & (tt.share == "all") & (tt.identity == "all") & (tt.effect != "all")]
         for m in show:
             s = d[d.method == m].assign(e=lambda x: x.effect.astype(float)).sort_values("e")
             ax.errorbar(range(len(s)), s["value"], yerr=[s["value"] - s["ci_lo"], s["ci_hi"] - s["value"]], color=STY[m][0], marker=STY[m][1], ms=3.5, lw=1, capsize=0, label=NAME[m])
@@ -108,7 +108,7 @@ def fig_task(t: pd.DataFrame, task: str, effects: list, top_effect):
         ax.set_title(COH[c], loc="left")
         ax.set_xlabel(EFFECT_LABEL[task])
         if i == 0:
-            ax.set_ylabel("AUROC, all bands and shares")
+            ax.set_ylabel("AUROC, band midhigh")
         if i == 2:
             ax.legend(frameon=False, fontsize=5, loc="center left", bbox_to_anchor=(1.0, 0.5))
     save(fig, f"b1_task_{task}")
@@ -121,7 +121,7 @@ def fig_low(t):
     for j, task in enumerate(tasks):
         top = {"level": 8, "pattern": 1, "loss": 1}[task]
         d = t[(t.task == task) & (t.effect == str(top)) & (t.share == "all") & (t.identity == "all") & (t.cohort == "all")]
-        for m in ("S_g", "S_fwd", "Delta_alpha", "Sdir", "B1"):
+        for m in ("S_g", "S_fwd", "Delta_alpha", "Delta_alpha_free", "Sdir", "B1", "Lfc"):
             s = d[(d.metric == "power_05") & (d.method == m)].set_index("band").reindex(RU.BANDS)
             ax[0, j].plot(range(4), s["value"], color=STY[m][0], marker=STY[m][1], ms=3.5, lw=1, label=NAME[m])
         ax[0, j].axhline(0.05, color="#BBBBBB", lw=0.6, ls="--")
@@ -161,7 +161,7 @@ def fig_share(t):
     for j, c in enumerate(COH):
         d = t[(t.task == "level") & (t.cohort == c) & (t.metric == "AUROC") & (t.effect == "8") & (t.band == "all") & (t.identity == "all") & (t.share != "all")]
         d2 = t[(t.task == "pattern") & (t.cohort == c) & (t.metric == "AUROC") & (t.effect == "1") & (t.band == "all") & (t.identity == "all") & (t.share != "all")]
-        for m in ("S_g", "Delta_alpha", "B1"):
+        for m in ("S_g", "Delta_alpha", "Delta_alpha_free", "B1"):
             for dd, ls, l in ((d, "-", "level 8"), (d2, ":", "pattern 1")):
                 s = dd[dd.method == m].assign(x=lambda x: x.share.astype(float)).sort_values("x")
                 ax[j].plot(s["x"] * 100, s["value"], color=STY[m][0], marker=STY[m][1], ms=3, lw=1, ls=ls, label=f"{NAME[m]}, {l}")
@@ -172,8 +172,25 @@ def fig_share(t):
     save(fig, "b1_share")
 
 
+def fig_identity_cells():
+    """Identity tertiles from the per-fit table (subsets are scored within each fit)."""
+    c = pd.read_parquet(RU.RES / "per_cell.parquet")
+    c = c[(c.metric == "AUROC") & c.subset.isin(RU.IDENTITY_BANDS) & c.alt.isin(["level", "pattern", "loss"])]
+    methods = ["S_g", "Delta_alpha", "Delta_alpha_free", "B1", "Sdir", "B1c"]
+    fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.0), constrained_layout=True)
+    for j, task in enumerate(("level", "pattern", "loss")):
+        M = c[c.alt == task].groupby(["method", "subset"])["value"].mean().unstack().reindex(methods)[RU.IDENTITY_BANDS]
+        M.index = [NAME[m] for m in methods]
+        heat_panel(ax[j], M)
+        ax[j].set_title(f"{task}, all effects, bands, cohorts", loc="left")
+        if j:
+            ax[j].set_yticklabels([])
+    save(fig, "b1_identity")
+    return c
+
+
 def fig_identity(t):
-    methods = ["S_g", "Delta_alpha", "B1", "Sdir", "B1c"]
+    methods = ["S_g", "Delta_alpha", "Delta_alpha_free", "B1", "Sdir", "B1c"]
     rows = []
     for task in ("level", "pattern", "loss"):
         for m in methods:
@@ -216,7 +233,7 @@ def fig_examples():
 
 def fig_trackd():
     t = pd.read_csv(RU.RES / "track_d" / "runtime.csv")
-    t = t[t.exit == 0]
+    t = t[t.finished]
     meth = ["chimera", "direct", "saturn", "camex"]
     col = {"chimera": "#0072B2", "direct": "#009E73", "saturn": "#CC79A7", "camex": "#E69F00"}
     nm = {"chimera": "Chimera", "direct": "direct baselines", "saturn": "SATURN", "camex": "CAMEX"}
@@ -251,7 +268,7 @@ def main():
     fig_low(t)
     fig_nulls(t)
     fig_share(t)
-    fig_identity(t)
+    fig_identity_cells()
     fig_examples()
     try:
         fig_trackd()
