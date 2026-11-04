@@ -8,7 +8,9 @@
 #
 # Expects the deposited bundles unpacked in place (see REPRODUCE.md): data/processed/ and
 # training/runs/ always; the gene-table check runs when results/gene_tables/ is present and
-# then also needs the revision seed runs. Writes nothing outside a temporary folder,
+# then also needs the revision seed runs; the check of the harmonised per-gene tables of both
+# gates (revision/check_gene_tables.py) runs when results/revision/H1 and Z4 are present and
+# needs the free-gate runs too. Writes nothing outside a temporary folder,
 # except the figures that notebook 03 writes when RUN_FIGURE=1.
 # Exit code 0 means every check passed.
 set -euo pipefail
@@ -112,6 +114,12 @@ for cohort in recipe:
     print(f"{cohort:12s} seeds={len(seeds):2d} genes={len(table):6d}  max |table - recomputed| = {worst:.1e}")
     assert worst < 1e-9, (cohort, worst)
 PY
+fi
+
+if [[ -f results/revision/H1/runs.tsv && -f results/revision/Z4/h1/kept_used.json ]]; then
+  step "harmonised per-gene tables (both gates) against the deposited runs"
+  # needs revision_results, checkpoints_canonical, checkpoints_revision and checkpoints_free_gate
+  "$PY" revision/check_gene_tables.py
 fi
 
 if [[ ${RUN_CHECKPOINT:-0} == 1 ]]; then

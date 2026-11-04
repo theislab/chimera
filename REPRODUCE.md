@@ -44,12 +44,15 @@ tar -xzf chimera_<bundle>.tar.gz -C /path/to/chimera
 |---|---|---|
 | `processed_data` | `data/processed/` | 7 cohort AnnData files, liver and testis ortholog tables (Ensembl 110), GIN feature scalers, build configs |
 | `checkpoints_canonical` | `training/runs/<run>/` | The 11 canonical runs: `model/`, `final_state.npz`, alpha snapshots, metrics, config, summary, tables, caches |
-| `checkpoints_revision` | `training/runs/rev-*/` | Revision runs (added seeds, CPU platform and repeat runs, controls, new-cohort grids and seeds): `model/`, `final_state.npz`, config, summary, metrics |
-| `gene_tables` | `results/gene_tables/` | One CSV per cohort (seed consensus): Ensembl gene ID, symbol, prior, raw prior, α, correction, Δα, D, S_g, sign consistency; seed reliability; column description in its `README.md` |
+| `checkpoints_revision` | `training/runs/rev-*/`, `training/runs/g1-*/` | Revision runs (added seeds, CPU platform and repeat runs, controls, recipe grids and seeds of every added cohort, latent-guard runs `rev-g1-*`): `model/`, `final_state.npz`, config, summary, metrics; for the latent-guard arm on thinned objects (`g1-*`) config, summary and final state |
+| `checkpoints_free_gate` | `training/runs/z3-*/`, `z4-*/`, `rev-ctl-liv_hmouse-m-*/` | Per-gene (free) gate fits (`--config M`): every fit of liver Human+Mouse, liver 4-species and testis Human+Mouse, and the kept seeds of each harmonised cohort (`results/revision/Z4/kept.json`); same files as `checkpoints_revision` |
+| `repaired_data` | `data/revision/O1/repair_*/`, `training/runs/o2-*/` | **Recommended for reuse:** liver and testis objects with the counts joined by Ensembl gene ID (build logs and repair lists beside them), and the models trained on them |
+| `gene_tables` | `results/gene_tables/` | One CSV per canonical cohort (seed consensus): Ensembl gene ID, symbol, prior, raw prior, α, correction, Δα, D, S_g, sign consistency; seed reliability; per-gene tables of the 26 harmonised cohorts for both gates (`harmonised/`); column description in its `README.md` |
 | `caches` | `notebooks/cache/`, `training/runs/baselines_*` | Notebook caches, including frozen external lookups, and the baseline runs |
-| `processed_revision` | `data/revision/` | Objects of the cohorts added during revision (Van Zyl and its subsets, bone marrow, kidney, islet, liver MASH pseudobulks and cell annotations), control objects, and the download manifests of every third-party input |
-| `revision_results` | `results/revision/` | Outputs of the analyses added during revision |
+| `processed_revision` | `data/revision/` | Objects of the cohorts added during revision (Van Zyl and its subsets, bone marrow, kidney, islet, cortex, lung, skeletal muscle, tumour myeloid cells, liver MASH pseudobulks and cell annotations), control objects, and the download manifests of every third-party input |
+| `revision_results` | `results/revision/` | Outputs of the analyses added during revision, including the harmonised per-gene tables of both gates (`H1/genes/`, `Z4/h1/genes/`) and the exploratory result tables |
 | `revision_competitors` | `results/revision/T5_*/` | SATURN and CAMEX runs of the benchmark |
+| `benchmark` | `results/revision/B1/`, `B2/`, `training/runs/b1*-*/`, `b2-*/` | Gene-level benchmark (ground-truth spike-in, robustness, independent data, practical cost): scored tables, overview, figures; config, summary and final state of every scored fit (altered objects are rebuilt by the task code) |
 | `plan_and_corrections` | `results/revision/_release/` | Pre-specified analysis plan with its amendment log; `before_after.csv` (numbers changed by the ortholog-identifier correction) |
 
 `data/`, `training/runs/`, `notebooks/cache/` and `results/` are not tracked by git.
@@ -117,6 +120,31 @@ seeds that are not canonical runs are `training/runs/rev-<cohort>-s<seed>/`. The
 `var_names` from the cohort AnnData and map them with the cohort's own table. Testis runs
 were trained with the prior clamped at 0.85 (`prior` in `final_state.npz` is clamped); the
 unclamped prior is `conservation_prior_raw.npy` in the same run directory.
+
+**Harmonised cohorts, both gates.** The 26 harmonised cohorts have one per-gene table per gate,
+in one schema: `results/revision/H1/genes/<cohort>.parquet` (canonical gate, the seeds kept in
+`results/revision/H1/runs.tsv`) and `results/revision/Z4/h1/genes/<cohort>.parquet` (per-gene gate,
+`--config M`, the seeds in `results/revision/Z4/h1/kept_used.json`); `.tsv.gz` copies are in
+`results/gene_tables/harmonised/`. Columns are defined in
+[`revision/tasks/H1_harmonise/rules.py`](revision/tasks/H1_harmonise/rules.py). Both are recomputed
+from the archived states, without the AnnData files, by
+
+```bash
+python revision/check_gene_tables.py     # exit 0 when every table of both gates matches its runs
+```
+
+A per-gene gate fit uses the cohort's recipe with `--config A` replaced by `--config M` (argv in
+`revision/tasks/Z4_free_gate_all/manifest.tsv`). The latent guard `--clamp-z-logvar` is a
+per-cohort recipe flag for cohorts whose fits go non-finite; the runs that used it are named
+`rev-g1-*` and `g1-*` and record it in `config.json` (`clamp_z_logvar`).
+
+**Repaired objects.** `data/revision/O1/repair_liver/` and `repair_testis/` hold the liver and
+testis cohorts with every count column taken from the raw row that carries the ortholog table's
+Ensembl ID (`repair_log.csv` lists each changed column). They are the recommended objects for new
+work on these cohorts; liver macaque is repaired only where its matrix carries Ensembl IDs, and
+zebrafish not at all. The canonical models and tables of the paper were trained on the
+unrepaired objects (`processed_data`); the models trained on the repaired objects are
+`training/runs/o2-*`.
 
 ## 5. Figures
 
