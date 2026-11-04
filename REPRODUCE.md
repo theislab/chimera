@@ -133,7 +133,9 @@ from the archived states, without the AnnData files, by
 python revision/check_gene_tables.py     # exit 0 when every table of both gates matches its runs
 ```
 
-A per-gene gate fit uses the cohort's recipe with `--config A` replaced by `--config M` (argv in
+A per-gene gate fit uses the cohort's recipe with `--config A` replaced by `--config M`
+(`CONFIG=M bash revision/retrain_from_recipe.sh <cohort> <seed> <run> cpu` for the seven canonical
+cohorts; the argv of every fit is in `revision/tasks/Z3_free_gate/manifest.tsv` and
 `revision/tasks/Z4_free_gate_all/manifest.tsv`). The latent guard `--clamp-z-logvar` is a
 per-cohort recipe flag for cohorts whose fits go non-finite; the runs that used it are named
 `rev-g1-*` and `g1-*` and record it in `config.json` (`clamp_z_logvar`).

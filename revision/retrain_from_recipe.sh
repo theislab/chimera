@@ -8,7 +8,8 @@
 # <cohort> is a key of the recipe table (liv_hmonkey, liv_hmouse, liv_hzeb, liv_4sp, test_hmac,
 # test_hmouse, test_3sp). The run goes to training/runs/<run_name>/ (default
 # retrain-<cohort>-s<seed>) and is never written over. Accelerator defaults to cpu. Set
-# PRINT_ONLY=1 to print the command without running it.
+# PRINT_ONLY=1 to print the command without running it. CONFIG=M trains the per-gene (free) gate
+# with the same recipe (the canonical runs use CONFIG=A, the default).
 set -euo pipefail
 
 cohort="${1:?cohort}"; seed="${2:?seed}"
@@ -22,7 +23,7 @@ h5ad="$(field 5)"; epochs="$(field 8)"; overrides="$(field 9)"
 [[ -e training/runs/$run ]] && { echo "training/runs/$run exists; choose another run name"; exit 2; }
 
 # shellcheck disable=SC2206
-cmd=("${PYTHON:-python}" training/run_experiment.py --run-name "$run" --config A --max-epochs "$epochs"
+cmd=("${PYTHON:-python}" training/run_experiment.py --run-name "$run" --config "${CONFIG:-A}" --max-epochs "$epochs"
      --adata "data/processed/$h5ad" --seed "$seed" --accelerator "$acc" $overrides)
 echo "${cmd[*]}"
 [[ ${PRINT_ONLY:-0} == 1 ]] || "${cmd[@]}"
