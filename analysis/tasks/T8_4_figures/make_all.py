@@ -1,10 +1,9 @@
-"""Render every revision panel and table, then check every PDF in ``figures/revision/``.
+"""Render every panel of this folder into ``figures/panels/`` and check each PDF.
 
-    PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.T8_4_figures.make_all \
-        [--label-use PATH_TO_DRAFT_TABLE]
+    PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.T8_4_figures.make_all
 
-Writes ``results/analysis/T8_4/checks.csv`` (fonts embedded, no Type 3, no internal run name) and exits
-non-zero if any panel fails.
+Writes ``results/analysis/T8_4/checks.csv`` (fonts embedded, no Type 3, no internal run name) and exits non-zero if any
+panel fails. The figures are then composed with ``bash figures/build.sh``.
 """
 
 from __future__ import annotations
@@ -14,15 +13,14 @@ import sys
 import pandas as pd
 
 from analysis.tasks.T8_4_figures import (common, fig3_integration, fig4_additions, fig5_controls,
-                                         fig7_validation, supp_figures, tables)
+                                         fig7_validation, supp_figures)
 
 
 def main() -> int:
+    panels = []
     for mod in (fig3_integration, fig4_additions, fig5_controls, fig7_validation, supp_figures):
-        mod.main()
-    sys.argv = [sys.argv[0]] + sys.argv[1:]
-    tables.main()
-    rows = [common.check_pdf(p) for p in sorted(common.FIG_OUT.glob("*.pdf"))]
+        panels += mod.main()
+    rows = [common.check_pdf(p) for p in sorted(panels)]
     df = pd.DataFrame(rows)
     out = common.RES / "T8_4" / "checks.csv"
     df.to_csv(out, index=False)

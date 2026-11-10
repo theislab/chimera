@@ -1,0 +1,21 @@
+# Environment of the figure build (compose, merge, crop, checks). It holds no analysis code.
+#
+#   mamba env create -f figures/environment.yml
+#
+# Exact conda packages of the environment the figures were built with: chimera_figures_env.linux-64.lock.txt
+# (mamba create -n chimera_figures_env --file figures/chimera_figures_env.linux-64.lock.txt, then the pip line below).
+# pdflatex comes from the system TeX Live, the same that builds the manuscript.
+name: chimera_figures_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.16
+  - poppler=26.11.0        # pdftoppm, pdftotext, pdffonts, pdfinfo
+  - ghostscript=10.08.0    # font sizes of text spans, page renders, content boxes for the crop
+  - qpdf=12.4.2            # merge, stable file identifiers
+  - pypdf=7.0.0            # page boxes for the crop check
+  - numpy=2.5.4
+  - pillow=13.0.0
+  - pip=26.2.2
+  - pip:
+      - pdfCropMargins==2.2.1   # provides pdf-crop-margins

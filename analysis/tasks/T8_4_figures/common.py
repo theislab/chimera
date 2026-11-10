@@ -1,8 +1,12 @@
-"""Shared paths, styles and checks for the revision figure panels (T8.4).
+"""Shared paths, styles and checks for the figure panels drawn by the analysis tasks.
 
-Every panel is one PDF in ``chimera-manuscript/figures/revision/`` rendered through
-``notebooks/_figure_design.py`` (fonts embedded as TrueType, no Type 3). A PNG preview of each panel
-goes to ``results/analysis/T8_4/preview/``. Scripts read result CSVs only; no model is loaded.
+Every panel is one PDF in ``figures/panels/<family>/`` (fonts embedded as TrueType, no Type 3), saved through
+``figures.style``; the figures of the paper are composed from the panels by ``figures/build.sh``. A PNG preview of each
+panel goes to ``results/analysis/T8_4/preview/``. Scripts read result tables only; no model is loaded.
+
+``save``, ``save_axes`` and ``copy_pdf`` take the former file name of a panel and look up its place in
+``figures/panel_names.tsv``; a name that is not in the table is an error. New code calls
+``figures.style.save_panel(fig, "family/name")`` directly. Set ``CHIMERA_FIGURES_OUT=<folder>`` for a dry run.
 
 Run all from ``chimera/``::
 
@@ -25,16 +29,27 @@ from analysis.common import gene_ids
 
 REPO = gene_ids.REPO_ROOT
 RES = REPO / "results" / "analysis"
-MS = Path(os.environ.get("CHIMERA_MANUSCRIPT", REPO.parent / "chimera-manuscript"))
-FIG_OUT = MS / "figures" / "revision"
-TAB_OUT = MS / "tables"
 PREVIEW = RES / "T8_4" / "preview"
 
 sys.path.insert(0, str(REPO / "notebooks"))
 import _figure_design as fd  # noqa: E402
 
-# Poppler tools for the font and text checks (any env that ships them; override with POPPLER_BIN).
-POPPLER = Path(os.environ.get("POPPLER_BIN", Path.home() / "tools/apps/mamba/envs/tardis_env/bin"))
+sys.path.insert(0, str(REPO))
+from figures import style  # noqa: E402
+
+
+def _poppler() -> Path | None:
+    """Folder of the poppler tools for the font check: POPPLER_BIN, else PATH, else the figures environment beside this one."""
+    if os.environ.get("POPPLER_BIN"):
+        return Path(os.environ["POPPLER_BIN"])
+    found = shutil.which("pdffonts")
+    if found:
+        return Path(found).parent
+    beside = Path(sys.prefix).parent / "chimera_figures_env" / "bin"
+    return beside if (beside / "pdffonts").exists() else None
+
+
+POPPLER = _poppler()
 
 # One colour and marker per readout, shared with X6 so every validation panel reads the same. Labels are the
 # reader names of the manuscript; the internal codes (keys) never reach a figure.
@@ -72,36 +87,37 @@ RHO_P = "partial rank correlation with independent measure, $\\rho_p$"
 def setup() -> None:
     fd.apply_design()
     plt.rcParams.update({"axes.titlesize": 7, "legend.fontsize": 6.5})
-    FIG_OUT.mkdir(parents=True, exist_ok=True)
     PREVIEW.mkdir(parents=True, exist_ok=True)
 
 
 def save(fig: plt.Figure, name: str, exact: bool = False) -> Path:
-    """PDF to the manuscript, PNG preview to results; returns the PDF path.
+    """Panel PDF to ``figures/panels`` (``name``: its former file name, see the module docstring), PNG preview to
+    results; returns the PDF path.
 
-    ``exact``: keep the figure size instead of cropping to content, so a panel drawn with fixed axes
-    lines up with its neighbours when F1_figures/compose.py places it with ``ink=False``.
+    The page is cropped to the drawn content with a 0.02 in pad. ``exact`` is kept for the existing calls and changes
+    nothing: under the design of ``_figure_design.apply_design`` (``savefig.bbox`` tight) those panels were always saved
+    cropped. They still line up in a row because their axes are drawn at fixed places; the figure spec places them with
+    ``X(...)``.
     """
-    if exact:
-        pdf = FIG_OUT / f"{name.lower()}.pdf"
-        fig.savefig(pdf, format="pdf")
-        fig.savefig(PREVIEW / f"{name.lower()}.png", format="png", dpi=200)
-        plt.close(fig)
-        return pdf
-    pdf = fd.save_figure(fig, name, formats=("pdf",), out_dir=FIG_OUT)[0]
-    fd.save_figure(fig, name, formats=("png",), out_dir=PREVIEW, close=True)
+    PREVIEW.mkdir(parents=True, exist_ok=True)
+    pdf = style.save_panel(fig, style.panel_for(name), exact=False, preview=False, close=False)
+    fig.savefig(PREVIEW / f"{name.lower()}.png", format="png", dpi=200, bbox_inches="tight", pad_inches=0.02)
+    plt.close(fig)
     return pdf
 
 
 def save_axes(fig: plt.Figure, name: str, axes: list, out_dir: Path | None = None, pad: float = 0.02) -> Path:
-    """One panel of a many-panel figure as its own PDF, for compose.py: only these axes, cropped to them."""
+    """One panel of a many-panel figure as its own PDF: only these axes, cropped to them. With ``out_dir`` the file is
+    written there under ``name``; without it, to ``figures/panels`` at the place of its former name."""
+    if out_dir is None:
+        return style.save_axes(fig, style.panel_for(name), axes, pad=pad)
     others = [a for a in fig.axes if a not in axes and a.get_visible()]
     for a in others:
         a.set_visible(False)
     fig.canvas.draw()
     r = fig.canvas.get_renderer()
     box = Bbox.union([a.get_tightbbox(r) for a in axes]).transformed(fig.dpi_scale_trans.inverted())
-    pdf = (out_dir or FIG_OUT) / f"{name.lower()}.pdf"
+    pdf = out_dir / f"{name.lower()}.pdf"
     fig.savefig(pdf, format="pdf", bbox_inches=box.padded(pad))
     for a in others:
         a.set_visible(True)
@@ -109,17 +125,20 @@ def save_axes(fig: plt.Figure, name: str, axes: list, out_dir: Path | None = Non
 
 
 def copy_pdf(src: Path, name: str) -> Path:
-    """Copy an existing panel made by its own task into the manuscript folder."""
-    dst = FIG_OUT / f"{name}.pdf"
-    shutil.copyfile(src, dst)
+    """Take a panel made by its own task as the panel that had the file name ``name``."""
+    dst = style.copy_panel(src, style.panel_for(name))
     png = src.with_suffix(".png")
     if png.exists():
+        PREVIEW.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(png, PREVIEW / f"{name}.png")
     return dst
 
 
 def check_pdf(path: Path) -> dict:
-    """Fonts embedded and none of Type 3; no internal run name on the panel."""
+    """Fonts embedded and none of Type 3; no internal run name on the panel. Without the poppler tools the check is
+    skipped (the binding checks are those of ``figures/build.sh``)."""
+    if POPPLER is None:
+        return dict(file=path.name, n_fonts="", type3="", unembedded="", panc="", ok=True, note="poppler not found: not checked")
     fonts = subprocess.run([str(POPPLER / "pdffonts"), str(path)], capture_output=True, text=True).stdout
     rows = [ln for ln in fonts.splitlines()[2:] if ln.strip()]
     type3 = [ln for ln in rows if " Type 3 " in ln]

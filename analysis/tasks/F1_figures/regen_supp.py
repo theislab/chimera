@@ -1,14 +1,13 @@
-"""Re-render the supplementary panels whose own task scripts now draw them at their size on the page.
+"""Re-render two supplementary panels that their own task scripts draw at their size on the page.
 
-Fig 8 (T7_10), bone marrow (T12_3), functional layer (T6_9) and the panels of T8_4 keep their own commands;
-these three write outputs that are only copied by T8_4, so this runs them and refreshes the copies.
+The ten-method integration panel is written by T5_5 into ``notebooks/figures/baselines_master_ext/``, where its figure
+spec reads it; the closure panel is written by T2_5 into its results folder and taken from there as a panel.
 
     PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.F1_figures.regen_supp
 """
 
 from __future__ import annotations
 
-import shutil
 import sys
 
 import numpy as np
@@ -25,8 +24,6 @@ def purity_view() -> None:
     cm.fd.set_figure_dir(cm.REPO / "notebooks" / "figures" / "baselines_master_ext")
     T = pd.read_csv(cm.REPO / "notebooks" / "cache" / "baselines_master_ext" / "master_table_ext.csv")
     views.figure(T, cm.fd)
-    shutil.copyfile(cm.REPO / "notebooks/figures/baselines_master_ext/composite_mixing_bio_10models.pdf",
-                    cm.FIG_OUT / "supp_integration_purity_view.pdf")
 
 
 def closure() -> None:
@@ -38,7 +35,7 @@ def closure() -> None:
     fig = R25.fig_closure(tables)
     fig.savefig(cm.RES / "T2_5" / "fig_supp_closure.pdf", bbox_inches="tight", pad_inches=0.01)
     fig.savefig(cm.RES / "T2_5" / "fig_supp_closure.png", dpi=200, bbox_inches="tight", pad_inches=0.01)
-    shutil.copyfile(cm.RES / "T2_5" / "fig_supp_closure.pdf", cm.FIG_OUT / "supp_celltype_closure.pdf")
+    cm.copy_pdf(cm.RES / "T2_5" / "fig_supp_closure.pdf", "supp_celltype_closure")
 
 
 if __name__ == "__main__":

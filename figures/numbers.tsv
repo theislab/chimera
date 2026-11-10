@@ -1,0 +1,86 @@
+key	number
+main_overview	1
+main_alpha_vs_prior	2
+main_integration	3
+main_delta_alpha_liver	4
+main_delta_alpha_liver_2	4 (continued)
+main_validation	5
+main_validation_2	5 (continued)
+main_tissues	6
+main_tissues_2	6 (continued)
+main_tissues_3	6 (continued)
+main_tissues_4	6 (continued)
+main_disease	7
+main_protein	8
+main_protein_2	8 (continued)
+supp_alpha_training	S2
+supp_alpha_robustness	S3
+supp_alpha_decorrelation	S4
+supp_integration_seven_methods	S5
+supp_integration_metrics	S6
+supp_integration_umap_testis	S7
+supp_integration_umap_liver	S8
+supp_integration_ten_methods	S9
+supp_integration_raw_metrics	S10
+supp_integration_eleven_cohorts	S11
+supp_sequence_axis	S13
+supp_known_measures	S14
+supp_relations_heatmap	S15
+supp_relations_density	S16
+supp_worked_genes	S17
+supp_categories_broad	S18
+supp_categories_liver	S19
+supp_categories_testis	S20
+supp_hallmark	S21
+supp_celltype_closure	S22
+supp_celltype_seeds	S23
+supp_functional_layer	S24
+supp_covariate_audit	S25
+supp_seed_reliability	S26
+supp_gate_gap	S27
+supp_gate_gap_classes	S28
+supp_gate_gap_named	S29
+supp_published_differences	S30
+supp_ground_truth	S31
+supp_ground_truth_2	S31 (continued)
+supp_ground_truth_3	S31 (continued)
+supp_ground_truth_4	S31 (continued)
+supp_ground_truth_5	S31 (continued)
+supp_benchmark_overview	S32
+supp_benchmark_tasks	S33
+supp_tissues_recurrence	S34
+supp_programs_recurrent	S35
+supp_programs_by_tissue	S36
+supp_programs_named_genes	S37
+supp_tissue_bone_marrow	S38
+supp_tissue_kidney	S39
+supp_tissue_islet	S40
+supp_tissue_eye	S41
+supp_tissue_cortex	S42
+supp_tissue_lung	S43
+supp_tissue_muscle	S44
+supp_tissue_tumor_myeloid	S45
+supp_tissues_lineage	S46
+supp_bone_marrow_reference	S47
+supp_cell_compartments	S48
+supp_cell_lineages	S49
+supp_primate_branches	S50
+supp_protein_architecture	S51
+supp_regulatory_architecture	S52
+supp_disease_genes	S53
+supp_drug_targets	S54
+supp_gin_linear_baseline	S56
+supp_gin_attribution_suite	S57
+supp_gin_method_consensus	S58
+supp_gin_orthogonality	S59
+supp_gin_per_pc	S60
+supp_atlas_spatial_autocorrelation	S62
+supp_atlas_archetype_trajectory	S63
+supp_atlas_archetype_enrichment	S64
+supp_residue_audit	S65
+supp_residue_mixed_effects	S66
+supp_residue_cliffs_delta	S67
+supp_residue_attention_by_feature	S68
+supp_residue_card_etv1	S69
+supp_residue_card_hprt1	S70
+supp_residue_card_runx1	S71

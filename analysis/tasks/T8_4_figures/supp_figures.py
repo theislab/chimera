@@ -1,19 +1,19 @@
-"""Supplementary panels: seed reliability (new), and panels made by their own tasks, copied unchanged.
+"""Supplementary panels: seed reliability, and panels made by their own tasks, taken unchanged.
 
-New here:
+Drawn here:
   supp_celltype_seed_stability  re-render of T2.5 ``fig_supp_seed_stability`` from ``seed_stability.csv``:
                           agreement between seeds of each cell type's contribution to S_g.
   supp_seed_reliability   pairwise seed agreement of Delta-alpha, alpha and S_g per cohort (T3.3
                           ``seed_pairs.csv``) with the reliability of the seed mean (``reliability.csv``).
-Copied (made and checked by their tasks; every copy is re-checked for fonts and run names):
+Taken as panels (made and checked by their tasks; every copy is re-checked for fonts and run names):
   supp_covariate_audit        T2.4 ``fig_supp_covariate_audit``  (7-cohort covariate audit)
   supp_celltype_closure       T2.5 ``fig_supp_closure``
   supp_relations_density      X4 ``fig_relations_density``
   supp_relations_heatmap      X4 ``fig_relations_heatmap``
-  supp_integration_raw_metrics      T5.5 ``raw_metrics_10models``
-  supp_integration_purity_view      T5.5 ``composite_mixing_bio_10models`` (with raw kNN species purity)
-Already in the manuscript folder, checked only: ``supp_functional_layer``, ``fig_known_measures``,
-``fig_sequence_axis``.
+The two integration panels of T5.5 (``raw_metrics_10models``, ``composite_mixing_bio_10models``) are read by their figure
+specs from ``notebooks/figures/baselines_master_ext/`` and are not copied.
+
+Panels go to ``figures/panels/`` under the names of ``figures/panel_names.tsv``.
 """
 
 from __future__ import annotations
@@ -34,10 +34,7 @@ COPIES = {
     "supp_celltype_closure": cm.RES / "T2_5" / "fig_supp_closure.pdf",
     "supp_relations_density": cm.RES / "X4" / "figures" / "fig_relations_density.pdf",
     "supp_relations_heatmap": cm.RES / "X4" / "figures" / "fig_relations_heatmap.pdf",
-    "supp_integration_raw_metrics": cm.REPO / "notebooks/figures/baselines_master_ext/raw_metrics_10models.pdf",
-    "supp_integration_purity_view": cm.REPO / "notebooks/figures/baselines_master_ext/composite_mixing_bio_10models.pdf",
 }
-EXISTING = ["supp_functional_layer", "fig_known_measures", "fig_sequence_axis"]
 
 
 def panel_seed_reliability() -> plt.Figure:
@@ -100,7 +97,6 @@ def main() -> list:
            cm.save(panel_celltype_seed_stability(), "supp_celltype_seed_stability")]
     for name, src in COPIES.items():
         out.append(cm.copy_pdf(src, name))
-    out += [cm.FIG_OUT / f"{n}.pdf" for n in EXISTING]
     return out
 
 

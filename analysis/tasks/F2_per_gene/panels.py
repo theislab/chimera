@@ -38,9 +38,9 @@ FL = 6.3  # axis labels
 
 
 def save(fig: plt.Figure, name: str):
-    pdf = cm.FIG_OUT / f"{name}.pdf"
-    with plt.rc_context({"savefig.bbox": None}):  # exact page size (the design default is tight): axes line up in compose
-        fig.savefig(pdf, format="pdf")
+    """Panel at its exact page size (the design default is a tight crop), so the axes line up in the composed figure."""
+    pdf = cm.style.save_panel(fig, cm.style.panel_for(name), exact=True, preview=False, close=False)
+    with plt.rc_context({"savefig.bbox": None}):
         fig.savefig(PREVIEW / f"{name}.png", format="png", dpi=250)
     plt.close(fig)
     return pdf

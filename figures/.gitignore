@@ -1,0 +1,7 @@
+# written by the build, not tracked
+_work/
+preview/
+__pycache__/
+# single pages of the hand-assembled first figure file, needed only until the figures that use them are composed from
+# panels; kept out of the history meanwhile (remove this line if a page has to stay)
+sources/assembled/

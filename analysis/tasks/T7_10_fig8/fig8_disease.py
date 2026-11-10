@@ -1,6 +1,7 @@
-"""Fig 8 (main, new in revision): which human disease responses the mouse model reproduces.
+"""Disease figure (main): which human disease responses the mouse model reproduces.
 
-``chimera-manuscript/figures/revision/fig8_disease.pdf`` and one PDF per panel (``fig8_disease_a`` ...); PNG preview and the plotted values
+One PDF per panel in ``figures/panels/main_disease/`` (kidney_transfer, stage_transfer, healthy_tissue_test,
+transfer_vs_null, injury_genes; figure key ``main_disease``); PNG preview of the whole figure and the plotted values
 (``fig8_source.tsv``) in ``results/analysis/T7_10/``. Every number is read from the result files below;
 nothing is typed in. Re-runnable: the islet H-D1 slot in panel c is filled when its output exists.
 
@@ -485,18 +486,17 @@ def main() -> int:
     _title(ax_e, "Cippà 2018 injury genes")
     fig.align_xlabels([ax_a, ax_b1, ax_b2])
 
-    # One PDF per panel; F1_figures/compose.py places them and adds the bold (a) labels.
-    pdf = cm.fd.save_figure(fig, NAME, formats=("pdf",), out_dir=cm.FIG_OUT)[0]
-    for k, axes in (("a", [ax_a]), ("b", [ax_b1, ax_b2]), ("c", [ax_c]), ("d", [ax_d]), ("e", [ax_e])):
-        cm.save_axes(fig, f"{NAME}_{k}", axes)
+    # One PDF per panel; the figure spec (figures/specs/main.py, main_disease) places them and the layout tool adds the letters.
+    pdfs = [cm.save_axes(fig, f"{NAME}_{k}", axes)
+            for k, axes in (("a", [ax_a]), ("b", [ax_b1, ax_b2]), ("c", [ax_c]), ("d", [ax_d]), ("e", [ax_e]))]
     png = cm.fd.save_figure(fig, NAME, formats=("png",), out_dir=OUT, close=True)[0]
     src = pd.DataFrame(src_rows)
     src.to_csv(OUT / "fig8_source.tsv", sep="\t", index=False)
-    chk = cm.check_pdf(pdf)
-    print(f"wrote {pdf}\n      {png}\n      {OUT / 'fig8_source.tsv'} ({len(src)} values)")
+    chks = [cm.check_pdf(p) for p in pdfs]
+    print("wrote " + ", ".join(p.name for p in pdfs) + f" in {pdfs[0].parent}\n      {png}\n      {OUT / 'fig8_source.tsv'} ({len(src)} values)")
     print(f"islet H-D1: {'drawn from ' + str(ISLET_H1) if islet_done else 'absent (' + str(ISLET_H1) + '); slot drawn as pending'}")
-    print(f"pdf check: {chk}")
-    return 0 if chk["ok"] else 1
+    print(f"pdf checks: {chks}")
+    return 0 if all(c["ok"] for c in chks) else 1
 
 
 if __name__ == "__main__":
