@@ -1,11 +1,13 @@
-"""I1 tables: both gates side by side.
+"""Tables: both gates side by side.
 
 (a) Fig 3 rows: the ten frozen methods unchanged (s42, as Fig 3), Chimera canonical gate as in Fig 3 (s42 run), canonical gate over seeds,
     per-gene gate over seeds; mixing score, conservation score, composite on the frozen panel bounds.
-(b) Harmonised cohorts: kNN mixing entropy, label transfer, kNN cell-type purity (H1 key) and the Z2 within-label AUROC, both gates; scVI
-    on the same object beside (H1 table for the cortex, lung, muscle and tumour cohorts; Z2's scVI latents elsewhere).
+(b) Harmonized cohorts: kNN mixing entropy, label transfer, kNN cell-type purity (H1 key) and the Z2_embedding within-label AUROC, both gates; scVI
+    on the same object beside (H1 table for the cortex, lung, muscle and tumor cohorts; Z2's scVI latents elsewhere).
     python -m analysis.tasks.I1_free_gate_integration.tables
-Writes results/analysis/I1/table_fig3.csv, table_harmonised.csv and the two .tex files in chimera-manuscript/tables/.
+Writes results/analysis/I1/table_fig3.csv, table_harmonised.csv and, in the same folder, the two tables as LaTeX
+(integration_per_gene_gate.tex, integration_per_gene_gate_harmonised.tex). Nothing is written into the manuscript repository, whose
+tables/ folder takes the two tables from these files by hand.
 """
 from __future__ import annotations
 
@@ -16,9 +18,8 @@ from analysis.tasks.I1_free_gate_integration import rules as RU
 from analysis.tasks.I1_free_gate_integration import score as SC
 
 SE = SC.SE
-MS = RU.REPO.parent / "chimera-manuscript" / "tables"
-TEX_A = MS / "integration_per_gene_gate.tex"
-TEX_B = MS / "integration_per_gene_gate_harmonised.tex"
+TEX_A = RU.OUT / "integration_per_gene_gate.tex"
+TEX_B = RU.OUT / "integration_per_gene_gate_harmonised.tex"
 ORDER = ["PCA", "Harmony", "scVI-sp", "scVI-donor", "sysVI", "CAMEX", "SATURN-Leiden", "scANVI", "SATURN"]
 SHORT = {"liv_hmonkey": "Liver H+Monkey", "liv_hmouse": "Liver H+Mouse", "liv_hzeb": "Liver H+Zeb", "liv_4sp": "Liver 4-sp",
          "test_hmac": "Testis H+Mac", "test_hmouse": "Testis H+Mouse", "test_3sp": "Testis 3-sp"}

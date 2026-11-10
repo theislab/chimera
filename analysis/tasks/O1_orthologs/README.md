@@ -45,4 +45,4 @@ Audits every ortholog pair of the cohorts against Ensembl Compara, flags pairs a
 - `training/runs/`
 - code of `H1_harmonise`
 
-**Notes.** The identifier-joined objects are the recommended data for new work (deposit bundle data_identifier_joined). The models of the paper were trained on the objects in data/processed/. Definitions in rules.py; further scripts (named_genes, named_claims, set_exclusion, rule_check, repair_*, retrain_compare, rebuild, findings) are single checks, each with its command in its docstring. named_genes.py reads the manuscript sources from a checkout beside this repository.
+**Notes.** The identifier-joined objects are the recommended data for new work (deposit bundle data_identifier_joined). The models of the paper were trained on the objects in data/processed/. Definitions in rules.py; further scripts (named_genes, named_claims, set_exclusion, rule_check, repair_*, retrain_compare, rebuild, findings) are single checks, each with its command in its docstring. named_genes.py reads the LaTeX sources of the paper, which are not in this repository (--manuscript DIR).

@@ -29,4 +29,4 @@ Compares cell-level integration of the per-gene gate and the protein-feature gat
 - `notebooks/cache/`
 - `training/runs/`
 
-**Notes.** tables.py writes the two LaTeX tables. mechanism.py is labeled exploratory. Definitions in rules.py. tables.py writes its LaTeX tables into a checkout of the manuscript beside this repository (../chimera-manuscript/tables/).
+**Notes.** tables.py writes the two tables as CSV and as LaTeX into results/analysis/I1/. mechanism.py is labeled exploratory. Definitions in rules.py.

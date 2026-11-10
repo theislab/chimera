@@ -12,7 +12,7 @@ input	evee	data/analysis/gold/G1/evolutionary_statistics.zip	H1, H2
 input	evee_map	results/analysis/T4_1/evee_symbol_to_ensg.tsv	T4.1 symbol map
 input	ts_liver	data/analysis/gold/G2/ts_liver.h5ad	H3
 input	tms_liver	data/analysis/gold/G3/tms_liver_10x.h5ad	H3
-input	h3_label_map	../chimera-private/reviews/cell_system_review_1/response/tools/h3_label_map.tsv	committed at T0.2
+input	h3_label_map	analysis/tasks/T4_3_scoreboard/h3_label_map.tsv	H3 cell-type label map (Tabula Sapiens to Tabula Muris Senis), fixed with the pre-specified analysis plan
 input	murat	data/raw/camex/2testis/dataset/raw-testis-{species}-Murat.h5ad	H4, 8 held-out species
 input	h4_map	results/analysis/T4_1/h4_ortholog_map_one2one_union.tsv.gz	H4 1:1 map, union of both Compara files (h4_map_union.py)
 input	loeuf	data/analysis/gold/G7/gnomad.v4.1.constraint_metrics.tsv	H8

@@ -34,4 +34,4 @@ Screens regions of gene space (by expression, specificity, identity and annotati
 - `data/analysis/x3_annotations/`
 - `data/processed/`
 
-**Notes.** Labeled exploratory in the paper (near-identical proteins; level in moderately expressed cell-type-specific liver genes). Definitions in rules.py. replicate.py opens the replication half only after it finds a marker in the authors' working notes, which are not in the repository; the archived result tables are the record.
+**Notes.** Labeled exploratory in the paper (near-identical proteins; level in moderately expressed cell-type-specific liver genes). Definitions in rules.py. replicate.py opens the replication half for the units listed in results/analysis/Y4/carried.json (written by carry.py from the odd autosomes); that list was fixed before any statistic on even autosomes was computed.

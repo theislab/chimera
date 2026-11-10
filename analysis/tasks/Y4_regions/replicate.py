@@ -1,4 +1,6 @@
-"""Y4 (EXPLORATORY): open even autosomes for the carried units only, after carried.json is committed to the ledger.
+"""EXPLORATORY: open even autosomes for the carried units only. The carried list (carried.json, written by carry.py from the
+odd autosomes) is the only input that selects units; it was fixed before any statistic on even autosomes was computed, so run this
+step only when that list is final.
 
 Sections, for each carried unit: replication (T1-T4 on even genes, BOOT_FINAL draws, also odd at the same draws);
 sibling cohorts of the tissue; the other tissue; X holdout; sensitivities (Murat primates, D_raw, uncapped identity, leave-one-seed-
@@ -26,15 +28,15 @@ from analysis.tasks.Y4_regions import rules as RU
 from analysis.tasks.Y4_regions import screen as SC
 
 OUT = SC.OUT
-LEDGER = SC.REPO.parent / "chimera-private/reviews/cell_system_review_1/response/ledgers/Y4_regions.md"
-MARK = "CARRIED LIST COMMITTED BEFORE EVEN GENES"
 RES = SC.REPO / "results/analysis"
 
 
 def carried() -> list[dict]:
-    if MARK not in LEDGER.read_text():
-        raise SystemExit("The carried list is not in the ledger yet.")
-    return json.loads((OUT / "carried.json").read_text())
+    """The carried units, as written by carry.py."""
+    path = OUT / "carried.json"
+    if not path.exists():
+        raise SystemExit(f"{path} is missing: run carry.py first; the carried list must be final before this step.")
+    return json.loads(path.read_text())
 
 
 def mask_of(c: str, region: str):
@@ -111,7 +113,7 @@ def sensitivities(u: dict) -> list[dict]:
 
 
 def seed_range(u: dict) -> dict:
-    """rho_p of each seed's readout on even genes of the region (D_raw and S per seed from X3)."""
+    """rho_p of each seed's readout on even genes of the region (D_raw and S per seed from X3_cross_cohort)."""
     c, g, x, reg = u["cohort"], u["gold"], u["readout"], u["region"]
     t = SC.table(c)
     s = pd.read_parquet(RES / f"X3/seeds/{c}.parquet").set_index("var_name").reindex(t["var_name"])

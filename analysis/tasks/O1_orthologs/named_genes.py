@@ -1,11 +1,13 @@
-"""O1 part B6: every human symbol named in main.tex, captions, tables and the Supplement, crossed with the flags of the cohorts; raw counts per species.
+"""Part B6: every human symbol named in main.tex, captions, tables and the Supplement, crossed with the flags of the cohorts; raw counts per species.
 Symbols are tokens of the .tex sources that equal a human symbol of any table, or the case-insensitive match of a mouse symbol. Text in comments is skipped.
+The LaTeX sources of the paper are not part of this repository: give their folder with --manuscript (it holds main.tex, supplementary/ and tables/).
 
-    PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.named_genes
+    PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.named_genes [--manuscript DIR]
 """
 
 from __future__ import annotations
 
+import argparse
 import glob
 import re
 import warnings
@@ -19,12 +21,14 @@ import scipy.sparse as sp
 from analysis.tasks.O1_orthologs import rules as RU
 
 warnings.filterwarnings("ignore")
-MS = RU.REPO.parent / "chimera-manuscript"
+MS = RU.REPO.parent / "chimera-manuscript"  # default of --manuscript: a checkout of the paper's sources beside this repository
 SKIP = {"SET", "CAT", "MAX", "MET", "REST", "CAPS", "ACE", "SHE", "CD", "IMPACT", "GC", "AR", "ALL", "BID", "NHS", "ICE", "PC", "CA", "CP", "ROCK", "ATM", "AMH", "TANK", "RAN", "WAS", "SI", "HR", "COIL", "MALL", "MARS", "MAGI", "CAST", "MAP", "PAM", "CLOCK", "NEAT", "DES", "DBP", "SARS", "GAN", "VAMP", "ESR", "NOTCH", "PLAN", "CAD", "CARD", "FAT", "MICE", "RELA", "BOD", "BAD", "SON", "TEC", "EGG", "SPRED", "IDS", "IDE", "GIN", "ESM", "MMD", "UMI", "TF", "PI", "NB", "LUC", "VAE", "PCA", "UMAP", "AUROC", "ROC", "CI", "SD", "BH", "QC", "OR", "ANOVA", "GO", "KO", "PDF", "TOP", "BMP", "NOT", "AND", "FOR", "IMP", "NET", "LAMP", "COPE", "HOOK", "PAGE", "WARS", "OAT", "SMS", "PLOD", "PEAK", "AIM", "STAR", "TRAP", "SAFE", "POLE", "SHOT", "TANGO", "TACTIC", "GAP", "CHIC", "ERF", "EVEE"}
 
 
-def tokens() -> pd.DataFrame:
-    files = [MS / "main.tex"] + sorted(Path(p) for p in glob.glob(str(MS / "supplementary/*.tex"))) + sorted(Path(p) for p in glob.glob(str(MS / "tables/*.tex")))
+def tokens(ms: Path = MS) -> pd.DataFrame:
+    if not (ms / "main.tex").is_file():
+        raise SystemExit(f"main.tex not found in {ms}: give the folder with the LaTeX sources of the paper with --manuscript")
+    files = [ms / "main.tex"] + sorted(Path(p) for p in glob.glob(str(ms / "supplementary/*.tex"))) + sorted(Path(p) for p in glob.glob(str(ms / "tables/*.tex")))
     rows = []
     for f in files:
         for i, ln in enumerate(f.read_text(errors="ignore").splitlines(), 1):
@@ -35,13 +39,16 @@ def tokens() -> pd.DataFrame:
 
 
 def main():
+    ap = argparse.ArgumentParser(description="Gene symbols named in the paper, crossed with the ortholog flags of the cohorts.")
+    ap.add_argument("--manuscript", type=Path, default=MS, help="folder with the LaTeX sources of the paper (main.tex, supplementary/, tables/)")
+    ms = ap.parse_args().manuscript
     G = pd.read_parquet(RU.RES / "flags_by_cohort.parquet")
     P = pd.read_parquet(RU.RES / "table_pairs_flags.parquet")
     M = pd.read_parquet(RU.RES / "mapping_rows.parquet")
     syms = set(G.symbol.dropna())
     mouse = P[P.species == "mmusculus"].dropna(subset=["species_gene_name"])
     m2h = dict(zip(mouse.species_gene_name, mouse.hsapiens_gene_name))
-    T = tokens()
+    T = tokens(ms)
     T["symbol"] = np.where(T.token.isin(syms), T.token, T.token.map(m2h))
     T = T[T.symbol.notna() & ~T.symbol.isin(SKIP)]
     T = T[T.token.str.len() >= 3]

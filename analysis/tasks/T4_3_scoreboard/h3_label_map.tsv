@@ -1,0 +1,7 @@
+coarse_type	ts_cell_type	tms_cell_type	ts_cells	tms_cells
+hepatocyte	hepatocyte	hepatocyte	7414	2929
+macrophage	macrophage	Kupffer cell	3232	2546
+endothelial	endothelial cell	endothelial cell of hepatic sinusoid	1774	675
+nk	natural killer cell	natural killer cell	745	552
+b_cell	B cell	B cell	163	203
+stellate	hepatic stellate cell	hepatic stellate cell	223	39

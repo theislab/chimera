@@ -1,26 +1,27 @@
-"""Gold standards G for the T4.3 scoreboard, built from the T4.1 files. No Chimera readout is read.
+"""Independent references ("golds") G of the validation, built from the files of analysis/tasks/T4_1_gold. No Chimera
+readout is read.
 
-Every G is oriented so that higher means more conserved (05 section 4).
+Every G is oriented so that higher means more conserved (pre-specified analysis plan, section 4).
 
-- H1, H2: G = -log EVEE ``var`` (liver, testis); symbols through the T4.1 map, var = -1 is a
-  missing-value sentinel and is dropped. EVEE ``mean`` is kept for the section 4 sensitivity.
+- H1, H2: G = -log EVEE ``var`` (liver, testis); symbols through the map of T4_1_gold, var = -1 is a
+  missing-value sentinel and is dropped. EVEE ``mean`` is kept for the sensitivity of plan, section 4.
 - H3: Tabula Sapiens liver (10x 3' v3 cells only) vs Tabula Muris Senis liver 10x, the
-  committed K = 6 label map, ages pooled. Per atlas and type, counts are pooled over all cells
+  K = 6 label map (``h3_label_map.tsv``, fixed with the plan), ages pooled. Per atlas and type, counts are pooled over all cells
   (the >= 30-cell rule of the plan is at atlas level), ``x = log2(1 + 1e6 C / sum C)`` with the
   library size over the human-mouse 1:1 liver vocabulary present in both atlases. A gene is
   scorable if it is detected in >= 1% of the cells of at least one type in both atlases (the
-  A5 A4 rule of the baselines). G = Pearson across the K types of the atlas-centred profiles;
+  1% detection rule of the direct baselines). G = Pearson across the K types of the atlas-centered profiles;
   NaN for a constant profile.
 - H4: the 8 Murat held-out species, coarse types present in all 8 (Spermatogonia,
-  Spermatocytes, spermatids, somatic), Ensembl 1:1 orthologs (T4.1 map; 110, chicken 105).
+  Spermatocytes, spermatids, somatic), Ensembl 1:1 orthologs (map of T4_1_gold; 110, chicken 105).
   Per species: library pseudobulk with >= 30 cells, mean over libraries of log2(1 + CPM),
   library size over the species' mapped genes; detection over the cells of those libraries.
   A species counts as present for a gene if the gene is mapped, detected in >= 1% of the cells
-  of at least one type and its profile is not constant. Pairwise Pearson of species-centred
+  of at least one type and its profile is not constant. Pairwise Pearson of species-centered
   profiles, Fisher z; G = unweighted mean of the three tier means (primate-primate,
   primate-outgroup, outgroup-outgroup); a gene needs >= 3 primates and >= 2 outgroups.
   ``H4_nsp`` (species present) joins C_pat. Primates-only G (>= 3 primates) is the sensitivity.
-- Split halves for the noise ceilings (05 section 3): H3, random halves of donors in each atlas
+- Split halves for the noise ceilings (plan, section 3): H3, random halves of donors in each atlas
   (TS has 4 donors, so donor halves, not cell halves); H4, library halves in each species;
   100 splits each, seeded. Each half goes through the same pipeline.
 - H8: LOEUF (gnomAD v4.1, canonical transcript, ``lof.oe_ci.upper``) and dN/dS (Ensembl
@@ -54,8 +55,8 @@ from analysis.tasks.T4_1_gold import gold_checks as GC
 REPO = gene_ids.REPO_ROOT
 GOLD = REPO / "data" / "analysis" / "gold"
 T41 = REPO / "results" / "analysis" / "T4_1"
-LABEL_MAP = (REPO.parent / "chimera-private" / "reviews" / "cell_system_review_1" / "response" / "tools"
-             / "h3_label_map.tsv")
+# H3 cell-type label map; fixed with the pre-specified analysis plan, before any readout was compared with these data.
+LABEL_MAP = Path(__file__).resolve().with_name("h3_label_map.tsv")
 HALLMARK = Path.home() / ".cache" / "gseapy" / "Enrichr.MSigDB_Hallmark_2020.gmt"
 MIN_CELLS = 30
 DET_MIN = 0.01
@@ -74,7 +75,7 @@ def log(*a):
 
 # ---------------------------------------------------------------- shared helpers
 def profile_corr(A: np.ndarray, B: np.ndarray, okA: np.ndarray, okB: np.ndarray) -> np.ndarray:
-    """Row-wise Pearson of centred profiles (genes x types); NaN where not ok or constant."""
+    """Row-wise Pearson of centered profiles (genes x types); NaN where not ok or constant."""
     A = A - A.mean(1, keepdims=True)
     B = B - B.mean(1, keepdims=True)
     na, nb = np.sqrt((A ** 2).sum(1)), np.sqrt((B ** 2).sum(1))

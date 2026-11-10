@@ -71,6 +71,7 @@ BASIS = {
 BUNDLES = [
     (r"results/analysis/(T5_1|T5_2|T5_3|T5_6)(/|$)", "bundle `tool_runs_saturn_camex`"),
     (r"results/analysis/(B1|B2)(/|$)", "bundle `gene_level_benchmark`"),
+    (r"results/analysis/T2_2/values\.csv$", "bundle `analysis_results`"),
     (r"results/analysis/T2_2(/|$)", "not deposited"),
     (r"results/analysis/", "bundle `analysis_results`"),
     (r"data/analysis/O1/repair_", "bundle `data_identifier_joined`"),

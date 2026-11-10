@@ -27,7 +27,7 @@ One reading for all 26 cohorts in ten tissues: per-gene tables in one schema wit
 - `training/runs/`
 - code of `F1_figures`
 
-**Notes.** README.md lists the steps. results/analysis/H1/genes/<cohort>.parquet are the per-gene tables of the protein-feature gate, checked by analysis/check_gene_tables.py; rules.py defines every column and the cohort registry. Labeled exploratory in the paper.
+**Notes.** README.md lists the steps. results/analysis/H1/genes/<cohort>.parquet are the per-gene tables of the protein-feature gate, checked by analysis/check_gene_tables.py; rules.py defines every column and the cohort registry. Labeled exploratory in the paper. recurrence.py reads the Hallmark library from the gseapy cache in the home folder (~/.cache/gseapy/), which T6_1_functional/fetch_enrichr_cache.py fills.
 <!-- glance:end -->
 
 Definitions: `rules.py` (registry, thresholds, naming rule, sets, lineage panels). Exploratory throughout.

@@ -28,4 +28,4 @@ Downloads the sources of the functional layer (gene sets, protein interaction ne
 - `data/analysis/gold/`
 - `data/processed/`
 
-**Notes.** xlsx_min.py is a standard-library reader used by coverage.py.
+**Notes.** xlsx_min.py is a standard-library reader used by coverage.py. fetch_enrichr_cache.py writes the two Enrichr libraries (Hallmark, Reactome) into the gseapy cache in the home folder (~/.cache/gseapy/), where gseapy itself would put them, and keeps the server responses in data/analysis/functional/; coverage.py and three other tasks (T4_1_gold, T4_3_scoreboard, H1_harmonise) read the libraries from that cache.

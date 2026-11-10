@@ -394,9 +394,12 @@ bundles:
                    T2_7, T3_1, T3_1b, T3_2, T3_2b, T3_3, T3_4, T3_5, T3_6, T4_1, T4_2, T4_3,
                    T5_4b, T5_5, T6_1, T6_3, T6_4, T6_6, T6_8, T6_8b, T6_8b_repeat.csv, T6_9,
                    T7_1, T7_2, T7_3, T7_8, T7_9, T8_1, T8_4, X1, X2, X3, X4, X5, X6, X7]
+      - file: results/analysis/T2_2/values.csv
     not_included:
       - path: results/analysis/T2_2
-        reason: working record of a notebook rerun (logs and earlier outputs), not a result
+        reason: >-
+          all but values.csv (the table of values, which is deposited): working record of a
+          notebook rerun (logs and earlier outputs), not a result
 
   tool_runs_saturn_camex:
     title: SATURN and CAMEX runs

@@ -17,7 +17,7 @@ Downloads the independent references of the pre-specified tests and the Ensembl 
     bash analysis/tasks/T4_1_gold/fetch_ensembl.sh
     python -m analysis.tasks.T4_1_gold.h4_map_union
     python -m analysis.tasks.T4_1_gold.dnds_release99_coverage
-    python -m analysis.tasks.T4_1_gold.gold_checks --label-map <tsv> <repo> <out>
+    python -m analysis.tasks.T4_1_gold.gold_checks --label-map analysis/tasks/T4_3_scoreboard/h3_label_map.tsv <repo> <out>
 
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
 
@@ -32,4 +32,4 @@ Downloads the independent references of the pre-specified tests and the Ensembl 
 - `data/processed/`
 - `data/raw/`
 
-**Notes.** fetch_item.sh and fetch_ensembl_species.sh are called by the fetch scripts. Downloads are recorded in MANIFEST.tsv files (URL, date, sha256).
+**Notes.** fetch_item.sh and fetch_ensembl_species.sh are called by the fetch scripts. Downloads are recorded in MANIFEST.tsv files (URL, date, sha256). gold_checks.py reads the Hallmark library from the gseapy cache in the home folder (~/.cache/gseapy/), which T6_1_functional/fetch_enrichr_cache.py fills.
