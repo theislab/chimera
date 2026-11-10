@@ -1,14 +1,15 @@
-"""T7.3: H-D1 and H-D1b on hepatocytes, Family 3 descriptive (plan section 8, section 3, amendment
-of 2026-11-01). G-D1 failed, so the frozen pass rule (>= 3 of 5 types) does not apply and no status
-is computed.
+"""Liver MASH: H-D1 and H-D1b on hepatocytes, Family 3 descriptive (pre-specified analysis plan, sections 8
+and 3; amendment log of the plan, 2026-11-01). G-D1 failed, so the frozen pass rule (>= 3 of 5 types)
+does not apply and no status is computed.
 
 Outcome: Q = sign(l^h) * m, m the apeGLM-shrunken mouse log2FC (adaptive prior, as the plan says),
 l^h the unshrunk human log2FC (the plan shrinks m only; the adaptive prior collapses the human fit,
 de.py), on liver H+Mouse vocabulary genes detected
 in >= 5% of hepatocyte nuclei in both species. Join on hsapiens_gene_id (human), mmusculus_gene_id
-of the same ortholog row (mouse). Readout: D, 10 seeds, T3.3 consensus; S_ema beside it.
+of the same ortholog row (mouse). Readout: D, 10 seeds, the seed consensus of
+analysis/tasks/T3_3_consensus; S_ema beside it.
 
-rho_p: ranks of Q and of the score, each residualised on C (section 3) plus splines of rank |l^h|
+rho_p: ranks of Q and of the score, each residualized on C (plan, section 3) plus splines of rank |l^h|
 and rank SE(m), Pearson of the residuals. Null: D residuals permuted within pi_raw x expression
 deciles, 10,000 draws, one-sided. CI: block bootstrap on the ESM modules, 10,000 draws, refit per
 draw; gene-level CI and variance ratio beside it.
@@ -215,7 +216,7 @@ def rho_row(u: pd.DataFrame, score: str, n_perm: int, n_boot: int, rng, extra_co
 
 
 def pi_row(u: pd.DataFrame) -> dict:
-    """pi and log mean have no rho_p on C (section 3): raw Spearman, plus a partial on the other C terms."""
+    """pi and log mean have no rho_p on C (plan, section 3): raw Spearman, plus a partial on the other C terms."""
     out = []
     for s in ("prior_raw", "log_cp10k_spmean"):
         others = [c for c in C_COLS if c != s] + NUIS
@@ -426,7 +427,7 @@ def main() -> int:
         ub = universe(tab, hb, mp, det_from=det)
         add(f"{nm}__all_universe", ub, "bulk")
         anchors.append(anchor(f"{nm}__all_universe", ub))
-        # hepatocyte-dominant: top quartile of X2 hep_enrich, the project's dominance rule (T4.3). A first
+        # hepatocyte-dominant: top quartile of hep_enrich of X2_liver_biology, the dominance rule of T4_3_scoreboard. A first
         # rule, hepatocyte share of expression >= 50%, left 34 genes and stays as a disclosed row
         ud = ub[ub["hep_enrich"] >= tab["hep_enrich"].quantile(0.75)].reset_index(drop=True)
         add(f"{nm}__hep_dominant", ud, "bulk")

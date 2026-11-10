@@ -1,4 +1,4 @@
-"""X3 (EXPLORATORY): gene classes, fixed before any class is compared with a Chimera readout.
+"""EXPLORATORY: gene classes, fixed before any class is compared with a Chimera readout.
 
 Sources (``data/analysis/x3_annotations/``, sha256 in ``MANIFEST.tsv``, fetched 2026-11-01):
 
@@ -34,9 +34,9 @@ mitochondrial      UniProt keyword KW-0496 Mitochondrion
 
 Programs (analyses 1-2): UniProt keywords of the categories Biological process, Molecular
 function, Cellular component and Domain, with at least ``MIN_PROGRAM`` genes in the
-analysed universe. Keywords of the category Disease are never used.
+analyzed universe. Keywords of the category Disease are never used.
 
-Reserved sets of the frozen plan (05 section 4, H5/H6) are never formed or tested. The
+Reserved sets of the frozen plan (pre-specified analysis plan, section 4, H5/H6) are never formed or tested. The
 UniProt keywords closest to them are excluded from every program list: ribosomal protein,
 ribonucleoprotein, proteasome, spliceosome, mRNA splicing, mRNA processing, secreted,
 extracellular matrix, collagen, immunity, innate immunity, adaptive immunity, inflammatory
@@ -65,7 +65,7 @@ RESERVED_KW = {
     "KW-0391": "Immunity", "KW-0399": "Innate immunity", "KW-1064": "Adaptive immunity",
     "KW-0395": "Inflammatory response", "KW-0051": "Antiviral defense",
     "KW-0216": "Detoxification", "KW-1281": "Bile acid catabolism",
-    # amendment (before any program or family was reported): signal peptide overlaps the
+    # changed before any program or family was reported: signal peptide overlaps the
     # reserved GO extracellular-region set too closely to be used as a program
     "KW-0732": "Signal",
 }

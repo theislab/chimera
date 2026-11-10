@@ -1,4 +1,5 @@
-"""P13: author injury-state fractions (CellStateLevel2) per type x role x species (plan section 8c).
+"""Author injury-state fractions (CellStateLevel2) of the kidney case, per type x role x species
+(pre-specified analysis plan, section 8c).
 
 Descriptive, and partly circular: the collection's shared state labels were made by mapping mouse
 onto human. Pooled over units of each role (multiome primary arms; Kirita and human v3 apart).

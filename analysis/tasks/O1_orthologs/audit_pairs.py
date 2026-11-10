@@ -1,4 +1,4 @@
-"""O1 step 1: every pair of every ortholog table against Compara 110 (protein and ncRNA dumps), 105, 116, the 110 GTFs; rebuild of each table from the dumps.
+"""Step 1: every pair of every ortholog table against Compara 110 (protein and ncRNA dumps), 105, 116, the 110 GTFs; rebuild of each table from the dumps.
 No count, readout or gold enters this script. Definitions: rules.py.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.audit_pairs

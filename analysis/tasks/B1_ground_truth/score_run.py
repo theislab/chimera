@@ -1,13 +1,13 @@
-"""B1: every gene-level readout of one fit, recomputed on that fit's own (altered) object. Writes per-gene scores.
+"""Every gene-level readout of one fit, recomputed on that fit's own (altered) object. Writes per-gene scores.
 
 Chimera: S_g (S_g_ema of the final state), S_fwd (the same log-likelihood ratio from a forward pass over all cells at
 the posterior mean, no 20-cell mask, added to separate the mask from count evidence; exploratory), D (alpha - prior,
 minus the run's median), D_raw (alpha - pi_raw, minus its median), B1z (E on Leiden clusters of the fit's z,
-residualised as T4.2), B1z_raw.
-Direct, same code as T4.2 and X4/X6 on the altered counts: B1 (E, the profile correlation, raw), B1b, B1c (residualised),
-B1c_raw, B2b, B3a (5-fold ridge on the 72 features, as moved by alter.py, predicting E), Sdir (labelled direct margin),
-Lfc (minus the absolute log2 ratio of species pseudobulk rates; direct fold change, added here as the plain
-comparator on level).
+residualized as the direct baselines of analysis/tasks/T4_2_gene_baselines), B1z_raw.
+Direct, same code as T4_2_gene_baselines, X4_where_differs and X6_adds_beyond on the altered counts: B1 (E, the profile
+correlation, raw), B1b, B1c (residualized), B1c_raw, B2b, B3a (5-fold ridge on the 72 features, as moved by alter.py,
+predicting E), Sdir (labeled direct margin), Lfc (minus the absolute log2 ratio of species pseudobulk rates; direct fold
+change, added here as the plain comparator on level).
 Static: pi, dN/dS, LOEUF. Control: expr (post-alteration species-balanced log CP10K), random.
 All scores are oriented so that higher means more conserved (metrics.py negates dN/dS and LOEUF).
 
@@ -74,7 +74,7 @@ def forward_margin(run_dir, a, cfg: dict, batch_size: int = 512) -> np.ndarray:
 
 
 def species_mixing(z: np.ndarray, spc: np.ndarray, k: int = 15, seed: int = 0) -> dict:
-    """Species entropy in 15-NN of z (normalised to [0, 1]) and purity, on at most 10,000 cells as queries."""
+    """Species entropy in 15-NN of z (normalized to [0, 1]) and purity, on at most 10,000 cells as queries."""
     from sklearn.neighbors import NearestNeighbors
 
     rng = np.random.default_rng(seed)

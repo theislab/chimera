@@ -1,4 +1,4 @@
-"""G1, coordinator request: an upper-only clamp of the sampled log-variance, as an experiment, without a package change (the package option is symmetric, the KL's range [-10, 10]).
+"""An upper-only clamp of the sampled log-variance, as an experiment, without a package change (the package option is symmetric, the KL's range [-10, 10]).
 
 A forward hook on z_logvar_linear clamps its output from above at Z_LOGVAR_BOUND. With the VAMP prior (every recipe) this equals an upper-only clamp in the sample: the VAMP KL clamps the
 same tensor to [-10, 10] already, so its value and gradient do not change; pseudo-input log-variances are clamped there too. What differs from a sampling-only clamp: the returned z_logvar and

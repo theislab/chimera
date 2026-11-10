@@ -1,11 +1,13 @@
-"""T7.9: calibrate the H-D4 calls against permuted condition labels (as T7.3).
+"""Islet case: calibrate the H-D4 calls against permuted condition labels (as in the liver MASH case,
+analysis/tasks/T7_3_mash).
 
 Gene-set permutation ignores correlation between genes, so a raw call count means little alone.
-For every DE-able type, the section 8b calls are recomputed with one species' fit replaced by a
-permuted-label fit (``de.py --perm``) and the other kept: 20 human draws, 11 mouse relabellings.
+For every DE-able type, the calls of section 8b of the pre-specified analysis plan are recomputed
+with one species' fit replaced by a permuted-label fit (``de.py --perm``) and the other kept: 20
+human draws, 11 mouse relabelings.
 Same universe, rank column (``log2fc_fixed``), 10,000 gene-set permutations and seeds as ``hd4.py``,
 so only the labels differ. A count is reported with p = (1 + draws >= observed) / (1 + draws); it
-counts as supported only at p < 0.05. Mouse draws: 11 relabellings give a floor of 1/12 = 0.083, so
+counts as supported only at p < 0.05. Mouse draws: 11 relabelings give a floor of 1/12 = 0.083, so
 that side cannot reach 0.05 and is reported as a range, not a test.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T7_9_islet/hd4_null.py [--jobs 8]

@@ -1,8 +1,8 @@
 """EXPLORATORY, post hoc, written after F1 and F2 were seen. Enters no test and no BH family.
 
-T4.3 showed pi x expression strata do not control cell-type dominance. Here F1 and the F2 node
-permutation are repeated with a dominance flag added to the strata (liver: top quartile of X2
-``hep_enrich``; testis: T2.5 commonest dominant type), r1 and r2, as in T4.3 dominance_exploratory.
+The validation (analysis/tasks/T4_3_scoreboard) showed that pi x expression strata do not control cell-type dominance. Here F1 and the F2 node
+permutation are repeated with a dominance flag added to the strata (liver: top quartile of X2_liver_biology
+``hep_enrich``; testis: commonest dominant type of T2_5_celltype_margin), r1 and r2, as in T4_3_scoreboard/dominance_exploratory.py.
 
     python analysis/tasks/T6_3_pathway/dominance_exploratory.py
 """

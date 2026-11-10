@@ -1,21 +1,21 @@
-"""X2 (EXPLORATORY): checkpoint forward pass with hepatocytes resolved along the porto-central axis.
+"""EXPLORATORY: checkpoint forward pass with hepatocytes resolved along the porto-central axis.
 
-Same per-cell log-likelihood ratio as T2.5 (``T2_5_celltype_margin/run.py``: shared decoder on
+Same per-cell log-likelihood ratio as T2_5_celltype_margin (``T2_5_celltype_margin/run.py``: shared decoder on
 the posterior-mean z against the model's per-species null rate, NB with the trained per-batch
 dispersion), summed per (species, cell type, zone). Hepatocytes get a zone (PP, mid, PC:
 within-species tertiles of a landmark zonation score, ``sets.ZONE_SCORE_*``); other types get
 zone "all". Also accumulated per group:
 
 * ``sum_wt``: the same ratio against a within-type null (Laplace-smoothed rate of each
-  (species, cell type), as T2.5, but on the posterior-mean z; T2.5 used one posterior sample);
+  (species, cell type), as T2_5_celltype_margin, but on the posterior-mean z; T2_5_celltype_margin used one posterior sample);
 * ``sum_pred``: the shared decoder's predicted composition mu1 / sum(mu1), i.e. what the
   species-blind decoder expects for these cells;
 * ``sum_obs`` and ``sum_lib``: observed counts and library sizes.
 
-Zonation score per hepatocyte (sets.py amendment 1): from the raw full-transcriptome object of
+Zonation score per hepatocyte (landmarks of sets.py): from the raw full-transcriptome object of
 the species, restricted to the hepatocytes of the cohort; log1p CP10K of each out-of-vocabulary
 landmark detected in >= 5 % of them, smoothed over a within-species 15-NN graph (20 PCs of
-2,000 HVGs of the raw object, plus self, row-normalised), z-scored; score = mean(z, pericentral)
+2,000 HVGs of the raw object, plus self, row-normalized), z-scored; score = mean(z, pericentral)
 - mean(z, periportal). Axis check per species: Spearman(PC part, PP part); the zonation
 analysis uses only species where it is <= AXIS_RHO (rule fixed before D was read).
 
@@ -55,7 +55,7 @@ RAW_DIR = gene_ids.REPO_ROOT / "data" / "raw" / "camex" / "1liver" / "dataset"
 
 
 def _smoother(Xs, lib):
-    """Row-normalised (15-NN connectivities + identity) of a within-species hepatocyte PCA (raw genes)."""
+    """Row-normalized (15-NN connectivities + identity) of a within-species hepatocyte PCA (raw genes)."""
     import anndata as ad
     import scanpy as sc
     import scipy.sparse as sp
@@ -220,7 +220,7 @@ def forward(label: str, threads: int, batch_size: int = 512) -> None:
     np.save(OUT / f"{label}__zmean.npy", zmean)
     zt.to_csv(OUT / f"{label}__zones.csv", index=False)
     zinfo.to_csv(OUT / f"{label}__zone_landmarks.csv", index=False)
-    # check: summed over groups, the species-null sum per species equals the T2.5 per-species sum
+    # check: summed over groups, the species-null sum per species equals the T2_5_celltype_margin per-species sum
     print(f"  {label}: {run}, {comp['source']}, {N} cells, {K} groups, {time.time() - t0:.0f}s", flush=True)
 
 

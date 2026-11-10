@@ -1,7 +1,7 @@
-"""Z1 training diagnostics: count dependence and health of a Chimera run. Blind: uses only the
+"""Training diagnostics: count dependence and health of a Chimera run. Blind: uses only the
 run's own state and the training counts.
 
-Per run, on genes with count support (|S_g_ema| >= 1e-6, the X4 definition of unmasked):
+Per run, on genes with count support (|S_g_ema| >= 1e-6, the X4_where_differs definition of unmasked):
 * rho_DS: Spearman(alpha - prior, S_g_ema), prior as the run anchored on it;
 * rho_DS_partial: same, partial on expression (Pearson of rank residuals on a natural spline of the
   rank of the species-balanced mean log1p CP10K);

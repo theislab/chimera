@@ -1,4 +1,4 @@
-"""T3.1 seed-pooling rule and T3.3 consensus tables and reliability.
+"""Seed-pooling rule, seed-consensus tables and their reliability.
 
 Definitions (pre-specified analysis plan, sections 2, 3 and 9):
 
@@ -9,8 +9,8 @@ Definitions (pre-specified analysis plan, sections 2, 3 and 9):
   they never enter D, so seed 42 is not counted twice.
 * Consensus D = mean over pooled seeds of (alpha - prior), minus the cohort median.
 * rel(D|C) = 2r / (1 + r), r = mean over all 2-vs-3 splits of the five-seed core (s42-s46) of the
-  correlation of residualised split means. With more than five seeds, also all 5-vs-5 splits
-  (stepped up to the full seed count by the same formula), labelled "all seeds".
+  correlation of residualized split means. With more than five seeds, also all 5-vs-5 splits
+  (stepped up to the full seed count by the same formula), labeled "all seeds".
 * Sign consistency per gene: fraction of pooled seeds whose (alpha - prior) has the sign of
   the consensus.
 
@@ -101,7 +101,7 @@ def run_cohort(cohort: str, outdir: Path) -> dict:
     data = {k: K.read_run(r) for k, r in all_runs.items()}
     Dm = pd.DataFrame({k: v["D"] for k, v in data.items()})
 
-    # Seed pooling (section 2), only when CPU references exist.
+    # Seed pooling (plan, section 2), only when CPU references exist.
     pool = {"cohort": cohort, "mps": sorted(mps), "cpu": sorted(cpu), "platform": bool(plat)}
     keep_mps = sorted(mps)
     cpu_keys = [k for k in Dm.columns if k.startswith("cpu")]

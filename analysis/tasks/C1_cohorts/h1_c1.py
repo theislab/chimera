@@ -1,9 +1,9 @@
-"""C1 cohorts in H1's schema and panels: H1's own code, registry swapped for the C1 cohorts, output in results/analysis/C1/h1/.
+"""Cohorts of this folder in the schema and panels of analysis/tasks/H1_harmonise: its own code with the registry swapped, output in results/analysis/C1/h1/.
 
-Set here, before importing H1: H1_OUT (output root) and H1_EXTRA (none). `rules.COHORTS` is replaced by the C1 cohorts that have kept runs
+Set here, before importing H1_harmonise: H1_OUT (output root) and H1_EXTRA (none). `rules.COHORTS` is replaced by the cohorts of this folder that have kept runs
 (`kept_runs.tsv`: cohort, seed, run). Writes genes/<cohort>.parquet, runs.tsv, set_z.csv, axis.csv, sets_membership.csv, drivers/, in the same
-form as results/analysis/H1/, so they join its tables by human Ensembl ID. B1 here: T4.2 pooled E on the training object, units sample_batch.
-Lineage panels per new tissue are fixed in LINEAGE_C1 below, committed with this file, before any readout.
+form as results/analysis/H1/, so they join its tables by human Ensembl ID. B1 here: T4_2_gene_baselines pooled E on the training object, units sample_batch.
+Lineage panels per new tissue are fixed in LINEAGE_C1 below, before any readout.
 
     python analysis/tasks/C1_cohorts/h1_c1.py tables [--cohort X] | sets [--jobs 8] | forward --run R --cohort X --seed S | drivers | gsea | archetypes
 """
@@ -120,7 +120,7 @@ def tables(one: str | None) -> None:
         for s, run in sorted(d["tried"].items()):
             h = TB.run_health(run)
             anchored = c.startswith("brain_dlpfc")  # the ruling's scope, see grid.anchored_tails
-            if anchored and h.get("no_nan"):  # coordinator ruling: both tails against the anchored prior when most genes are near pi = 1
+            if anchored and h.get("no_nan"):  # both tails against the anchored prior when most genes are near pi = 1 (same rule as in grid.py)
                 h["healthy"] = bool(h["n_active_z"] == 10 and h["tail_up_anch"] >= RU.TAIL_MIN and h["tail_dn_anch"] >= RU.TAIL_MIN and h["sat_hi"] <= RU.SAT_MAX and h["sat_lo"] <= RU.SAT_MAX)
             runs.append(dict(cohort=c, tissue=d["tissue"], role="new", seed=s, kept=bool(h["healthy"]), **h))
     rt = pd.DataFrame(runs)

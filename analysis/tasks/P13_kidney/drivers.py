@@ -1,21 +1,22 @@
-"""P13: E-K4 cell-type drivers of the count margin (plan section 8c), descriptive, Family 3.
+"""E-K4 of the kidney case: cell-type drivers of the count margin (pre-specified analysis plan, section 8c),
+descriptive, Family 3.
 
-Forward pass (``--forward <seed>``): the T2.5 checkpoint-only forward pass
+Forward pass (``--forward <seed>``): the checkpoint-only forward pass of the margin decomposition
 (``T2_5_celltype_margin/run.py::forward_sums``, unchanged) on one kidney seed run, with the kidney
 healthy object as data and ``cell_type`` (= ``cell_ontology_class``) as the grouping. Sums go to
 ``results/analysis/P13/drivers/fw_s<seed>.npz``; nothing is written to the run directory.
 
-Combine (``--combine``), per gene g, species s, cell type k (T2.5 ``margin.decompose``, posterior mean z):
+Combine (``--combine``), per gene g, species s, cell type k (``margin.decompose`` of T2_5_celltype_margin, posterior mean z):
 * mouse-row contribution M_gk = w_sk S_gsk for s = Mouse (w_sk = n_sk / (n_s K)); human-row
   contribution likewise; mean over the five seeds;
 * divergent mass of a gene in type k = max(-M_gk, 0) (the shared decoder fits mouse cells of k worse
   than the null); share of type k = divergent mass in k / total divergent mass of g;
-* E-K4 (8c): for Cippa human-specific genes (Table S3 acute primary, Table S9 late secondary), the
+* E-K4 (plan, section 8c): for Cippa human-specific genes (Table S3 acute primary, Table S9 late secondary), the
   mean share carried by PT + TAL versus immune (myeloid, lymphoid) and stromal (fib, vsm_p) rows,
   beside the same shares for Cippa shared genes and for all vocabulary genes with a defined share
   (the descriptive expectation); per-type shares also by Cippa list;
-* baseline beside it (per-type pseudobulk): the leave-one-type-out change in B1 (E; T4.2 pseudobulk
-  correlation over the shared classes on the same object): increase_k = E_{-k} - E_all, positive
+* baseline beside it (per-type pseudobulk): the leave-one-type-out change in B1 (E; pseudobulk correlation
+  of T4_2_gene_baselines over the shared classes on the same object): increase_k = E_{-k} - E_all, positive
   when type k carries cross-species disagreement; share of type k = max(increase_k, 0) / sum.
 
 Descriptive only: no test, no pass rule.
@@ -67,7 +68,7 @@ def _kidney_adata(cohort: str, backed: bool = False):
 def forward(seed: int, threads: int, batch_size: int) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     run = seed_runs()[seed]
-    C.read_adata = _kidney_adata  # the T2.5 forward pass reads the cohort through this helper
+    C.read_adata = _kidney_adata  # the forward pass of T2_5_celltype_margin reads the cohort through this helper
     fw = T25RUN.forward_sums(f"kidney_s{seed}", "kidney", run, threads, batch_size)
     fw["run"] = np.array(run)
     tmp = OUT / f"fw_s{seed}.tmp.npz"

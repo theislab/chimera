@@ -1,4 +1,5 @@
-"""T7.3: hepatocyte pseudobulk DE for liver MASH (plan section 8, amendment of 2026-11-01).
+"""Hepatocyte pseudobulk DE for liver MASH (pre-specified analysis plan, section 8; amendment log of the
+plan, 2026-11-01).
 
 Runs in ``revision_de_env`` (PyDESeq2 0.5.2), never ``chimera_env``. No Chimera readout is read.
 G-D1 failed, so only hepatocytes are fitted, and H-D1 and H-D4 are Family 3 descriptive.
@@ -154,7 +155,7 @@ MOUSE = dict(design="~ time + diet", factor="diet", test="WD", ref="SD")
 
 
 def permuted_labels(obs: pd.DataFrame, col: str, strata: str, rng, n: int) -> list:
-    """n distinct relabellings within strata, never the observed labels or their exact swap."""
+    """n distinct relabelings within strata, never the observed labels or their exact swap."""
     real = obs[col].astype(str).to_numpy()
     levels = sorted(set(real))
     swap = np.where(real == levels[0], levels[1], levels[0])

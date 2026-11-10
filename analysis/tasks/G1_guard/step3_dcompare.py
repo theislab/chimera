@@ -1,6 +1,6 @@
-"""G1 step 3: guard-on fits at full depth (liver H+Mouse, testis H+Mouse; seeds 45, 46) against the canonical D. No gold is read.
+"""Step 3: guard-on fits at full depth (liver H+Mouse, testis H+Mouse; seeds 45, 46) against the canonical D. No gold is read.
 
-D = alpha - prior (final_state.npz), as analysis/common/controls.py. Canonical seed sets: controls.SEED_SETS (the five seeds of the paper's D) and, as sensitivity, the ten H1 seeds.
+D = alpha - prior (final_state.npz), as analysis/common/controls.py. Canonical seed sets: controls.SEED_SETS (the five seeds of the paper's D) and, as sensitivity, the ten seeds of H1_harmonise.
 For a guard run of seed s: rho(D_guard, mean of the canonical seeds other than s), raw Spearman and residual given C (controls.design). The canonical floor F is the leave-one-seed-out rho of each
 canonical seed against the mean of the others, on the same rows. Inside seed range: rho_guard >= min F. Also the paired rho with the canonical fit of the same seed.
     python -m analysis.tasks.G1_guard.step3_dcompare

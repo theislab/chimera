@@ -1,4 +1,4 @@
-"""G1 step 2: one short fit from a given source tree; records the hash of every RNG state at the end, so RNG consumption can be compared and not only parameters.
+"""Step 2: one short fit from a given source tree; records the hash of every RNG state at the end, so RNG consumption can be compared and not only parameters.
 
 scvi.settings.seed is None in chimera_env, so scvi's train/validation split (DataSplitter.setup, np.random.RandomState(seed=None)) is drawn from OS entropy in every process: two fits of
 the same tree, seed and node differ from the first batch on (found here, G1). That draw is pinned here, the same in both trees, by setting scvi.settings.seed; nothing in either tree changes.

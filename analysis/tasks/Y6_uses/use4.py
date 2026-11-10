@@ -1,4 +1,4 @@
-"""Y6 use 4: cis-regulatory evidence by proxy, rules.py USE 4. Human-chimpanzee hybrid allele counts against human-macaque readouts; islet is human-mouse.
+"""Use 4: cis-regulatory evidence by proxy, rules.py USE 4. Human-chimpanzee hybrid allele counts against human-macaque readouts; islet is human-mouse.
 
 Matched contexts, closest available: liver H+Monkey hepatocytes vs hybrid hepatocyte progenitors (HP); eye H+M. mulatta melanocytes vs retinal pigment epithelium (RPE; both pigmented, the eye object has no RPE type); islet
 H+Mouse beta cells vs pancreatic progenitors (PP); testis H+Macaque has no matched type (negative context, level gap pooled).

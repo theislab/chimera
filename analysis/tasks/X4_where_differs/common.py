@@ -1,4 +1,4 @@
-"""X4 (EXPLORATORY): shared loaders and statistics. rho_p as in T4.3 (``stats.py`` reused)."""
+"""EXPLORATORY: shared loaders and statistics. rho_p as in T4_3_scoreboard (``stats.py`` reused)."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def useed(*parts) -> int:
 
 
 def residual_rank(g: pd.DataFrame, col: str, covs: list[str]) -> pd.Series:
-    """Rank residual of col on spline(covs), standardised; NaN where anything is missing."""
+    """Rank residual of col on spline(covs), standardized; NaN where anything is missing."""
     ok = g[col].notna() & g[covs].notna().all(1)
     out = pd.Series(np.nan, index=g.index)
     if ok.sum() < 50:
@@ -136,7 +136,7 @@ def matched(g: pd.DataFrame, flag, pool, value: str, covs: list[str], key: str =
     pick = rng.integers(0, len(ub), (RU.DRAWS, len(ub)))
     boot = sums[pick].sum(1) / np.maximum(cnts[pick].sum(1), 1)
     lo, hi = np.quantile(boot, [0.025, 0.975])
-    # null by neighbour draws, as X1-X3
+    # null by neighbor draws, as X1-X3
     ch = rng.integers(0, nn, (RU.NULL_DRAWS, len(fi)))
     draws = nv[np.arange(len(fi))[None, :], ch].mean(1)
     obs, c = v[fi].mean(), draws.mean()

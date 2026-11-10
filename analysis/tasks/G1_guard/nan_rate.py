@@ -1,5 +1,5 @@
-"""G1: per setting, guard-on fits finished / non-finite / tried against the unguarded rows of the owning task (health records of B2, D1, T12.2b), plus where each non-finite guard fit died.
-Unguarded counts use every rep the owner tried for that (cohort, setting, form), not only reps 0 and 1; rows still running are not counted.    python -m analysis.tasks.G1_guard.nan_rate
+"""Per setting, guard-on fits finished / non-finite / tried against the unguarded rows of the owning task (health records of B2_benchmark, D1_sparse_genes, T12_2b_recipe), plus where each non-finite guard fit died.
+Unguarded counts use every rep that the owning task tried for that (cohort, setting, form), not only reps 0 and 1; rows still running are not counted.    python -m analysis.tasks.G1_guard.nan_rate
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ def unguarded(kind, cohort, setting, form):
     if kind == "b2":
         pat = f"b2-{cohort}-{setting}{'_law' if form == 'law' else ''}-r[0-9].json"
         files = list(B2H.glob(pat))
-        if form == "unchanged":  # D1 runs recipe-unchanged depth rows where B2 has none (r1 on testis)
+        if form == "unchanged":  # D1_sparse_genes runs recipe-unchanged depth rows where B2_benchmark has none (r1 on testis)
             files += [f for f in D1H.glob(f"d1-{cohort}-{setting}-r[0-9].json") if not (B2H / f.name.replace("d1-", "b2-")).exists()]
     else:
         files = list(D1H.glob(f"d1-{cohort}-{setting}{'law' if form == 'law' else ''}-r[0-9].json"))

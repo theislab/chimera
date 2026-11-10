@@ -2,8 +2,9 @@
 
 (a) Fig 3 rows: the ten frozen methods unchanged (s42, as Fig 3), Chimera canonical gate as in Fig 3 (s42 run), canonical gate over seeds,
     per-gene gate over seeds; mixing score, conservation score, composite on the frozen panel bounds.
-(b) Harmonized cohorts: kNN mixing entropy, label transfer, kNN cell-type purity (H1 key) and the Z2_embedding within-label AUROC, both gates; scVI
-    on the same object beside (H1 table for the cortex, lung, muscle and tumor cohorts; Z2's scVI latents elsewhere).
+(b) Harmonized cohorts: kNN mixing entropy, label transfer, kNN cell-type purity (H1_harmonise key) and the Z2_embedding within-label AUROC,
+    both gates; scVI on the same object beside (H1_harmonise table for the cortex, lung, muscle and tumor cohorts; the scVI latents of
+    Z2_embedding elsewhere).
     python -m analysis.tasks.I1_free_gate_integration.tables
 Writes results/analysis/I1/table_fig3.csv, table_harmonised.csv and, in the same folder, the two tables as LaTeX
 (integration_per_gene_gate.tex, integration_per_gene_gate_harmonised.tex). Nothing is written into the manuscript repository, whose

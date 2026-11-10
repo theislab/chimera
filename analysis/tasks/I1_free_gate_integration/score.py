@@ -1,4 +1,4 @@
-"""I1 per-run scoring: one fitted latent, every integration and embedding metric the paper uses, with the paper's own functions.
+"""Per-run scoring: one fitted latent, every integration and embedding metric the paper uses, with the paper's own functions.
 
     python -m analysis.tasks.I1_free_gate_integration.score unit <cohort> <run> [--stages fig3,h1,z2,enc,spec]
     python -m analysis.tasks.I1_free_gate_integration.score list            units of rules.lines() not yet scored (cohort run per line)
@@ -120,7 +120,7 @@ def unit(c: str, run: str, stages=STAGES) -> None:
 
 
 def check() -> dict:
-    """Canonical runs only: Fig 3 Chimera s42 rows, H1 integration cache, Z2 measure and encoded tables must be reproduced."""
+    """Canonical runs only: Fig 3 Chimera s42 rows, H1_harmonise integration cache, Z2_embedding measure and encoded tables must be reproduced."""
     out = {}
     from analysis.tasks.Z2_embedding import rules as Z2R
     cache = SE.REPO / "notebooks" / "cache" / "baselines_master"

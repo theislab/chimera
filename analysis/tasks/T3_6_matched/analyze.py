@@ -1,12 +1,12 @@
-"""T3.6 analysis: matched cell types (liver 4-sp, Hepatocytes + Endothelial). Run after the run ends.
+"""Analysis of the matched-cell-type control (liver 4-sp, Hepatocytes + Endothelial). Run after the run ends.
 
 Compares ``rev-ctl-liv_4sp-matchA-s42`` with the liver 4-sp consensus of D excluding seed 42
-(seeds 43-46 from T3.2; ``analysis/common/controls.py``), on the Spearman scale and on the
+(seeds 43-46 from analysis/tasks/T3_2_seeds; ``analysis/common/controls.py``), on the Spearman scale and on the
 covariate-residual scale (the matched run on covariates of its own h5ad, the consensus on the
-full cohort's), for D and for S_g_ema. Calls (05 section 9), residual scale: ``preserved``
+full cohort's), for D and for S_g_ema. Calls (pre-specified analysis plan, section 9), residual scale: ``preserved``
 rho >= min F, ``lost`` rho < 0.5 * median F, ``partial`` otherwise, with F the five
 leave-one-seed-out rho of liver 4-sp. If the call is ``partial``, two more seeds are added
-before interpreting (T3.6 card). Reported beside the offline composition result S_bal
+before interpreting. Reported beside the offline composition result S_bal
 (``s_bal.py``); a two-type model has less contrast by design, so disagreement does not
 automatically limit canonical claims. Also: landmark sign table, tail fractions, last
 epoch and expectations.

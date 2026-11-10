@@ -1,4 +1,4 @@
-"""T1.3: load the 11 canonical checkpoints on CPU and compare alpha with final_state.npz."""
+"""Load the 11 canonical checkpoints on CPU and compare alpha with final_state.npz."""
 import sys
 import time
 
@@ -35,7 +35,7 @@ for cohort, run in RUNS:
         ref = np.load(rd / "final_state.npz")["alpha"]
         rho = spearmanr(a, ref)[0]
         row = f"{cohort}\t{run}\tyes\t{a.size}\t{rho:.6f}\t{np.abs(a - ref).max():.3g}\t{time.time() - t:.0f}\t"
-    except Exception as e:  # recorded, triaged in the ledger
+    except Exception as e:  # recorded in the output table
         row = f"{cohort}\t{run}\tno\t\t\t\t{time.time() - t:.0f}\t{type(e).__name__}: {str(e)[:200]}"
     print(row, flush=True)
     out.write(row + "\n")

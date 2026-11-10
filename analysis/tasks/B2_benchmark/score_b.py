@@ -1,4 +1,4 @@
-"""B2 Track B: score one (cohort, setting). Writes tidy rows in the benchmark schema, head-to-head, per-replicate values.
+"""Track B: score one (cohort, setting). Writes tidy rows in the benchmark schema, head-to-head, per-replicate values.
 
 rho_p with the independent gold, and agreement with the method's full-data reading, as README.md. Run in chimera_env.
     python -m analysis.tasks.B2_benchmark.score_b --index I     (I into task_list)

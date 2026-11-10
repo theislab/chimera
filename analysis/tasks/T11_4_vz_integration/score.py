@@ -1,4 +1,4 @@
-"""T11.4: Van Zyl integration benchmark, a separate row excluded from the 7-cohort mean.
+"""Van Zyl integration benchmark, a separate row excluded from the 7-cohort mean.
 
 For every usable dataset (``vz.usable_datasets``): Chimera (the selected s42
 grid run; every seed in D beside it) against the canonical baseline panel (PCA, Harmony, scVI with
@@ -7,7 +7,7 @@ species as batch, scVI / scANVI / sysVI with the sample as batch; ``baselines.ts
 ``cell_type_harmonised``). Composite = the notebooks/07_baselines_master formula: six metrics
 direction-corrected, min-max across the models of the dataset, 0.4 mixing + 0.6 biology.
 Chance references (majority-class rate, knn_mixing_entropy under random mixing) are reported beside.
-SATURN and CAMEX are not run on Van Zyl (their adapters, T5.2, are bound to the CAMEX raw files).
+SATURN and CAMEX are not run on Van Zyl (their adapters, T5_2_adapters, are bound to the CAMEX raw files).
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T11_4_vz_integration/score.py
 """

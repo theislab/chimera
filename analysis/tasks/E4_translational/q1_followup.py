@@ -1,6 +1,6 @@
-"""E4 Q1 follow-up (post hoc, written after reading q1_concordance.csv): does mouse lethality or phenotype breadth explain the inverse
-association of Delta-alpha with curated mouse disease models? Adds MGI/IMPC lethality and the number of MP systems (Y2 pheno) to the
-pooled model. Prints only; numbers are copied into the ledger.
+"""Q1 follow-up (post hoc, written after reading q1_concordance.csv): does mouse lethality or phenotype breadth explain the inverse
+association of Delta-alpha with curated mouse disease models? Adds MGI/IMPC lethality and the number of MP systems (Y2_functional pheno) to the
+pooled model. Prints only.
 
     PYTHONPATH=$PWD mamba run -n chimera_env python -m analysis.tasks.E4_translational.q1_followup
 """

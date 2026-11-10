@@ -1,11 +1,11 @@
-"""X4 (EXPLORATORY): the T2.5 margin with no neural model (rules.py, Direct margin).
+"""EXPLORATORY: the T2_5_celltype_margin margin with no neural model (rules.py, Direct margin).
 
 For each cell of (species s, type k): mu1 = rbar_gk L_c, rbar_gk = mean over species of the species' rate in
 k (a type present in one species uses its own rate); mu0 = p_gs L_c, p_gs = rate of g in s. NB log likelihood
 ratio with gene-wise moment dispersion; S_gsk = mean over cells; w_sk = n_sk / (n_s K); Cdir_gk = sum_s w_sk
 S_gsk; Sdir_g = sum_k Cdir_gk = sum_s Cspdir_gs. Laplace smoothing as ``precompute_p_null`` (0.5 count). Cell labels are used.
 
-Pattern and level parts (added after the mechanism notes, to test them). With mu_p = rbar_gk c_gs L_c, where c_gs rescales the
+Pattern and level parts (added after results were seen, to test what the readouts measure). With mu_p = rbar_gk c_gs L_c, where c_gs rescales the
 shared profile to species s's own total for g, Sdir = LLR(mu_p vs mu0) + LLR(mu1 vs mu_p): the first term is the gain from the
 shared profile at the species' own level (pattern), the second the cost of forcing one level on both species (level). Exact.
 

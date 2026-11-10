@@ -1,4 +1,4 @@
-"""B1 scoring of one altered fit against its truth table. Fixed before any altered run was scored.
+"""Scoring of one altered fit against its truth table. Fixed before any altered run was scored.
 
 Each score is oriented so higher = more conserved; d = -score is the divergence call. The expected direction of every
 alteration on every conservation score is "altered below its matched control" (PREDICTIONS.md).

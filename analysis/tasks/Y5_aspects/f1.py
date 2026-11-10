@@ -1,4 +1,4 @@
-"""Y5 F1: protein properties against S, D_raw, GIN protein-only and expression-only responses, with comparators.
+"""F1: protein properties against S, D_raw, GIN protein-only and expression-only responses, with comparators.
 
 Usage: python -m analysis.tasks.Y5_aspects.f1 [scan|ridge]
 """

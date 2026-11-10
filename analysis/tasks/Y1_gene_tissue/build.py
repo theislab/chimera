@@ -1,9 +1,9 @@
-"""Y1: one gene table per tissue, profiles, direct margins and B1 cell halves. No gold is read and no two tissues are joined.
+"""One gene table per tissue, profiles, direct margins and B1 cell halves. No gold is read and no two tissues are joined.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.build <tissue> [--no-direct] [--no-halves]
 
 Writes results/analysis/Y1/cache/tissue__<t>.parquet, profiles__<t>.npz, Sdir__<t>.parquet, b1_halves__<t>.npz,
-tissue_meta__<t>.json. A repro check against the T4.2 or task table's B1 is asserted: same E to 1e-9 on the same object and units.
+tissue_meta__<t>.json. A repro check against the T4_2_gene_baselines or task table's B1 is asserted: same E to 1e-9 on the same object and units.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ def readout_table(t: str, var_names) -> pd.DataFrame:
 
 
 def seed_S(t: str, var_names, ppass: np.ndarray) -> pd.DataFrame:
-    """S per seed: S_g_ema, or on bone marrow ppass x the human and mouse rows of the T2.5 forward margin."""
+    """S per seed: S_g_ema, or on bone marrow ppass x the human and mouse rows of the T2_5_celltype_margin forward margin."""
     d = Y.TISSUES[t]
     S = {}
     if t == "bone_marrow":
@@ -95,7 +95,7 @@ def covariates(a, X, spc, lab, x, h, m, groups) -> pd.DataFrame:
         expr.append(np.asarray(cp[spc == s].mean(0)).ravel())
         det.append(np.asarray(Xb[spc == s].mean(0)).ravel())
     A = np.stack([np.column_stack([x[(s, g)] for g in groups]) for s in (h, m)])  # species, genes, types
-    # tau over shared types (T4.3 tau_shared): on CP10K means, species without counts left out of the mean
+    # tau over shared types (T4_3_scoreboard tau_shared): on CP10K means, species without counts left out of the mean
     taus = []
     cp10 = X.multiply(1e4 / np.maximum(L, 1)[:, None]).tocsr()
     for s in (h, m):
@@ -118,7 +118,7 @@ def covariates(a, X, spc, lab, x, h, m, groups) -> pd.DataFrame:
 
 
 def b1_halves(X, spc, lab, lib, h, m, n, n_splits, seed):
-    """T4.3 baseline_splits rule: cells split 50/50 within (species, group, library), unit minimum halved."""
+    """T4_3_scoreboard baseline_splits rule: cells split 50/50 within (species, group, library), unit minimum halved."""
     rng = np.random.default_rng(seed)
     key = pd.Series(spc + "|" + lab + "|" + lib).groupby(spc + "|" + lab + "|" + lib).indices
     A, B = np.full((n_splits, n), np.nan, np.float32), np.full((n_splits, n), np.nan, np.float32)

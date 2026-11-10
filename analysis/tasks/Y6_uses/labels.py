@@ -1,4 +1,4 @@
-"""Y6 use 1: labels from the parsed Ensembl fields, rules.py USE 1. No count or readout enters. Run with python -I.
+"""Use 1: labels from the parsed Ensembl fields, rules.py USE 1. No count or readout enters. Run with python -I.
 
     python -I analysis/tasks/Y6_uses/labels.py
 """

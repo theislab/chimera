@@ -1,4 +1,8 @@
-"""B1 Track D: tool inputs for the timing jobs, in the tool's env. Full object: the T5 or B1 inputs; subsample: the same cells as Chimera's object."""
+"""Track D: tool inputs for the timing jobs, in the tool's env.
+
+Full object: the input files of analysis/tasks/T5_2_adapters or those built by B1_ground_truth/tools.py; subsample: the same
+cells as Chimera's object.
+"""
 
 from __future__ import annotations
 
@@ -49,7 +53,7 @@ def main():
         src = wd / "saturn_in"
     else:
         if cohort != "kidney" and keep is not None:
-            # T5 raw files subset to the cells
+            # raw files of T5_2_adapters subset to the cells
             s5 = C5.INPUTS / STEM[cohort] / "camex"
             src = wd / "camex_in"
             src.mkdir(exist_ok=True)

@@ -1,4 +1,4 @@
-"""Z4, gold-free: health of every free-gate candidate (Z4 fits and Z3's fits of liver H+Mouse, testis H+Mouse, liver 4 species),
+"""Gold-free: health of every free-gate candidate (Z4 fits and Z3_free_gate's fits of liver H+Mouse, testis H+Mouse, liver 4 species),
 integration against the cohort's kept canonical seeds, recipe check against the canonical config, and the kept seeds per cohort.
 Reads final_state.npz, config.json and summary.json only; no gold, set or reference is opened.
 
@@ -145,7 +145,7 @@ def main():
     ent = H.get("int_knn_mixing_entropy", pd.Series(np.nan, index=H.index))
     H["mixing_ok"] = (ent >= RU.MIX_FRAC * H.can_entropy_median) & (H.adversary.fillna(1) <= H.can_adv_max + RU.ADV_MARGIN)
     H["healthy"] = H.healthy_gate.fillna(False).astype(bool) & H.mixing_ok.fillna(False).astype(bool)
-    # recipe check against the canonical run the recipe was copied from (Z3 fits: Z3 checked theirs)
+    # recipe check against the canonical run the recipe was copied from (Z3_free_gate fits: Z3_free_gate checked theirs)
     first_kept = kept_can.sort_values("seed").groupby("cohort").run.first()
     chk = []
     for r in H.itertuples():
@@ -159,7 +159,7 @@ def main():
     kept = {}
     for c, g in H.groupby("cohort", sort=False):
         g = g.sort_values("seed")
-        if c in RU.Z3_FREE:  # Z3's line: first 5 passing Z3's gate rule (mixing reported, not applied, as Z3 fixed it)
+        if c in RU.Z3_FREE:  # Z3_free_gate's line: first 5 passing Z3_free_gate's gate rule (mixing reported, not applied, as Z3_free_gate fixed it)
             ok = g[g.healthy_gate.fillna(False).astype(bool)].head(RU.Z3_MAX_SEEDS)
         else:
             ok = g[g.healthy]

@@ -1,4 +1,4 @@
-"""X7 (EXPLORATORY, added after the rules.py tests were read): diagnostics of the per-cell residual share and the
+"""EXPLORATORY, added after the rules.py tests were read: diagnostics of the per-cell residual share and the
 species margins.
 
     cellvar  share of the variance of the per-cell residual share (tv) explained by species, by coarse type and by
@@ -6,7 +6,7 @@ species margins.
     adds     increments: gene x type R given the direct Ddir (and the reverse); species contrasts given the
              same-count baselines; S_Mouse given E(Human, Mouse).
     own      species-own margin with no sharing: mu1 = the species' own rate in each type x library, mu0 = the
-             species rate x library, NB with gene-wise moment dispersion (as X4 direct_margin); Sown_gs = mean over
+             species rate x library, NB with gene-wise moment dispersion (as X4_where_differs direct_margin); Sown_gs = mean over
              cells of s. Compared with Chimera's S_gs and the shared direct margin (Cspdir) gene by gene, and on
              the golds. If z keeps species, the shared decoder can fit each species alone and S_gs follows Sown.
 Writes results/analysis/X7/posthoc_*.csv.
@@ -265,8 +265,8 @@ def sec_checks():
 
 
 def sec_pairfit():
-    """Does the 4-sp joint-fit mouse margin add beyond the human-mouse pair fit's S (seed consensus, X4 table),
-    the labelled direct mouse margin of the 4-sp counts (Cspdir_Mouse) and E(Human, Mouse)?"""
+    """Does the 4-sp joint-fit mouse margin add beyond the human-mouse pair fit's S (seed consensus, X4_where_differs table),
+    the labeled direct mouse margin of the 4-sp counts (Cspdir_Mouse) and E(Human, Mouse)?"""
     units = []
     g = CM.load("liv_4sp")
     pair = CM.load("liv_hmouse").drop_duplicates("hsapiens_gene_id").set_index("hsapiens_gene_id")

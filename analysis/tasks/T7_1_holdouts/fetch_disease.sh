@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T7.1 downloads, disease raw data. Mouse diet series: per-sample h5 files only, CS184-CS197.
+# Downloads of the liver disease raw data. Mouse diet series: per-sample h5 files only, CS184-CS197.
 # Usage: fetch_disease.sh <chimera_repo>
 C="$1"; F="$C/analysis/tasks/T4_1_gold/fetch_item.sh"; D="$C/data/analysis/disease/raw"; M="$D/MANIFEST.tsv"
 GEO=https://ftp.ncbi.nlm.nih.gov/geo

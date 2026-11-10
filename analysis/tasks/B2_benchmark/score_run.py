@@ -1,10 +1,10 @@
-"""B2 Track B: every gene-level readout of one grid row, on that row's own object. Writes per-gene scores; reads no gold.
+"""Track B: every gene-level readout of one grid row, on that row's own object. Writes per-gene scores; reads no gold.
 
 Chimera (when the row has a fit): S_g (S_g_ema), S_fwd (forward-pass margin at the posterior mean, no 20-cell mask, exploratory, as Track A),
 D (alpha - prior minus the median), D_raw, B1z (E on Leiden clusters of the fit's z).
-Direct, the T4.2 and X4/X6 code on the object's counts and b2_label: B1 (E, raw), B1b, B1c (residualised as T4.2), B1c_raw, B2b (any K >= 2,
-flagged in the metadata when K < 4; X6), B3a (5-fold ridge on the 72 features as moved by perturb.py), Sdir (labelled direct margin), Lfc
-(minus absolute log2 ratio of species pseudobulk rates).
+Direct, the code of T4_2_gene_baselines, X4_where_differs and X6_adds_beyond on the object's counts and b2_label: B1 (E, raw), B1b, B1c (residualized
+as T4_2_gene_baselines), B1c_raw, B2b (any K >= 2, flagged in the metadata when K < 4; X6_adds_beyond), B3a (5-fold ridge on the 72 features as moved
+by perturb.py), Sdir (labeled direct margin), Lfc (minus absolute log2 ratio of species pseudobulk rates).
 Pooled fallback, only where cells were removed or split (families composition, sampling, technical; no-label settings; B1z): a group that exists in
 the unperturbed data (or any cluster or matched pair) with >= the minimum cells in total but no library reaching it is pooled over its libraries
 instead of vanishing. This cannot change the full-data values and stops the per-library rule from failing the baselines by itself.
@@ -43,7 +43,7 @@ def full_groups(cohort: str) -> set:
 
 
 def pseudobulk_fb(X, spc, lab, library, min_cells: int, allowed):
-    """T4.2 pseudobulk, then the pooled fallback. allowed: None = no fallback; 'all' = any group; a set = those groups."""
+    """T4_2_gene_baselines pseudobulk, then the pooled fallback. allowed: None = no fallback; 'all' = any group; a set = those groups."""
     x, f, units = T42.pseudobulk(X, spc, lab, library, min_cells)
     rescued = []
     if allowed is not None:

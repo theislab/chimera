@@ -43,7 +43,7 @@ TESTIS = {
     "Macaque": ("2testis/dataset/raw-testis-macaque-Murat.h5ad", "macaca_mulatta"),
     "Mouse": ("2testis/dataset/raw-testis-mouse-Murat.h5ad", "mouse"),
 }
-# Kidney H+Mouse (P13 healthy training object). No authors' raw files: B1 builds tool inputs from the object itself.
+# Kidney H+Mouse (P13_kidney healthy training object). No authors' raw files: B1_ground_truth builds tool inputs from the object itself.
 KIDNEY = {
     "Human": ("kidney/raw-kidney-human-KPMP.h5ad", "human"),
     "Mouse": ("kidney/raw-kidney-mouse-KPMP.h5ad", "mouse"),

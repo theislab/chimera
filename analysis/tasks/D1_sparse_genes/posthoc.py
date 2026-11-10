@@ -1,5 +1,5 @@
-"""D1 post hoc, chosen after a_rho.csv was read; labelled so. (1) D on masked genes given C plus all 69 protein columns; (2) with and without an exact zero in a species; (3) forward margin against
-label-free and labelled direct scores on masked genes, head to head. Writes results/analysis/D1/posthoc_*.csv.
+"""Post hoc, chosen after a_rho.csv was read; labeled so. (1) D on masked genes given C plus all 69 protein columns; (2) with and without an exact zero in a species; (3) forward margin against
+label-free and labeled direct scores on masked genes, head to head. Writes results/analysis/D1/posthoc_*.csv.
     python -m analysis.tasks.D1_sparse_genes.posthoc
 """
 

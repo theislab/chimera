@@ -1,12 +1,12 @@
 """Integration benchmark on the new cohorts, a track of its own (Track I). Integration is the substrate of Chimera's readouts, not its aim; this track says whether the latent is usable.
 
 Same benchmark as Fig 3: the 10-model panel, compute_integration_metrics unmodified (k 15, seed 42), direction correction, min-max across the models of each cohort, mixing and biology means, composite 0.4 mixing + 0.6 biology
-(T5.5 score_external.score_table). Scaling is PER COHORT, so adding a cohort cannot change any value of the original seven; `score.py` checks this, and the seven-cohort aggregate is kept as reported, with the extended one beside it.
+(T5_5_benchmark score_external.score_table). Scaling is PER COHORT, so adding a cohort cannot change any value of the original seven; `score.py` checks this, and the seven-cohort aggregate is kept as reported, with the extended one beside it.
 
-Objects and Chimera fit: H1 table, kept s42 fit. Batch keys: `config_key` is the run's config.json batch key (coordinator's instruction), and fills the "scVI-donor", Harmony, scANVI, sysVI columns. On kidney and bone marrow that key is one-to-one with species, as `batch` is on
+Objects and Chimera fit: those of analysis/tasks/H1_harmonise, kept s42 fit. Batch keys: `config_key` is the run's config.json batch key, and fills the "scVI-donor", Harmony, scANVI, sysVI columns. On kidney and bone marrow that key is one-to-one with species, as `batch` is on
 liver H+Mouse, so scVI-donor equals scVI-sp there in all but name; a sensitivity table therefore replaces those four columns by the sample-level key `sample_key` (what the testis rows use), reported beside and not in the main table.
-Van Zyl H+Mouse: the seven-method row of T11.4 is reused as it stands (labels cell_type_harmonised, Harmony/scVI-donor/scANVI/sysVI on `batch`); only SATURN, SATURN-Leiden and CAMEX are new.
-SATURN, SATURN-Leiden, CAMEX on new cohorts go through the 1:1 orthologs (T5.6 Adapter B; no raw per-species gene sets or homology tables exist for them); the seven original rows use the native adapters. Stated in the table's `adapter` column.
+Van Zyl H+Mouse: the seven-method row of T11_4_vz_integration is reused as it stands (labels cell_type_harmonised, Harmony/scVI-donor/scANVI/sysVI on `batch`); only SATURN, SATURN-Leiden and CAMEX are new.
+SATURN, SATURN-Leiden, CAMEX on new cohorts go through the 1:1 orthologs (T5_6_gene_level Adapter B; no raw per-species gene sets or homology tables exist for them); the seven original rows use the native adapters. Stated in the table's `adapter` column.
 """
 
 from __future__ import annotations

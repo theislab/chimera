@@ -1,4 +1,4 @@
-"""Y2: checks of the annotation tables only (no readout): bigWig reader against the UCSC API; known genes against their annotation."""
+"""Checks of the annotation tables only (no readout): bigWig reader against the UCSC API; known genes against their annotation."""
 
 from __future__ import annotations
 

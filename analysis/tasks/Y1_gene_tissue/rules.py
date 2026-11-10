@@ -1,37 +1,36 @@
-"""Y1 (EXPLORATORY, Family 3): gene x tissue view of the count margin. Definitions, fixed before any association.
+"""EXPLORATORY, Family 3: gene x tissue view of the count margin. Definitions, fixed before any association.
 
-Nothing here changes a status, row or modifier of the plan. Every test below is chosen after the scoreboard. Predictions and
-the verdict rule: chimera-private ledger Y1_gene_tissue.md.
+Nothing here changes a status, row or modifier of the plan. Every test below is chosen after the scoreboard.
 
 Tissues and readouts. Human and mouse in common in every tissue; gene identity is the human Ensembl ID through
 analysis.common.gene_ids (never a symbol, never ortho_N). Models stand as they are (no retuning).
-  liver        liv_hmouse     pair fit, 10 frozen seeds (T3.3)              S = mean S_g_ema
-  testis       test_hmouse    pair fit, 10 frozen seeds (T3.3)              S = mean S_g_ema
-  kidney       kidney         pair fit, 5 healthy seeds (P13)               S = mean S_g_ema
-  islet        islet          pair fit, 5 healthy seeds (T7.9)              S = mean S_g_ema
+  liver        liv_hmouse     pair fit, 10 frozen seeds (T3_3_consensus)              S = mean S_g_ema
+  testis       test_hmouse    pair fit, 10 frozen seeds (T3_3_consensus)              S = mean S_g_ema
+  kidney       kidney         pair fit, 5 healthy seeds (P13_kidney)               S = mean S_g_ema
+  islet        islet          pair fit, 5 healthy seeds (T7_9_islet)              S = mean S_g_ema
   eye          van_zyl hmouse pair fit, 2 healthy seeds s42, s43 (T11)      S = mean S_g_ema
-  bone_marrow  human+lemur+mouse fit, 2 healthy seeds s42, s46 (T12.3)      S = ppass x mean over the human and mouse
-                                                                            rows of the T2.5 forward margin, mean over seeds
-D = alpha - prior as anchored, mean over the same seeds, centred on the cohort median (the fit's one D; on bone marrow the
-fit is three-species). D_raw beside it: alpha - pi_raw, centred; on clamped recipes it nearly equals -pi on the raw scale, so D_raw
+  bone_marrow  human+lemur+mouse fit, 2 healthy seeds s42, s46 (T12_3_tests)      S = ppass x mean over the human and mouse
+                                                                            rows of the T2_5_celltype_margin forward margin, mean over seeds
+D = alpha - prior as anchored, mean over the same seeds, centered on the cohort median (the fit's one D; on bone marrow the
+fit is three-species). D_raw beside it: alpha - pi_raw, centered; on clamped recipes it nearly equals -pi on the raw scale, so D_raw
 enters the variance split only with pi_raw in the design.
-B1 = cross-species pseudobulk profile correlation E (T4.2) of the human-mouse pair over the tissue's shared groups,
-raw, residualised here. Bone marrow uses E_human_mouse, not the pooled three-pair value. K per tissue 4, 6, 13, 8, 9, 8.
-Sdir, Sdir_pattern, Sdir_level = the X4 no-model direct margin and its exact split, on the same cells and groups as B1
-(human and mouse cells only on bone marrow; X4 cache on liver and testis).
+B1 = cross-species pseudobulk profile correlation E (T4_2_gene_baselines) of the human-mouse pair over the tissue's shared groups,
+raw, residualized here. Bone marrow uses E_human_mouse, not the pooled three-pair value. K per tissue 4, 6, 13, 8, 9, 8.
+Sdir, Sdir_pattern, Sdir_level = the X4_where_differs no-model direct margin and its exact split, on the same cells and groups as B1
+(human and mouse cells only on bone marrow; X4_where_differs cache on liver and testis).
 
 Covariates per tissue, computed on human and mouse cells: expr = mean of species mean log1p CP10K, det = mean of species
-detection, tau = T4.3 tau over the human-mouse shared types, amp = SD over shared types of log2 CPM, mean of species,
+detection, tau = T4_3_scoreboard tau over the human-mouse shared types, amp = SD over shared types of log2 CPM, mean of species,
 dom = top minus mean of other shared types of log2 CPM, mean of species. prior_raw and log_cds_length are the gene's own.
 
 Comparable: within a tissue, ranks. Not comparable: raw S across tissues (scale follows depth and counts; sign only after
-within-tissue centring; zero depends on cohort), raw B1 across tissues (K differs). So every cross-tissue statistic uses
-z_gt = within-tissue standardised residual of rank(score) on the spline design of the tissue's covariates. A tissue main effect
+within-tissue centering; zero depends on cohort), raw B1 across tissues (K differs). So every cross-tissue statistic uses
+z_gt = within-tissue standardized residual of rank(score) on the spline design of the tissue's covariates. A tissue main effect
 is zero by construction after this; "gene vs tissue" therefore reads as gene vs gene x tissue, split from noise by reliabilities.
-The tissue share before centring is reported on raw values as a statement about scale only.
+The tissue share before centering is reported on raw values as a statement about scale only.
 
 Count support. A cell (g, t) has count support if |S| >= MASK_EPS (not masked) and ppass >= PPASS_MIN (passes the 20-cell
-rule in at least half of the 256-cell batches). This is the primary matrix: the T2.5 margin_support flag needs Delta-alpha
+rule in at least half of the 256-cell batches). This is the primary matrix: the T2_5_celltype_margin margin_support flag needs Delta-alpha
 and truncates |S| at its median, which would select on the outcome and on expression. Strict support (|S| >= tissue median
 of unmasked |S|, sign of S stable over the tissue's seeds) is the sensitivity for (b) and the rule for naming in (d).
 """
@@ -60,7 +59,7 @@ TISSUES = ["liver", "testis", "kidney", "islet", "bone_marrow", "eye"]
 GOLD_TISSUE = {"liver": "liver", "kidney": "kidney", "pancreas": "islet", "testis": "testis"}
 GOLD_COLUMN = {"liver": "G_H3", "kidney": "G_kidney", "pancreas": "G_pancreas", "testis": "G_H4"}
 
-# Covariates of the target tissue T (columns of the tissue table, spline of rank, df 4, section 3).
+# Covariates of the target tissue T (columns of the tissue table, spline of rank, df 4; pre-specified analysis plan, section 3).
 C_EXPR_DET = ["expr", "det"]
 C_PAT = ["prior_raw", "expr", "det", "log_cds_length", "tau"]  # + H4_nsp for the testis gold
 
@@ -87,9 +86,9 @@ MIN_TISSUES = 5
 # (b) Variance split on z, one row per score and design. Designs: ED = expr, det (the question); ED_pi = + prior_raw;
 # ED_tau = + tau (matched variability). Universes: all count-supported cells; complete cases in all six tissues (S and D); B1 defined.
 #   gene share = mean over tissue pairs of the Pearson of z; rel_t = cell-half reliability on the fixed model (S; 1 forward pass per
-#   tissue, label x half groups), cell-half (B1, N_HALVES splits, unit minimum halved, T4.3 baseline_splits rule), seed split (D, S beside);
+#   tissue, label x half groups), cell-half (B1, N_HALVES splits, unit minimum halved, T4_3_scoreboard baseline_splits rule), seed split (D, S beside);
 #   noise share = 1 - mean rel_t; gene x tissue share = mean rel_t - gene share. All on the complete-case universe; block CI on the
-#   gene share. ESM-free part of D: residual of z(D) on a 5-fold ridge on the 64 PCs, as X3, gene share again.
+#   gene share. ESM-free part of D: residual of z(D) on a 5-fold ridge on the 64 PCs, as X3_cross_cohort, gene share again.
 N_HALVES = 20
 # (c2) Tissue contrast within gene: for two golds T, T', rho of (z S_T - z S_T') with (z G_T - z G_T'), z on each tissue's C_PAT
 #   (+ H4_nsp on testis), genes with both golds and support in both tissues, 6 pairs, for S, B1, D, Sdir; BH over each score's six.

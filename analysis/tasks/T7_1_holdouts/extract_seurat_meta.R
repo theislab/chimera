@@ -1,4 +1,4 @@
-# T7.2 step 2: write the @meta.data of the GSE202379 Seurat object to TSV.
+# For step 2 of T7_2_disease_objects/build.py: write the @meta.data of the GSE202379 Seurat object to TSV.
 # Metadata only: no assay, count or expression slot is read or written.
 #
 # Usage: R_LIBS_USER=~/R_libs Rscript extract_seurat_meta.R <SeuratObject.rds.gz> <out.tsv.gz>

@@ -1,4 +1,4 @@
-"""One command from MANIFEST.tsv to all T4.3 outputs: checks and checksums every input, runs
+"""One command from MANIFEST.tsv to all outputs of the validation: checks and checksums every input, runs
 the steps in order (a step whose outputs exist is skipped unless --redo), then the scoreboard.
 
 Usage (from chimera/, in chimera_env, PYTHONPATH=.):

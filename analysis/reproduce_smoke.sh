@@ -10,7 +10,7 @@
 # models_canonical always. The check of the consensus tables runs when results/gene_tables/ is
 # present (bundle gene_tables) and then also needs models_seeds_controls_cohorts. The check of the
 # per-gene tables of all 26 cohorts for both gates (analysis/check_gene_tables.py) runs when
-# results/analysis/H1 and Z4 are present (bundle analysis_results) and also needs
+# results/analysis/H1 and Z4_free_gate_all are present (bundle analysis_results) and also needs
 # models_per_gene_gate. Writes nothing outside a temporary folder, except the figures that
 # notebook 03 writes when RUN_FIGURE=1.
 # Exit code 0 means every check passed.

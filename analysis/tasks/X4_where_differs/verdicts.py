@@ -1,7 +1,6 @@
-"""X4 (EXPLORATORY): the verdict rule of rules.py applied mechanically to the re-read tables.
+"""EXPLORATORY: the verdict rule of rules.py applied mechanically to the re-read tables.
 
 CI degenerate (ESM blocks too few: width < 0.02) is reported as not estimable and counts as null.
-Wording changes required on top of the rule (REVERSED-TESTIS, level vs pattern, state) are in the ledger.
 Writes results/analysis/X4/verdicts.csv.
 """
 

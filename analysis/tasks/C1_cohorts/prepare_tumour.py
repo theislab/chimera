@@ -1,8 +1,8 @@
-"""C1: Zilionis 2019 (GSE127465) to per-species h5ad, tumour libraries, raw counts from RAW.tar, authors' cell metadata.
+"""Zilionis 2019 (GSE127465) to per-species h5ad, tumor libraries, raw counts from RAW.tar, authors' cell metadata.
 
-The normalised matrices are not used. Cells: those in the authors' metadata, tumour only: human Tissue == tumor, mouse Tumor or healthy == t.
+The normalized matrices are not used. Cells: those in the authors' metadata, tumor only: human Tissue == tumor, mouse Tumor or healthy == t.
 The authors' QC differs by species (human >= 300 UMI, mitochondrial <= 20%; mouse >= 637 UMI, <= 15%), so one rule is applied on top in both species, the stricter pair:
-at least 637 UMI and at most 15% mitochondrial (checklist item 4; the cut acts on the authors' columns). The deposit has symbols only. They are mapped through the release they were built on (checklist 2b): all 41,861 human names are in Ensembl 91 and all 28,205 mouse names in Ensembl 81, no other
+at least 637 UMI and at most 15% mitochondrial (the cut acts on the authors' columns). The deposit has symbols only. They are mapped through the release they were built on: all 41,861 human names are in Ensembl 91 and all 28,205 mouse names in Ensembl 81, no other
 release checked (75-98) reaches that; names unique in the release; stable ID then joins Ensembl 110 orthologs. An unmapped gene is not listed, so it is a missing gene, not a zero.
 
     python analysis/tasks/C1_cohorts/prepare_tumour.py

@@ -1,13 +1,13 @@
-"""Z4 independent references: the canonical reading's agreement statistics recomputed with the free-gate D beside it, same code,
+"""Independent references: the canonical reading's agreement statistics recomputed with the free-gate D beside it, same code,
 same golds, covariates, blocks and draws; paired difference free - canonical.
 
-  trackc   B2 Track C units (track_c.table, strata, covariates, EN.Task with B2's seeds and 10,000 block draws) for the liver, testis,
-           kidney, islet and bone-marrow golds; strata all, count_supported (B2's, canonical support) and support_both (free and
-           canonical). Scores: B2's core set plus D_free, S_free, D_raw_free. h2h: D_free against D, S_g, S_free and the baselines.
-  lists    Bone-marrow Shay lists (track_c.list_sets, stratified AUROC, B2's seeds; D_free and S_free appended after B2's methods).
+  trackc   B2_benchmark Track C units (track_c.table, strata, covariates, EN.Task with B2_benchmark's seeds and 10,000 block draws) for the liver, testis,
+           kidney, islet and bone-marrow golds; strata all, count_supported (B2_benchmark's, canonical support) and support_both (free and
+           canonical). Scores: B2_benchmark's core set plus D_free, S_free, D_raw_free. h2h: D_free against D, S_g, S_free and the baselines.
+  lists    Bone-marrow Shay lists (track_c.list_sets, stratified AUROC, B2_benchmark's seeds; D_free and S_free appended after B2_benchmark's methods).
   cortex   C1 E-B1 (tests_c1.rho_table: rho_p with held-out regions | C, permutation and block bootstrap; delta to canonical D) and
            E-B2 (near-identical strata, tests_c1.boot_spear).
-  cases    C1 H-D1 (Alzheimer on M1 H+Mouse, lung, muscle): C1's h_d1 statistic with D_free and S_free added (C1's files untouched).
+  cases    C1 H-D1 (Alzheimer on M1 H+Mouse, lung, muscle): C1_cohorts's h_d1 statistic with D_free and S_free added (C1_cohorts's files untouched).
 
     PYTHONPATH=$PWD python -m analysis.tasks.Z4_free_gate_all.references trackc|lists|cortex|cases|summary [--jobs 6]
 Output: results/analysis/Z4/references/
@@ -67,7 +67,7 @@ def unit_list(cohorts: list[str]) -> list[dict]:
 
 
 def score_unit(u: dict) -> tuple[list[dict], list[dict]]:
-    """As track_c.score_unit, main group only, with the free-gate scores added; B2's seed, draws, universe rule."""
+    """As track_c.score_unit, main group only, with the free-gate scores added; B2_benchmark's seed, draws, universe rule."""
     c, kind, gold, stn = u["cohort"], u["kind"], u["gold"], u["stratum"]
     covs = next(x[2] for x in RC.COHORTS_C[c]["golds"] if x[0] == kind)
     t = add_free(TC.table(c), c)
@@ -107,7 +107,7 @@ def trackc(jobs: int) -> None:
     H = pd.DataFrame([r for x in res for r in x[1]])
     R.to_csv(OUT / "trackc_rho.csv", index=False)
     H.to_csv(OUT / "trackc_h2h.csv", index=False)
-    # check: canonical D and S_g on strata all and count_supported reproduce B2's unit files (same universe -> same estimate)
+    # check: canonical D and S_g on strata all and count_supported reproduce B2_benchmark's unit files (same universe -> same estimate)
     ck = []
     for (c, kind, stn), g in R[R.stratum.isin(["all", "count_supported"])].groupby(["cohort", "kind", "stratum"]):
         f = B2R.RES / "track_C" / "units" / f"{c}__{kind}__{stn}.parquet"
@@ -201,7 +201,7 @@ def cortex(n_perm: int, n_boot: int) -> None:
 
 
 def h_d1(case: str, model: str, types: list[str], n_perm: int, n_boot: int) -> pd.DataFrame:
-    """tests_c1.h_d1 with D_free and S_free added; reads C1's DE files, writes only to Z4."""
+    """tests_c1.h_d1 with D_free and S_free added; reads C1_cohorts's DE files, writes only to Z4."""
     rng = np.random.default_rng(T1.SEED + 1)
     de = CF.RES / case / "de"
     g = c1_genes(model)

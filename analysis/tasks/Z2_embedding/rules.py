@@ -1,7 +1,7 @@
-"""Z2: is Chimera's latent competent inside a cell-type label, and what sets that? Definitions, fixed before any Z2 metric was computed.
+"""Is Chimera's latent competent inside a cell-type label, and what sets that? Definitions, fixed before any metric of this task was computed.
 
 No gene-level gold is read. TS and TMS appear only as cells with author zones (hepatocytes), never as gene scores. No Murat, EVEE, COE or disease object.
-Chimera seeds: H1 runs.tsv, kept and healthy. scVI: n_latent 10, n_hidden 128, 100 epochs, the batch key of the Chimera run on the same object, seeds 42-44, saved so it can encode new cells.
+Chimera seeds: runs.tsv of H1_harmonise, kept and healthy. scVI: n_latent 10, n_hidden 128, 100 epochs, the batch key of the Chimera run on the same object, seeds 42-44, saved so it can encode new cells.
 Other latents (PCA, Harmony, sysVI, CAMEX, SATURN, scANVI) only where already on disk; they place the cost against mixing, they do not drive any decision.
 """
 from __future__ import annotations
@@ -11,14 +11,14 @@ from analysis.common import gene_ids
 REPO = gene_ids.REPO_ROOT
 OUT = REPO / "results" / "analysis" / "Z2"
 RUNS = REPO / "training" / "runs"
-K = 30                    # neighbours for rho_self, rho_cross (Y5 KNN_CROSS), kNN classifier and kNN regression
-K_MIX = 15                # mixing and label transfer: compute_integration_metrics as in Fig 3 and H1
+K = 30                    # neighbors for rho_self, rho_cross (Y5_aspects KNN_CROSS), kNN classifier and kNN regression
+K_MIX = 15                # mixing and label transfer: compute_integration_metrics as in Fig 3 and H1_harmonise
 K_GRAPH = 15              # graph connectivity
-PERPLEXITY = 30           # cLISI, as scib (3 x perplexity neighbours)
+PERPLEXITY = 30           # cLISI, as scib (3 x perplexity neighbors)
 N_PCS_WITHIN = 10         # within-label variance captured: top PCs of log CP10K on the top N_HVG genes of the label
 N_HVG = 2000
 MIN_LABEL_CELLS = 100     # a (species, label) enters within-label variance with at least this many cells
-MIN_TASK_CELLS = 40       # a species enters a task with at least this many cells, as Y5
+MIN_TASK_CELLS = 40       # a species enters a task with at least this many cells, as Y5_aspects
 MIN_DET = 0.01            # a marker enters a species with detection of at least this
 
 H5AD = {
@@ -30,14 +30,14 @@ H5AD = {
     "vz_hmmul": "data/analysis/van_zyl/van_zyl_hmmul.h5ad", "vz_primates": "data/analysis/van_zyl/van_zyl_primates.h5ad",
     "vz_full": "data/analysis/van_zyl/van_zyl_unified.h5ad",
 }
-TABLE = {"islet": "testis"}   # islet is on the testis ortholog table (B2 integration rules); others as gene_ids.TABLES
+TABLE = {"islet": "testis"}   # islet is on the testis ortholog table (B2_benchmark integration rules); others as gene_ids.TABLES
 LABEL_KEY = {c: "cell_ontology_class" for c in H5AD}
 LABEL_KEY.update({"kidney": "cell_type", "islet": "cell_type", "liv_hmonkey": "cell_type", "liv_hmouse": "cell_type", "liv_4sp": "cell_type"})
 COHORTS_CORE = ["liv_hmouse", "liv_4sp", "liv_hmonkey", "test_hmouse", "test_3sp", "test_hmac", "kidney", "islet", "bone_marrow"]
 COHORTS_LABELFREE = ["vz_hmouse", "vz_hmmul", "vz_primates", "vz_full"]
 
 # Reference markers, literature, human symbols, mapped through the cohort's ortholog table. Fixed before any metric. up - dn, z within (species, label).
-HEP_ZONE = {  # Y5 rules.ZONE["hepatocyte"]: Halpern 2017, Aizarani 2019, MacParland 2018, Ben-Moshe 2019. Pericentral up.
+HEP_ZONE = {  # Y5_aspects rules.ZONE["hepatocyte"]: Halpern 2017, Aizarani 2019, MacParland 2018, Ben-Moshe 2019. Pericentral up.
     "up": ["GLUL", "CYP2E1", "CYP1A2", "OAT", "AXIN2", "LECT2", "SLC1A2", "RGN", "CYP27A1", "CYP7A1", "NOTUM", "TBX3", "RNF43", "ZNRF3", "LGR5", "ADH4", "CYP3A4", "ALDH1A1"],
     "dn": ["CPS1", "HAL", "SDS", "ASS1", "ASL", "PCK1", "G6PC1", "ARG1", "ALDOB", "ALB", "PIGR", "HAMP", "APOA1", "FBP1", "GLS2", "CTSC", "TAT", "ITIH4"]}
 PT_SEGMENT = {  # S1 up, S3 down: Lake 2023 Nature, Ransick 2019 Dev Cell, Park 2018 Science, Chen 2019 JASN.
@@ -96,19 +96,19 @@ LEVELS = {
     "cmmd": ("raw", "--celltype-conditional-mmd --celltype-key cell_ontology_class"),   # liver only: label-conditional MMD on the eight labels
     "gmmd": ("raw", ""),                                                                 # testis only: global MMD, base without the conditional flags
     # Mechanism tests, not settings: the encoder reads raw counts (chimera/_module.py forward and _encoder_input). train_patched.py overrides that method from outside the package.
-    # Added after adv0 + MMD0 was read (amendment 12): both terms lowered together, a frontier between canonical and off. Two knobs by design.
+    # Added after adv0 + MMD0 was read: both terms lowered together, a frontier between canonical and off. Two knobs by design.
     "adv50mmd10": ("raw", "--adv-weight 50 --lambda-mmd 10"), "adv20mmd10": ("raw", "--adv-weight 20 --lambda-mmd 10"), "adv50mmd5": ("raw", "--adv-weight 50 --lambda-mmd 5"), "adv20mmd5": ("raw", "--adv-weight 20 --lambda-mmd 5"),
-    # Added after novamp s42 was read (amendment 13): more mixing pressure without the VAMP prior.
+    # Added after novamp s42 was read: more mixing pressure without the VAMP prior.
     "novamp_adv400": ("raw", "--no-vamp-prior --adv-weight 400"), "novamp_mmd100": ("raw", "--no-vamp-prior --lambda-mmd 100"),
-    "novamp_cmmd": ("raw", "--no-vamp-prior --celltype-conditional-mmd --celltype-key cell_ontology_class"),  # amendment 15
+    "novamp_cmmd": ("raw", "--no-vamp-prior --celltype-conditional-mmd --celltype-key cell_ontology_class"),  # added later
     "logx": ("log1p", ""), "logcp": ("logcp", ""), "logx_adv0mmd0": ("log1p", "--adv-weight 0 --lambda-mmd 0"),
 }
-# Budget amendment withdrawn by the coordinator (amendments 1, 2): the factorial as committed runs in full. The order in factorial.tsv is priority order, and rows only ever append.
+# The factorial runs in full. The order in factorial.tsv is priority order, and rows only ever append.
 COHORT_LEVELS = {
     "liv_hmouse": ["logx", "logcp", "adv50", "adv0", "mmd10", "mmd0", "cmmd", "fb05", "fb2", "nl20", "ep300", "klw5", "res01", "adv100", "adv0mmd0", "novamp", "nl30", "zb0", "logx_adv0mmd0"],
     "test_hmouse": ["adv100", "adv0", "mmd10", "mmd0", "adv0mmd0", "gmmd", "fb05", "fb2", "nl20", "klw5", "logx", "logx_adv0mmd0"],
 }
-# Existing runs that already differ by one knob. Single seeds, read as dose evidence only: runs with a healthy Z1 row enter.
+# Existing runs that already differ by one knob. Single seeds, read as dose evidence only: runs with a healthy Z1_retune row enter.
 EXISTING_GRIDS = {
     "kidney": {"base": ["rev-kid-grid3-s42", "rev-kid-s43", "rev-kid-s44", "rev-kid-s45", "rev-kid-s46"], "adv100": ["rev-kid-grid2-s42"], "adv200": ["rev-kid-grid1-s42"], "mmd100_adv200": ["rev-kid-grid4-s42"],
                "fb15_adv200": ["rev-kid-grid6-s42"], "global_adv200": ["rev-kid-grid8-s42"]},
@@ -130,7 +130,7 @@ def base_seed_runs(cohort: str) -> dict[int, str]:
     return {s: f"rev-{cohort}-s{s}" for s in (range(45, 52) if cohort == "liv_hmouse" else range(43, 52))}
 
 
-# Decision rule, fixed before reading. A setting is "clearly better" only if ALL hold on both factorial cohorts, on seeds passing the Z1 health rule (at least 2 per level):
+# Decision rule, fixed before reading. A setting is "clearly better" only if ALL hold on both factorial cohorts, on seeds passing the Z1_retune health rule (at least 2 per level):
 THRESH = dict(
     min_healthy=2,
     gain_liver_tms_auroc=0.10,    # liver TMS zone AUROC through the encoder, mean over seeds, above base by at least this

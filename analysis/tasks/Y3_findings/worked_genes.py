@@ -1,23 +1,23 @@
-"""Y3 (EXPLORATORY): what the spermatocyte-peak and hepatocyte catabolic genes look like in the counts.
+"""EXPLORATORY: what the spermatocyte-peak and hepatocyte catabolic genes look like in the counts.
 
-No training and no new association with a gold: read-outs and golds are copied from the X4 gene tables, and
-pseudobulks are the X4 / T4.2 ones (log2(1 + CPM) from raw counts, per species and cell type or stage, mean
+No training and no new association with a gold: read-outs and golds are copied from the X4_where_differs gene tables, and
+pseudobulks are the X4_where_differs / T4_2_gene_baselines ones (log2(1 + CPM) from raw counts, per species and cell type or stage, mean
 over libraries). The cell counts and raw UMI totals are recomputed here from the training h5ad.
 
-Worked genes, by a stated rule (the tables were already read in X1, X2 and X4, so the rule is descriptive):
-    testis   of the 17 X4 named spermatocyte genes (reread_x1_named.csv): strict spermatocyte peak, all three golds
+Worked genes, by a stated rule (the tables were already read in X1_testis_discovery, X2_liver_biology and X4_where_differs, so the rule is descriptive):
+    testis   of the 17 X4_where_differs named spermatocyte genes (reread_x1_named.csv): strict spermatocyte peak, all three golds
              present, largest residual Murat pattern r_G_H4.
-    liver    of the 13 X4-nameable 4-species core genes (reread_x2_named.csv): hepatocyte detection >= 0.25 in human,
-             macaque and mouse, both independent golds present, lowest EVEE level value (G_H1).
-    Amendment after the first run, before any text: the first liver rule was largest |S| with counts in all four
+    liver    of the 13 4-species core genes nameable under X4_where_differs (reread_x2_named.csv): hepatocyte detection
+             >= 0.25 in human, macaque and mouse, both independent golds present, lowest EVEE level value (G_H1).
+    Changed after the first run, before any text: the first liver rule was largest |S| with counts in all four
     species, which gave ASL. ASL is a poor example of its class: macaque cells of every type detect it at 66-100%
     and zebrafish has 3 UMI in 5,289 hepatocytes, so its macaque profile is nearly flat. It stays a robust margin call,
     named in the Fig 4 text, but it does not show "pattern shared, level differs" in raw counts. The rule above
     was written after seeing the table, so the choice of worked gene is illustration, not evidence.
 
 Set-level checks, on the same tables:
-    testis   X1 SC-peak group (human-defined): share of genes whose peak stage in mouse and macaque is SC too.
-    liver    X2 list of 63 nuclear genes: share with the hepatocyte as top shared type per species; hepatocyte
+    testis   X1_testis_discovery SC-peak group (human-defined): share of genes whose peak stage in mouse and macaque is SC too.
+    liver    X2_liver_biology list of 63 nuclear genes: share with the hepatocyte as top shared type per species; hepatocyte
              log2(1 + CPM) median per species and median absolute gap per species pair, beside matched-free background.
 
 Writes results/analysis/Y3/worked_*.csv.
@@ -108,7 +108,7 @@ def main():
     if missing:
         print("missing stage columns", missing[:8], [k for k in t3.columns if k.startswith("x_")][:12], flush=True)
     h = t3[[k for k in cols["Human"] if k in t3]].to_numpy(float)
-    # human-defined SC-peak: X1 rule, peak minus mean >= 1 log2 and detection >= 0.10 in the peak stage
+    # human-defined SC-peak: X1_testis_discovery rule, peak minus mean >= 1 log2 and detection >= 0.10 in the peak stage
     peak_h = np.nanargmax(h, 1)
     margin = np.nanmax(h, 1) - np.nanmean(h, 1)
     det = t3[[f"f_Human_{t}" for t in STAGES]].to_numpy(float)
@@ -147,7 +147,7 @@ def main():
                          n_set_expr_both=int((in63 & expr).sum())))
     pd.DataFrame(rows).to_csv(OUT / "worked_sets_liver_gaps.csv", index=False)
     # level-matched hepatocyte gap: set genes against non-set genes in the same decile of pair-mean hepatocyte level
-    # (genes expressed in both species); per list, 63 genes and the 15 X4 core genes
+    # (genes expressed in both species); per list, 63 genes and the 15 X4_where_differs core genes
     core = pd.read_csv(RES / "X4/reread_x2_named.csv")
     core = core[core.cohort == "liv_4sp"].symbol.tolist()
     rows = []

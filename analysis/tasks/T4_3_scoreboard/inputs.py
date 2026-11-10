@@ -1,8 +1,8 @@
 """Per-cohort inputs of the scoreboard: covariates C (and tau for C_pat), ESM PCs, ESM blocks,
-per-seed D, consensus D, baselines and the T2.5 margin-support flag. Gene key: human ENSG.
+per-seed D, consensus D, baselines and the margin-support flag of analysis/tasks/T2_5_celltype_margin. Gene key: human ENSG.
 
-Readout (05 section 2): D = mean over the pooled seeds of (alpha - prior), minus the cohort
-median, from the T3.3 consensus table; per-seed D is re-read from each run's final_state.npz
+Readout (pre-specified analysis plan, section 2): D = mean over the pooled seeds of (alpha - prior), minus the cohort
+median, from the seed-consensus table of analysis/tasks/T3_3_consensus; per-seed D is re-read from each run's final_state.npz
 (read-only) for the leave-one-seed-out range and rel(D|C), and the mean is checked against
 the consensus column. D_raw = mean alpha - pi_raw, minus its median (the alpha - pi_raw
 sensitivity; identical to D on unclamped liver recipes).
@@ -115,7 +115,7 @@ def seed_runs_used(cohort: str) -> dict[int, str]:
     pool = {p["cohort"]: p for p in json.loads((T33_DIR / "seed_pooling.json").read_text())}
     used = pool[cohort]["used"]
     runs = {**T33.MPS.get(cohort, {}), **T33.cpu_runs(cohort)}
-    # CPU seeds take precedence over an MPS run of the same number (T3.3 col())
+    # CPU seeds take precedence over an MPS run of the same number (col() of T3_3_consensus)
     cpu = T33.cpu_runs(cohort)
     return {s: (cpu[s] if s in cpu else runs[s]) for s in used}
 
@@ -187,7 +187,7 @@ def load(cohort: str, cache_dir: Path, consensus: bool = True) -> dict:
     sp_cols = [c for c in b.columns if c.startswith("n_types_det_")]
     det = b[sp_cols].reindex(tab["var_name"]).to_numpy()
     tab["low_detection"] = (det == 0).any(1)
-    # margin support (T2.5, canonical run)
+    # margin support (T2_5_celltype_margin, canonical run)
     t25 = T25_DIR / f"{cohort}__genes.parquet"
     if t25.exists():
         mg = pd.read_parquet(t25).set_index("var_name")
@@ -197,7 +197,7 @@ def load(cohort: str, cache_dir: Path, consensus: bool = True) -> dict:
 
 
 def b3b(F72: np.ndarray, d: np.ndarray) -> np.ndarray:
-    """B3b on a given D: the T4.2 cross-fitted ridge (5 folds, seed 0) on the 72 features."""
+    """B3b on a given D: the cross-fitted ridge of T4_2_gene_baselines (5 folds, seed 0) on the 72 features."""
     return T42.cross_fit_ridge(F72, np.asarray(d, dtype=float))[0]
 
 

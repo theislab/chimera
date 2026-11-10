@@ -1,4 +1,4 @@
-"""Y1 addition J: split the model's own margin, S = pattern gain + level cost, on existing checkpoints (T2.5 forward pass, posterior mean z).
+"""Addition J: split the model's own margin, S = pattern gain + level cost, on existing checkpoints (T2_5_celltype_margin forward pass, posterior mean z).
 
 mu1 = exp(shared(z)) L, mu0 = p_null[s] sum(mu1), c_gs = sum x / sum mu1 per species and gene, mu_p = c_gs mu1.
 Pm = mean over species of mean over cells of LLR(mu_p vs mu0); Lm = the same of LLR(mu1 vs mu_p). Pm + Lm = forward S, exact. Per species and group sums kept.

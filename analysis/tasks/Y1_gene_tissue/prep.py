@@ -1,6 +1,6 @@
-"""Y1 (a): the gene x tissue matrices and the joined gold table. Joins tissues on the human Ensembl ID.
+"""(a): the gene x tissue matrices and the joined gold table. Joins tissues on the human Ensembl ID.
 
-Writes results/analysis/Y1/matrices/: raw_<score>.parquet (genes x tissues, centred on the tissue median of supported genes for S,
+Writes results/analysis/Y1/matrices/: raw_<score>.parquet (genes x tissues, centered on the tissue median of supported genes for S,
 D, Sdir, Sdir_pattern, Sdir_level; raw for B1), z_<score>__<design>.parquet (z_gt), support.parquet, strict.parquet, cov_<col>.parquet,
 golds.parquet, blocks.parquet, halves_S.npz. Nothing is compared across tissues here.
 

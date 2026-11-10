@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T11.1 step 3 sources. Usage: fetch_glaucoma_sources.sh <chimera_repo>
+# Sources of the glaucoma gene list (step 3). Usage: fetch_glaucoma_sources.sh <chimera_repo>
 # van Zyl 2020 (PMC7229661): the PMC article page, from which the gene sentences are quoted
 # (publisher blocks the PMC XML). Gharahkhani 2021: Nature Communications ESM MOESM4 holds
 # Supplementary Data 1-25 (SD14 = functional annotation of all 127 loci); the XML gives Table 1.

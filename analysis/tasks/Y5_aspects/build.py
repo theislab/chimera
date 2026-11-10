@@ -1,4 +1,4 @@
-"""Y5: annotation table, per-seed forward margins and gene tables on healthy seeds. No association is computed here.
+"""Annotation table, per-seed forward margins and gene tables on healthy seeds. No association is computed here.
 
     python -m analysis.tasks.Y5_aspects.build annot
     python -m analysis.tasks.Y5_aspects.build forward --threads 10
@@ -40,7 +40,7 @@ def healthy(cohort: str, rawtail: bool = False) -> dict[int, str]:
 
 
 def seed_policy(cohort: str) -> dict[int, str]:
-    """Literal gate; testis pairs on the raw-prior tail (labelled sensitivity); descriptive cohorts: all finished seeds."""
+    """Literal gate; testis pairs on the raw-prior tail (labeled sensitivity); descriptive cohorts: all finished seeds."""
     if cohort in RU.PRIMARY:
         return healthy(cohort)
     if cohort in RU.SENS_RAWTAIL or cohort == "test_hmac":

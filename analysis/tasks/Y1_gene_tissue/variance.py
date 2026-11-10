@@ -1,4 +1,4 @@
-"""Y1 (b): variance split on z, for S, D, B1 (and Sdir). Complete-case universe unless stated. Block CI on the gene share.
+"""(b): variance split on z, for S, D, B1 (and Sdir). Complete-case universe unless stated. Block CI on the gene share.
 
 gene share = mean Pearson of z over tissue pairs. rel: S = cell-half reliability on the fixed model times seed reliability of the mean over
 the tissue's seeds; B1 = cell-half reliability; D = seed reliability only (no cell-half version exists without retraining: noted, it flatters D).
@@ -153,7 +153,7 @@ def main():
                 prs.append(dict(score=sc, design=dn, a=a, b=b, r=v))
     pd.DataFrame(rows).to_csv(OUT / "variance_split.csv", index=False)
     pd.DataFrame(prs).to_csv(OUT / "variance_pairs.csv", index=False)
-    # two-way ANOVA on raw values, tissue share as a statement on scale: complete cases, values standardised over the whole matrix
+    # two-way ANOVA on raw values, tissue share as a statement on scale: complete cases, values standardized over the whole matrix
     an = []
     for sc in ("S", "D", "B1"):
         v = raw[sc].reindex(genes)

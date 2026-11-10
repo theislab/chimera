@@ -1,4 +1,4 @@
-"""T11.8: apply the README decision rule: class-filtered models against the current Van Zyl models.
+"""Apply the README decision rule: class-filtered models against the current Van Zyl models.
 
 Reads alpha and prior of each run only; no gene list, no gold. Writes
 ``results/analysis/T11/class_filter/compare.{json,tsv}``.

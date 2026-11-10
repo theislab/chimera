@@ -2,13 +2,13 @@
 
 Runs the unmodified `train-saturn.py` of the pinned clone in this process
 (runpy), with published defaults plus `--pe_sim_penalty=1.0`, then aligns the
-output to the processed h5ad by obs_names and writes z_mean.npy (L2-normalised
+output to the processed h5ad by obs_names and writes z_mean.npy (L2-normalized
 `.X`), z_raw.npy (raw `.X`) and config.json.
 
 Thread control: train-saturn.py sets OMP_NUM_THREADS=4 / MKL_NUM_THREADS=6 at
 import time. Numpy, torch and sklearn are imported here first with the thread
 count of the allocation, so those assignments have no effect on the already
-initialised thread pools. torch.set_num_threads is set explicitly.
+initialized thread pools. torch.set_num_threads is set explicitly.
 """
 from __future__ import annotations
 

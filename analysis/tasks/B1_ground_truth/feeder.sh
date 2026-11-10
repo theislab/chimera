@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tops up B1 tasks from queue.tsv, in its order, so that B1 holds at most CPU_CAP CPUs and MEM_CAP GB (run plus pending, counted with
+# Tops up this folder's jobs from queue.tsv, in its order, to at most CPU_CAP CPUs and MEM_CAP GB (run plus pending, counted with
 # squeue -r): the per-user limits are 512 CPUs and 2T. Touches no other job. Run from chimera/. Usage: bash feeder.sh [CPU_CAP] [MEM_CAP_GB]
 CAP=${1:-170}; MEMCAP=${2:-680}
 Q=analysis/tasks/B1_ground_truth/queue.tsv

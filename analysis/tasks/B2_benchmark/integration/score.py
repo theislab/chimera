@@ -1,4 +1,4 @@
-"""Score Track I: new cohorts on the 10-model panel, same scoring as T5.5; extended table; checks that no old value moved. Writes results/analysis/B2/integration/:
+"""Score Track I: new cohorts on the 10-model panel, same scoring as T5_5_benchmark; extended table; checks that no value of the seven-cohort table moved. Writes results/analysis/B2/integration/:
 master_table_extended.csv (the seven rows of master_table_ext.csv byte-identical in value, then the new cohorts), sensitivity_sample_key.csv, mean_scores_both.csv, checks.json, tidy.parquet (overview rows, Track I).
 Re-runnable as latents arrive; a cohort with a missing model is listed with its available models and a blank composite.    python -m analysis.tasks.B2_benchmark.integration.score
 """
@@ -107,7 +107,7 @@ def main():
     T.to_csv(RI.OUT / "master_table_extended.csv", index=False)
     if sens:
         pd.concat(sens, ignore_index=True).to_csv(RI.OUT / "sensitivity_sample_key.csv", index=False)
-    # no old value moved: scaling is per cohort, the seven rows are read from the frozen table and never rescaled
+    # no value of the seven-cohort table moved: scaling is per cohort, the seven rows are read from the frozen table and never rescaled
     again = pd.read_csv(RI.OUT / "master_table_extended.csv", float_precision="round_trip")
     o2 = again[again.dataset.isin(old.dataset.unique())]
     cols = [k for k in old.columns if k in o2 and old[k].dtype != object]

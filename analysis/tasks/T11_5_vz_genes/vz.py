@@ -1,12 +1,12 @@
-"""Van Zyl datasets for T11.4-T11.7: paths, seed runs, seed health and integration references.
+"""Van Zyl datasets for T11_4_vz_integration-T11_7_vz_figure: paths, seed runs, seed health and integration references.
 
 Registry: ``DATASETS`` below plus optional rows in ``datasets_extra.tsv`` (columns dataset, h5ad,
 seed_map, label, beside), so a retuned dataset is added with one row and one more pass of the
 scripts; ``beside`` marks a dataset reported next to the main ones (not in the figure).
 
-Seed rule for new cohorts (amendment log, latest rows): a seed enters D if it finished, has no NaN, no
+Seed rule for the further cohorts (amendment log of the pre-specified analysis plan): a seed enters D if it finished, has no NaN, no
 latent collapse (10/10 active z dims) and both Delta-alpha tails against the raw prior (not frozen),
-and saturation is at most 10% (above 5% its saturated genes are flagged). Other seeds are discarded and not analysed. A
+and saturation is at most 10% (above 5% its saturated genes are flagged). Other seeds are discarded and not analyzed. A
 dataset needs 2 or more such seeds.
 """
 
@@ -118,7 +118,7 @@ def usable_datasets() -> list[str]:
 
 def integration_reference(obs: pd.DataFrame, k: int = 15, n: int = 20000, seed: int = 0) -> dict:
     """Chance references: majority-class rate (adversary) and the expected knn_mixing_entropy
-    if the k neighbours were drawn at random from the species proportions."""
+    if the k neighbors were drawn at random from the species proportions."""
     p = obs["species"].astype(str).value_counts(normalize=True).sort_index().to_numpy()
     K = len(p)
     draws = np.random.default_rng(seed).multinomial(k, p, size=n) / k

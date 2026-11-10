@@ -1,18 +1,18 @@
-"""T7.3: H-D4, hepatocyte MASH programs, Family 3 descriptive (amendment of 2026-11-01). No Chimera
-readout enters.
+"""Liver MASH: H-D4, hepatocyte MASH programs, Family 3 descriptive (amendment log of the pre-specified
+analysis plan, 2026-11-01). No Chimera readout enters.
 
-GSEA machinery is T7.9's (``T7_9_islet/hd4.py``), so all disease cases share one implementation:
+GSEA machinery is that of the islet case (``T7_9_islet/hd4.py``), so all disease cases share one implementation:
 preranked on log2FC, weighted KS, gene-set permutations, MSigDB Hallmark 2020 and Reactome
 2024, 15-500 genes in the universe. Universe: genes tested in the human and mouse primary fits, as
 Ensembl Compara 110 one2one orthologs, on human symbols. This is wider than the liver H+Mouse
 vocabulary, so genes such as TREM2 count here.
 
-Ranking: fixed-scale apeGLM log2FC (prior scale 1, ``log2fc_fixed``) in both species. T7.9 ranks on
-the adaptive prior, but with 3 healthy donors that prior collapses the human fit (de.py), and a
+Ranking: fixed-scale apeGLM log2FC (prior scale 1, ``log2fc_fixed``) in both species. The adaptive
+prior is not used for ranking: with 3 healthy donors it collapses the human fit (de.py), and a
 weighted KS on values near zero has no meaning. The adaptive prior and the Wald statistic are shown
 beside it (h4_rank_sensitivity.tsv).
 
-Calls (section 8 gives none; the rule is 8b's, plus "opposite"):
+Calls (pre-specified analysis plan, section 8 gives none; the rule is that of section 8b, plus "opposite"):
   transfers           human q < 0.05 (BH over sets) and mouse one-sided p in the human direction has
                       q < 0.05 (BH over the human-significant sets)
   opposite            human q < 0.05 and the mouse one-sided p against the human direction has q < 0.05
@@ -127,7 +127,7 @@ def main() -> int:
         print(g["call"].value_counts().to_dict(), "universe", len(uni), flush=True)
         jobs = [(n, a.n_perm_sens, SEED + 2 + i) for i, n in enumerate(hum_s + mus_s + perm_h + perm_m)]
         res = dict(ex.map(_gsea, jobs, chunksize=1))
-    # per-program NES of every human-side contrast, with BH over sets: the tissue-source check of the ledger
+    # per-program NES of every human-side contrast, with BH over sets: the tissue-source check (read by post.py)
     long = []
     for n in hum_s + ["human_primary"]:
         x = (prim[n] if n == "human_primary" else res[n])[["library", "set", "nes", "p"]].copy()

@@ -1,4 +1,4 @@
-"""Y6 use 1, PH5 (post hoc, see ledger): count-free wrong-ortholog label from gene names. T_named_else = the species gene's own name differs from the human symbol and
+"""Use 1, PH5 (post hoc): count-free wrong-ortholog label from gene names. T_named_else = the species gene's own name differs from the human symbol and
 another gene of that species in Ensembl 110 carries the human symbol. Also the whole vocabulary count, per table.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.use1_named

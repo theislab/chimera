@@ -1,4 +1,4 @@
-"""C1: recipe grid and blind selection (plan section 13.0). No reference, test or disease file is read here.
+"""Recipe grid and blind selection (pre-specified analysis plan, section 13.0). No reference, test or disease file is read here.
 
     python analysis/tasks/C1_cohorts/grid.py manifest <cohort> [--round 1]   # writes grids/<cohort>_r<k>.tsv (run_name, args)
     python analysis/tasks/C1_cohorts/grid.py report <cohort>                 # health, rho, embedding per run; selection
@@ -157,7 +157,7 @@ def report(cohort: str) -> pd.DataFrame:
     t = pd.DataFrame(rows)
     t.insert(0, "cohort", cohort)
     if anchored_tails(cohort):
-        # Coordinator ruling (amendment log): more than half of genes at pi >= 0.90: both tails against the anchored prior; saturation and every other criterion unchanged.
+        # Rule (amendment log of the pre-specified analysis plan): more than half of genes at pi >= 0.90: both tails against the anchored prior; saturation and every other criterion unchanged.
         t["healthy_raw_rule"] = t["healthy"]
         t["healthy"] = (t.get("no_nan") == True) & (t["n_active_z"] == 10) & (t["tail_up_tr"] >= ZD.TAIL_MIN) & (t["tail_dn_tr"] >= ZD.TAIL_MIN) & (t["sat_hi"] <= ZD.SAT_MAX) & (t["sat_lo"] <= ZD.SAT_MAX)  # noqa: E712
     out = CF.RES / cohort

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# T12.1 downloads (login node). Usage: fetch_bm.sh <chimera_repo>
-# CELLxGENE h5ads (dataset ids in scouting S2): Tabula Sapiens Bone_Marrow, Tabula Microcebus
+# Downloads of the bone-marrow cohort (run on a node with internet access). Usage: fetch_bm.sh <chimera_repo>
+# CELLxGENE h5ads (dataset ids in the URLs below): Tabula Sapiens Bone_Marrow, Tabula Microcebus
 # Bone marrow, Tabula Muris Senis Bone marrow 10x. Ensembl 110 GTFs for mouse and mouse lemur
 # (gene symbols for the ortholog table; the Compara 110 homologies TSV and the human GTF are
 # already in data/analysis/ensembl110/). GEO platform annotations for the COE recomputation.
@@ -19,7 +19,7 @@ EF=https://ftp.ensembl.org/pub/release-110/gtf
 "$F" E110_GTF_MM "$EF/mus_musculus/CHECKSUMS" "$E/CHECKSUMS.mus_musculus" "$ME"
 "$F" E110_GTF_MIC "$EF/microcebus_murinus/Microcebus_murinus.Mmur_3.0.110.gtf.gz" "$E/Microcebus_murinus.Mmur_3.0.110.gtf.gz" "$ME"
 "$F" E110_GTF_MIC "$EF/microcebus_murinus/CHECKSUMS" "$E/CHECKSUMS.microcebus_murinus" "$ME"
-# Section 12 spleen rule (lemur NK under 150 cells, decided on counts): spleen from all three atlases.
+# Spleen rule of the pre-specified analysis plan, section 12 (lemur NK under 150 cells, decided on counts): spleen from all three atlases.
 # Tabula Sapiens Spleen cee11228-9f0b-4e57-afe2-cfe15ee56312; Tabula Microcebus Spleen
 # bf694f39-4342-4e75-aec0-d46db17f2036; Tabula Muris Senis Spleen 10x e2b469d4-b5c3-4a35-9d19-ee71ce61cae0.
 if [ "${WITH_SPLEEN:-0}" = 1 ]; then

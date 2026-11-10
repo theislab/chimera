@@ -1,4 +1,4 @@
-"""D1 (b): depth experiment on genes that become sparse. Rows in results/analysis/D1/b_rho.csv, per-gene frames in b_genes/.
+"""(b): depth experiment on genes that become sparse. Rows in results/analysis/D1/b_rho.csv, per-gene frames in b_genes/.
     python -m analysis.tasks.D1_sparse_genes.b_depth
 """
 
@@ -23,11 +23,11 @@ FULL_ALIAS = {"S": "S_ema"}
 
 
 def load_runs(c: str, setting: str):
-    """Replicates of a depth: B2 fits where they exist, D1 fits otherwise. Setting names ending in law are arm L, D1 only."""
+    """Replicates of a depth: B2_benchmark fits where they exist, fits of this task otherwise. Setting names ending in law are arm L, this task only."""
     fr, used = [], []
     for r in range(3):
         cand = [(RU.RES / "scores" / f"d1-{c}-{setting}-r{r}.parquet", RU.RES / "health" / f"d1-{c}-{setting}-r{r}.json")]
-        b2s = setting.replace("law", "_law")  # B2 runs depth25_law on the same objects and seeds; D1 does not duplicate it
+        b2s = setting.replace("law", "_law")  # B2_benchmark runs depth25_law on the same objects and seeds; this task does not duplicate it
         cand.append((B2.RES / "scores" / f"b2-{c}-{b2s}-r{r}.parquet", B2.RES / "health" / f"b2-{c}-{b2s}-r{r}.json"))
         for p, h in cand:
             if p.exists() and h.exists():
@@ -61,7 +61,7 @@ def frame(c: str, setting: str):
     if ok:
         Ms = np.column_stack([np.abs(f["S_g"].reindex(t.index).to_numpy(float)) < 1e-6 for f in ok])
         t["masked_f"] = Ms.all(1)
-    else:  # no fit finished: genes expected to be masked, chance of passing the 20-cell mask under 5% (ppass of the setting's object); stated in the ledger
+    else:  # no fit finished: genes expected to be masked, chance of passing the 20-cell mask under 5% (ppass of the setting's object)
         t["masked_f"] = (np.nanmean(np.column_stack([f["ppass"].reindex(t.index).to_numpy(float) for f in fr]), 1) < 0.05)
     t["sparse_f"] = (~t.masked).to_numpy() & t.clean.to_numpy() & t["masked_f"].to_numpy()
     t["always_masked"] = t.masked.to_numpy() & t.clean.to_numpy()

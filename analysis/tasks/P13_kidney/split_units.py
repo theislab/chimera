@@ -1,4 +1,5 @@
-"""P13: fix every unit's role for the kidney AKI case (plan section 8c), from obs metadata only.
+"""Fix every unit's role for the kidney AKI case (pre-specified analysis plan, section 8c), from obs
+metadata only.
 
 No expression value is read: only ``obs`` columns of the two CELLxGENE files.
 

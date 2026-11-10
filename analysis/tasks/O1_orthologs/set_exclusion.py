@@ -1,15 +1,15 @@
-"""O1 follow-up: text-cited set statistics recomputed without the genes the ortholog audit dropped.
+"""Follow-up: text-cited set statistics recomputed without the genes the ortholog audit dropped.
 
 Genes: OTC (human source zero), ASS1 (not in the liver table), COL17A1, CD40LG, SELE, SELP (zebrafish
 one-to-one partner another protein or low-confidence; SELE also no mouse counts). They are removed
 from the gene universe of each liver cohort, so they enter neither a set nor its matched null.
 
 Cited numbers and their sources (same code, inputs, seeds and set/score positions as the originals):
-* X2 ``drivers.csv``: Fig 4c urea-cycle / gluconeogenesis set, score D, matchings C and C_hep,
+* X2_liver_biology ``drivers.csv``: Fig 4c urea-cycle / gluconeogenesis set, score D, matchings C and C_hep,
   universes all and complete, every liver cohort (main text and Extended Results: 4-sp d -1.36,
   Human+Macaque -2.14, Human+Mouse +0.66, p 0.40).
-* X2 ``set_species_share.csv``: species shares of the same set's summed margin (human 69%).
-* T2.6 ``category_matched.csv``: broad Cytoskeleton & ECM on liver 4 species, expression- and
+* X2_liver_biology ``set_species_share.csv``: species shares of the same set's summed margin (human 69%).
+* T2_6_matched ``category_matched.csv``: broad Cytoskeleton & ECM on liver 4 species, expression- and
   length-matched d (+0.24), the only text-cited category that holds one of the genes (COL17A1).
   The other cited categories hold none of them (``classify_extended`` / ``classify_broad``).
 

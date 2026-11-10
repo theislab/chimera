@@ -1,5 +1,5 @@
-"""G1 step 3: health of one guard-arm fit, by the owning task's definitions (B2/D1: alpha, z, S_g finite and 10 latent dims with Var(z_mean) >= 0.01; gate tails beyond 0.05 of the raw prior;
-bone marrow also the T12.2b G-V gate). Plus where the run first went non-finite, from the probe. Reads no gold, no readout beyond these.
+"""Step 3: health of one guard-arm fit, by the owning task's definitions (B2/D1: alpha, z, S_g finite and 10 latent dims with Var(z_mean) >= 0.01; gate tails beyond 0.05 of the raw prior;
+bone marrow also the T12_2b_recipe G-V gate). Plus where the run first went non-finite, from the probe. Reads no gold, no readout beyond these.
     python -m analysis.tasks.G1_guard.step3_health --index I
 """
 

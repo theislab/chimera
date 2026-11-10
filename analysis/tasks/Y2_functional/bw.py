@@ -1,4 +1,4 @@
-"""Y2: minimal read-only bigWig reader (pure Python + numpy): UCSC bbi format, no zoom levels used."""
+"""Minimal read-only bigWig reader (pure Python + numpy): UCSC bbi format, no zoom levels used."""
 
 from __future__ import annotations
 

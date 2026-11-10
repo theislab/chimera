@@ -1,4 +1,4 @@
-"""C1: scVI(species) reference on the same object (checklist item 9), same settings as training/compare_vs_scvi.py, cached there; metrics by the same function.
+"""scVI(species) reference on the same object, same settings as training/compare_vs_scvi.py, cached there; metrics by the same function.
 
     python analysis/tasks/C1_cohorts/scvi_ref.py <cohort>
 """

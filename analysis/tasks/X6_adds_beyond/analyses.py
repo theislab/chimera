@@ -1,6 +1,6 @@
-"""X6 (EXPLORATORY): incremental information (part 1) and label degradation (part 2). Rules in rules.py.
+"""EXPLORATORY: incremental information (part 1) and label degradation (part 2). Rules in rules.py.
 
-Sections: repro (X4 numbers first), incremental, degradation. Writes results/analysis/X6/*.csv.
+Sections: repro (X4_where_differs numbers first), incremental, degradation. Writes results/analysis/X6/*.csv.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ def readers(c: str) -> list[str]:
     return ["D", "S", "Sdir"] + (["D_raw"] if c.startswith("test") else [])
 
 
-# ---------------------------------------------------------------- reproduction of X4
+# ---------------------------------------------------------------- reproduction of X4_where_differs
 def repro():
     units = []
     for c in RU.COHORTS:

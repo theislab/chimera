@@ -1,6 +1,6 @@
-"""T2.3: liver versus testis comparison of delta-alpha with correct gene identity.
+"""Liver versus testis comparison of delta-alpha, genes matched on the human Ensembl gene ID.
 
-Primary version: raw prior (alpha - pi_raw), centred on the cohort median, same species
+Primary version: raw prior (alpha - pi_raw), centered on the cohort median, same species
 pair (H+Monkey vs H+Macaque, H+Mouse vs H+Mouse). Reported beside it, in one table: the
 clamped prior the runs anchor on, expression-trend removal, and 4-sp vs 3-sp.
 
@@ -34,7 +34,7 @@ MIN_PROGRAM_GENES = 15
 PRIMARY = "raw_centred"
 
 # Version -> (column, how the zero point is set). "median": subtract the cohort median
-# before joining (05 section 2 D). "program_mean": signs relative to the mean of program
+# before joining (D of the pre-specified analysis plan, section 2). "program_mean": signs relative to the mean of program
 # means (the reference "cohort-centred" row). "none": as trained.
 VERSIONS = {
     "raw_centred": ("delta_alpha_raw", "median"),
@@ -46,8 +46,8 @@ VERSIONS = {
     "raw_expr_resid": ("da_raw_expr_resid", "none"),
 }
 
-# Reference values from the earlier read-only analysis (response plan, section 2.5,
-# correct-join table; 2 decimals, n exact).
+# Reference values of an independent computation of the same table, for comparison
+# (2 decimals, n exact).
 REFERENCE = {
     ("n_genes", "clamped"): (8366, 8233, 8879),
     ("gene_rho", "clamped"): (0.01, -0.16, -0.21),
@@ -58,11 +58,11 @@ REFERENCE = {
     ("frac_livneg_programs_pos_testis", "clamped_centred_programs"): (0.68, 0.71, 0.43),
     ("frac_livneg_programs_pos_testis", "clamped_expr_resid"): (0.23, 0.11, 0.25),
 }
-# Fig 7e compares the per-gene mean over the four liver cohorts with the mean over the
-# three testis cohorts (supplementary_figures.tex:350).
+# The sign-quadrant panel compares the per-gene mean over the four liver cohorts with the mean
+# over the three testis cohorts (panel e of the residue-audit figure of the Supplement).
 FIG7E = ("liver mean (4 cohorts) vs testis mean (3 cohorts)",
          ["liv_hmonkey", "liv_hmouse", "liv_hzeb", "liv_4sp"], ["test_hmac", "test_hmouse", "test_3sp"])
-# Claim-ledger values C05, C06 and the earlier reproduction of Fig 7e on the true join.
+# Reference values of the gene-level sign statistics and of the sign-quadrant panel, for comparison.
 CLAIMS_REFERENCE = {
     ("frac_livneg_genes_pos_testis", "clamped", "H+Mouse vs H+Mouse"): 0.76,
     ("frac_livneg_genes_pos_testis", "raw", "H+Mouse vs H+Mouse"): 0.19,

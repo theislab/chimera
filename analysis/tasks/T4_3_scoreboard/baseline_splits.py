@@ -1,8 +1,8 @@
-"""Split halves of the baselines for their noise ceilings (05 section 3: "Baselines: same split
-method"). The training cohorts have fewer than 4 donors per species (liver: one library per
-species; testis H+Mouse: 2 mouse libraries), so the halves are random cell halves, labelled
+"""Split halves of the baselines for their noise ceilings (pre-specified analysis plan, section 3:
+"Baselines: same split method"). The training cohorts have fewer than 4 donors per species (liver: one library per
+species; testis H+Mouse: 2 mouse libraries), so the halves are random cell halves, labeled
 technical: cells are split 50/50 within each (species, cell type, library) group, and each half
-goes through the T4.2 pipeline (E, L, B2b; Leiden clusters of Chimera's z from the full data;
+goes through the pipeline of the direct baselines, analysis/tasks/T4_2_gene_baselines (E, L, B2b; Leiden clusters of Chimera's z from the full data;
 B3a refitted on the half's E) with the unit cell minimum halved (15 cells per type, 10 per cluster)
 so that each half keeps the group set of the full data (liver mouse cholangiocytes have 35 cells).
 100 splits, seeded.

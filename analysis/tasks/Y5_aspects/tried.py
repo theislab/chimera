@@ -1,4 +1,4 @@
-"""Y5: one list of every Chimera-readout test tried, BH across all of them, replication half beside it.
+"""One list of every Chimera-readout test tried, BH across all of them, replication half beside it.
 
 Writes results/analysis/Y5/tried.csv and survivors.csv. Usage: python -m analysis.tasks.Y5_aspects.tried
 """

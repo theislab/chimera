@@ -1,4 +1,4 @@
-"""T5.5: integration scorecard of SATURN, SATURN-Leiden and CAMEX beside the seven-method panel.
+"""Integration scorecard of SATURN, SATURN-Leiden and CAMEX beside the seven-method panel.
 
 Imports ``compute_integration_metrics`` unmodified from ``training/compare_vs_scvi.py``, with the
 same k=15, seed=42, ``species`` and ``cell_type`` as the master table. The 49 cached JSONs are read,
@@ -10,7 +10,7 @@ Checks that stop the run:
   * the 7-model composite rebuilt here equals the CSV within 1e-12;
   * one cached latent per dataset recomputed in this env reproduces its cached raw metrics.
 
-Panel: 10 models, composite recomputed with no frozen bounds. SATURN enters L2-normalised, its raw
+Panel: 10 models, composite recomputed with no frozen bounds. SATURN enters L2-normalized, its raw
 latent is scored for the Supplement only. CAMEX seed 42 enters the table; seeds 42-44 give the SD.
 
 Outputs: notebooks/cache/baselines_master_ext/{<ds>__<model>.json, master_table_ext.csv,

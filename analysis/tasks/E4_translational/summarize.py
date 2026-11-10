@@ -1,5 +1,5 @@
-"""E4 step 4: call shares of targets and disease genes against strata-preserving permutation (pooled over human-mouse tissues), and the
-detection gap of robust below and above calls (targets beside all genes). Post hoc summaries of the card's call shares; labelled so.
+"""Step 4: call shares of targets and disease genes against strata-preserving permutation (pooled over human-mouse tissues), and the
+detection gap of robust below and above calls (targets beside all genes). Post hoc summaries of the call shares of rules.py; labeled so.
 
 Writes results/analysis/E4/{callshare_perm.csv, detection_gap.csv}.
 

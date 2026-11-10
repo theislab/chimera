@@ -1,6 +1,6 @@
-"""T7.1 checks from GEO sample metadata only: donors per condition, G-D1 countable parts.
+"""Checks of the liver disease data from GEO sample metadata only: donors per condition, G-D1 countable parts.
 
-Reads the SOFT sample text written by fetch_disease.sh and the committed hold-out table.
+Reads the SOFT sample text written by fetch_disease.sh and the fixed hold-out table.
 No expression value is read.
 
 Usage: python -I sample_counts.py <disease_raw_dir> <holdouts.tsv> <out_dir>
@@ -61,7 +61,7 @@ def main(raw: Path, holdouts: Path, out: Path) -> None:
     nash = [k for k in donors if k.lower() == "nash w/o cirrhosis"]
     n_h = sum(len(donors[k]) for k in healthy)
     n_n = sum(len(donors[k]) for k in nash)
-    # mouse training mice from the committed hold-out table
+    # mouse training mice from the fixed hold-out table
     with holdouts.open() as f:
         ho = list(csv.DictReader(f, delimiter="\t"))
     tr = Counter(r["diet"] for r in ho if r["role"] == "training")

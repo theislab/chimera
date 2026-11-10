@@ -1,4 +1,4 @@
-"""Y5 additions fixed after F1 and T3.1-T3.2 were read, before these ran (ledger amendment).
+"""Additions fixed after F1 and the tests T3.1 and T3.2 of this task were read, before these ran.
 
 F1c: GIN protein-only response c_esm and the ridge prediction on ESM against independent pattern golds, odd and even,
 within and across tissues. Comparators: B3a (feature ridge on B1b), and the same regressor fit to B1b.

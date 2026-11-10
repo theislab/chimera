@@ -1,5 +1,5 @@
-"""T6.6 F4: conserved liver-TF binding B_g against r2, liv_hmouse, with test_hmouse as tissue
-control on one gene universe (05 section 7). Measures conservation, not coherence.
+"""F4: conserved liver-TF binding B_g against r2, liv_hmouse, with test_hmouse as tissue
+control on one gene universe (pre-specified analysis plan, section 7). Measures conservation, not coherence.
 
 Bound in a species: max score (MACS2, -10 log10 Q; 0 = no peak) over the TF's liver-lineage
 experiments >= 500, within +/-5 kb of the TSS. B_g = TFs bound in both / TFs bound in either; genes
@@ -132,7 +132,7 @@ def main() -> None:
                          p_diff=float((1 + (bd <= 0).sum()) / (N_BOOT + 1)),
                          diff_block_lo=float(np.quantile(bdb, .025)), diff_block_hi=float(np.quantile(bdb, .975)),
                          p_diff_block=float((1 + (bdb <= 0).sum()) / (N_BOOT + 1))))
-    # B_g also residualised on the same design: B_g tracks expression, r2 does not (estimate only)
+    # B_g also residualized on the same design: B_g tracks expression, r2 does not (estimate only)
     Zl = FN.designs(liv.set_index("hsapiens_gene_id").loc[U].reset_index(), Eliv[liv["hsapiens_gene_id"].isin(U).to_numpy()][
         pd.Index(liv.loc[liv["hsapiens_gene_id"].isin(U), "hsapiens_gene_id"]).get_indexer(U)])
     ids_t = tes.loc[tes["hsapiens_gene_id"].isin(U), "hsapiens_gene_id"]

@@ -1,4 +1,4 @@
-"""Y6 use 1, PH4: flagged candidates per species with counts and Ensembl reasons. The flag: S_row at or beyond the odd-tuned T_lowconf threshold of the row, or among the 1% most negative S_gs of U_expr.
+"""Use 1, PH4: flagged candidates per species with counts and Ensembl reasons. The flag: S_row at or beyond the odd-tuned T_lowconf threshold of the row, or among the 1% most negative S_gs of U_expr.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.candidates
 """

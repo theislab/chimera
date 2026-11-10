@@ -1,4 +1,4 @@
-"""T6.8: prior-swap runs against same-seed canonical runs, against the seed floor. Control evidence
+"""Prior-swap runs against same-seed canonical runs, against the seed floor. Control evidence
 only: enters no scoreboard and no readout.
 
 Same-seed pair: Spearman of c, Delta-alpha (each run against its own prior), S_g_ema, alpha; D also on
@@ -36,7 +36,7 @@ OUT = gene_ids.REPO_ROOT / "results/analysis/T6_8"
 SEEDS = [45, 46, 47, 48]
 INTEGRATED = FN.INTEGRATED_SEEDS
 POOR = [45, 46, 49, 50]
-ENTROPY_BAR = 0.253  # amendment 2026-11-02
+ENTROPY_BAR = 0.253  # amendment log of the pre-specified analysis plan (2026-11-02)
 COHORT = "liv_hmouse"
 KEYS = ["correction", "D", "S_g_ema", "alpha"]
 

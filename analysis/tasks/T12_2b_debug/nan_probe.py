@@ -1,4 +1,4 @@
-"""T12.2b hypothesis 3: locate the first non-finite tensor in a bone-marrow training run.
+"""T12_2b_recipe hypothesis 3: locate the first non-finite tensor in a bone-marrow training run.
 
 Wraps ``ChimeraModule.forward`` (no change to the package) and records, for every training
 step, the maxima of the tensors that can overflow: library size, counts, z_mean, z_logvar,

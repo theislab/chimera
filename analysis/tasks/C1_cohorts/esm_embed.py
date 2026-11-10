@@ -1,4 +1,4 @@
-"""C1: ESM-2 gene embeddings for species outside the SATURN export, the SATURN recipe.
+"""ESM-2 gene embeddings for species outside the SATURN export, the SATURN recipe.
 
 SATURN (``protein_embeddings/`` of its clone, see ``analysis/external_tools``): Ensembl ``pep.all``, proteins with a stop codon
 dropped; ``esm2_t48_15B_UR50D``, sequences truncated at 1022 residues, mean of the last layer (48) over

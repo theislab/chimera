@@ -1,4 +1,4 @@
-"""Y6 use 1: genome annotation labels, independent of counts. Reads downloaded files only; run with python -I.
+"""Use 1: genome annotation labels, independent of counts. Reads downloaded files only; run with python -I.
 
 For each species gene of every ortholog table (rows: species, human gene, species gene):
   Compara 110: homology type, identity, GOC, WGA, is_high_confidence of the pair (both dumps read; each pair sits under one species).

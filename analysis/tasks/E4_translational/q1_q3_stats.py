@@ -1,4 +1,4 @@
-"""E4 step 2: Q1-Q3 statistics on both read-outs (definitions in rules.py). EXPLORATORY.
+"""Step 2: Q1-Q3 statistics on both read-outs (definitions in rules.py). EXPLORATORY.
 
 Writes results/analysis/E4/{tables/cohorts.parquet, q1_concordance.csv, q1_per_cohort.csv, q1_not.csv, q23_sets.csv,
 q23_contrast.csv, q23_partial.csv, q23_callshare.csv}.

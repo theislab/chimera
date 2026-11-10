@@ -1,12 +1,12 @@
-"""X7 (EXPLORATORY): checkpoint-only forward pass for the per-cell residual share and species margins.
+"""EXPLORATORY: checkpoint-only forward pass for the per-cell residual share and species margins.
 
 Definitions in rules.py. Nothing is trained and nothing is written to run dirs. The model is loaded with
-``ChimeraModel.load(..., accelerator="cpu")`` as in T2.5; alpha is checked against final_state.npz, the
+``ChimeraModel.load(..., accelerator="cpu")`` as in T2_5_celltype_margin; alpha is checked against final_state.npz, the
 shared-only and full reconstructions against ``get_shared_only_expression`` / ``get_expression`` on the first
-cells, and the species margin sums of the canonical runs against the T2.5 forward npz.
+cells, and the species margin sums of the canonical runs against the T2_5_celltype_margin forward npz.
 
 Per cell: tv (A1), gain (A2), lshare (A3), library size, z mean. Per (species, cell_type) and gene: sums of
-r_cg, |r_cg|, the full-vs-shared log-likelihood gain, the composition shift p_full - p_sh, and the T2.5
+r_cg, |r_cg|, the full-vs-shared log-likelihood gain, the composition shift p_full - p_sh, and the T2_5_celltype_margin
 margin l_cg (mean z). Per species and gene: sum of l_cg.
 
 Usage: python -m analysis.tasks.X7_architecture_outputs.forward --runs liv_hmouse,liv_hmouse_s43 [--threads 5]
@@ -42,7 +42,7 @@ def run_table() -> dict:
             names = {}
         try:
             names.update({int(k): v for k, v in I.load(c, gene_ids.REPO_ROOT / "results/analysis/T4_3/cache")["meta"]["seeds"].items()})
-        except Exception:  # noqa: BLE001 - cohorts without a T4.3 cache use SEED_RUNS only
+        except Exception:  # noqa: BLE001 - cohorts without a T4_3_scoreboard cache use SEED_RUNS only
             pass
         for s in seeds:
             out[f"{c}_s{s}"] = (c, names[s])
@@ -50,7 +50,7 @@ def run_table() -> dict:
 
 
 def nb_llr(x, mu1, mu0, th):
-    """log NB(x | mu1, th) - log NB(x | mu0, th) (T2.5 formula)."""
+    """log NB(x | mu1, th) - log NB(x | mu0, th) (T2_5_celltype_margin formula)."""
     import torch
 
     e = 1e-8
@@ -153,7 +153,7 @@ def forward(label: str, cohort: str, run: str, threads: int, batch_size: int = 5
             ar = r.abs().sum(1)
             lshare[idx] = (ar / (ar + (a - abar).abs().sum(1))).numpy()
             lib[idx] = L.squeeze(1).numpy()
-            # T2.5 margin, mean z (no batch offset; null on the shared total)
+            # T2_5_celltype_margin margin, mean z (no batch offset; null on the shared total)
             mu1 = torch.exp(sh) * L
             Lt = mu1.sum(1, keepdim=True).clamp(min=1.0)
             mu0 = (p_null[s_t] * Lt).clamp(min=1e-8)
@@ -182,7 +182,7 @@ def forward(label: str, cohort: str, run: str, threads: int, batch_size: int = 5
                run=np.array(run), cohort=np.array(cohort))
     for k, v in acc.items():
         out[f"sum_{k}"] = v
-    # canonical: T2.5 species sums must match
+    # canonical: T2_5_celltype_margin species sums must match
     f25 = T25 / f"{label}.npz"
     if f25.exists():
         with np.load(f25) as z25:

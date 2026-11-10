@@ -1,13 +1,14 @@
-"""I1 amendment 1: liver H+Monkey replication of the liver H+Mouse zonation result, fixed before any H+Monkey free-gate value was read.
+"""Liver H+Monkey replication of the liver H+Mouse zonation result, fixed before any H+Monkey free-gate value was read.
 
-Pairs: per-gene gate Z4 fits z4-liv_hmonkey-m-s42..s46 (Z4 gate health, from Z4's health table) against the canonical-recipe CPU runs
-o2-ctrl-liv_hmonkey-s42..s46 (O2 control arm; health by the committed canonical rule, Z3 ``health.gate``), paired by seed number.
-Test: hepatocyte zone AUROC in the model (Z2 ``hep_zone`` task: Z2 markers, standardised logistic regression, 5-fold, mean over
-species), I1 ``score.py`` unchanged. Primary: paired difference free - canonical, one-sided paired t; replicated if the one-sided
+Pairs: per-gene gate fits z4-liv_hmonkey-m-s42..s46 of Z4_free_gate_all (its gate health, from its health table) against the canonical-recipe CPU
+runs o2-ctrl-liv_hmonkey-s42..s46 (control arm of analysis/tasks/O1_orthologs, repair_monkey.py; health by the fixed canonical rule, Z3_free_gate
+``health.gate``), paired by seed number.
+Test: hepatocyte zone AUROC in the model (Z2_embedding ``hep_zone`` task: Z2_embedding markers, standardized logistic regression, 5-fold, mean over
+species), ``score.py`` of this task unchanged. Primary: paired difference free - canonical, one-sided paired t; replicated if the one-sided
 95% lower bound is above 0. Beside: seed-range call, rho_self, rho_cross, kNN-AUROC, and the integrated pairs (both seeds with
-mixing entropy at least half the median of the canonical H1 kept seeds, Z4's criterion).
+mixing entropy at least half the median of the canonical kept seeds of H1_harmonise, the criterion of Z4_free_gate_all).
 
-    python -m analysis.tasks.I1_free_gate_integration.replication health    canonical O2 health (no zone value, no free value)
+    python -m analysis.tasks.I1_free_gate_integration.replication health    health of the control-arm runs (no zone value, no free value)
     python -m analysis.tasks.I1_free_gate_integration.replication test      the test, after the units are scored
 Writes results/analysis/I1/replication_health.csv, replication.csv, replication.json.
 """
@@ -49,7 +50,7 @@ def health() -> pd.DataFrame:
 
 
 def lines() -> list[dict]:
-    """Rows for rules.lines(): line 'replication_hmonkey'. Canonical inclusion from replication_health.csv; free from Z4 gate health."""
+    """Rows for rules.lines(): line 'replication_hmonkey'. Canonical inclusion from replication_health.csv; free from Z4_free_gate_all gate health."""
     out = []
     if HEALTH.exists():
         H = pd.read_csv(HEALTH).set_index("seed")
@@ -77,7 +78,7 @@ def one_sided(d: np.ndarray) -> dict:
 
 
 def test(variant: str = "spec") -> dict:
-    """variant 'spec': amendment 1 (Z4 gate health); 'kept_json': per-gene seeds also in Z4's kept.json (adds Z4's mixing criterion)."""
+    """variant 'spec': gate health of Z4_free_gate_all; 'kept_json': per-gene seeds also in Z4_free_gate_all's kept.json (adds Z4_free_gate_all's mixing criterion)."""
     P = pd.read_csv(RU.OUT / "per_seed.csv")
     P = P[(P.line == "replication_hmonkey") & P.included]
     if variant == "kept_json":

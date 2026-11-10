@@ -1,4 +1,4 @@
-"""B1 Track A: select gene sets and alter counts in one species, keeping depth and sparsity real.
+"""Track A: select gene sets and alter counts in one species, keeping depth and sparsity real.
 
 Pure numpy / scipy on a CSR count matrix. Every draw comes from a seeded generator, so an altered object
 regenerates exactly from its grid row (cohort, alteration, effect, band, share, seed). The h5ad is removed

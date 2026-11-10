@@ -1,7 +1,7 @@
-"""T6.4: F2 (Moran's I on PPI graphs) and F3 (interolog retention), 05 section 7.
+"""F2 (Moran's I on PPI graphs) and F3 (interolog retention), pre-specified analysis plan, section 7.
 
-F2. I = x'Wx / x'x on graph nodes, x centred there (``morans_I`` of notebooks/_esm_geometry_builder.py,
-sparse and for graphs of unequal degree). Row-standardised weights are primary, binary weights a
+F2. I = x'Wx / x'x on graph nodes, x centered there (``morans_I`` of notebooks/_esm_geometry_builder.py,
+sparse and for graphs of unequal degree). Row-standardized weights are primary, binary weights a
 sensitivity (I = n / (2E) * x'Ax / x'x). Graphs: HuRI, STRING direct ``experiments`` >= 400, each with
 all edges and after removing edges above the 99th percentile of ESM cosine over all gene pairs.
 Two nulls, both one-sided: node permutation within pi x mean x degree strata (10,000 draws) and
@@ -45,7 +45,7 @@ MIN_TESTABLE = 5
 
 @numba.njit(cache=False)
 def rewire_null(eu, ev, n, X, nswap_factor, n_rw, seed):
-    """Moran's I under degree-preserving rewiring. eu, ev: edges on 0..n-1; X: centred, n x q.
+    """Moran's I under degree-preserving rewiring. eu, ev: edges on 0..n-1; X: centered, n x q.
     Returns I_row and I_bin, n_rw x q. Adjacency held as an n x n byte matrix."""
     np.random.seed(seed)
     E = len(eu)

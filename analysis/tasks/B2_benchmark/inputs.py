@@ -1,7 +1,7 @@
 """Per-cohort gene table for scoring: covariates, ESM blocks, golds, static scores. Keyed by var_name within a cohort and human ENSG across cohorts.
 
-Canonical cohorts: T4.3 cache (same covariates, tau, blocks as the scoreboard). New cohorts: H1 gene table (same schema for all), T4.3 CDS lengths, Y1 ESM blocks.
-Golds: T4.3 gold table, Y1 atlas golds; EVEE kidney; atlas level golds (golds_c.py). dN/dS and LOEUF oriented so that higher means more constrained.
+Canonical cohorts: T4_3_scoreboard cache (same covariates, tau, blocks as the scoreboard). New cohorts: gene table of analysis/tasks/H1_harmonise (same schema for all), T4_3_scoreboard CDS lengths, Y1_gene_tissue ESM blocks.
+Golds: T4_3_scoreboard gold table, Y1_gene_tissue atlas golds; EVEE kidney; atlas level golds (golds_c.py). dN/dS and LOEUF oriented so that higher means more constrained.
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ def gold_table() -> pd.DataFrame:
 
 
 def cohort_table(cohort: str) -> pd.DataFrame:
-    """var_name, hsapiens_gene_id, covariates, block, tau_shared, H1 readouts, golds, static scores. All 14+ cohorts in one schema."""
+    """var_name, hsapiens_gene_id, covariates, block, tau_shared, H1_harmonise readouts, golds, static scores. All 14+ cohorts in one schema."""
     h = pd.read_parquet(RES / f"H1/genes/{cohort}.parquet").set_index("hsapiens_gene_id")
     if cohort in CANON and (RES / f"T4_3/cache/{cohort}__inputs.parquet").exists():
         c = pd.read_parquet(RES / f"T4_3/cache/{cohort}__inputs.parquet")
@@ -74,7 +74,7 @@ def cohort_table(cohort: str) -> pd.DataFrame:
     g = gold_table()
     for k in g.columns:
         t[k] = g[k].reindex(t.index)
-    # H1's dN/dS, LOEUF oriented
+    # dN/dS and LOEUF of the H1_harmonise table, oriented
     t["dNdS_score"] = -h["dNdS"].reindex(t.index).astype(float)
     t["LOEUF_score"] = -h["LOEUF"].reindex(t.index).astype(float)
     t["pi_score"] = t["prior_raw"]

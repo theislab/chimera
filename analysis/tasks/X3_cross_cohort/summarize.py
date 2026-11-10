@@ -1,4 +1,4 @@
-"""X3 (EXPLORATORY): compact cross-cohort summary tables from the ``analyses.py`` CSVs.
+"""EXPLORATORY: compact cross-cohort summary tables from the ``analyses.py`` CSVs.
 
 * ``summary_classes.csv``: per class and score, the matched excess (C4) in each cohort, the
   number of cohorts with a positive / negative excess at p < 0.01, and the seed range.
@@ -7,7 +7,7 @@
 * ``summary_depth_programs.csv``: per liver program, matched excess per species pair for D, S
   and B1b, and the monkey-to-mouse change.
 * ``summary_coupling.csv``: per cohort, feature predictability of D (this task's ESM-only CV R²
-  of residual D; T2.4's 72-feature CV R² of s42 delta-alpha) beside the D-S residual coupling.
+  of residual D; T2_4_covariates's 72-feature CV R² of s42 delta-alpha) beside the D-S residual coupling.
 
 Writes results/analysis/X3/summary_*.csv.
 """

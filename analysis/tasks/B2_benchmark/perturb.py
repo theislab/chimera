@@ -1,4 +1,4 @@
-"""B2 Track B: build the object of one setting. Pure numpy / scipy on the canonical object; every draw comes from a seeded
+"""Track B: build the object of one setting. Pure numpy / scipy on the canonical object; every draw comes from a seeded
 generator, so an object regenerates exactly from its grid row (cohort, setting, rep). The h5ad is removed after its fit is scored.
 
 Written to the object:
@@ -190,7 +190,7 @@ def species_diff(lab, spc) -> np.ndarray:
 
 
 def nolabel(X, spc, lab_true, seed: int, r_min: float) -> np.ndarray:
-    """Annotation-free direct workflow of X6: per-species Leiden on HVGs, clusters matched across species by reciprocal best hits
+    """Annotation-free direct workflow of X6_adds_beyond: per-species Leiden on HVGs, clusters matched across species by reciprocal best hits
     of marker-profile correlation at r >= r_min; matched pairs share a label, the rest keep species-own labels."""
     from analysis.tasks.X6_adds_beyond import degrade as X6
     from analysis.tasks.X6_adds_beyond import rules as X6R

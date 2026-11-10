@@ -1,4 +1,4 @@
-"""Build one tool row's input in chimera_env: the setting's object, and per-species files for the T5 pipelines on the 1:1 orthologs (Adapter B of T5.6).
+"""Build one tool row's input in chimera_env: the setting's object, and per-species files for the SATURN and CAMEX pipelines (T5_2_adapters) on the 1:1 orthologs (Adapter B of T5_6_gene_level).
     data/analysis/B2/tool_inputs/<run>/object.h5ad            obs b2_label, b2_library, species; X counts
     .../saturn/{human,mouse}.h5ad, run.csv                    symbols as var_names, obs cell_type = b2_label; min 3 cells per gene (Adapter A rule)
     .../camex/raw-b2-{human,mouse}-x.h5ad, gene_matches_human2mouse.csv   obs cell_ontology_class = b2_label

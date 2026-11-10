@@ -1,12 +1,12 @@
 """Calibration of the pre-specified set test on random sets from a cell-type-dominated gene pool.
 
 Uniform random sets are exchangeable within strata by construction, so they cannot show the
-failure X2 found for hepatocyte gene sets. Here random sets of matched size are drawn from the
-pool X2 used (liver: top quartile of ``hep_enrich``) or its testis analogue (genes whose T2.5
-dominant cell type is the commonest one), then go through the same statistic: pi_raw x
+failure that analysis/tasks/X2_liver_biology found for hepatocyte gene sets. Here random sets of matched size are
+drawn from the pool used there (liver: top quartile of ``hep_enrich``) or its testis analogue (genes whose
+dominant cell type in analysis/tasks/T2_5_celltype_margin is the commonest one), then go through the same statistic: pi_raw x
 expression decile cells, the 5:1 background rule, stratified AUROC, set labels permuted within
 kept strata. Real D is used; no gold or gene set is read. Reports the fraction of nominal
-one-sided p < 0.05 in each direction (5% if calibrated). 40 is the X2 set size.
+one-sided p < 0.05 in each direction (5% if calibrated). 40 is the set size of X2_liver_biology.
 
 Usage: python -m analysis.tasks.T4_3_scoreboard.calibration_dominant [--n-sets 200 --n-perm 2000]
 """

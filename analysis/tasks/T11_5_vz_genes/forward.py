@@ -1,8 +1,8 @@
-"""T11.5: T2.5 checkpoint-only forward pass on one Van Zyl seed run (code unchanged).
+"""T2_5_celltype_margin checkpoint-only forward pass on one Van Zyl seed run (code unchanged).
 
 ``T2_5_celltype_margin/run.py::forward_sums`` with the Van Zyl dataset as data, gene identity
-through the ``van_zyl`` table, and two groupings: the harmonised fine types
-(``cell_type_harmonised``, for the per-gene cell-type drivers of V3) and the harmonised classes
+through the ``van_zyl`` table, and two groupings: the harmonized fine types
+(``cell_type_harmonised``, for the per-gene cell-type drivers of V3) and the harmonized classes
 (``cell_ontology_class``, the conditional-MMD key). Batch codes come from the run's own
 ``batch_key`` (``source_batch``). Output ``results/analysis/T11/drivers/fw_<dataset>_s<seed>.npz``;
 nothing is written to the run directory.

@@ -1,4 +1,4 @@
-"""Y5 F4: modules. Gene-pair coherence, modules replicated on even genes, programs moving as a block.
+"""F4: modules. Gene-pair coherence, modules replicated on even genes, programs moving as a block.
 
 Sections: pairs, modules, blocks. Usage: python -m analysis.tasks.Y5_aspects.f4 <section> [cohort]
 """

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T12.1 COE inputs: Ensembl 110 BioMart (archive host jul2023 = "Ensembl Genes 110") probe-to-gene
+# Inputs of the conservation of expression (COE): Ensembl 110 BioMart (archive host jul2023 = "Ensembl Genes 110") probe-to-gene
 # maps for the two GEO platforms. GPL4685 (D-MAP, HT_HG-U133A probesets, same IDs and probes as
 # U133A 2.0 / U133 Plus 2) and GPL6246 (ImmGen, MoGene 1.0 ST transcript clusters).
 # Usage: fetch_probe_maps.sh <chimera_repo>

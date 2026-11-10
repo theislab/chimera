@@ -1,4 +1,4 @@
-"""Z2 shared: cohort cells, within-label targets (cached), latents, metrics. Every latent gets the same cells, the same k, the same functions."""
+"""Shared: cohort cells, within-label targets (cached), latents, metrics. Every latent gets the same cells, the same k, the same functions."""
 from __future__ import annotations
 
 import json
@@ -140,7 +140,7 @@ def targets(c: str):
 
 
 def _auroc(z, y, multi: bool):
-    """CV AUROC, standardised logistic regression and kNN (k 30). Five stratified folds, seed 0. Macro one-vs-rest if more than two levels."""
+    """CV AUROC, standardized logistic regression and kNN (k 30). Five stratified folds, seed 0. Macro one-vs-rest if more than two levels."""
     skf = StratifiedKFold(5, shuffle=True, random_state=0)
     lv = np.unique(y)
     pl, pk = np.zeros((len(y), len(lv))), np.zeros((len(y), len(lv)))
@@ -298,7 +298,7 @@ def chimera_runs(c: str) -> dict[int, str]:
 
 
 def latents(c: str) -> dict[str, tuple[str, int, Path]]:
-    """name -> (method, seed, path). Chimera healthy seeds, then scVI on the Chimera batch key, Y5's scVI, then any tool latent already on disk."""
+    """name -> (method, seed, path). Chimera healthy seeds, then scVI on the Chimera batch key, Y5_aspects's scVI, then any tool latent already on disk."""
     stem = Path(RU.H5AD[c]).stem
     out = {}
     for s, run in chimera_runs(c).items():

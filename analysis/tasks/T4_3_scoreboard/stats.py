@@ -1,4 +1,4 @@
-"""Statistics of the T4.3 scoreboard (05 sections 3, 5, 6). Pure functions, no file access.
+"""Statistics of the validation scoreboard (pre-specified analysis plan, sections 3, 5, 6). Pure functions, no file access.
 
 Conventions
 - Ranks are mid-ranks taken once within the universe U; the spline design is built once in U
@@ -100,7 +100,7 @@ def strata(pi_raw: np.ndarray, expr: np.ndarray, min_size: int = 20) -> np.ndarr
 
 
 def cells(pi_raw: np.ndarray, expr: np.ndarray | None) -> np.ndarray:
-    """Unmerged decile cells (sets, 05 section 4); expression only when pi_raw is None."""
+    """Unmerged decile cells (sets; plan, section 4); expression only when pi_raw is None."""
     if pi_raw is None:
         return deciles(expr)
     return deciles(pi_raw) * 10 + deciles(expr)
@@ -203,7 +203,7 @@ def simultaneous_ci(est: np.ndarray, draws: np.ndarray, level: float) -> tuple[n
 
 # ---------------------------------------------------------------- reliability
 def split_rel(halves_a: np.ndarray, halves_b: np.ndarray, Z: np.ndarray, rows: np.ndarray | None = None) -> dict:
-    """rel = 2r/(1+r), r = mean over splits of the Pearson of the residualised ranks of the two
+    """rel = 2r/(1+r), r = mean over splits of the Pearson of the residualized ranks of the two
     halves. Each split uses the genes where both halves are defined; ranks and the design are
     taken within those genes (rows of Z with the covariates of U)."""
     rs, ns = [], []
@@ -235,7 +235,7 @@ def sign_concordance(d: np.ndarray, g: np.ndarray, lab: np.ndarray) -> float:
 
 # ---------------------------------------------------------------- stratified AUROC / AUPRC
 def kept_strata(inset: np.ndarray, lab: np.ndarray, ratio: int = 5, absolute: bool = False) -> np.ndarray:
-    """Strata kept for a set test (05 section 4): at least 5 background genes per set gene
+    """Strata kept for a set test (plan, section 4): at least 5 background genes per set gene
     (n_bg >= 5 n_set). ``absolute`` (Family 3 sensitivity): at least 5 background genes."""
     keep = np.zeros(len(lab), bool)
     for s in np.unique(lab):

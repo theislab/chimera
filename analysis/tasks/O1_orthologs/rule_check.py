@@ -1,6 +1,6 @@
-"""O1 step 4: is_high_confidence as a filter, count-free and gold-free. Compara's flag has an identity arm, so it can fail true syntenic orthologs of fast proteins, which are what
+"""Step 4: is_high_confidence as a filter, count-free and gold-free. Compara's flag has an identity arm, so it can fail true syntenic orthologs of fast proteins, which are what
 Chimera reads. Classes of one-to-one protein pairs: clean; low_syntenic (not high-confidence, GOC and WGA both at least 50); low_nosynteny (not high-confidence, the rest); plus the wrong-pair signatures.
-Readouts: exact zero in the species, B1, dN/dS, identity, on the H1 per-gene tables (no gold). Post hoc, after reading PODXL and SPINK2 in the named list.
+Readouts: exact zero in the species, B1, dN/dS, identity, on the per-gene tables of H1_harmonise (no gold). Post hoc, after reading PODXL and SPINK2 in the named list.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.rule_check
 """

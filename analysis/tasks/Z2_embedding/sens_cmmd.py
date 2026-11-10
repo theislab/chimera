@@ -1,6 +1,6 @@
-"""Z2 labelled sensitivity, coordinator's instruction after the decision that the canonical recipe stays: liver H+Mouse trained with label-conditional MMD, the 4 existing healthy seeds (42-45).
-Reads golds; enters no status, row or modifier. T4.3 and T5.6 code imported unchanged (units, RNG streams by unit id, draws 10,000, permutations 10,000); only the liver H+Mouse D, S_ema and seed matrix are swapped.
-Lines: frozen = the check that this harness returns the frozen values to 1e-9; cmmd4 = seeds 42-45; cmmd_no45 = seeds 42-44, the s45-free second line, stated beside. The frozen T4.3 and T5.6 folders are only read.
+"""Labeled sensitivity, run with the canonical recipe kept as it is: liver H+Mouse trained with label-conditional MMD, the 4 existing healthy seeds (42-45).
+Reads golds; enters no status, row or modifier. T4_3_scoreboard and T5_6_gene_level code imported unchanged (units, RNG streams by unit id, draws 10,000, permutations 10,000); only the liver H+Mouse D, S_ema and seed matrix are swapped.
+Lines: frozen = the check that this harness returns the frozen values to 1e-9; cmmd4 = seeds 42-45; cmmd_no45 = seeds 42-44, the s45-free second line, stated beside. The frozen T4_3_scoreboard and T5_6_gene_level folders are only read.
 Comparators stay frozen, including B1z (clusters on the canonical latent). Reliability, ceilings: the plan's 2-vs-3 splits need 5 seeds, so absent here.
 python -m analysis.tasks.Z2_embedding.sens_cmmd --workers 14    Output: results/analysis/Z2/sens_cmmd/"""
 from __future__ import annotations
@@ -49,7 +49,7 @@ def set_line(base: dict, line: str) -> None:
     draw = c["alpha"] - tab["prior_raw"].to_numpy()
     tab["D_raw"] = draw - np.median(draw)
     D.update(M=c["M"], seeds=seeds)
-    tab["D3"] = consensus([42, 43, 44])["D"] + np.median(consensus([42, 43, 44])["M"].mean(1))  # as run.py: uncentred mean of seeds 42-44; ranks only
+    tab["D3"] = consensus([42, 43, 44])["D"] + np.median(consensus([42, 43, 44])["M"].mean(1))  # as run.py: uncentered mean of seeds 42-44; ranks only
 
 
 def units(tools: list[str]) -> list[dict]:
@@ -67,7 +67,7 @@ def units(tools: list[str]) -> list[dict]:
         U.append(T.unit(f"{h}:margin_support", "F3", "margin_with_support_canonical_flag", h, c, g, cov, ["D"], subset="margin_support"))
         for t in tools:
             U.append(T.unit(f"{h}:tool:{t}", "F1_tools", "tool_vs_D3", h, c, g, cov, ["D3", t]))
-    # post hoc T4.3 reading: H3 with hepatocyte enrichment in the design (design and bootstrap as dominance_exploratory; its id and stream differ, checked on value only)
+    # post hoc T4_3_scoreboard reading: H3 with hepatocyte enrichment in the design (design and bootstrap as dominance_exploratory; its id and stream differ, checked on value only)
     U.append(T.unit("H3:hep", "F3", "H3_given_hep_enrich", "H3", "liv_hmouse", "G_H3", "C_pat_hep", ["D"], perm="one"))
     U.append(T.unit("H1:hep", "F3", "H1_given_hep_enrich", "H1", "liv_hmouse", "G_H1", "C_hep", ["D"], perm="one"))
     return U
@@ -96,7 +96,7 @@ def y4(cm4: dict, cm3: dict) -> pd.DataFrame:
 
 
 def catabolic(frozen: pd.DataFrame, cm4: dict, cm3: dict) -> pd.DataFrame:
-    """Where the hepatocyte catabolic list (X2 divergent_conserved, liver 4-sp, the C43 list) sits in liver H+Mouse D and S: mean percentile within genes, frozen and labelled."""
+    """Where the hepatocyte catabolic list (X2_liver_biology divergent_conserved, liver 4-sp) sits in liver H+Mouse D and S: mean percentile within genes, frozen and labeled."""
     x = pd.read_csv(RU.REPO / "results/analysis/X2/divergent_conserved.csv")
     rows = []
     for co, g in x.groupby("cohort"):

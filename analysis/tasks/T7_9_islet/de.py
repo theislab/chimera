@@ -1,4 +1,4 @@
-"""T7.9: pseudobulk differential expression for the islet T2D case (plan section 8b).
+"""Pseudobulk differential expression for the islet T2D case (pre-specified analysis plan, section 8b).
 
 Runs in ``revision_de_env`` (PyDESeq2 0.5.2), never ``chimera_env``. No Chimera readout is read.
 
@@ -11,18 +11,18 @@ Per DE-able type t (``results/analysis/T7_9/gd1b_types.csv``), on the DE units o
   db/db = dbdb_disease vs dbdb_control, mSTZ = mstz_disease vs mstz_control (1 vs 1, descriptive).
 
 Wald tests; PyDESeq2's apeGLM prior on the tested coefficient (``lfc_shrink``), twice:
-``log2fc_shrunk`` with the adaptive prior and ``log2fc_fixed`` with prior scale 1 (T7.3). The adaptive
-prior collapses the human fits (92-99.8% of genes at |log2FC| < 0.001 in delta, ductal, endothelial
-and stellate), so l^h is the unshrunk ``log2fc_mle``, m stays adaptive as the plan says, and H-D4
-ranks on ``log2fc_fixed`` in both species. Mouse fits use only genes
-measured in both DE studies (``var['measured_dbdb']`` and ``var['measured_mstz']``; elsewhere the
-atlas pads a gene missing from a study's reference with zeros). Genes with < 10 counts summed over
-the units are not tested. ``det_frac`` = cells with count > 0 / cells, over the units
-used, for section 8b's 5% detection rule.
+``log2fc_shrunk`` with the adaptive prior and ``log2fc_fixed`` with prior scale 1 (as in the liver
+MASH case, analysis/tasks/T7_3_mash). The adaptive prior collapses the human fits (92-99.8% of genes
+at |log2FC| < 0.001 in delta, ductal, endothelial and stellate), so l^h is the unshrunk
+``log2fc_mle``, m stays adaptive as the plan says, and H-D4 ranks on ``log2fc_fixed`` in both
+species. Mouse fits use only genes measured in both DE studies (``var['measured_dbdb']`` and
+``var['measured_mstz']``; elsewhere the atlas pads a gene missing from a study's reference with
+zeros). Genes with < 10 counts summed over the units are not tested. ``det_frac`` = cells with
+count > 0 / cells, over the units used, for the 5% detection rule of plan, section 8b.
 
-Permuted labels (``--perm``, for the H-D4 calibration and the section 8b controls): human condition
+Permuted labels (``--perm``, for the H-D4 calibration and the controls of plan, section 8b): human condition
 labels within sex x chemistry over the 26 DE donors, 20 draws, the same donor labels in every type;
-mouse labels within study, all 11 relabellings other than the true one. Only ``log2fc_fixed`` is
+mouse labels within study, all 11 relabelings other than the true one. Only ``log2fc_fixed`` is
 shrunk there. Written to ``de/perm/``.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T7_9_islet/de.py [--types beta,...] [--n-cpus 16]
@@ -130,7 +130,7 @@ def human_label_draws(obs: pd.DataFrame) -> list:
 
 
 def mouse_label_draws(obs: pd.DataFrame) -> list:
-    """All within-study relabellings that keep each study's arm sizes, except the true labels."""
+    """All within-study relabelings that keep each study's arm sizes, except the true labels."""
     d = obs[obs["role"].isin(["de_control", "de_disease"])].drop_duplicates("sample").set_index("sample")
     d = d[["study", "condition"]].astype(str).sort_index()
     per = []
@@ -169,7 +169,7 @@ def run_perm(pb_h: ad.AnnData, pb_m: ad.AnnData, types: list, n_cpus: int) -> No
 
 
 def run_loo(pb_h: ad.AnnData, pb_m: ad.AnnData, t: str, n_cpus: int) -> None:
-    """Leave-one-out primary fits for the H-D1 sensitivity (section 8b): each ND DE-half donor
+    """Leave-one-out primary fits for the H-D1 sensitivity (plan, section 8b): each ND DE-half donor
     (human, ``~ sex + chemistry + condition``) and each mouse DE library (``~ study + condition``;
     ``~ condition`` when the remaining libraries come from one study). A fit needs >= 2 units per
     arm. Human fits skip the adaptive prior (l^h is the MLE); mouse fits keep it (m is adaptive).

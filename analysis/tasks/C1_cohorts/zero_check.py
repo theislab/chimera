@@ -1,4 +1,4 @@
-"""C1, checklist item 2b. Per cohort and species, before training: genes with exact zero in the training cells of a species; their total under ID in the species' whole source (all units
+"""Checklist item 2b. Per cohort and species, before training: genes with exact zero in the training cells of a species; their total under ID in the species' whole source (all units
 and classes, ID and, for symbol matrices, name), and whether a gene quiet in one species is well expressed in the other species of the object.
 
 Output results/analysis/C1/<cohort>/zero_genes.tsv and one line per species.

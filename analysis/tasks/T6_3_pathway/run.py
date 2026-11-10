@@ -1,4 +1,4 @@
-"""T6.3: G0 (set-level reliability across seeds) and F1 (pathway coherence), 05 section 7.
+"""G0 (set-level reliability across seeds) and F1 (pathway coherence), pre-specified analysis plan, section 7.
 
 G0: Spearman between seeds of set means of per-seed D, Hallmark and Reactome, against the same
 statistic on shuffled gene-to-set assignment and against gene-level Spearman.

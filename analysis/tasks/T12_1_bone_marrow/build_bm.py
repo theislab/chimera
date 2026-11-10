@@ -1,6 +1,6 @@
-"""T12.1: build the bone-marrow cohort (human, mouse lemur, mouse) from the CELLxGENE files.
+"""Build the bone-marrow cohort (human, mouse lemur, mouse) from the CELLxGENE files.
 
-Pre-specified analysis plan section 12. Inputs (``data/analysis/bone_marrow/raw/``, see
+Pre-specified analysis pre-specified analysis plan, section 12. Inputs (``data/analysis/bone_marrow/raw/``, see
 MANIFEST.tsv): Tabula Sapiens Bone_Marrow and Spleen, Tabula Microcebus Bone marrow and
 Spleen, Tabula Muris Senis Bone marrow and Spleen (10x). Counts are ``raw/X`` (integer UMIs).
 
@@ -14,10 +14,10 @@ Steps, in order:
    Van Zyl (``T11_1_vanzyl/build_vanzyl.py``) and kidney (``P13_kidney/build.py``). The
    human mitochondrial percentage stays in ``obs['pct_counts_mt']`` for disclosure.
 3. Labels: the committed map ``celltype_map.tsv`` (CELLxGENE ``cell_type`` to the nine
-   harmonised types; ``DROP`` rows removed). Every label present must be in the map.
-4. Spleen rule (section 12): if lemur bone-marrow B or NK has fewer than 150 cells after steps
+   harmonized types; ``DROP`` rows removed). Every label present must be in the map.
+4. Spleen rule (pre-specified analysis plan, section 12): if lemur bone-marrow B or NK has fewer than 150 cells after steps
    1-3, the spleen files of all three atlases are added. Decided on these counts only.
-5. Caps (build 2, T12.2b): every species x type, bone marrow and spleen together, at ``CAP``
+5. Caps (build 2, T12_2b_recipe): every species x type, bone marrow and spleen together, at ``CAP``
    cells, drawn uniformly without replacement (numpy default_rng(SEED) over sorted cell IDs).
    ``CAP`` is the largest multiple of 50 for which the capped total does not exceed
    ``SIZE_REF`` = 28,854 cells, the size of the testis 3-species cohort
@@ -25,7 +25,7 @@ Steps, in order:
    schedule (KL and FQR warm-ups at epoch 20, adversary at 5, plateau LR decay) were set.
    Reason: at 128,328 cells (build 1, 452 steps per epoch against 29-102 in the canonical
    cohorts) training collapsed the latent or went NaN, and a proportional 25k draw of the same
-   cells did not (``ledgers/T12_2b_debug.md`` in chimera-private). One per-type cap also
+   cells did not (diagnostics of analysis/tasks/T12_2b_debug). One per-type cap also
    keeps any single type from dominating the cohort: after the spleen addition B and T, not
    neutrophil and erythroid, were the largest classes, so build 1's neutrophil/erythroid-only
    cap (5,000) had lost its reason. Decided on cell counts only.
@@ -43,7 +43,7 @@ sample_id, assay, age_months (mouse; NaN otherwise), development_stage, sex.
 Writes ``bone_marrow_unified.h5ad``, ``gin_scaler_bone_marrow.pkl``, ``build_report.json`` and
 count tables to ``data/analysis/bone_marrow/v2/`` (or ``--out``), never to ``data/processed/``.
 Build 1 (20% mt filter, neutrophil/erythroid cap 5,000; 128,328 cells) stays in
-``data/analysis/bone_marrow/`` for the record of the T12.2 grid that was trained on it.
+``data/analysis/bone_marrow/`` for the record of the T12_2_recipe grid that was trained on it.
 
     python analysis/tasks/T12_1_bone_marrow/build_bm.py [--out DIR]
 """
@@ -94,7 +94,7 @@ CAPPED = tuple(TYPES)  # every type (build 2); build 1 capped neutrophil and ery
 SIZE_REF = 28854  # testis 3-species cohort, cells (camex_testis_unified.h5ad)
 CAP_STEP = 50
 SEED = 42
-SPLEEN_MIN = 150  # lemur bone-marrow B or NK below this -> add spleen (section 12)
+SPLEEN_MIN = 150  # lemur bone-marrow B or NK below this -> add spleen (plan, section 12)
 OBS_KEEP = ["donor_id", "sample_id", "assay", "development_stage", "sex", "cell_type",
             "cell_type_ontology_term_id", "age"]
 

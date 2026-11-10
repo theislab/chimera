@@ -1,4 +1,4 @@
-"""T11.2c: full-cohort recipe by count dependence (README.md). Reads alpha, prior and S_g_ema only.
+"""Full-cohort recipe by count dependence (README.md). Reads alpha, prior and S_g_ema only.
 
 Writes ``results/analysis/T11/count_rule/selection.{tsv,json}`` and, for ``vz.DATASETS['full']``,
 ``analysis/tasks/T11_2c_count_rule/seed_map_winner.tsv``.

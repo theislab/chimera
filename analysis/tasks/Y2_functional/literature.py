@@ -1,4 +1,4 @@
-"""Y2 (EXPLORATORY) section (d): literature-curated human-mouse differences against readouts and baselines.
+"""EXPLORATORY: section (d): literature-curated human-mouse differences against readouts and baselines.
 
 ``literature_cases.tsv``: the curated list, written with no access to any readout. ``literature_expect.tsv``: each row encoded by hand
 from the list's own direction text, committed before the first join, in the coarse labels of the cohort:
@@ -7,10 +7,10 @@ from the list's own direction text, committed before the first join, in the coar
   not visible at this resolution); uncodable.
 
 Visible in the counts ("supported by these data"), fixed here before the join:
-  level, on_off: x_Mouse - x_Human in that type, centred on the median over genes with detection >= 1% in both species (X4 definition), has the
+  level, on_off: x_Mouse - x_Human in that type, centered on the median over genes with detection >= 1% in both species (X4_where_differs definition), has the
   expected sign with |d| >= 1 (log2 units).
   type_switch, stage_peak: peak of the species' per-type expression differs (both species detected >= 1% in their own peak type).
-  zonation: hepatocyte porto-central slope (X2 zone table, PC - PP): human and mouse slope have the expected signs (0 means |slope| < 0.5).
+  zonation: hepatocyte porto-central slope (X2_liver_biology zone table, PC - PP): human and mouse slope have the expected signs (0 means |slope| < 0.5).
   sub_type, uncodable: not assessable.
 
 Recovered by score X: X defined, and X at or below the 25th percentile of its 200 nearest genes in rank space of expression, detection, tau, pi. Genes with

@@ -1,4 +1,4 @@
-"""B1 realism: does an altered object look like real data to the same QC? No training, no method score is read.
+"""Realism: does an altered object look like real data to the same QC? No training, no method score is read.
 
 Rows: every alteration at its strongest effect plus sham_swap and thin_both, band low and high, share 5%, seed 42, all
 three cohorts; also pattern q 0.5 and level f 2 in the band midhigh. For each object:

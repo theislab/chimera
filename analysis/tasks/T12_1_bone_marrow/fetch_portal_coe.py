@@ -1,4 +1,4 @@
-"""T12.1 cross-check: per-gene COE published on the Shay et al. 2013 web portal.
+"""Cross-check: per-gene COE published on the Shay et al. 2013 web portal.
 
 Shay Dataset S3 could not be fetched (PMC serves a proof-of-work page to scripts, PNAS and
 Europe PMC answer 403; Europe PMC lists the article as not open access). The portal named in

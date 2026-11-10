@@ -1,4 +1,4 @@
-"""T7.3 control: Guilliams lean human hepatocyte pseudobulks, for Gribben healthy vs Guilliams lean.
+"""Control of the liver MASH case: Guilliams lean human hepatocyte pseudobulks, for Gribben healthy vs Guilliams lean.
 
 Donor H38 is the only Guilliams nuclei donor with a lean label we can verify (``diet`` in the
 CAMEX object for CS170; GEO marks H38 Visium as healthy and gives no diet for the other donors).
@@ -6,8 +6,9 @@ CS170 trained the canonical liver H+Mouse model, so it shares a sample with D; C
 second library, GSE192742) does not, and it is the primary side of the control. CS170 is shown
 beside it.
 
-CS171 has no labels in GEO: QC as T7.2 (>= 200 genes, mitochondrial fraction < 20%), then kNN
-transfer (k = 15, PCA on 2,000 HVG of the reference) from the CS170 annotation.
+CS171 has no labels in GEO: QC as for the liver MASH objects (analysis/tasks/T7_2_disease_objects;
+>= 200 genes, mitochondrial fraction < 20%), then kNN transfer (k = 15, PCA on 2,000 HVG of the
+reference) from the CS170 annotation.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T7_3_mash/guilliams.py
 """

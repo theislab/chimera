@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Official runs of T2.3-T2.7 in chimera_env, on the current node (CPU).
+# Official runs of T2_3_tissue-T2_7_consistency in chimera_env, on the current node (CPU).
 # Outputs: results/analysis/T2_{3,4,5,6,7}/, each with _provenance.json and DONE last.
 # Optional: REF_TABLES=<folder with the earlier per-cohort CSVs> adds the full-precision
-# reproduction check to T2.4. THREADS sets the torch threads of T2.5 (default 4).
+# reproduction check to T2_4_covariates. THREADS sets the torch threads of T2_5_celltype_margin (default 4).
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO"

@@ -1,7 +1,7 @@
-"""C1: per-gene human-partner profile correlation in data never used in training (T4.2 `pair_corr` rule on unit pseudobulks).
+"""Per-gene human-partner profile correlation in data never used in training (T4_2_gene_baselines `pair_corr` rule on unit pseudobulks).
 
-Mean over units with at least 30 cells of log2(1 + CPM) on the 1:1 human-partner genes, per class; a gene is scored if detected in >= 1% of a class in both species (T4.2);
-Pearson over shared classes of species-centred profiles. No model and no Chimera readout is read.
+Mean over units with at least 30 cells of log2(1 + CPM) on the 1:1 human-partner genes, per class; a gene is scored if detected in >= 1% of a class in both species (T4_2_gene_baselines);
+Pearson over shared classes of species-centered profiles. No model and no Chimera readout is read.
 
     python analysis/tasks/C1_cohorts/golds.py          # writes results/analysis/C1/golds/<region>_<partner>.parquet
 """
@@ -27,7 +27,7 @@ def prof(pb: ad.AnnData, genes: pd.Index) -> tuple[dict, dict]:
     Dn = pb.layers["n_detected"]
     x, f = {}, {}
     G = len(genes)
-    total = np.asarray(X.sum(1)).ravel()  # library over all genes of the species, as CPM in T4.2 on the species' vocabulary after the 1:1 join below
+    total = np.asarray(X.sum(1)).ravel()  # library over all genes of the species, as CPM in T4_2_gene_baselines on the species' vocabulary after the 1:1 join below
     for t, g in pb.obs.reset_index(drop=True).groupby("cell_ontology_class", observed=True):
         rows = g.index[g["n_cells"].astype(int) >= MIN_CELLS].to_numpy()
         if len(rows) == 0:

@@ -1,28 +1,28 @@
-"""X2 (EXPLORATORY): per-gene liver tables for the biology deep-dive.
+"""EXPLORATORY: per-gene liver tables for the biology deep-dive.
 
 Per liver cohort, one row per gene (``var_name``, joined on ``hsapiens_gene_id`` where other
 tables are keyed by it):
 
-* T2.5 gene table (canonical s42): alpha, prior, prior_raw, S_g_ema, tail, margin_support,
+* T2_5_celltype_margin gene table (canonical s42): alpha, prior, prior_raw, S_g_ema, tail, margin_support,
   dominant_cell_type, covariates, per-species detection.
-* Consensus D (T3.3 definition: mean over pooled seeds of alpha - prior, minus the cohort
+* Consensus D (T3_3_consensus definition: mean over pooled seeds of alpha - prior, minus the cohort
   median), its seed SD, sign consistency and mean S_ema. liv_4sp (5 seeds) and liv_hmonkey
   (3 seeds) from results/analysis/T3_3; liv_hmouse (10 seeds) from results/analysis/X2/consensus
   (T3_3_consensus/run.py --outdir, all seeds finished at run time); liv_hzeb has one seed, so
   D = (alpha - prior) - median of s42 and the seed columns are NaN.
-* Cell-type decomposition of the margin (T2.5, s42): unweighted per-cell means S_gsk
+* Cell-type decomposition of the margin (T2_5_celltype_margin, s42): unweighted per-cell means S_gsk
   (``S__<species>__<type>``, model null) and within-type null (``W__<species>__<type>``);
   per-species contributions ``Cs__<species>`` = sum_k w_sk S_gsk (sum over species = S_g);
   per-type contributions ``Ck__<type>`` = C_gk.
-* Baselines: B1b, B1b_raw, B1c (T4.2); per species x type pseudobulk log2(1 + CPM)
-  ``x__<species>__<type>`` (T4.2 definition, libraries >= 30 cells), detection ``f__``, and the
+* Baselines: B1b, B1b_raw, B1c (T4_2_gene_baselines); per species x type pseudobulk log2(1 + CPM)
+  ``x__<species>__<type>`` (T4_2_gene_baselines definition, libraries >= 30 cells), detection ``f__``, and the
   log2 fold change to human per type ``lfc__<species>__<type>``.
 * Presence: ``zero__<species>`` (no count in the cohort), ``absent__<species>`` (neither the
   native nor the human symbol is in the raw CAMEX object's feature set: a structural zero),
   ``complete`` (counts in every species).
 * ``hep_enrich``: mean over species of hepatocyte pseudobulk minus the mean over that species'
   types (a hepatocyte-specificity covariate for the C_hep matching variant).
-* ``D_matched_pct``: percentile of D among the 100 nearest genes in standardised rank space of
+* ``D_matched_pct``: percentile of D among the 100 nearest genes in standardized rank space of
   (prior_raw, species-balanced log CP10K, species-balanced detection, log CDS length).
 
 Writes results/analysis/X2/genes/<cohort>.parquet. Read-only elsewhere.

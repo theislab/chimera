@@ -1,4 +1,4 @@
-"""O1 step 1c: flags per cohort, gene and species; counts and shares per cohort and species. Counts of the objects only for exact zeros; no readout or gold.
+"""Step 1c: flags per cohort, gene and species; counts and shares per cohort and species. Counts of the objects only for exact zeros; no readout or gold.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.flags
 """

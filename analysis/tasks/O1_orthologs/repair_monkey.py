@@ -1,4 +1,4 @@
-"""O2, H+Monkey, seeds 42-51 on repaired and control. Classifier, rate rule and both reference forms: ledgers/O2_repair.md, amendment, committed before these runs.
+"""Liver H+Monkey, seeds 42-51 on the identifier-joined ("repaired") object and on the control. Classifier, rate rule and both reference forms were fixed before these runs.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.repair_monkey rate       # gold-free
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.repair_monkey compare    # gold-free

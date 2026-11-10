@@ -1,4 +1,4 @@
-"""Y6 use 1: genome annotation check, rules.py USE 1. Odd autosomes tune, even autosomes score.
+"""Use 1: genome annotation check, rules.py USE 1. Odd autosomes tune, even autosomes score.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.use1 [--threads 12]
 """

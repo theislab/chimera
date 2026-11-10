@@ -1,4 +1,4 @@
-"""X7 (EXPLORATORY): tests of rules.py. Sections: types (A-i), cells (descriptive), genetype (A-ii, drivers),
+"""EXPLORATORY: tests of rules.py. Sections: types (A-i), cells (descriptive), genetype (A-ii, drivers),
 species (Lead B), mixing. Writes results/analysis/X7/*.csv.
 
 Usage: python -m analysis.tasks.X7_architecture_outputs.analyses [--sections types,cells,genetype,species,mixing]

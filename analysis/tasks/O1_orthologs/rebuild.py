@@ -1,4 +1,4 @@
-"""O1 part C: liver H+Mouse through the steps of notebooks/01_data_preparation.ipynb (sections 2-6, then build_subset) with a given ortholog table.
+"""Part C: liver H+Mouse through the steps of notebooks/01_data_preparation.ipynb (sections 2-6, then build_subset) with a given ortholog table.
 
 Same functions, same order, same arguments as the notebook. ``--tag canonical`` keeps the whole table and is the control: it must reproduce the canonical object.
 ``--tag t3`` drops every group flagged T3 on human or mouse, then renumbers groups from 0 (the unified object needs them dense); the canonical ID stays in ``canonical_group_id``.

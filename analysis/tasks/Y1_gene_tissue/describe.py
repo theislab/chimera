@@ -1,4 +1,4 @@
-"""Y1: per-tissue description (depth, K, support) and cell-half reliability of each gold on its universe.
+"""Per-tissue description (depth, K, support) and cell-half reliability of each gold on its universe.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.describe
 """

@@ -1,6 +1,6 @@
-"""Y4 (EXPLORATORY): gap map between sequence similarity and deployment. Descriptive, rules.py.
+"""EXPLORATORY: gap map between sequence similarity and deployment. Descriptive, rules.py.
 
-Per region and split, residualised on expression and detection only (not pi): mean percentile of id_true minus mean
+Per region and split, residualized on expression and detection only (not pi): mean percentile of id_true minus mean
 percentile of S, of D_raw and of the pattern gold (the gold column only when ``gold`` is passed); share of genes with
 id_true in the top tertile and S residual in the bottom tertile against the expected 1/9; ratio of the SD of the S residual
 in the region to the split's SD. `gap odd`, then `gap even` after the carried list is committed.

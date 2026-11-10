@@ -1,4 +1,4 @@
-"""Y5 shared statistics. Rank partial correlation as T4.3/X4; block bootstrap over gene modules."""
+"""Shared statistics. Rank partial correlation as in T4_3_scoreboard and X4_where_differs; block bootstrap over gene modules."""
 from __future__ import annotations
 
 import numpy as np
@@ -65,7 +65,7 @@ def forward_runs(c: str):
 
 
 def contribs(c: str) -> pd.DataFrame:
-    """Healthy-seed mean of C_gk (coarse types) and Csp_s, from the Y5 forward pass (T2.5 definitions)."""
+    """Healthy-seed mean of C_gk (coarse types) and Csp_s, from the Y5 forward pass (T2_5_celltype_margin definitions)."""
     from analysis.tasks.T4_2_gene_baselines import run as T42
     acc = {}
     for f in forward_runs(c):

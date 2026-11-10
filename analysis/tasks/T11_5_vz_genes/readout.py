@@ -1,24 +1,24 @@
-"""T11.5: Van Zyl gene table, covariate audit, baselines, H5/H6-style sets, margin support.
+"""Van Zyl gene table, covariate audit, baselines, H5/H6-style sets, margin support.
 
-Per usable dataset (``vz.usable_datasets``), with sections 2-5 and 9 of the pre-specified plan unchanged:
+Per usable dataset (``vz.usable_datasets``), with sections 2-5 and 9 of the pre-specified analysis plan unchanged:
 
-* seeds in D: ``vz.seeds_in_D`` (latest amendment rows); genes with alpha > 0.95 in a seed are flagged;
+* seeds in D: ``vz.seeds_in_D`` (amendment log of the plan); genes with alpha > 0.95 in a seed are flagged;
 * covariates C: ``cohorts.gene_covariates`` (tau over ``cell_type_harmonised``), raw prior from the
   run's ``conservation_prior_raw.npy`` (checked against the h5ad prior), log human CDS length;
 * D = mean over D seeds of alpha - prior (as anchored, clamped 0.85 on clamped recipes) minus the
   median; ``D_raw`` against the raw prior; ``S_ema`` = mean ``S_g_ema``;
-* covariate audit (T2.4 functions): Spearman of D with each covariate, partial rho(D, S | expression),
+* covariate audit (T2_4_covariates functions): Spearman of D with each covariate, partial rho(D, S | expression),
   5-fold CV R^2 of D on the GIN feature groups;
-* B1 (T4.2 functions): cross-species pseudobulk profile correlation E over ``cell_ontology_class``,
-  units ``obs['batch']`` with >= 30 cells, pooled over species pairs; ``B1_pi`` residualised on the
+* B1 (T4_2_gene_baselines functions): cross-species pseudobulk profile correlation E over ``cell_ontology_class``,
+  units ``obs['batch']`` with >= 30 cells, pooled over species pairs; ``B1_pi`` residualized on the
   raw prior, ``B1b`` on prior, expression and detection; pairwise ``E_human_<species>``;
-* sets (section 4, T4.3 functions): C1, C2 above, V2, V3 below matched background in raw prior x
+* sets (plan, section 4; T4_3_scoreboard functions): C1, C2 above, V2, V3 below matched background in raw prior x
   expression decile cells (strata kept with >= 5 background genes per set gene); stratified AUROC,
   1,000 gene bootstraps, 2,000 permutations within strata, BH over the four sets; scores D, D without
   flagged saturated genes, B1b and, stratified on expression only, the raw prior;
 * tidy per-gene table ``results/analysis/T11/genes/genes_<dataset>.tsv`` (gene id, pi, alpha per seed,
-  centred Delta-alpha, S_ema, count support, margin support, saturated flag) for the harmonised panels;
-* margin support (section 9, T2.5 functions): per D seed, fraction of |Delta-alpha| > 0.05 genes whose
+  centered Delta-alpha, S_ema, count support, margin support, saturated flag) for the harmonized panels;
+* margin support (plan, section 9; T2_5_celltype_margin functions): per D seed, fraction of |Delta-alpha| > 0.05 genes whose
   S_g_ema agrees in sign and is at least the median |S|; mean over seeds.
 
 No glaucoma gene is read here.
@@ -58,7 +58,7 @@ def _load(name: str, path):
 
 
 _T24 = _load("t24_covariates_run", vz.ROOT / "analysis" / "tasks" / "T2_4_covariates" / "run.py")
-cv_r2, partial_rank = _T24.cv_r2, _T24.partial_rank  # T2.4 functions, unchanged
+cv_r2, partial_rank = _T24.cv_r2, _T24.partial_rank  # T2_4_covariates functions, unchanged
 
 OUT = vz.OUT / "readout"
 GOLD = vz.ROOT / "results" / "analysis" / "T4_3" / "golds" / "gold_table.csv"
@@ -127,7 +127,7 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
     first = runs[min(runs)]
     praw = C.raw_prior(vz.TABLE_COHORT, first, a.var["conservation_prior"].to_numpy(dtype=float))
     a_tau = a.copy()
-    a_tau.obs["cell_type"] = a.obs[vz.LABEL_KEY].astype(str).values  # tau over harmonised types
+    a_tau.obs["cell_type"] = a.obs[vz.LABEL_KEY].astype(str).values  # tau over harmonized types
     g = C.gene_covariates(a_tau)
     del a_tau
     g["hsapiens_gene_id"] = gene_ids.ensembl(vz.TABLE_COHORT, a.var_names).values
@@ -155,13 +155,13 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
     for s in Dm.columns:
         g[f"D_s{s}"] = Dm[s]
 
-    # covariate audit (T2.4 definitions)
+    # covariate audit (T2_4_covariates definitions)
     aud = [dict(covariate=c, spearman=float(spearmanr(g["D"], g[c], nan_policy="omit")[0])) for c in AUDIT]
     expr = g[["log_mean", "detection", "log_var"]].to_numpy()
     aud.append(dict(covariate="partial_S_given_expr", spearman=partial_rank(g["D"], g["S_ema"], expr)))
     cv = [dict(features=k, cv_r2=cv_r2(F[:, cols], g["D"].to_numpy())) for k, cols in FEATURE_GROUPS.items()]
 
-    # B1 baselines (T4.2)
+    # B1 baselines (T4_2_gene_baselines)
     X = a.X.tocsr() if sp.issparse(a.X) else sp.csr_matrix(a.X)
     X = X.astype(np.float64)
     species = a.obs["species"].astype(str).to_numpy()
@@ -184,15 +184,15 @@ def readout(ds: str, gold: pd.DataFrame) -> None:
 
     OUT.mkdir(parents=True, exist_ok=True)
     g.reset_index(names="var_name").to_parquet(OUT / f"genes_{ds}.parquet")
-    # Tidy per-gene table for the harmonised panels (one row per vocabulary gene).
+    # Tidy per-gene table for the harmonized panels (one row per vocabulary gene).
     tidy = pd.DataFrame(dict(hsapiens_gene_id=g["hsapiens_gene_id"], symbol=g["symbol"], var_name=g.index,
                              pi=g["prior_raw"], pi_anchored=g["prior"]))
     for s in Am.columns:
         tidy[f"alpha_s{s}"] = Am[s]
     tidy["delta_alpha_centred"] = g["D"]
     tidy["S_ema"] = g["S_ema"]
-    tidy["count_support"] = np.abs(g["S_ema"]) >= MG.MASK_EPS  # |S_g_ema| >= 1e-6, X4 definition
-    tidy["margin_support"] = MG.margin_flag(md.to_numpy(), g["S_ema"].to_numpy())  # T2.5 flag on the seed mean
+    tidy["count_support"] = np.abs(g["S_ema"]) >= MG.MASK_EPS  # |S_g_ema| >= 1e-6, X4_where_differs definition
+    tidy["margin_support"] = MG.margin_flag(md.to_numpy(), g["S_ema"].to_numpy())  # T2_5_celltype_margin flag on the seed mean
     tidy["saturated_flag"] = g["saturated_flag"]
     tidy["log_cp10k_spmean"] = g["log_cp10k_spmean"]
     tidy["detection_spmean"] = g["detection_spmean"]

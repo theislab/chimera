@@ -1,4 +1,4 @@
-"""Write the D1 fit grid and the chromosome folds. No readout is read. Tiers fix the order of work; whole tiers finished at the stop time enter the analysis, by time alone.
+"""Write the fit grid of this task and the chromosome folds. No readout is read. Tiers fix the order of work; whole tiers finished at the stop time enter the analysis, by time alone.
    python -m analysis.tasks.D1_sparse_genes.make_grid
 """
 
@@ -58,7 +58,7 @@ def main():
             for r in (0, 1):
                 add(1, c, f"ho{f}_P", "heldout", r, RU.HOLD_SEEDS[r], "P")
         for s in ("depth5", "depth10", "depth25"):
-            if not (c == "liv_hmouse" and s == "depth25"):  # B2 fits exist
+            if not (c == "liv_hmouse" and s == "depth25"):  # B2_benchmark fits exist
                 add(1, c, s, "sampling", 0, B2.FIT_SEEDS[0])
     # tier 2: depth r1
     for c in RU.DEPTH_COHORTS:
@@ -72,7 +72,7 @@ def main():
     # added after both 4-sp fold A seeds failed the health rule; at the end, so row numbers stay
     add(1, "liv_4sp", "hoA_P", "heldout", 2, RU.HOLD_SEEDS[2], "P")
     add(1, "liv_4sp", "hoA_P", "heldout", 3, RU.HOLD_SEEDS[3], "P")
-    # arm L, coordinator 2026-11-02: the same depth objects (same draw, same seed) with the anchor scaled by analysis/common/depth_anchor.py
+    # arm L: the same depth objects (same draw, same seed) with the anchor scaled by analysis/common/depth_anchor.py
     for c in RU.DEPTH_COHORTS:
         for st in ("depth25", "depth10"):
             for r in (0, 1):

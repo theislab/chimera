@@ -39,7 +39,7 @@ follow the run's own count evidence. Blind: no gold, test or disease result is o
 expression; fraction with count support; tails on the raw prior; saturation; NaN; active z dims; adversary;
 mixing; learning-rate freeze epoch. `curves.py` prints the same over training.
 
-## Rule (amendment log, row "2 or more seeds", binding), fixed before each round
+## Rule (amendment log of the pre-specified analysis plan, row "2 or more seeds"), fixed before each round
 A seed is healthy if: finite alpha, z and S_g_ema; 10/10 z dims with Var(z_mean) >= 0.01; alpha - raw prior
 beyond +0.05 and beyond -0.05 in at least 2% of genes each; alpha > 0.95 and alpha < 0.05 each in at most 10%
 of genes (genes above 0.95 are flagged). Unhealthy seeds are discarded. A row qualifies with at least 2 healthy
@@ -50,6 +50,6 @@ At most one round of seeds per row: no seed is added to change a ranking.
 ## Rounds
 Round 1, Van Zyl H+Pig and H+M. fascicularis (`round1_vz_pairs.tsv`).
 
-Round 1 outcome: the highest-rho ranking above was not applied. By instruction received after submission, the round
+Round 1 outcome: the highest-rho ranking above was not applied. The round
 stopped once the existing rule-base recipe (row a) had 2 healthy seeds per cohort, without chasing a higher rho.
-Rows b, c and d were not analysed and enter nothing.
+Rows b, c and d were not analyzed and enter nothing.

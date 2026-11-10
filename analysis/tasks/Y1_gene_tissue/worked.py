@@ -1,4 +1,4 @@
-"""Y1 (d): worked genes with raw counts and the species x cell type decomposition. Gene list given on the command line.
+"""(d): worked genes with raw counts and the species x cell type decomposition. Gene list given on the command line.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.worked SYMBOL [SYMBOL ...]
 

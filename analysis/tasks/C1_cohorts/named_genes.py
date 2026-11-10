@@ -1,4 +1,4 @@
-"""C1: named genes per cohort, with counts and ortholog checked gene by gene (coordinator after O1). Strict support (H1 rule); not in zero_genes.tsv; both tails of D.
+"""Named genes per cohort, with counts and ortholog checked gene by gene (the check that analysis/tasks/O1_orthologs motivates). Strict support (rule of H1_harmonise); not in zero_genes.tsv; both tails of D.
 Columns: symbol, D, S_ema, B1, pi, tau, per species detection and counts over the whole training object, each partner's ID, name, identity, GOC, WGA, top class by |contribution| in each species row.
 
     python analysis/tasks/C1_cohorts/named_genes.py <cohort> ... [--k 15]

@@ -1,4 +1,4 @@
-"""B1 Track D tables: results/analysis/B1/track_d/{runtime.csv, returns.csv} and tidy rows in B1_trackD_tidy.csv (schema of B1_tidy.csv).
+"""Track D tables: results/analysis/B1/track_d/{runtime.csv, returns.csv} and tidy rows in B1_trackD_tidy.csv (schema of B1_tidy.csv).
 
 All jobs on one node, 16 CPUs (job.sbatch). A Chimera job counts as finished when its run folder holds final_state.npz and summary.json:
 run_experiment.py exits 1 when an expectation check fails, which is not a failed fit.
@@ -6,7 +6,7 @@ run_experiment.py exits 1 when an expectation check fails, which is not a failed
 Tidy tasks (rank_direction lower):
   runtime, memory        wall hours and peak GB of one job, per cohort and object.
   pipeline_runtime       wall hours to get both a cross-species embedding and gene-level scalars on the same cohort: Chimera = one fit;
-                         SATURN + direct, CAMEX + direct = the tool's fit plus the labelled direct pipeline. Gene scalars of the tools need the
+                         SATURN + direct, CAMEX + direct = the tool's fit plus the labeled direct pipeline. Gene scalars of the tools need the
                          direct pipeline beside them, since their own are our derivations.
   scaling_cells          wall hours on testis H+Mouse at 25, 50, 100% of cells (setting carries n_cells).
   scaling_species        Chimera wall hours per 1,000 cells on 2, 3, 4 species (testis H+Mouse, testis 3-sp, liver 4-sp; descriptive: recipes and

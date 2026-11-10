@@ -1,4 +1,4 @@
-"""C1: build a cohort object, the T7.2 / T12.1 / P13 pipeline, one code path for every cohort. No readout or test here.
+"""Build a cohort object, the T7_2_disease_objects / T12_1_bone_marrow / P13_kidney pipeline, one code path for every cohort. No readout or test here.
 
 Per species of a source (cached, shared by the cohorts of that source):
 
@@ -11,9 +11,9 @@ Per species of a source (cached, shared by the cohorts of that source):
 Per cohort:
 
 5. Classes: DROP in the map removed; a class stays only if at least 2 species have it and it has at least 50 cells in
-   each species that has it (checklist item 5).
+   each species that has it.
 6. Cap: one number for every species x class, the largest multiple of 50 that keeps the total within the size of the
-   three-species testis cohort (28,854 cells), donors sharing each quota (T7.2 water-filling).
+   three-species testis cohort (28,854 cells), donors sharing each quota (T7_2_disease_objects water-filling).
 7. Ortholog table (`orthologs.py`), measured genes only; `compute_conservation_prior`, `download_and_process_esm2`,
    `pca_esm2`, `compute_esm2_interspecies_variance`, `construct_unified_adata`, `compute_expression_stats`,
    `assemble_gin_features`; a group stays only if each of its genes has count > 0 over the species' units and it is
@@ -68,7 +68,7 @@ NEW_ESM = CF.DATA / "esm" / "ESM2"
 ESM_FILES = {"hsapiens": ("human_embedding.torch", SATURN / "human_embedding.torch"),
              "mmusculus": ("mouse_embedding.torch", SATURN / "mouse_embedding.torch"),
              "mmulatta": ("macaca_mulatta_embedding.torch", SATURN / "macaca_mulatta_embedding.torch"),
-             # linked under its short name so the loader's substring match cannot pick it for mouse (T12.1)
+             # linked under its short name so the loader's substring match cannot pick it for mouse (T12_1_bone_marrow)
              "mmurinus": ("mmurinus_embedding.torch", SATURN / "mouse_lemur_embedding.torch"),
              "drerio": ("zebrafish_embedding.torch", SATURN / "zebrafish_embedding.torch"),
              "ptroglodytes": ("chimpanzee_embedding.torch", NEW_ESM / "chimpanzee_embedding.torch"),

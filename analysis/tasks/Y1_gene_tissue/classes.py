@@ -1,4 +1,4 @@
-"""Y1 (d): stable and flipping genes, what moves in flips, the literature panel, and worked genes with counts.
+"""(d): stable and flipping genes, what moves in flips, the literature panel, and worked genes with counts.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.classes
 """
@@ -112,7 +112,7 @@ def main():
     xt = pd.crosstab(ctS["cls"], ctB["cls"])
     xt.to_csv(OUT / "classes_S_vs_B1.csv")
     print(xt, flush=True)
-    # annotation classes from the X3/X4 tables (Lambert, UniProt, HGNC)
+    # annotation classes from the X3_cross_cohort and X4_where_differs tables (Lambert, UniProt, HGNC)
     ann = []
     for c in ("liv_hmouse", "test_hmouse"):
         g = pd.read_parquet(Y.RES / "X4" / "genes" / f"{c}.parquet").set_index("hsapiens_gene_id")

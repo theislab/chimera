@@ -1,12 +1,12 @@
-"""X4 (EXPLORATORY, owner addition): how consensus delta-alpha and S_g relate to sequence constraint, expression,
+"""EXPLORATORY addition: how consensus delta-alpha and S_g relate to sequence constraint, expression,
 specificity, length and direct baselines. Descriptive; no gold is used; unfavourable relations are shown as they are.
 
-Readouts: D (T3.3 consensus, the scoreboard readout: clamped prior on testis), D_raw (raw prior), S (S_ema).
+Readouts: D (T3_3_consensus consensus, the scoreboard readout: clamped prior on testis), D_raw (raw prior), S (S_ema).
 Relations: dN/dS and LOEUF (human; dN/dS is human-mouse in every cohort), pi_raw, expression (species-balanced
-log CP10K), specificity tau (X3 column, one definition in all cohorts), log CDS length, B1b, B2b.
+log CP10K), specificity tau (X3_cross_cohort column, one definition in all cohorts), log CDS length, B1b, B2b.
 raw = Spearman. adjusted = rho_p of readout and relation given C (pi_raw, expression, detection, CDS length) without
 the relation itself; for expression, detection is also left out (they are nearly the same quantity).
-CI: block bootstrap on ESM modules where T4.3 built them, gene bootstrap elsewhere (ci_kind).
+CI: block bootstrap on ESM modules where T4_3_scoreboard built them, gene bootstrap elsewhere (ci_kind).
 seed_lo, seed_hi: range of the raw Spearman over the cohort's seeds, each seed's delta-alpha or S on its own.
 
 Writes results/analysis/X4/relations.csv and figures/fig_relations_{density,heatmap}.{pdf,png}.

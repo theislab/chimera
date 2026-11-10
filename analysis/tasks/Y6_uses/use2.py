@@ -1,4 +1,4 @@
-"""Y6 use 2: choosing a model species, rules.py USE 2.
+"""Use 2: choosing a model species, rules.py USE 2.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.use2
 """
@@ -41,7 +41,7 @@ def sets():
 
 
 def pick(g, gold, scores, seed, draws=1000):
-    """Pick accuracy on clear cases, all scores on the same genes, block CI. Median-centred in the fit."""
+    """Pick accuracy on clear cases, all scores on the same genes, block CI. Median-centered in the fit."""
     m = g[[gold] + scores + ["block"]].replace([np.inf, -np.inf], np.nan).dropna()
     gc = m[gold] - m[gold].median()
     clear = gc.abs() > gc.abs().median()

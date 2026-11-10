@@ -1,4 +1,4 @@
-"""Build the object of one grid row. Depth: B2 perturb.build. Held-out: zero the counts of the fold's genes, recompute p_null, keep features (arm P drops expression columns at training
+"""Build the object of one grid row. Depth: B2_benchmark perturb.build. Held-out: zero the counts of the fold's genes, recompute p_null, keep features (arm P drops expression columns at training
 through the recipe's own --gin-feature-op zero_expr_stats). Run in chimera_env.
     python -m analysis.tasks.D1_sparse_genes.objects --index I
 """

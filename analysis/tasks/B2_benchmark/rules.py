@@ -1,8 +1,8 @@
-"""B2 Tracks B and C of the gene-level benchmark, tools, overview: definitions, fixed before any run is scored.
+"""Tracks B and C of the gene-level benchmark, tools, overview: definitions, fixed before any run is scored.
 
 Design in README.md, predictions in PREDICTIONS.md. Nothing in the chimera package changes. Chimera is retrained with the
 cohort's canonical recipe; the only recipe change is the no-label form on cohorts whose recipe reads labels, the form the
-repository already uses for controls (T5.4b: cell-type-conditional MMD removed, same MMD weight, then global).
+repository already uses for controls (T5_4b_label_ablation: cell-type-conditional MMD removed, same MMD weight, then global).
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ TASK_DIR = REPO / "analysis" / "tasks" / "B2_benchmark"
 T42_KEY = "T4_2"
 
 # ---------------------------------------------------------------------------
-# Track B cohorts. Recipes are the canonical ones (07_EXPERIMENT_MATRIX, T3.2, P13), identical to Track A's.
+# Track B cohorts. Recipes are the canonical ones (configs/canonical_recipes.tsv, T3_2_seeds, P13_kidney), identical to Track A's.
 # ---------------------------------------------------------------------------
 COHORTS = {
     "liv_hmouse": dict(
@@ -55,10 +55,10 @@ WAVE2 = {
 }
 ALL_COHORTS = {**COHORTS, **WAVE2}
 SPECIES = ("Human", "Mouse")
-# Cell-type maps. Testis model labels (cell_ontology_class) follow the T4.2 coarse labels through this map.
+# Cell-type maps. Testis model labels (cell_ontology_class) follow the T4_2_gene_baselines coarse labels through this map.
 TESTIS_MODEL_PARENT = {"SG": "Spermatogonia", "SC": "Spermatocytes", "rSD": "spermatids", "eSD": "spermatids",
                        "Sertoli": "Sertoli", "Other_somatic": "somatic"}
-COARSE = {  # the coarse labels of X6 on liver and testis; kidney by nephron segment group, written from names only
+COARSE = {  # the coarse labels of X6_adds_beyond on liver and testis; kidney by nephron segment group, written from names only
     "liv_hmouse": {"Hepatocytes": "epithelial", "Cholangio": "epithelial", "Endothelial": "endothelial",
                    "fibroblasts": "stromal_immune", "Kupffer cells": "stromal_immune", "Macrophages": "stromal_immune",
                    "B Plasma cells": "stromal_immune", "HsPCs": "stromal_immune"},
@@ -80,7 +80,7 @@ SETTINGS = {
     "relabel10": dict(family="label", kind="relabel", q=0.10),
     "relabel25": dict(family="label", kind="relabel", q=0.25),
     "relabel50": dict(family="label", kind="relabel", q=0.50),
-    "relabel25_near": dict(family="label", kind="relabel_near", q=0.25),  # confusion toward the most similar type (X6 disclosure)
+    "relabel25_near": dict(family="label", kind="relabel_near", q=0.25),  # confusion toward the most similar type (X6_adds_beyond disclosure)
     "coarse": dict(family="label", kind="coarse"),
     "fine": dict(family="label", kind="fine"),
     "species_diff": dict(family="label", kind="species_diff"),
@@ -99,8 +99,8 @@ SETTINGS = {
     "depth50": dict(family="sampling", kind="depth", frac=0.50),
     "depth25": dict(family="sampling", kind="depth", frac=0.25),
     "few_donors": dict(family="sampling", kind="few_donors"),
-    # depth law arm: the same objects as depth50 and depth25 (object_of), recipe with lambda_anchor scaled by analysis/common/depth_anchor.py; added at the coordinator's
-    # instruction before any of these rows ran. Direct methods read the same counts, so only Chimera is new. Reported beside the recipe-unchanged rows.
+    # depth law arm: the same objects as depth50 and depth25 (object_of), recipe with lambda_anchor scaled by analysis/common/depth_anchor.py; added
+    # before any of these rows ran. Direct methods read the same counts, so only Chimera is new. Reported beside the recipe-unchanged rows.
     "depth50_law": dict(family="sampling", kind="depth", frac=0.50, object_of="depth50", depth_law=True),
     "depth25_law": dict(family="sampling", kind="depth", frac=0.25, object_of="depth25", depth_law=True),
     # technical
@@ -120,9 +120,9 @@ XB_SIGMA = 0.5             # extra batch: half of each species' cells get gene f
 XB_DEPTH = 0.7
 CHEM_CLIP = 16.0           # chemistry: empirical gene-wise capture profile, see perturb.chem_profile
 MIN_LIB = 1                # a cell left with no count is dropped after thinning, and counted
-LEIDEN = dict(n_top_genes=2000, n_pcs=30, n_neighbors=15, resolution=1.0, min_cells=20, n_markers=50, marker_det=0.10)  # X6
-MIN_CELLS_LABEL = 30       # T4.2
-MIN_CELLS_CLUSTER = 20     # T4.2
+LEIDEN = dict(n_top_genes=2000, n_pcs=30, n_neighbors=15, resolution=1.0, min_cells=20, n_markers=50, marker_det=0.10)  # X6_adds_beyond
+MIN_CELLS_LABEL = 30       # T4_2_gene_baselines
+MIN_CELLS_CLUSTER = 20     # T4_2_gene_baselines
 
 # Health (discard rule, the same as Track A): a fit is discarded if alpha, z or S_g is non-finite or fewer than 10 of 10 latent
 # dims have Var(z_mean) >= 0.01. Mixing is recorded, never used to discard. Discarded fits are counted in one Methods line.
@@ -136,7 +136,7 @@ MIN_REPS = 2
 # ---------------------------------------------------------------------------
 COV_C = ["prior_raw", "log_cp10k_spmean", "detection_spmean", "log_cds_length"]
 COV_PAT = COV_C + ["tau_shared"]
-# Track B golds. 05 sections 3-4. Covariates are the unperturbed cohort's in every setting, so the estimand does not move.
+# Track B golds. pre-specified analysis plan, sections 3-4. Covariates are the unperturbed cohort's in every setting, so the estimand does not move.
 B_GOLDS = {
     "liv_hmouse": {"pattern": ("G_H3", COV_PAT), "level": ("G_H1", COV_C)},
     "test_hmouse": {"pattern": ("G_H4", COV_PAT + ["H4_nsp"]), "level": ("G_H2", COV_C)},
@@ -149,16 +149,16 @@ DIRECT = ["B1", "B1b", "B1c", "B2b", "B3a", "Sdir", "Lfc"]
 STATIC = ["pi", "dNdS", "LOEUF"]
 TOOLS = ["SATURN", "CAMEX", "GeneSpectra", "CACIMAR", "SAMap"]
 CONTROLS = ["expr", "random"]
-# Free per-gene gate (Z3, Z4; added at the coordinator's instruction after Track B and C values were seen): Delta-alpha of the free-gate fits where they exist (Track A arms of B1,
-# Track C cohorts with Z4 fits). No free-gate fit is trained on Track B objects, so it is absent there, not failed.
+# Per-gene gate (Z3_free_gate, Z4_free_gate_all; added after Track B and C values were seen): Delta-alpha of the free-gate fits where they exist (Track A arms of B1,
+# Track C cohorts with Z4_free_gate_all fits). No free-gate fit is trained on Track B objects, so it is absent there, not failed.
 CHIMERA_FREE = ["D_free"]
 OVERVIEW_METHODS = CHIMERA + CHIMERA_FREE + DIRECT + STATIC + TOOLS
 J_H2H = ["B1b", "B1c", "B2b", "B3a", "Sdir"]  # direct comparators; B1z is Chimera's own latent and is compared separately
-N_DRAWS_B = 2_000          # as X6
-N_DRAWS_C = 10_000         # as T4.3 and Y1
+N_DRAWS_B = 2_000          # as X6_adds_beyond
+N_DRAWS_C = 10_000         # as T4_3_scoreboard and Y1_gene_tissue
 BOOT_SEED = 20261102
-SPLINE_MIN = 300           # below this a stratum uses intercept + linear ranks (Y4)
-STRATUM_MIN = 60           # below this a stratum is not scored (Y4)
+SPLINE_MIN = 300           # below this a stratum uses intercept + linear ranks (Y4_regions)
+STRATUM_MIN = 60           # below this a stratum is not scored (Y4_regions)
 ID_BANDS = [("id_lt70", 0, 0.70), ("id_70_85", 0.70, 0.85), ("id_85_95", 0.85, 0.95), ("id_95_98", 0.95, 0.98), ("id_ge98", 0.98, 1.01)]
 EXPR_BANDS = 4             # quartiles of species-balanced expression
 

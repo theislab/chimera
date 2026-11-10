@@ -1,4 +1,4 @@
-"""T11.8: human + mouse subset of the class-filtered Van Zyl object, as T11.2b (``build_subset``), and cohort checks."""
+"""Human + mouse subset of the class-filtered Van Zyl object, as T11_2b_vz_subsets (``build_subset``), and cohort checks."""
 
 from __future__ import annotations
 

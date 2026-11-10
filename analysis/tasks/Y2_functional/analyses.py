@@ -1,4 +1,4 @@
-"""Y2 (EXPLORATORY, Family 3): tests of rules.py. Sections: pheno, viability, regulatory, discordant.
+"""EXPLORATORY, Family 3: tests of rules.py. Sections: pheno, viability, regulatory, discordant.
 
 --mechanics replaces every readout and baseline by independent noise and writes to mechanics/, so that the machinery can
 be checked with no association read.

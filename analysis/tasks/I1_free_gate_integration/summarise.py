@@ -1,4 +1,4 @@
-"""I1 summary: per-seed tidy table, Fig 3 scores on the frozen panel bounds, free vs canonical per cohort and metric, verdict.
+"""Summary: per-seed tidy table, Fig 3 scores on the frozen panel bounds, free vs canonical per cohort and metric, verdict.
 
     python -m analysis.tasks.I1_free_gate_integration.summarise [--cohorts a,b,...]
 
@@ -132,7 +132,7 @@ def higher_better(metric: str) -> bool:
 
 
 def kept_json() -> dict:
-    """Z4's kept.json: cohort -> set of kept free runs (gate health and Z4's mixing criterion)."""
+    """Z4's kept.json: cohort -> set of kept free runs (gate health and Z4_free_gate_all's mixing criterion)."""
     f = RU.RES / "Z4" / "kept.json"
     return {c: set(v.values()) for c, v in json.loads(f.read_text()).items()} if f.exists() else {}
 
@@ -142,7 +142,7 @@ def comparisons(P: pd.DataFrame) -> pd.DataFrame:
     K = kept_json()
     P = P[P.included]
     for (c, line, m), g in P[P.line == "main"].groupby(["cohort", "line", "metric"]):
-        # variant: free seeds restricted to Z4's kept.json (coordinator), canonical side unchanged
+        # variant: free seeds restricted to Z4_free_gate_all's kept.json, canonical side unchanged
         if m.endswith(("outside_bounds", "wins_vs_pca")) or c not in K:
             continue
         fr = g[(g.gate == "free") & g.run.isin(K[c])].set_index("seed").value
@@ -205,7 +205,7 @@ def main():
     v["z3"]["cohorts"] = sorted(z3.cohort.unique())
     v["all"] = RU.verdict(Q, sorted(Q.metric.unique()))
     v["all"]["cohorts"] = sorted(Q.cohort.unique())
-    # Fig 3 metrics and H1 metrics separately (Fig 3 rows only have fig3)
+    # Fig 3 metrics and H1_harmonise metrics separately (Fig 3 rows only have fig3)
     for fam in ("fig3", "h1", "z2"):
         q = Q[Q.metric.str.startswith(fam + "|")]
         if len(q):

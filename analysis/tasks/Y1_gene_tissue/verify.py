@@ -1,4 +1,4 @@
-"""Y1: independent recomputation of the headline numbers. No shared statistics code: S and B1 re-read from each task's own table, joined on ENSG,
+"""Independent recomputation of the headline numbers. No shared statistics code: S and B1 re-read from each task's own table, joined on ENSG,
 covariates recomputed from raw counts here, cubic polynomials of rank instead of splines, no block machinery.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.verify

@@ -1,11 +1,11 @@
-"""T12.2: apply the pre-committed selection rule to the bone-marrow recipe grid (README.md).
+"""Apply the pre-committed selection rule to the bone-marrow recipe grid (README.md).
 
 1. Gate G-V on each finished grid run (s42): no NaN; saturation <= 5% in each alpha tail;
    10/10 active z dims; both tails of alpha - prior present.
 2. Among runs that pass, the integration composite from
    ``training/compare_vs_scvi.py::compute_integration_metrics`` (k=15, seed=42) on ``z_mean``
-   with ``obs['cell_ontology_class']`` (the nine harmonised types): the six metrics
-   direction-corrected and min-max normalised across the passing runs, then
+   with ``obs['cell_ontology_class']`` (the nine harmonized types): the six metrics
+   direction-corrected and min-max normalized across the passing runs, then
    0.4 * mixing + 0.6 * biology (formula of notebooks/07_baselines_master.ipynb). Highest
    composite wins; ties (|diff| < 1e-9) go to the lower grid_id.
 

@@ -1,4 +1,4 @@
-"""Depth scaling of the gate anchor, shared by D1 and B2 Track B.
+"""Depth scaling of the gate anchor, shared by D1_sparse_genes and B2_benchmark Track B.
 
 The fit reward is a per-cell mean log-likelihood difference, so it scales with count depth, and the anchor that sets the scale of Delta-alpha (Law 2, tables/k_scaling_laws.tex) was set at the
 recipe's depth. On bone marrow the anchor was therefore scaled by the depth ratio (T12_2b_debug.md: 0.001 x 3,672 / 1,097 = 0.0033). The same rule here, in both directions:

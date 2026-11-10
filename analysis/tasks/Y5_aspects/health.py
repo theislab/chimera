@@ -1,4 +1,4 @@
-"""Y5: G-V health gate on every seed of the seven canonical cohorts. Training-health quantities only; no readout.
+"""G-V health gate on every seed of the seven canonical cohorts. Training-health quantities only; no readout.
 
 Usage: python -m analysis.tasks.Y5_aspects.health
 """

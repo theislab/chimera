@@ -1,11 +1,11 @@
-"""T11.1: check the Van Zyl object against the raw GEO matrices, gene by gene.
+"""Check the Van Zyl object against the raw GEO matrices, gene by gene.
 
 For every species and every ortholog group:
 * the object's per-gene total equals the total of the CSV row the group maps to (its Ensembl
   ID row when the matrix has one, else its symbol row);
 * false zeros: the group is all-zero in the object although the CSV has counts under the
   group's Ensembl ID, or under its (unique) symbol when the matrix has no ID row;
-* for groups whose ID and symbol are both rows of the matrix (audit R4 n1), the object column
+* for groups whose ID and symbol are both rows of the matrix, the object column
   equals the ID row cell by cell.
 
 Writes ``verify_build.json`` beside the object and exits 1 on any mismatch.

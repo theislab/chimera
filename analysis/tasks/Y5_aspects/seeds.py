@@ -1,4 +1,4 @@
-"""Y5, comparator seeds and T3.1b (run after the owner asked for generous CPU use; amendment 8).
+"""Comparator seeds and test T3.1b of this task.
 
 train <cohort> <seed>   scVI as the existing baselines (n_latent 10, n_hidden 128, 100 epochs, library batch key), model saved under
                         results/analysis/Y5/scvi/ so it can encode new cells. Nothing is written to training/runs.

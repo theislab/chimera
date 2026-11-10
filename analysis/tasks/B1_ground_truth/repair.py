@@ -1,4 +1,4 @@
-"""Rows whose fit ended without scores (tasks submitted before the direct readouts were separated from the fit). Lists them in repair.tsv; no fit is rerun.
+"""Rows whose fit ended without scores (tasks that ran the direct readouts inside the fit job). Lists them in repair.tsv; no fit is rerun.
 A task in the queue is not a row to repair. Then: sbatch --array=0-N analysis/tasks/B1_ground_truth/repair.sbatch"""
 
 from __future__ import annotations

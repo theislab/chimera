@@ -1,4 +1,4 @@
-"""Z4: write manifest.tsv, one row per free-gate fit to train. Recipe = argv of the cohort's first kept H1 run with provenance,
+"""Write manifest.tsv, one row per free-gate fit to train. Recipe = argv of the cohort's first kept run of H1_harmonise with provenance,
 `--config A` -> `--config M`, seed replaced; nothing else changes. Memory = 1.3 x the peak RSS of the cohort's canonical jobs + 1 GB,
 at least 3 GB (sacct MaxRSS of the jobs named in _provenance.json; cohorts without provenance use the values in MEM_FALLBACK).
 
@@ -66,7 +66,7 @@ def free_args(argv: list[str], seed: int) -> str:
     a[i + 1] = "M"
     j = a.index("--seed")
     a[j + 1] = str(seed)
-    assert "--clamp-z-logvar" not in a  # no chosen recipe of H1 uses the guard; G1's guard is only a labelled fallback
+    assert "--clamp-z-logvar" not in a  # no chosen recipe of H1_harmonise uses the guard; the guard of G1_guard is only a labeled fallback
     return " ".join(a)
 
 

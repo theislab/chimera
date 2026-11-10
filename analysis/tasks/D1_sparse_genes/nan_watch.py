@@ -1,4 +1,4 @@
-"""D1: stop a depth fit once its loss is NaN (it cannot recover; the remaining epochs are wasted CPU) and record a discarded health stub, so completion counts it as tried, not finished.
+"""Stop a depth fit once its loss is NaN (it cannot recover; the remaining epochs are wasted CPU) and record a discarded health stub, so completion counts it as tried, not finished.
 Only tasks of the D1 arrays, only depth settings. Run in a loop by the session.    python3 nan_watch.py
 """
 import json

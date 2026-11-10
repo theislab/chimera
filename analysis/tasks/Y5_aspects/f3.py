@@ -1,6 +1,6 @@
-"""Y5 F3: cell states inside an author label.
+"""F3: cell states inside an author label.
 
-Sections: zone (T3.1), stage (T3.2), goldwithin + within (T3.3), b1z (T3.4), clusters (T3.5), encode (T3.1b).
+Sections (tests of this task): zone (T3.1), stage (T3.2), goldwithin + within (T3.3), b1z (T3.4), clusters (T3.5), encode (T3.1b).
 Usage: python -m analysis.tasks.Y5_aspects.f3 <section> [--cohort c]
 """
 from __future__ import annotations
@@ -304,7 +304,7 @@ def theta_mom(Xd):
 
 
 def knn_margin(X, z, spcs, cells, seed_k=RU.KNN_CROSS, level_free=False):
-    """No-model margin on any latent: gene's fit from other-species neighbours minus species-and-label flat rate."""
+    """No-model margin on any latent: gene's fit from other-species neighbors minus species-and-label flat rate."""
     L = np.asarray(X.sum(1)).ravel().astype(float)
     S = np.unique(spcs[cells])
     G = X.shape[1]
@@ -492,7 +492,7 @@ def b1z_tests():
 
 
 def b1z_sweep(cohorts=("liv_hmouse", "test_3sp", "test_hmouse", "test_hmac", "liv_4sp")):
-    """T3.4 sensitivity: every latent at several Leiden resolutions; label-free testis runs; fine-label direct E (human, macaque)."""
+    """Test T3.4, sensitivity: every latent at several Leiden resolutions; label-free testis runs; fine-label direct E (human, macaque)."""
     from analysis.tasks.T4_2_gene_baselines import run as T42
     default = T42.LEIDEN_RESOLUTION
     for c in cohorts:
@@ -581,7 +581,7 @@ def b1z_sweep_tests():
 
 
 def b1z_extra():
-    """Comparators named in amendment 5: X6 damaged-label direct scores, hepatocyte enrichment, seed dose-response."""
+    """Comparators added later: X6_adds_beyond damaged-label direct scores, hepatocyte enrichment, seed dose-response."""
     rows, dose = [], []
     for c, gold in (("liv_hmouse", "G_H3"), ("test_hmouse", "G_H4")):
         g = K.genes(c)
@@ -619,8 +619,8 @@ def b1z_extra():
 
 
 def anchor(cohorts=("liv_hmouse", "test_3sp", "test_hmouse", "liv_4sp")):
-    """T3.4 without clusters. K-means centroids in each latent; the 50 nearest cells per species to each centroid are that species'
-    pseudobulk at the centroid, however far they lie. So a latent that keeps species apart is not penalised by Leiden. If Chimera's
+    """Test T3.4 without clusters. K-means centroids in each latent; the 50 nearest cells per species to each centroid are that species'
+    pseudobulk at the centroid, however far they lie. So a latent that keeps species apart is not penalized by Leiden. If Chimera's
     lead is alignment it holds here; if it is the shared-cluster count it goes."""
     from sklearn.cluster import MiniBatchKMeans
     from analysis.tasks.T4_2_gene_baselines import run as T42

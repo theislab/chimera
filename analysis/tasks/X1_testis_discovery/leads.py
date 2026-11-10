@@ -1,10 +1,10 @@
-"""X1 (EXPLORATORY): testis discovery leads on the per-gene tables from ``build.py``.
+"""EXPLORATORY: testis discovery leads on the per-gene tables from ``build.py``.
 
 Every lead is reported whatever its outcome. Chimera readouts: D_raw (alpha - raw prior,
-median-centred; primary here), D_clamp (alpha - clamped prior, median-centred), S_g_ema and
-its stage decomposition (T2.5 identity). Baselines beside each: B1b / B1b_raw (cross-species
-cell-type profile correlation, T4.2), B1c (rank-matched level, T4.2) and per-stage
-pseudobulk differences (build.py). Uncentred delta-alpha is never tested against zero.
+median-centered; primary here), D_clamp (alpha - clamped prior, median-centered), S_g_ema and
+its stage decomposition (T2_5_celltype_margin identity). Baselines beside each: B1b / B1b_raw (cross-species
+cell-type profile correlation, T4_2_gene_baselines), B1c (rank-matched level, T4_2_gene_baselines) and per-stage
+pseudobulk differences (build.py). Uncentered delta-alpha is never tested against zero.
 
 Stage groups: each gene's peak stage in HUMAN pseudobulk only (no cross-species
 information), among SG, SC, rSD, eSD, Sertoli, Other_somatic; a gene is assigned when
@@ -115,7 +115,7 @@ def stage_tables(labels: list[str], B: int, seed: int):
                                          frac_X=(g.chrom[f] == "X").mean(),
                                          median_B1b_raw=g.B1b_raw[f].median()))
                 if grp in STAGES:
-                    # per-stage pseudobulk baseline at the group's own stage: minus mean |species-centred
+                    # per-stage pseudobulk baseline at the group's own stage: minus mean |species-centered
                     # log2 difference to human| (higher = more conserved), and minus mean |log2 FC|
                     g["PB_dc_own"] = -np.mean([g[f"dc_{s}_{grp}"].abs() for s in OTHER[cohort]], axis=0)
                     g["PB_lfc_own"] = -np.mean([g[f"lfc_{s}_{grp}"].abs() for s in OTHER[cohort]], axis=0)

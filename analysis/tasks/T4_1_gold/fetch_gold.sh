@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T4.1 gold items G1, G7, G8 (see fetch_ensembl.sh), G9, G10. Usage: fetch_gold.sh <chimera_repo>
+# Independent references G1, G7, G8 (see fetch_ensembl.sh), G9, G10. Usage: fetch_gold.sh <chimera_repo>
 C="$1"; F="$C/analysis/tasks/T4_1_gold/fetch_item.sh"; G="$C/data/analysis/gold"
 "$F" G1 "https://web.archive.org/web/20220226202014/https://portals.broadinstitute.org/evee/static/data/evolutionary_statistics.zip" "$G/G1/evolutionary_statistics.zip" "$G/G1/MANIFEST.tsv"
 "$F" G9 "https://www.tau.ac.il/~elieis/HKG/HK_genes.txt" "$G/G9/HK_genes.txt" "$G/G9/MANIFEST.tsv"

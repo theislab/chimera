@@ -1,4 +1,4 @@
-"""X2 (EXPLORATORY): gene sets and gene lists for the liver biology analysis, fixed before any D is read.
+"""EXPLORATORY: gene sets and gene lists for the liver biology analysis, fixed before any D is read.
 
 Zonation sets are written from the published papers only (human symbols, 1:1 orthologs
 taken as they appear in the liver ortholog table; genes absent from the 1:1 vocabulary are
@@ -22,13 +22,13 @@ landmarks.
 
 The plan's reserved sets (H5/H6: Eisenberg housekeeping; HGNC ribosomal, proteasome,
 spliceosome; Hallmark xenobiotic, bile acid, interferon, inflammatory; GO extracellular
-region) are never formed or tested in X2.
+region) are never formed or tested in this task.
 """
 
 from __future__ import annotations
 
 # ---- zonation (literature-defined; fixed before D was read) --------------------------------
-# Amendment 1 (before any D was read): six of the eight scoring landmarks (GLUL, CYP2E1,
+# Changed before any D was read: six of the eight scoring landmarks (GLUL, CYP2E1,
 # CYP1A2, ASS1, ALB, CYP2F1) are absent from the 1:1 four-species liver vocabulary, so
 # hepatocytes are placed on the porto-central axis from the raw CAMEX full-transcriptome
 # objects (data/raw/camex/1liver/dataset/raw-liver-*.h5ad, same cells), with species-native
@@ -70,7 +70,7 @@ ZONATION_SOURCES = {
     "PP_canonical": "Ben-Moshe & Itzkovitz 2019 review",
 }
 
-# ---- named genes on the submitted figures --------------------------------------------------
+# ---- named genes on the figures --------------------------------------------------
 # Fig 4c themes, verbatim from notebooks/_alpha_biology_simpler_builder.py (H_THEMES)
 FIG4C_THEMES = {
     "Urea cycle / GNG": ["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"],
@@ -78,14 +78,14 @@ FIG4C_THEMES = {
     "Liver support": ["SELP", "SELE", "VCAM1", "F3", "CR2", "CD40LG", "COL17A1", "PDGFRB", "KIT", "C1QC"],
     "Housekeeping": ["DDX4", "RPL3", "EEF1A1", "EEF2", "ACTB", "TUBA1A", "COX4I1", "NDUFA1", "HNF4A"],
 }
-# urea-cycle enzymes and transporters (T2.6 list)
+# urea-cycle enzymes and transporters (T2_6_matched list)
 UREA_CYCLE = ["CPS1", "OTC", "ASS1", "ASL", "ARG1", "NAGS", "ARG2", "SLC25A15", "SLC25A13", "SLC25A2"]
-# extra named genes in T2.5 landmarks and Fig 7 (CPS1)
+# extra named genes in T2_5_celltype_margin landmarks and Fig 7 (CPS1)
 EXTRA_NAMED = ["ASS1", "NAGS", "ALB", "APOA1"]
 
 # ---- divergent-but-protein-conserved selection (fixed before D was read) --------------------
 # high prior: prior_raw in the top third of the cohort; D in the bottom 5 %; margin support
-# (T2.5 flag); sign of (alpha - prior) negative in every seed of the consensus.
+# (T2_5_celltype_margin flag); sign of (alpha - prior) negative in every seed of the consensus.
 DIVCONS_PRIOR_Q = 2 / 3
 DIVCONS_D_Q = 0.05
 

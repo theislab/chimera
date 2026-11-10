@@ -1,25 +1,26 @@
-"""T7.9: islet gene table for H-D1 and H-D1b (plan sections 2, 3, 5 and 8b).
+"""Islet gene table for H-D1 and H-D1b (pre-specified analysis plan, sections 2, 3, 5 and 8b).
 
 One row per gene of ``islet_healthy_train.h5ad`` (testis human-mouse 1:1 table, joined by human
 Ensembl ID through ``load_table("testis")``):
 
-* covariates C (section 3) on the healthy training object: raw prior (the run's
+* covariates C (plan, section 3) on the healthy training object: raw prior (the run's
   ``conservation_prior_raw.npy``, checked against the h5ad prior), species-balanced mean log1p
   CP10K and detection (``cohorts.gene_covariates``), log human CDS length (``controls.cds_table``);
-* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PC features (``T4_3 inputs.esm_blocks``);
-* D (section 2): mean over the seed runs of ``T7_9_recipe_b/seed_map.tsv`` (s42 = the selected
+* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PC features (``T4_3_scoreboard/inputs.py::esm_blocks``);
+* D (plan, section 2): mean over the seed runs of ``T7_9_recipe_b/seed_map.tsv`` (s42 = the selected
   grid run rev-isl-grid14-s42, s43-s46) that pass the training-health gate (G-D2 / G-V thresholds,
-  ``run_report.py``; amendment: a failing seed does not enter D or S_ema) of alpha - prior as
+  ``run_report.py``; amendment log of the plan: a failing seed does not enter D or S_ema) of alpha - prior as
   anchored (clamped at 0.85), minus the cohort median; ``D_all_nonnan`` = the same over every
   non-NaN seed, when that set differs (sensitivity); ``D_raw`` = mean alpha - pi_raw minus its median (named sensitivity); ``S_ema`` =
   mean ``S_g_ema``; leave-one-seed-out D; per-seed leave-one-out rho on the C-residual scale;
   rel(D|C) over the 10 2-vs-3 splits; ``D_unflagged`` = the same mean over the seeds that the
   run report does not flag as poorly mixed (Family 3, only if a seed is flagged);
-* baselines on the same object (T4.2 functions): B1b_raw = E (cross-species pseudobulk profile
-  correlation over the shared classes, units = ``sample_batch`` with >= 30 cells), B1b = E
-  residualised on prior, expression and detection splines, B2b (specificity cosine, K >= 4).
+* baselines on the same object (functions of the direct baselines, analysis/tasks/T4_2_gene_baselines):
+  B1b_raw = E (cross-species pseudobulk profile correlation over the shared classes, units =
+  ``sample_batch`` with >= 30 cells), B1b = E residualized on prior, expression and detection splines,
+  B2b (specificity cosine, K >= 4).
 
-All CPU seeds, so the section 2 MPS pooling clause does not apply. No logFC is read.
+All CPU seeds, so the MPS pooling clause of plan, section 2 does not apply. No logFC is read.
 
     PYTHONPATH=<chimera repo> python -I analysis/tasks/T7_9_islet/readout.py
 """
@@ -149,7 +150,7 @@ def main() -> int:
         rs.append(float(np.corrcoef(e1, e2)[0, 1]))
     r = float(np.mean(rs))
 
-    # baselines B1b, B2b (T4.2 definitions) on the healthy object
+    # baselines B1b, B2b (definitions of T4_2_gene_baselines) on the healthy object
     X = a.X.tocsr() if sp.issparse(a.X) else sp.csr_matrix(a.X)
     X = X.astype(np.float64)
     species = a.obs["species"].astype(str).to_numpy()

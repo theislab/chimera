@@ -1,4 +1,4 @@
-"""G1 step 1: posterior log-variance of every canonical and kept run, read from the saved encoder.
+"""Step 1: posterior log-variance of every canonical and kept run, read from the saved encoder.
 
 No training and no change to any run. For each run: rebuild the encoder and z_logvar head from model/model.pt, pass all cells of the run's own object through it, and record per latent dimension
 the maximum, the minimum and the counts of cell x dim above +10 and below -10 (the clamp of the VAMP KL). Two passes: eval mode (running batch norm, no dropout; what inference sees) and train mode
@@ -159,7 +159,7 @@ def main():
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     for path, rs in by_obj.items():
-        o = ad.read_h5ad(REPO / path[path.index("data/"):])  # older configs: chimera/data/..., /Users/...
+        o = ad.read_h5ad(REPO / path[path.index("data/"):])  # older configs record the path with a prefix (chimera/data/..., an absolute path)
         X = o.X.tocsr() if sp.issparse(o.X) else sp.csr_matrix(o.X)
         del o
         for r in rs:

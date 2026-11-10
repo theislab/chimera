@@ -1,7 +1,7 @@
-"""T4.2: simple gene-level baselines B1b, B1c, B1z, B2b, B3a, B3b for every cohort.
+"""Direct gene-level baselines B1b, B1c, B1z, B2b, B3a, B3b for every cohort.
 
-Definitions follow the frozen analysis plan (05 section 5) and audit A5 action A4. No gold
-standard is read and no association with one is computed here; the scoreboard (T4.3) does that.
+Definitions follow the pre-specified analysis plan, section 5. No gold standard is read and no
+association with one is computed here; the validation (analysis/tasks/T4_3_scoreboard) does that.
 
 Shared preprocessing
 - ``.X`` is checked to hold raw counts (non-negative integers) over the whole matrix.
@@ -15,29 +15,29 @@ Shared preprocessing
   both species.
 
 Scores
-- E (per pair): Pearson across the pair's shared groups of the species-centred profiles,
+- E (per pair): Pearson across the pair's shared groups of the species-centered profiles,
   undefined for a constant profile. One pair: E = r. Several pairs: Fisher-z mean over the
   scorable pairs weighted by K_pair - 3; pairs with K_pair <= 3 carry no weight and are dropped.
-- B1b = E on cell types, residualised on additive natural cubic splines (df 4, knots at rank
+- B1b = E on cell types, residualized on additive natural cubic splines (df 4, knots at rank
   quartiles, tied knots merged) of rank pi_raw, rank species-balanced mean log1p CP10K and rank species-balanced
   detection, fitted on the scorable genes. ``B1b_raw`` = E.
-- B1c: within each type shared by all species of the cohort, genes are rank-normalised per
+- B1c: within each type shared by all species of the cohort, genes are rank-normalized per
   species (mid-ranks / n genes); L = -mean_t |r_s - r_s'|, mean over scorable pairs; then
-  residualised as B1b. ``B1c_raw`` = L.
+  residualized as B1b. ``B1c_raw`` = L.
 - B1z: E across Leiden clusters of Chimera's latent (canonical checkpoint,
   ``ChimeraModel.load(...).get_latent_representation()``), 15-NN exact graph, resolution 1,
-  igraph Leiden, fixed seed; residualised as B1b. ``B1z_raw`` = E on clusters.
+  igraph Leiden, fixed seed; residualized as B1b. ``B1z_raw`` = E on clusters.
 - B2b: p[g,s,t] = 2^x / sum_t 2^x on the types shared by all species; cosine(p_s, p_s'),
   mean over scorable pairs. Only when that K >= 4; otherwise NA for every gene (liver
   H+Zebrafish K=3 and 4-sp K=2), never forced.
 - B3a, B3b: 5-fold cross-fitted RidgeCV on the 72 GIN features (``varm['gene_features']``,
-  standardised inside each fold) predicting E (B1b_raw) and delta-alpha. Genes with a target
+  standardized inside each fold) predicting E (B1b_raw) and delta-alpha. Genes with a target
   get their out-of-fold prediction; genes without one get the mean of the five fold models
   (none of which saw them). ``*_oof`` flags which.
 
 The delta-alpha source for B3b is an argument: ``canonical`` (alpha - prior of the canonical s42
 run, the clamped prior on clamped recipes) or a CSV/parquet path, ``{cohort}`` substituted, keyed
-by ``hsapiens_gene_id`` with the value in ``--delta-column`` (the T3.3 consensus D).
+by ``hsapiens_gene_id`` with the value in ``--delta-column`` (the consensus D of analysis/tasks/T3_3_consensus).
 
 Outputs ``results/analysis/T4_2/baselines__<cohort>.csv`` (one row per human ENSG),
 ``pseudobulk_units__<cohort>.csv``, ``summary__<cohort>.json``, ``marker_check.csv``.
@@ -184,7 +184,7 @@ def shared_groups(x: dict, species_list: list[str], among: list[str]) -> list[st
 
 
 def pair_corr(x: dict, f: dict, s1: str, s2: str, groups: list[str], n_genes: int):
-    """Pearson across groups of the species-centred profiles; NaN where unscorable or constant."""
+    """Pearson across groups of the species-centered profiles; NaN where unscorable or constant."""
     r = np.full(n_genes, np.nan)
     if len(groups) < 2:
         return r, np.zeros(n_genes, bool)

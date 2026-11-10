@@ -1,11 +1,11 @@
-"""T7.2: annotated disease objects for the liver MASH case study.
+"""Annotated disease objects for the liver MASH case study.
 
 Human: GSE202379 (Gribben 2024), ``*-raw_counts.csv.gz`` only (never ``norm_counts``).
 Mouse: GSE192742 diet series CS184-CS197 (Guilliams 2022), ``filtered_feature_bc_matrix`` h5.
 Hold-out mice are fixed in ``../T7_1_holdouts/holdouts.tsv`` (CS184, CS185, CS195, CS196).
 No disease concordance, no logFC and no Chimera readout is computed here.
 
-Steps (task card T7.2, plan section 8; every rule below was fixed before the mouse
+Steps (pre-specified analysis plan, section 8; every rule below was fixed before the mouse
 type counts were seen):
 
 1. ``_validate_raw_counts``, ``_standardize_obs_columns``, ``_qc_filter`` (min 200 genes,
@@ -13,8 +13,8 @@ type counts were seen):
    ``MT-`` rows, so for human the same 20% threshold is applied to the authors'
    ``percent.mt.RNA``.
 2. Human coarse type from the authors' ``cell.annotation`` (Seurat ``@meta.data``, extracted
-   at T7.1). Checked against coarse marker sets and against kNN label transfer from the
-   CAMEX human liver nuclei (CS170).
+   by ``T7_1_holdouts/extract_seurat_meta.R``). Checked against coarse marker sets and against
+   kNN label transfer from the CAMEX human liver nuclei (CS170).
 3. Mouse coarse type: kNN label transfer (reference PCA, k = 15) from CAMEX mouse liver nuclei
    (ABU20, author labels; its 23 "HsPCs" are dropped from the reference), combined with coarse
    marker sets on Leiden clusters of the query (resolution ``LEIDEN_RES``). Per cluster:
@@ -23,13 +23,13 @@ type counts were seen):
    < ``MIN_MARGIN`` -> "unresolved" (mixed or doublet-like). T == M with T carried by
    >= ``MIN_TRANSFER_FRAC`` of the cluster -> T. M a class absent from the reference
    (lymphocyte, neutrophil, mesothelial) -> M. Otherwise "unresolved" (excluded downstream).
-4. Disease states (plan section 8, frozen marker sets; human symbols, mouse 1:1 ortholog from
+4. Disease states (plan, section 8, frozen marker sets; human symbols, mouse 1:1 ortholog from
    the testis table, else Ensembl Compara 110 ``ortholog_one2one``): ``scanpy.tl.score_genes``
-   on log-normalised counts within the coarse type, state = top quartile of that type within
+   on log-normalized counts within the coarse type, state = top quartile of that type within
    species. Scoring population = the species' training nuclei before caps (human: primary
    healthy donors and NASH without cirrhosis; mouse: the 8 training mice).
-5. Primary sets. Human healthy = "Healthy control" without P98 (D13), HL1 right lobe only (A6
-   3.2; all other primary samples are right lobe). Human MASH = "NASH w/o cirrhosis". Mouse
+5. Primary sets. Human healthy = "Healthy control" without P98, HL1 right lobe only (all
+   other primary samples are right lobe). Human MASH = "NASH w/o cirrhosis". Mouse
    training = holdouts.tsv role "training". P98, the other HL1 lobes, NAFLD, cirrhosis,
    end stage and hold-out mice stay in the per-sample pseudobulks.
 6. Donor caps for the pooled object: at most ``CAP`` nuclei per species x condition x coarse
@@ -48,9 +48,9 @@ type counts were seen):
    cell_ontology_class, condition (control/disease) and the native condition label.
 8. Per-sample pseudobulks per coarse type for every sample (all human, all 12 mice), from all
    QC-passed annotated nuclei (no caps), native gene space, with per-gene nuclei-detected
-   counts for T7.3's 5% detection rule.
+   counts for the 5% detection rule of the case study (analysis/tasks/T7_3_mash).
 
-Gate G-D1 (plan section 8): >= 3 healthy donors (P98 excluded), >= 15 MASH donors, >= 4 SD +
+Gate G-D1 (plan, section 8): >= 3 healthy donors (P98 excluded), >= 15 MASH donors, >= 4 SD +
 4 WD training mice, >= 4 of 5 types pseudobulk-able at >= 20 nuclei per sample. Reading fixed
 here, before the mouse counts: a type is pseudobulk-able if, after dropping the DE units
 (human donor, mouse animal) with < 20 nuclei of that type, the remaining units still meet the
@@ -156,7 +156,7 @@ COARSE_MARKERS = {
     "mesothelial": ["MSLN", "UPK3B", "LRRN4", "WT1"],
 }
 NON_REFERENCE = {"lymphocyte", "neutrophil", "mesothelial"}
-# Plan section 8, frozen at T0.2 (human symbols).
+# Pre-specified analysis plan, section 8; fixed with the plan (human symbols).
 STATES = {
     "state_scar_lipid_macrophage": ("macrophage", ["TREM2", "CD9", "SPP1", "GPNMB", "CD63", "FABP5", "LGALS3"]),
     "state_activated_hsc": ("hsc_fibroblast", ["COL1A1", "COL1A2", "COL3A1", "ACTA2", "TIMP1", "LUM",
@@ -204,7 +204,7 @@ def load_human(jobs: int) -> ad.AnnData:
     parts, genes0 = [], None
     import multiprocessing as mp
 
-    # spawn, not fork: a forked pool left the parent deadlocked in later threaded code
+    # spawn, not fork: a forked pool deadlocks the parent in later threaded code
     with ProcessPoolExecutor(max_workers=jobs, mp_context=mp.get_context("spawn")) as ex:
         for name, genes, cells, X in ex.map(_read_human_member, [(tar_path, n) for n in names]):
             if genes0 is None:
@@ -332,7 +332,7 @@ _COMPARA_CACHE: dict = {}
 
 
 def _gtf_unique_name_to_id() -> dict:
-    """Ensembl 110 gene_name -> gene_id where the name is unique (annotation for T7.3 joins)."""
+    """Ensembl 110 gene_name -> gene_id where the name is unique (annotation for the joins of T7_3_mash)."""
     import re
 
     ids: dict = {}
@@ -396,7 +396,7 @@ def knn_transfer(ref: ad.AnnData, ref_labels: pd.Series, query: ad.AnnData) -> p
 
 
 def marker_scores(ln: ad.AnnData, markers: dict) -> pd.DataFrame:
-    """Per nucleus mean log-normalised expression of each class's markers."""
+    """Per nucleus mean log-normalized expression of each class's markers."""
     out = {}
     for c, genes in markers.items():
         g = [x for x in genes if x in ln.var_names]

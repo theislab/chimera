@@ -1,5 +1,5 @@
 """Where each latent keeps depth, species and zone, and how noisy the posterior is along each axis. On z_mean PCs (training cells of a cohort):
-pc_share; posterior variance along the PC over z_mean variance along it (noise ratio, from each cell's diagonal posterior); CV AUROC of species from z (standardised LR, all cells and inside the largest label);
+pc_share; posterior variance along the PC over z_mean variance along it (noise ratio, from each cell's diagonal posterior); CV AUROC of species from z (standardized LR, all cells and inside the largest label);
 rate = mean KL(q(z|x) || p) per cell for the fitted prior: for Chimera the VAMP estimate on one sample, as the loss; for scVI the N(0, I) closed form, compared with n_latent x free bits.
 python -m analysis.tasks.Z2_embedding.snr   Output: results/analysis/Z2/snr.csv, snr_pcs.csv"""
 from __future__ import annotations

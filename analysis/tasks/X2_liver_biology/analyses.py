@@ -1,9 +1,9 @@
-"""X2 (EXPLORATORY): liver biology leads on the per-gene tables (``build.py``) and forward sums.
+"""EXPLORATORY: liver biology leads on the per-gene tables (``build.py``) and forward sums.
 
-Every lead is written whatever its outcome. Chimera readouts: consensus D (T3.3), S_ema and
-its exact species x type decomposition (T2.5; unweighted per-cell means S_gsk, within-type null
+Every lead is written whatever its outcome. Chimera readouts: consensus D (T3_3_consensus), S_ema and
+its exact species x type decomposition (T2_5_celltype_margin; unweighted per-cell means S_gsk, within-type null
 W_gsk, species contributions Cs, type contributions Ck). Baselines beside each: B1b / B1b_raw /
-B1c (T4.2) and per-type pseudobulk log2 fold change to human (``lfc__``).
+B1c (T4_2_gene_baselines) and per-type pseudobulk log2 fold change to human (``lfc__``).
 
 Outputs in results/analysis/X2/:
 * ``presence.csv``: genes per cohort with zero counts / absent from the raw object, per species,
@@ -183,7 +183,7 @@ def dominant(g: pd.DataFrame) -> pd.DataFrame:
     A = g[cs].abs()
     share = A.max(1) / A.sum(1).replace(0, np.nan)
     sp_ = A.idxmax(1).str.replace("Cs__", "")
-    # dominant (species, type) cell: w_sk * S_gsk with the T2.5 weights
+    # dominant (species, type) cell: w_sk * S_gsk with the T2_5_celltype_margin weights
     w = pd.read_csv(OUT / "genes" / "type_weights.csv")
     w = w[w.cohort == g["cohort"].iloc[0]]
     cells = {}

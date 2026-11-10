@@ -1,4 +1,4 @@
-"""Y1 post hoc golds (ledger addition C): living donor kidney vs TMS kidney; Muraro pancreas vs TMS pancreas. T4.3 H3 recipe unchanged.
+"""Post hoc golds: living donor kidney vs TMS kidney; Muraro pancreas vs TMS pancreas. T4_3_scoreboard H3 recipe unchanged.
 
 Sub-golds: kidney_nephron = pt, tal, dct, pc, endothelial, mesangial (no immune type; bone marrow has none of them);
 islet_noacinar = without acinar (the islet fit has no acinar class). No Chimera readout is read.

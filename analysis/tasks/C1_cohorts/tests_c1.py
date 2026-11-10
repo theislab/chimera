@@ -1,6 +1,6 @@
-"""C1 tests of plan section 13, one file, same statistics for every cohort. Exploratory, Family 3.
+"""Tests of the pre-specified analysis plan, section 13, one file, same statistics for every cohort. Exploratory, Family 3.
 
-Inputs: results/analysis/C1/h1/genes/<cohort>.parquet (H1 schema), drivers fw files, golds, DE and H-D4 of the cases, references.tsv.
+Inputs: results/analysis/C1/h1/genes/<cohort>.parquet (schema of H1_harmonise), drivers fw files, golds, DE and H-D4 of the cases, references.tsv.
 
     python analysis/tasks/C1_cohorts/tests_c1.py brain | ad | lung | tumour  [--n-perm 10000] [--n-boot 2000]
 """
@@ -227,7 +227,7 @@ def brain(n_perm: int, n_boot: int) -> None:
 
 
 def ase_test(n_perm: int, n_boot: int) -> None:
-    """E-B7, plan section 13a. Hybrid allele-specific reference (Wang, Starr, Fraser 2024; Agoglia 2021; Y6 gold table): cis level change human vs chimpanzee, non-atlas.
+    """E-B7, pre-specified analysis plan, section 13a. Hybrid allele-specific reference (Wang, Starr, Fraser 2024; Agoglia 2021; Y6_uses gold table): cis level change human vs chimpanzee, non-atlas.
     Targets, oriented so that positive means a smaller cis change: -abs(a_CS) (cortical spheroid), -abs(a_MN) (motor neuron), and P_cis. Join by human symbol."""
     rng = np.random.default_rng(SEED + 7)
     out = CF.RES / "cortex"

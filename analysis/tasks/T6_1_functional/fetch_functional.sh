@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T6.1 downloads. Usage: fetch_functional.sh <chimera_repo>
+# Downloads of the functional layer. Usage: fetch_functional.sh <chimera_repo>
 C="$1"; F="$C/analysis/tasks/T4_1_gold/fetch_item.sh"; D="$C/data/analysis/functional"; M="$D/MANIFEST.tsv"
 S=https://stringdb-downloads.org/download
 "$F" HuRI https://interactome-atlas.org/data/HuRI.tsv "$D/HuRI.tsv" "$M"

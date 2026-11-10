@@ -1,4 +1,4 @@
-"""T3.5 analysis: keep sequence, destroy counts. Run once the 12 control runs have finished.
+"""Analysis of the control that keeps the sequence features and destroys the counts. Run once the 12 control runs have finished.
 
 For each control run ``rev-ctl-<cohort>-perm<A|B|C>-s<seed>`` (``manifest.tsv``; permutation
 from ``data/analysis/controls/<control>.perm.npz``), against the cohort consensus of D
@@ -7,9 +7,9 @@ excluding the run's own seed (``analysis/common/controls.py``, seeds 42-46):
 * slot rho, ``rho(D_arm[g], D_ref[g])``: the sequence-driven component;
 * moved rho, ``rho(D_arm[g], D_ref[perm[g]])``: the count-driven component;
 
-each on the Spearman scale and on the covariate-residual scale (each score residualised on
+each on the Spearman scale and on the covariate-residual scale (each score residualized on
 its own covariates; the control's count covariates move with the counts), and the same for
-S_g_ema. Calls (05 section 9):
+S_g_ema. Calls (pre-specified analysis plan, section 9):
 
 * slot: ``high`` only if above the 97.5th percentile of the 1,000-permutation offline ridge
   projection null for the same arm and reference (``offline_null.py``); ``low`` if below the

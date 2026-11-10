@@ -1,4 +1,4 @@
-"""Y5 T3.5 (descriptive): per author label, share of cells in cross-species clusters and share of neighbours from the other species, each latent."""
+"""Test T3.5 (descriptive): per author label, share of cells in cross-species clusters and share of neighbors from the other species, each latent."""
 from __future__ import annotations
 import numpy as np
 import pandas as pd

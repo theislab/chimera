@@ -1,4 +1,4 @@
-"""T7.1: check the disease downloads against GEO's own file lists. Metadata only.
+"""Check the disease downloads against GEO's own file lists. Metadata only.
 
 For each RAW.tar, every member name and size must match ``filelist.txt``. The GSE192742
 per-sample h5 files are checked against that series' file list. For GSE129516 the header

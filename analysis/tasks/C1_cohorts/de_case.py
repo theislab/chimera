@@ -1,9 +1,9 @@
-"""C1: pseudobulk DE for the disease cases, the P13 fit unchanged (`P13_kidney/de.py::fit`, `permuted_labels`). Runs in revision_de_env, never chimera_env. No Chimera readout.
+"""Pseudobulk DE for the disease cases, the P13_kidney fit unchanged (`P13_kidney/de.py::fit`, `permuted_labels`). Runs in revision_de_env, never chimera_env. No Chimera readout.
 
     python analysis/tasks/C1_cohorts/de_case.py --case ad [--perm-task K --n-chunks N] [--n-cpus 8]
 
-Primary: human l^h = log2fc_mle, mouse m = log2fc_fixed. A unit needs at least 20 nuclei of the type. Label null: relabellings within
-strata (`CASES`), N_PERM = 200 or all distinct relabellings where fewer exist, never the observed labels or their swap.
+Primary: human l^h = log2fc_mle, mouse m = log2fc_fixed. A unit needs at least 20 nuclei of the type. Label null: relabelings within
+strata (`CASES`), N_PERM = 200 or all distinct relabelings where fewer exist, never the observed labels or their swap.
 """
 from __future__ import annotations
 

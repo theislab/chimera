@@ -1,4 +1,4 @@
-"""T6.6 step 1: fix the liver-lineage experiment filter and the TF panel. Reads only ChIP-Atlas
+"""Step 1: fix the liver-lineage experiment filter and the TF panel. Reads only ChIP-Atlas
 column headers; no Chimera readout and no binding value. Run before ``run.py``.
 
     python analysis/tasks/T6_6_regulatory/fix_panel.py

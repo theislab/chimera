@@ -2,7 +2,7 @@
 
 Loads the authors' `analysis/<tissue>/params.py` from the pinned clone and
 changes only: `path` (cohort input folder), the dataset rows (the cohort's
-species pairs, human as labelled source), `device` -> 'cpu', `log_path`.
+species pairs, human as labeled source), `device` -> 'cpu', `log_path`.
 All other values stay at the authors' defaults (epoch_integration=10,
 dim_hidden=128, gnn_layer_num=2, encoder=GCN). Runs `Trainer.integration()`
 only, never `annotation()`. Seeds random, numpy, torch and dgl after the

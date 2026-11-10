@@ -1,4 +1,4 @@
-"""O1 part B6, per claim: each gene named in the text, in the cohort its claim is about: flags, raw counts per species, D, S_ema, strict support.
+"""Part B6, per claim: each gene named in the text, in the cohort its claim is about: flags, raw counts per species, D, S_ema, strict support.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.named_claims
 """

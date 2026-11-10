@@ -1,4 +1,4 @@
-"""Y6: one tidy table of (fit, species, gene) rows from stored forward passes and per-gene tables. No label is read here.
+"""One tidy table of (fit, species, gene) rows from stored forward passes and per-gene tables. No label is read here.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.build_rows
 """

@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=4G
 #SBATCH --time=04:00:00
-# Ensembl 110 reference files the C1 cohorts need and no earlier task fetched.
+# Ensembl 110 reference files that the cohorts of this folder need and no earlier task fetched.
 E=https://ftp.ensembl.org/pub/release-110
 D=data/analysis/new_usecases/ensembl110
 mkdir -p $D

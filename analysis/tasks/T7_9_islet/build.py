@@ -1,4 +1,5 @@
-"""T7.9: islet T2D objects (plan section 8b), the T7.2 pipeline on islet data.
+"""Islet T2D objects (pre-specified analysis plan, section 8b): the pipeline of the liver MASH objects
+(analysis/tasks/T7_2_disease_objects) on islet data.
 
 Human: 48-donor islet atlas (CELLxGENE 464a2c70), integer counts from ``raw.X``.
 Mouse: Hrovatin 2023 atlas (CELLxGENE 2cf0b367), integer counts from ``raw.X``, only the
@@ -6,13 +7,13 @@ libraries listed in ``donor_roles.tsv`` (db/db and mSTZ studies; 4m and aged hea
 Roles come from ``donor_roles.tsv`` (``split_donors.py``, seed 20261101). No logFC, no
 disease concordance and no Chimera readout is computed here.
 
-Steps (section 8b):
+Steps (plan, section 8b):
 
 1. ``_validate_raw_counts``, ``_standardize_obs_columns`` and ``_qc_filter`` from
    ``chimera._data_utils`` with >= 200 genes and **no mitochondrial cut** (``MAX_MT_PCT = 100``,
-   amendment 2026-11-02). A 20% cut removed 14.6% of ND DE cells but 8.4% of T2D cells (and
-   10.6% of human against 0.04% of mouse), so it could bias the disease contrast; Van Zyl and
-   kidney drop it for the same reason. ``qc_by_group.csv`` reports, per species x role x
+   amendment log of the plan, 2026-11-02). A 20% cut removed 14.6% of ND DE cells but 8.4% of T2D cells (and
+   10.6% of human against 0.04% of mouse), so it could bias the disease contrast; the eye (Van Zyl)
+   and kidney cohorts drop it for the same reason. ``qc_by_group.csv`` reports, per species x role x
    condition x chemistry, the cells removed and the share a 20% cut would have removed. ``obs['batch']`` of
    the healthy object is the technical source dataset (``technical_batch``); donors and libraries
    are in ``obs['sample_batch']``.
@@ -21,17 +22,17 @@ Steps (section 8b):
    are unresolved). Coarse marker check per author label, reported only.
 3. Per-library pseudobulks per class for every unit in ``donor_roles.tsv`` (all QC-passed
    annotated cells, no caps, native gene space; ``layers['n_detected']`` for the 5% rule).
-4. Gate G-D1b and the owner filter rule: a unit enters a type's DE only with >= 20 cells; a
+4. Gate G-D1b and the filter rule for sparse types: a unit enters a type's DE only with >= 20 cells; a
    type is DE-able only if >= 6 ND (DE half), >= 12 T2D, >= 2 control and >= 2 diabetic mouse
    units remain. Every dropped unit-type pair and type is written to ``filters.csv``.
 5. Healthy islet object (training-half donors and training mice only): classes with >= 50
    training cells in each species (others filtered and logged), caps of 2,000 cells per
-   species x class shared by donors (T7.2 water-filling, seed 20261101; reason: islets are 60-80%
-   beta and alpha cells, so without a cap the decoder and the conditional MMD would see the
-   minority types only rarely; 2,000 is the liver T7.2 value and keeps the object near the size of
-   the canonical testis cohorts; a class below the cap keeps all its cells, so class sizes stay
-   unequal across species, e.g. mouse ductal), testis table
-   vocabulary, ``compute_conservation_prior``, ESM features as T7.2,
+   species x class shared by donors (water-filling of T7_2_disease_objects, seed 20261101; reason:
+   islets are 60-80% beta and alpha cells, so without a cap the decoder and the conditional MMD
+   would see the minority types only rarely; 2,000 is the value of the liver case and keeps the
+   object near the size of the canonical testis cohorts; a class below the cap keeps all its cells,
+   so class sizes stay unequal across species, e.g. mouse ductal), testis table
+   vocabulary, ``compute_conservation_prior``, ESM features as in T7_2_disease_objects,
    ``construct_unified_adata``, ``compute_expression_stats`` and ``assemble_gin_features`` on
    these cells, ``precompute_p_null``, ``assert_table_matches``. Genes are dropped if absent from
    either species' matrix, not measured in every mouse training study, or in < 3 cells (list and
@@ -86,7 +87,7 @@ SATURN = t72.SATURN
 OUT = ROOT / "data" / "analysis" / "disease_islet"
 
 SEED = 20261101
-MAX_MT_PCT = 100.0  # no mitochondrial cut (amendment 2026-11-02); 20.0 is reported, not applied
+MAX_MT_PCT = 100.0  # no mitochondrial cut (amendment log of the plan, 2026-11-02); 20.0 is reported, not applied
 MT_REPORT = 20.0
 MIN_CELLS_UNIT = 20
 MIN_CELLS_MODEL = 50
@@ -208,7 +209,7 @@ def marker_check(a: ad.AnnData, species: str, table: pd.DataFrame, res: TaskOutp
 
 
 def qc(a: ad.AnnData, name: str) -> tuple[ad.AnnData, dict]:
-    """T7.2's QC with no mitochondrial cut; the share a 20% cut would remove is reported per group."""
+    """QC of T7_2_disease_objects with no mitochondrial cut; the share a 20% cut would remove is reported per group."""
     from chimera._data_utils import _qc_filter, _standardize_obs_columns, _validate_raw_counts
 
     _validate_raw_counts(a, name)
@@ -288,7 +289,8 @@ def technical_batch(obs: pd.DataFrame) -> pd.Series:
     """``obs['batch']``: the technical source dataset within a species, as in the canonical cohorts.
 
     Species + source study, plus chemistry where it differs within a study. Donors and libraries
-    never enter it (iter94); they stay in ``obs['sample_batch']`` for DE and pseudobulks.
+    never enter it (donor-level batches fail in training); they stay in ``obs['sample_batch']`` for
+    DE and pseudobulks.
     """
     chem = obs["assay"].astype(str).str.extract(r"(v\d)$")[0]
     study = obs["study"].astype(str)

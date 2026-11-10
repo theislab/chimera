@@ -1,4 +1,4 @@
-"""B1 Track D: the direct pipeline a user would run, timed per step on one object: pseudobulk with labels; B1 and B1c, B2b; Sdir; B3a."""
+"""Track D: the direct pipeline a user would run, timed per step on one object: pseudobulk with labels; B1 and B1c, B2b; Sdir; B3a."""
 
 from __future__ import annotations
 

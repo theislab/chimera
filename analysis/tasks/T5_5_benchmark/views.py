@@ -1,8 +1,8 @@
-"""T5.5 views beside the composite (composite unchanged, as frozen).
+"""Views beside the composite (composite unchanged, as frozen).
 
 1. ``composite_mixing_bio_10models``: four panels on the same rows and columns, columns grouped by
    label use: raw kNN species purity (lower = more species mixing), Mixing score, Biology score
-   (normalised means, as in the composite), Composite. Reads ``master_table_ext.csv``.
+   (normalized means, as in the composite), Composite. Reads ``master_table_ext.csv``.
 2. Supplementary sensitivity: SATURN, SATURN-Leiden and CAMEX latents reduced to 10 dimensions by PCA
    (sklearn, random_state 0; the panel's other methods have 10), rescored with the unmodified
    ``compute_integration_metrics`` (k=15, seed=42), and the 10-model composite recomputed with these

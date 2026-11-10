@@ -2,10 +2,11 @@
 modifier. It measures how far the pre-specified results depend on cell-type dominance, the
 confounder that ``calibration_dominant.py`` found the pi x expression strata do not control.
 
-Dominance: liver, top quartile of X2 ``hep_enrich``; testis, T2.5 dominant type = commonest type.
+Dominance: liver, top quartile of ``hep_enrich`` of analysis/tasks/X2_liver_biology; testis, dominant type of
+analysis/tasks/T2_5_celltype_margin = commonest type.
 - The 9 Family 2 tests with dominance added to the strata (same AUROC, 5:1 rule, permutation).
 - H1-H4 and the Figs 4-6 estimates with dominance added to the design (liver: spline of rank
-  hep_enrich, as X2's C_hep; testis: the binary flag), block bootstrap, stratified permutation
+  hep_enrich, as C_hep of X2_liver_biology; testis: the binary flag), block bootstrap, stratified permutation
   with the flag added to the strata.
 
 Usage: python -m analysis.tasks.T4_3_scoreboard.dominance_exploratory

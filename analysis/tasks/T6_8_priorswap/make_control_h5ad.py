@@ -1,8 +1,8 @@
-"""T6.8 prior swap: pi' = 0.5 pi + 0.5 smooth(pi, STRING direct graph), through data preparation only.
+"""Prior swap: pi' = 0.5 pi + 0.5 smooth(pi, STRING direct graph), through data preparation only.
 
-smooth(pi, G)[g] = mean of pi over the neighbours of g in the STRING 12.0 physical graph (direct
+smooth(pi, G)[g] = mean of pi over the neighbors of g in the STRING 12.0 physical graph (direct
 ``experiments`` >= 400, same graph as F2, restricted to the cohort's genes); a gene without
-neighbours keeps its own pi. Only ``var['conservation_prior']`` changes. Counts, ``p_null``, obs and
+neighbors keeps its own pi. Only ``var['conservation_prior']`` changes. Counts, ``p_null``, obs and
 ``gene_features`` (including the identity columns 65, 69-71 and the ESM PCs) are the canonical
 ones. Canonical prior kept in ``var['conservation_prior_canonical']``.
 

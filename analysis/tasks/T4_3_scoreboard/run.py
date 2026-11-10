@@ -1,11 +1,12 @@
-"""T4.3 validation scoreboard: every pre-specified test of 05 sections 3-6, by a fixed procedure.
+"""Validation scoreboard: every test of the pre-specified analysis plan, sections 3-6, by a fixed procedure.
 
-Inputs (see MANIFEST.tsv): T3.3 consensus D, T4.2 baselines, golds built by ``golds.py``,
-baseline split halves (``baseline_splits.py``), T2.5 margin flags and contributions.
+Inputs (see MANIFEST.tsv): consensus D (analysis/tasks/T3_3_consensus), direct baselines
+(analysis/tasks/T4_2_gene_baselines), golds built by ``golds.py``, baseline split halves (``baseline_splits.py``),
+margin flags and contributions (analysis/tasks/T2_5_celltype_margin).
 
 Modes
 - ``real``: the official run. Needs ``results/analysis/T3_3/DONE``.
-- ``null-D``: D (with every per-seed column and the T2.5 contributions, one gene permutation per
+- ``null-D``: D (with every per-seed column and the contributions of T2_5_celltype_margin, one gene permutation per
   cohort, seeded) is permuted across genes before anything is computed; mechanics check.
 - ``null-G``: every gold (and its split halves, the sets and the per-type driver golds) is
   permuted across genes; D is a stand-in from the finished seeds. Mechanics check for the
@@ -53,7 +54,7 @@ COVSETS = {
     "C_eveemean_liver": COV + ["evee_mean_liver"],
     "C_eveemean_testis": COV + ["evee_mean_testis"],
 }
-PRIMARY = {  # 05 section 4
+PRIMARY = {  # pre-specified analysis plan, section 4
     "H1": dict(cohort="liv_hmouse", gold="G_H1", cov="C", tissue="liver", kind="level"),
     "H2": dict(cohort="test_hmouse", gold="G_H2", cov="C", tissue="testis", kind="level"),
     "H3": dict(cohort="liv_hmouse", gold="G_H3", cov="C_pat", tissue="liver", kind="pattern"),
@@ -66,7 +67,7 @@ SET_COHORT = {"liver": "liv_hmouse", "testis": "test_hmouse"}
 DRIVER_TYPES = {"Hepatocytes": "hepatocyte", "Endothelial": "endothelial", "fibroblasts": "stellate",
                 "Kupffer cells": "macrophage"}
 CORE = [42, 43, 44, 45, 46]
-INTEGRATED_SEEDS = {"liv_hmouse": [42, 43, 44, 47, 48, 51]}  # amendment log 2026-11-02, Family 3 only
+INTEGRATED_SEEDS = {"liv_hmouse": [42, 43, 44, 47, 48, 51]}  # amendment log of the pre-specified analysis plan (2026-11-02), Family 3 only
 N_DRAWS = 10_000
 N_PERM = 10_000
 N_BOOT_SETS = 2_000
@@ -153,7 +154,7 @@ def prepare(mode: str, null_seed: int) -> None:
             tab["D_int"] = mi - np.median(mi)
         tab["B3b"] = I.b3b(F72, tab["D"].to_numpy())
         ref = RES / f"T4_3/baselines_consensusD/baselines__{cohort}.csv"
-        if mode == "real" and ref.exists():  # same code path as T4.2 run.py --delta-alpha <consensus>
+        if mode == "real" and ref.exists():  # same code path as T4_2_gene_baselines/run.py --delta-alpha <consensus>
             rb = pd.read_csv(ref).set_index("var_name")["B3b"].reindex(tab["var_name"]).to_numpy()
             err = float(np.nanmax(np.abs(rb - tab["B3b"].to_numpy())))
             d["meta"]["b3b_vs_T4_2_rerun_max_abs"] = err
@@ -508,7 +509,7 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
             for b in J + ["B3b"]:
                 U.append(dict(kind="set", id=f"set:{tis}:{s}:{b}", family="F3", tissue=tis, cohort=c, set=s, score=b,
                               strata="pi_expr", direction=d))
-    if tools is not None:  # curated sets for the primary tool scalars and D_3, Family 3 (T5.6, L4)
+    if tools is not None:  # curated sets for the primary tool scalars and D_3, Family 3 (T5_6_gene_level)
         for tis, sets in SETS.items():
             c = SET_COHORT[tis]
             for s in sets:
@@ -620,7 +621,7 @@ def main(argv=None):
         sets.loc[m, "q_bh"] = S.bh(sets.loc[m, "p_perm"].tolist())
         sets.loc[m, "pass_predicted_direction"] = (sets.loc[m, "q_bh"] < 0.05) & np.where(
             sets.loc[m, "direction"] == "above", sets.loc[m, "auroc"] > 0.5, sets.loc[m, "auroc"] < 0.5)
-    # controls with raw Spearman only (05 section 3)
+    # controls with raw Spearman only (plan, section 3)
     ctrl = []
     for h, v in PRIMARY.items():
         tab = DATA[v["cohort"]]["tab"]

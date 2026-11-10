@@ -1,4 +1,4 @@
-"""T7.9: fix every donor's and library's role for the islet T2D case, from obs metadata only.
+"""Fix every donor's and library's role for the islet T2D case, from obs metadata only.
 
 No expression value is read: only ``obs`` of the two CELLxGENE files.
 

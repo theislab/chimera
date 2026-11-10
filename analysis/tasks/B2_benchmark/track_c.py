@@ -1,8 +1,8 @@
-"""B2 Track C: rho_p, 10,000 block draws, head-to-head, on every cohort x gold x stratum; named lists; Y4 replication. Re-runnable: new cohorts join by a row in rules_c.py.
+"""Track C: rho_p, 10,000 block draws, head-to-head, on every cohort x gold x stratum; named lists; Y4_regions replication. Re-runnable: new cohorts join by a row in rules_c.py.
     python -m analysis.tasks.B2_benchmark.track_c units            write the unit list
     python -m analysis.tasks.B2_benchmark.track_c unit --index I   one unit (rho_p)
     python -m analysis.tasks.B2_benchmark.track_c lists --cohort c named lists of one cohort
-    python -m analysis.tasks.B2_benchmark.track_c y4               Y4 replication
+    python -m analysis.tasks.B2_benchmark.track_c y4               Y4_regions replication
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ def table(cohort: str) -> pd.DataFrame:
     t["S_g"] = t["S_ema"]
     t["var_name"] = b["var_name"].reindex(t.index)
     z4 = RU.REPO / "results/analysis/Z4/h1/genes" / f"{cohort}.parquet"
-    if z4.exists():  # free-gate Delta-alpha (Z4, H1 format), a Chimera readout beside D
+    if z4.exists():  # per-gene-gate Delta-alpha (Z4_free_gate_all, H1_harmonise schema), a Chimera readout beside D
         t["D_free"] = pd.read_parquet(z4).set_index("hsapiens_gene_id")["D"].reindex(t.index)
     rng = np.random.default_rng(RU.useed("random", cohort))
     t["random"] = rng.random(len(t))
@@ -110,7 +110,7 @@ def score_unit(u: dict) -> None:
         U = ok0 & np.isfinite(scores["S_g"]) & np.isfinite(scores["D"])
         in_core = ["S_g", "D"]
     main_extra = {}
-    if "D_free" in t and np.isfinite(t["D_free"].to_numpy(dtype=float)[U]).all():  # free gate defined on every gene of U: scored on the same genes as D (Z4's universe)
+    if "D_free" in t and np.isfinite(t["D_free"].to_numpy(dtype=float)[U]).all():  # free gate defined on every gene of U: scored on the same genes as D (Z4_free_gate_all's universe)
         main_extra["D_free"] = t["D_free"].to_numpy(dtype=float)
     task.add("main", U, G, {**{k: scores[k] for k in in_core}, **main_extra, "random": scores["random"], "D_raw": scores["D_raw"]}, covs)
     task.add("pi", U, G, dict(pi=t["pi_score"].to_numpy(dtype=float)), [x for x in covs if x != "prior_raw"])

@@ -11,8 +11,8 @@ median of Delta-alpha; plus knn_mixing_entropy (k=15, seed 42, as in selection),
 entropy over mouse cells only (most mouse cells have no partner class for conditional MMD),
 final adversary accuracy, the first snapshot with a non-finite alpha and Gate G-V. A seed is flagged poorly mixed if its knn_mixing_entropy
 is below FLAG_RATIO times the selected run's (bar fixed before any seed was trained;
-Liver H+Mouse integrated seeds had 0.25-0.50, poorly mixed 0.06-0.19, ledger T3_3).
-Flagged seeds are reported separately; the primary D stays the mean over seeds (section 2).
+Liver H+Mouse integrated seeds had 0.25-0.50, poorly mixed 0.06-0.19, results of T3_3_consensus).
+Flagged seeds are reported separately; the primary D stays the mean over seeds (pre-specified analysis plan, section 2).
 
     python analysis/tasks/T11_2_recipe/run_profile.py
 """
@@ -49,7 +49,7 @@ def sign_profile(delta: np.ndarray, tag: str) -> dict:
 
 
 def species_entropy(z: np.ndarray, species: np.ndarray, which: str, k: int = 15) -> float:
-    """Mean normalised species entropy of the k nearest neighbours, over cells of one species."""
+    """Mean normalized species entropy of the k nearest neighbors, over cells of one species."""
     from sklearn.neighbors import NearestNeighbors
 
     codes, names = pd.factorize(species, sort=True)

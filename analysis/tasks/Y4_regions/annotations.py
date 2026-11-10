@@ -1,4 +1,4 @@
-"""Y4 (EXPLORATORY): gene annotations for regions. No readout or gold is read here.
+"""EXPLORATORY: gene annotations for regions. No readout or gold is read here.
 
 Compara 110 (`data/analysis/ensembl110/`): gene-age proxy and paralog status of human genes.
 UniProt, HGNC, Lambert (`data/analysis/x3_annotations/`), Hallmark (`data/analysis/functional/`): classes and sets.
@@ -23,7 +23,7 @@ COMPARA = REPO / "data/analysis/ensembl110/Compara.110.protein_default.homologie
 HALLMARK = REPO / "data/analysis/functional/Enrichr.MSigDB_Hallmark_2020.server_response.txt"
 CHROM = REPO / "results/analysis/X1/genes/chromosome_ensembl110.csv"
 
-# Named classes beyond X3, from UniProt keywords. ``metabolic`` = enzyme with a metabolism keyword.
+# Named classes beyond X3_cross_cohort, from UniProt keywords. ``metabolic`` = enzyme with a metabolism keyword.
 KW_CLASSES = {
     "ligand": ["KW-0202", "KW-0339", "KW-0372", "KW-0527"],  # cytokine, growth factor, hormone, neuropeptide
     "secreted": ["KW-0964"],

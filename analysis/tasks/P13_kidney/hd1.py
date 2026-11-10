@@ -1,24 +1,26 @@
-"""P13: H-D1, H-D1b, controls and sensitivities for the kidney AKI case (plan section 8c, amendments).
+"""H-D1, H-D1b, controls and sensitivities for the kidney AKI case (pre-specified analysis plan, section 8c,
+with its amendment log).
 
-Family 3 throughout; nothing here changes section 6.
+Family 3 throughout; nothing here changes the decision procedure (plan, section 6).
 
 Outcome per DE-able type t: Q = sign(l^h) * m, with l^h the unshrunk human log2FC (``log2fc_mle``,
 human primary fit) and m the fixed-scale apeGLM mouse log2FC (``log2fc_fixed``, mouse primary fit,
-prior scale 1; amendment after T7.3). SE(m) = ``lfcse_fixed``. Genes: kidney vocabulary (1:1 in the
-table of D) detected (``det_frac``) in >= 5% of the type's nuclei in both species' DE units.
+prior scale 1; amendment made after the liver MASH case, analysis/tasks/T7_3_mash). SE(m) =
+``lfcse_fixed``. Genes: kidney vocabulary (1:1 in the table of D) detected (``det_frac``) in >= 5% of
+the type's nuclei in both species' DE units.
 Readout D from ``readout.py`` (five seeds); C from the healthy training object.
 
-rho_p, one-sided null and CI: the T7.3 implementation (``T7_3_mash.hd1.rho_row``): ranks of Q and
-D residualised on C + splines of rank |l^h| and rank SE(m), Pearson; D residuals permuted within
+rho_p, one-sided null and CI: the implementation of T7_3_mash (``T7_3_mash.hd1.rho_row``): ranks of Q and
+D residualized on C + splines of rank |l^h| and rank SE(m), Pearson; D residuals permuted within
 pi_raw x expression strata; block bootstrap on the ESM modules; tertile test inside.
 
-Pass rule (8c; reported, Family 3): (i) PT rho_p > 0 and q < 0.05 (BH over DE-able types);
+Pass rule (plan, section 8c; reported, Family 3): (i) PT rho_p > 0 and q < 0.05 (BH over DE-able types);
 (ii) >= ceil(n/2) DE-able types with rho_p > 0 and q < 0.05; (iii) over types with >= 150
 human-DE genes (FDR < 0.1) the mean top-minus-bottom D-tertile sign agreement >= 0.10, permutation
 p < 0.05 (one permutation of D within strata of the whole vocabulary, applied to every type).
 Not testable: PT < 1,000 genes, or fewer than 3 types with >= 1,000 genes.
 
-Also: S_ema, D_raw and B1b beside D (Family 3); H-D1b nested models (T7.3 ``nested``); controls
+Also: S_ema, D_raw and B1b beside D (Family 3); H-D1b nested models (``nested`` of T7_3_mash); controls
 (the first 20 permuted-label fits per species, ``de/perm``); sensitivities (biopsy-only and v3
 human, per-stage and Kirita mouse, leave-one-out fits in ``de/loo`` when present).
 

@@ -1,4 +1,4 @@
-"""T8.1: specificity of the residue-level GIN attention (Fig 7 layer), on cached inputs only.
+"""Specificity of the residue-level GIN attention (the residue layer of the protein figure), on cached inputs only.
 
 Per-residue attention is recomputed from cached ESM-2 35M human embeddings, the 64-PC IG
 attribution of each gene and the 480 -> 64 bridge:
@@ -12,7 +12,7 @@ Two nulls replace a_g and recompute every residue's attention, ``--draws`` times
 - random direction: a Gaussian direction in the 64-PC attribution space, rescaled to ||a_g||.
 
 Statistic per gene: difference of category medians of attn. ``scaled`` divides by the gene's
-median attn (swapped attributions change amplitude; audit A8 section 2.3); ``unscaled`` is the
+median attn (swapped attributions change amplitude); ``unscaled`` is the
 raw difference (the published per-gene test). Across genes: median, fraction > 0, Wilcoxon p.
 Empirical p: (1 + #null with |stat| >= |obs|) / (1 + draws), two-sided; one-sided in the
 observed direction is also written.

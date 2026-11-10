@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=120G
 #SBATCH --time=12:00:00
-# T7.3 and T7.8, CPU only, revision_de_env.
+# Liver MASH case and its second contrast (t78_second_contrast.py), CPU only, revision_de_env.
 # Usage: mkdir -p results/analysis/T7_3/logs && sbatch --output=results/analysis/T7_3/logs/%x_%j.out \
 #          analysis/tasks/T7_3_mash/run.sbatch <stage>
 # Stages: fits (sensitivity, permuted, bulk, batch control), analysis (H-D1, H-D1b, H-D4), t78.

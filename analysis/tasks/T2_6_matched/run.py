@@ -1,4 +1,4 @@
-"""T2.6: category and landmark claims under expression and length matching; mtDNA check.
+"""Gene-category and landmark statements under expression and length matching; mtDNA check.
 
 Sets, per cohort, with true gene identity (``gene_ids``):
 * every narrow category of ``notebooks/_gene_categories.py`` and every broad umbrella of
@@ -6,16 +6,16 @@ Sets, per cohort, with true gene identity (``gene_ids``):
   vocabulary), ``other`` excluded;
 * the Fig 4c landmark themes (``notebooks/_alpha_biology_simpler_builder.py`` H_THEMES):
   urea cycle / gluconeogenesis, mtDNA OXPHOS, liver supporting tissue, housekeeping controls;
-* the urea-cycle enzyme list and the mtDNA / nuclear OXPHOS categories used in the
-  earlier read-only analysis;
+* the urea-cycle enzyme list and the mtDNA / nuclear OXPHOS categories of the
+  reference table below (``REFERENCE``);
 * the Fig 6 GIN archetypes A0-A2 (canonical 4-sp run, ``tables/gene_archetypes.csv``), 4-sp only.
 
-For each set: mean delta-alpha raw (uncentred), centred on the cohort median, Cohen-style
-d = mean / SD of all genes (uncentred, centred on the cohort median as in the
-pre-specified readout D, and centred on the cohort mean), against the clamped prior the run anchors on and against the
+For each set: mean delta-alpha raw (uncentered), centered on the cohort median, Cohen-style
+d = mean / SD of all genes (uncentered, centered on the cohort median as in the
+pre-specified readout D, and centered on the cohort mean), against the clamped prior the run anchors on and against the
 raw prior; then the same set against expression-matched and expression- and CDS-length-
 matched background genes, with empirical two-sided p. Random gene sets check that the
-centred and matched statistics give d ~ 0 in every cohort.
+centered and matched statistics give d ~ 0 in every cohort.
 
 mtDNA: liver mtDNA-encoded genes against non-mt genes with the same cross-species detection
 imbalance (range of per-species detection fractions in hepatocytes) and expression level.
@@ -58,7 +58,7 @@ FIG4C_THEMES = {
 UREA_CYCLE = ["CPS1", "OTC", "ASS1", "ASL", "ARG1", "NAGS", "ARG2", "SLC25A15", "SLC25A13", "SLC25A2"]
 ARCHETYPE_RUN = C.CANONICAL["liv_4sp"]
 
-# Earlier read-only analysis, liver rows (testis rows there used wrong labels):
+# Reference values of an independent computation, liver rows only, for comparison:
 # (cohort, set) -> (n, da_mean, matched_null_mean, matched_null_sd, emp_p, da_expr_resid)
 REFERENCE = {
     ("liv_hmonkey", "mtDNA"): (9, -0.1827, -0.0278, 0.0604, 0.0100, -0.1413),
@@ -97,7 +97,7 @@ def window_null(values: np.ndarray, x: np.ndarray, set_idx: np.ndarray, pool: np
 
 def knn_null(values: np.ndarray, Z: np.ndarray, set_idx: np.ndarray, pool: np.ndarray, B: int,
              rng, nn: int = NN) -> np.ndarray:
-    """k-D matching on standardised rank coordinates ``Z``: nearest ``nn`` pool genes."""
+    """k-D matching on standardized rank coordinates ``Z``: nearest ``nn`` pool genes."""
     d = ((Z[set_idx][:, None, :] - Z[pool][None, :, :]) ** 2).sum(-1)
     nb = np.argpartition(d, min(nn, len(pool) - 1), axis=1)[:, :nn]
     nbrs = pool[nb]
@@ -175,7 +175,7 @@ def set_rows(g: pd.DataFrame, cohort: str, sets: dict, B: int, seed: int) -> lis
 
 
 def random_rows(g: pd.DataFrame, cohort: str, B: int, seed: int) -> list[dict]:
-    """Random sets: uncentred d inherits the cohort offset; centred and matched d should be ~0."""
+    """Random sets: uncentered d inherits the cohort offset; centered and matched d should be ~0."""
     rng = np.random.default_rng(seed)
     rows = []
     x = g["log_mean"].to_numpy()

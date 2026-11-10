@@ -1,15 +1,15 @@
-"""T3.6 offline: composition-balanced fit-quality margin S_bal from the canonical checkpoint.
+"""Composition-balanced fit-quality margin S_bal from the canonical checkpoint, without training.
 
 No training. A checkpoint-only forward pass (posterior-mean z; components loaded as in
-T2.5) gives, per cell, the log-likelihood ratio of the shared decoder against two nulls:
+analysis/tasks/T2_5_celltype_margin) gives, per cell, the log-likelihood ratio of the shared decoder against two nulls:
 
 * the species-wide null ``p_null`` the model uses (gives S, the margin as trained), and
 * a composition-balanced null over the shared cell types K* (present in every species):
   ``pbal[s] = sum_k wbar_k * (sum_{c in s,k} x_c + 1) / (sum_{c in s,k} lib_c + G)`` with
-  ``wbar_k`` the species-mean proportion of type k, renormalised over K*.
+  ``wbar_k`` the species-mean proportion of type k, renormalized over K*.
 
 ``S = mean_s mean_{c in s} l_c``; ``S_bal = (1/|species|) sum_s sum_{k in K*} wbar_k mean_{c in s,k} lb_c``.
-``S_shared`` is the part of S contributed by shared types. Reported (A2 section 2.3):
+``S_shared`` is the part of S contributed by shared types. Reported:
 rho(S_bal, S), sign flips in the top half of genes by |S|, the share of Var(S) from shared
 types, and Spearman of the ridge projection of S_bal and of S onto the GIN features with
 the correction c. Reference values (A2, 4-sp): 0.89, 7.5%, 81%, 0.84 vs 0.81.

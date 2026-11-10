@@ -1,4 +1,4 @@
-"""Y6: mechanics checks and the tidy table in the benchmark schema.
+"""Mechanics checks and the tidy table in the benchmark schema.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.checks
 """
@@ -30,7 +30,7 @@ def checks():
         rows.append(dict(fit=fit, species=lab, label=label, ap_here=mine, ap_sklearn=sk, ap_lift_permuted_mean=np.mean(perm), ap_lift_permuted_q975=np.percentile(perm, 97.5)))
     pd.DataFrame(rows).to_csv(RU.OUT / "checks_use1.csv", index=False)
     print(pd.DataFrame(rows).round(4).to_string())
-    # Y4 saw UBE2G2 near absent in mouse at identity 1.00.
+    # Y4_regions saw UBE2G2 near absent in mouse at identity 1.00.
     print(d[d.symbol == "UBE2G2"][["fit", "species_label", "identity_s", "S_gs", "det_s", "det_other", "goc", "wga", "high_conf", "homology_type_116", "T_lowconf", "T_later"]].round(3).to_string())
 
 

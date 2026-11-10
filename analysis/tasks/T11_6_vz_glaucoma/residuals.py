@@ -1,4 +1,4 @@
-"""T11.6 V2: Chimera per-species residual, by species and class, from the checkpoints.
+"""V2: Chimera per-species residual, by species and class, from the checkpoints.
 
 Per seed in D and per gene g, species s, class k (``cell_ontology_class``): RMS over cells of the
 residual head's log-rate (``output_residual`` on the mean-z decoder state, the species and batch one-hots),

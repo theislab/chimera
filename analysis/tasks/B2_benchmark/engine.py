@@ -1,4 +1,4 @@
-"""B2 scoring engine: rho_p, joint block bootstrap and head-to-head of the plan's section 3 and 5, reusing the T4.3 statistics.
+"""Scoring engine: rho_p, joint block bootstrap and head-to-head of the plan's section 3 and 5, reusing the T4_3_scoreboard statistics.
 
 A task holds groups. A group is (rows, columns, design): ranks are taken once within the rows and the design is built once there; each draw reweights
 blocks over all genes of the task, so every group of a task shares its draws and differences across groups have CIs.
@@ -15,7 +15,7 @@ from analysis.tasks.T4_3_scoreboard import stats as ST
 
 
 def design_for(cov: pd.DataFrame, columns: list[str]) -> np.ndarray:
-    """Spline df 4 of each covariate rank from SPLINE_MIN genes up, intercept + linear ranks below (Y4). A covariate with one value is dropped."""
+    """Spline df 4 of each covariate rank from SPLINE_MIN genes up, intercept + linear ranks below (Y4_regions). A covariate with one value is dropped."""
     cols = [c for c in columns if cov[c].nunique() > 1]
     if len(cov) >= RU.SPLINE_MIN:
         return K.design(cov, columns=cols)

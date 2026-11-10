@@ -1,12 +1,12 @@
-"""Z3 free gate on independent data: seed sets, lines and fixed definitions. Rule text in the private ledger Z3_free_gate.md,
-committed before any gold was read on a free-gate D.
+"""Per-gene ("free") gate on independent data: seed sets, lines and fixed definitions. The rule was
+fixed before any gold was read on a D of the per-gene gate.
 
 Free gate = Config M (no GIN, free per-gene c_g, same model form, package unchanged); recipe otherwise the cohort's
 canonical recipe. Outputs are read from final_state.npz (alpha, prior, S_g_ema), never through ChimeraModel.load,
 which does not restore per_gene_correction.
 
-Lines, each a whole T4.3 scoreboard run with the frozen draws, golds, blocks, covariates and baselines:
-  frozen  the T3.3 seeds through this harness: must return results/analysis/T4_3 and T5_6/scoreboard values (check only);
+Lines, each a whole T4_3_scoreboard scoreboard run with the frozen draws, golds, blocks, covariates and baselines:
+  frozen  the T3_3_consensus seeds through this harness: must return results/analysis/T4_3 and T5_6/scoreboard values (check only);
   free5   Config M, 5 healthy seeds per cohort (liver H+Mouse, testis H+Mouse, liver 4-sp);
   can5    canonical recipe on the same seed numbers and platform (CPU) where they exist: the like-for-like comparator;
   can_state (liver H+Mouse) canonical seeds matched on training state to free5, other cohorts as can5.
@@ -31,7 +31,7 @@ FREE = {
     "test_hmouse": {s: f"z3-test_hmouse-m-s{s}" for s in (42, 43, 44, 45, 46)},
     "liv_4sp": {s: f"z3-liv_4sp-m-s{s}" for s in (42, 43, 44, 45, 46, 47, 48, 49)},  # 47-49 after s44, s46 went NaN
 }
-# Canonical recipe on CPU by seed number (T3.1 s42 CPU runs, T3.2 seeds); 4-sp has no CPU s42, so its s42 is the MPS run.
+# Canonical recipe on CPU by seed number (T3_1_platform s42 CPU runs, T3_2_seeds seeds); 4-sp has no CPU s42, so its s42 is the MPS run.
 CAN_CPU = {
     "liv_hmouse": {42: "rev-cpu-liv_hmouse-s42", **{s: f"rev-liv_hmouse-s{s}" for s in range(45, 52)}},
     "test_hmouse": {42: "rev-cpu-test_hmouse-s42", **{s: f"rev-test_hmouse-s{s}" for s in range(43, 52)}},
@@ -39,23 +39,23 @@ CAN_CPU = {
 }
 # can5 = the canonical runs with the free5 seed numbers; a number with no canonical CPU run takes the lowest unused
 # canonical CPU seed. can_state (liver H+Mouse only, where seeds fall into two training states) = canonical seeds of
-# the T3.3 pool matched one for one on state (integrated / poorly mixed, O2's four markers), CPU first, by seed number.
-# D_3 for the tool comparison: the three lowest seed numbers of each line (T5.6 used 42-44, the lowest of the frozen set).
+# the T3_3_consensus pool matched one for one on state (integrated / poorly mixed, the four markers of O1_orthologs/repair_compare.py), CPU first, by seed number.
+# D_3 for the tool comparison: the three lowest seed numbers of each line (T5_6_gene_level used 42-44, the lowest of the frozen set).
 
 # Count support: |S_ema| >= EPS in BOTH the free5 and the can5 consensus (same genes in both lines).
 EPS = 1e-6
 
-# Health rule: the Z1 rule (05 section 13.0), the one under which the frozen canonical seeds pass: finite alpha, prior,
+# Health rule: the Z1_retune rule (pre-specified analysis plan, section 13.0), the one under which the frozen canonical seeds pass: finite alpha, prior,
 # z and no E2.1; 10 of 10 z dimensions with Var >= 0.01; alpha - raw prior beyond +0.05 and beyond -0.05 each in at
 # least 2% of genes; alpha > 0.95 and alpha < 0.05 each in at most 10%. (The literal G-V gate, 5% saturation and tails on
 # the anchored prior, would drop frozen canonical seeds: liver s46, s48 on saturation, every testis seed on the clamped
 # lower tail; it is reported beside.) Poorly mixed but healthy seeds stay in D, with mixing reported.
 SAT_MAX, ZVAR_MIN, N_ACTIVE, TAIL_DELTA, TAIL_MIN = 0.10, 0.01, 10, 0.05, 0.02
 SAT_MAX_GV = 0.05
-# Amendment (2026-11-03, gold-blind, before any gold was read on a free-gate D): for free-gate (Config M) seeds the tail
+# Changed gold-blind, before any gold was read on a D of the per-gene gate: for free-gate (Config M) seeds the tail
 # criterion is replaced. It tests that the GIN left the prior (E9.2); a free per-gene gate cannot be stuck that way, and
 # its spread is set by |S_g| (c ~ S_g at equilibrium): every testis free seed has tails of 0.2-0.3% with the gate
 # tracking counts at rho .96. Free seeds pass if the other criteria hold and the gate follows its own count evidence:
 # Spearman(alpha - prior, S_g_ema) >= FREE_RHO_MIN on count-supported genes. Canonical seeds keep the rule above.
 FREE_RHO_MIN = 0.5
-# Labelled sensitivity, liver H+Mouse only: integrated seeds of each line (free_int, can_int: seeds 42, 47, 48 on CPU).
+# Labeled sensitivity, liver H+Mouse only: integrated seeds of each line (free_int, can_int: seeds 42, 47, 48 on CPU).

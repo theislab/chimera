@@ -1,4 +1,4 @@
-"""Write the manifest of round 1 (Van Zyl H+Pig, H+M. fascicularis). Rows differ from the K = 2 rule base only."""
+"""Write the manifest of the first set of recipes (Van Zyl H+Pig, H+M. fascicularis). Rows differ from the K = 2 rule base only."""
 from pathlib import Path
 
 BASE = ("--config A --max-epochs 150 --adata data/analysis/van_zyl/van_zyl_{c}.h5ad --seed {s} --batch-key source_batch "

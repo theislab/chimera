@@ -1,20 +1,20 @@
-"""Y3 (EXPLORATORY, Family 3): does S_g from a healthy-only kidney model survive H-D1's label-permuted controls?
+"""EXPLORATORY, Family 3: does S_g from a healthy-only kidney model survive H-D1's label-permuted controls?
 
-P13's h1.tsv gives S_ema positive in all nine kidney cell types (rho_p +0.007 to +0.065) with stratified-permutation
+P13_kidney's h1.tsv gives S_ema positive in all nine kidney cell types (rho_p +0.007 to +0.065) with stratified-permutation
 p values and block CIs, but h1_controls_summary.tsv holds controls for D only. This recomputes S_ema, D and B1b on the
-permuted-label DE fits with the P13 universe and design. H-D1's pass rule concerns D and still fails; nothing here
+permuted-label DE fits with the P13_kidney universe and design. H-D1's pass rule concerns D and still fails; nothing here
 touches it, the row or any status.
 
 Definitions, fixed before anything below was computed (S_ema primary values were known from h1.tsv, controls were not):
-    statistic  rho_p as hd1.quick: ranks of Q = sign(l^h) * m and of the score, residualised on C + splines of
+    statistic  rho_p as hd1.quick: ranks of Q = sign(l^h) * m and of the score, residualized on C + splines of
                rank |l^h| and rank SE(m), Pearson. Same universe() per fit.
     controls   every fit in de/perm: human labels permuted (mouse primary), mouse labels permuted (human primary).
     per type   empirical two-sided-style tail: share of control |values| at or above the primary value, one tail
-               (control >= primary), per relabelling; p = (1 + k) / (1 + n); BH over nine types within relabelling.
+               (control >= primary), per relabeling; p = (1 + k) / (1 + n); BH over nine types within relabeling.
     across     mean rho_p over the nine types, per draw index, where every type has that draw.
     survives   (a) across-type mean above the 95th percentile of both control distributions, and (b) at least one type
-               with BH q < 0.05 under both relabellings. Otherwise the result sits inside the controls and is left out.
-    baseline   B1b goes through the same procedure, as the comparison, and D as the check against P13's summary.
+               with BH q < 0.05 under both relabelings. Otherwise the result sits inside the controls and is left out.
+    baseline   B1b goes through the same procedure, as the comparison, and D as the check against P13_kidney's summary.
 
 Writes results/analysis/Y3/kidney_controls_draws.csv, kidney_controls_types.csv, kidney_controls_across.csv.
 

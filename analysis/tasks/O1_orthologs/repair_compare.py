@@ -1,4 +1,4 @@
-"""O2: comparison of repaired runs with canonical seeds, gold-free. Rule in ledgers/O2_repair.md, committed before any run existed.
+"""Comparison of the runs on identifier-joined objects ("repaired") with canonical seeds, gold-free. The rule was fixed before any run existed.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.repair_compare gate
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.repair_compare readouts      # only after the gate
@@ -62,7 +62,7 @@ def load_runs(c):
 
 
 def state_markers(c, can, new, a1):
-    """Four markers, midpoints from canonical runs (ledger). Liver H+Mouse only."""
+    """Four markers, midpoints from canonical runs. Liver H+Mouse only."""
     ref = pd.read_csv(RU.REPO / "results/analysis/T3_1b/seed_integration.csv")
     ref = ref[ref.cohort == c].set_index("run")
     rows = []

@@ -1,4 +1,4 @@
-"""G1: stop a guard-arm fit once its training loss is NaN at an epoch end (it does not recover), after the probe has written the first non-finite batch; then write its health record.
+"""Stop a guard-arm fit once its training loss is NaN at an epoch end (it does not recover), after the probe has written the first non-finite batch; then write its health record.
 Only tasks of G1 arrays (job name g1_arm). Run repeatedly while the array runs, from the repository root with mamba on PATH:    python3 analysis/tasks/G1_guard/nan_watch.py
 """
 import re

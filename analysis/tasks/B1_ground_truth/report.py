@@ -1,4 +1,4 @@
-"""B1 report tables from the tidy file: main table per alteration x method, predictions against outcomes, low-expression power.
+"""Report tables from the tidy file: main table per alteration x method, predictions against outcomes, low-expression power.
 
 Writes results/analysis/B1/{main_table.csv, low_expression.csv, type1.csv, chimera_vs_best.csv} and prints them.
 """

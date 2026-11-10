@@ -1,5 +1,5 @@
-"""D1: runs tried and finished per cohort, setting and method, in the schema of B2_benchmark/completion.py. A fit that goes non-finite under a setting is a result and stays here; a job lost to a bad node is infrastructure, is run again and is not recorded.
-Chimera: tried = a health record for the grid row or the B2 row; finished = healthy under the health rule; finished_gate_tail = finished with at least 2% of genes beyond |0.05| on either raw-prior side (coordinator: a flat gate is reported apart). Direct readouts are computed on the object whether or not the fit finished.
+"""Runs tried and finished per cohort, setting and method, in the schema of B2_benchmark/completion.py. A fit that goes non-finite under a setting is a result and stays here; a job lost to a bad node is infrastructure, is run again and is not recorded.
+Chimera: tried = a health record for the grid row or the B2_benchmark row; finished = healthy under the health rule; finished_gate_tail = finished with at least 2% of genes beyond |0.05| on either raw-prior side (a flat gate is reported apart). Direct readouts are computed on the object whether or not the fit finished.
     python -m analysis.tasks.D1_sparse_genes.completion
 """
 

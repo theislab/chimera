@@ -1,4 +1,4 @@
-"""Y6 use 1, POST HOC, written after reading the card's tests, committed before running. See ledgers/Y6_uses.md, "Post hoc".
+"""Use 1, POST HOC, written after reading the first tests and fixed before running.
 
 PH1 count-only analogue of S_row. The top flags of S_row are highly expressed genes absent from one species (ribosomal proteins in lemur and pig), and the margin of a
     near-absent gene pays in proportion to the expected count. So: gap_abs = largest other-species CP10k - CP10k of s, gap_log = the same on log1p. No model.

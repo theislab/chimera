@@ -1,11 +1,11 @@
-"""X4 (EXPLORATORY): independent per-type and per-donor tables from the gold atlases.
+"""EXPLORATORY: independent per-type and per-donor tables from the gold atlases.
 
-1. TS / TMS liver, per (atlas, type, donor) count sums (T4.3 ``h3_inputs``, same vocabulary and labels):
+1. TS / TMS liver, per (atlas, type, donor) count sums (T4_3_scoreboard ``h3_inputs``, same vocabulary and labels):
    - between-donor SD of hepatocyte log2(1 + CPM), donors with >= 30 hepatocytes;
    - TS vs TMS per-type level difference, for replication of the CAMEX gap;
-   - donor-half reliability of the per-type level gold of T4.3 (20 splits).
+   - donor-half reliability of the per-type level gold of T4_3_scoreboard (20 splits).
 2. Murat held-out species, per coarse type: level matching among species, mean over species pairs of
-   -|rank_s1 - rank_s2| within the type (the testis analogue of the T4.3 driver gold), genes detected
+   -|rank_s1 - rank_s2| within the type (the testis analogue of the T4_3_scoreboard driver gold), genes detected
    in >= 1% of the type's cells in at least 5 species.
 
 Writes results/analysis/X4/cache/{atlas_h3.parquet,atlas_h3_rel.csv,atlas_h4_types.parquet}.

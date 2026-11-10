@@ -1,4 +1,4 @@
-"""T2.7: measured values for the internal-consistency repairs of the manuscript tables.
+"""Measured values behind the recipe and assumption tables of the Supplement.
 
 One row per value: the item, its manuscript location, the value the manuscript states,
 the value measured here from the h5ads, ``final_state.npz``, checkpoint configs and code,
@@ -11,7 +11,7 @@ and the source of the measurement. Items:
   (cross-seed gate: what it measures and its values for alpha and delta-alpha).
 * ESM-2 model: embedding dimension of the SATURN ESM-2 files and the code constant.
 * M/F ortholog-QC flags: the rule as written, counts per cohort, and whether the
-  hand-labelled attribution candidates satisfy it.
+  hand-labeled attribution candidates satisfy it.
 
 Usage::
 
@@ -39,7 +39,7 @@ ROOT = gene_ids.REPO_ROOT
 RECIPES = "tables/per-dataset-recipes.tex"
 ASSUME = "tables/assumptions-summary.tex"
 
-# What the submitted tables state, transcribed (manuscript location -> text).
+# Stated values to compare against, transcribed from the manuscript tables (manuscript location -> text).
 STATED = {
     "liv_hmonkey": dict(row="Liver, H+Mac", N="≈12 k", G="≈12 k", B="3", shared_ct="6",
                         alpha_mean="0.784 ± 0.001 (3 seeds)", alpha_std="0.142 ± 0.002",
@@ -289,7 +289,7 @@ def mf_rows() -> list[dict]:
     rows.append(row("M / F flags after the cross-tissue consistency filter (7 cohorts, union)",
                     "extended_methods:1531-1545", "-", f"M {len(tot_m)}, F {len(tot_f)}",
                     "final_state.npz, joined on hsapiens_gene_id"))
-    # hand-labelled attribution candidates
+    # hand-labeled attribution candidates
     text = (ROOT / "notebooks" / "_gin_attribution_builder.py").read_text()
     cand = re.findall(r'\("([A-Za-z0-9.-]+)",\s+"(M|F|ref)",\s+"([a-z_0-9]+)"', text)
     dsmap = {"panc_hmonkey": "liv_hmonkey", "panc_hmouse": "liv_hmouse", "panc_hzeb": "liv_hzeb", "panc_4sp": "liv_4sp"}

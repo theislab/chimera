@@ -1,4 +1,4 @@
-"""O2: canonical objects rebuilt with counts joined on Ensembl ID. Rules in ledgers/O2_repair.md.
+"""Canonical objects rebuilt with counts joined on the Ensembl gene ID (the identifier-joined objects).
 
 The steps of notebooks/01_data_preparation.ipynb, in order and with the notebook's arguments; the repair acts on the unified object between
 ``construct_unified_adata`` and ``compute_expression_stats``. ``--mode control`` applies no repair and must return the canonical object.

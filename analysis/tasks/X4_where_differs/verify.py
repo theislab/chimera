@@ -1,4 +1,4 @@
-"""X4 (EXPLORATORY): independent recomputation of headline numbers. Uses no X4 or T4.3 statistics code and no X4 gene table:
+"""EXPLORATORY: independent recomputation of headline numbers. Uses no X4 or T4_3_scoreboard statistics code and no X4 gene table:
 source files joined on ENSG, polynomial (degree 3) rank covariates instead of splines. Writes results/analysis/X4/verify.csv."""
 
 from __future__ import annotations

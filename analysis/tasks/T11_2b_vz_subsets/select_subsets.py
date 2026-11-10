@@ -1,6 +1,6 @@
-"""T11.2b: selection per Van Zyl subset, the seed manifest, and the per-run report (README.md).
+"""Selection per Van Zyl subset, the seed manifest, and the per-run report (README.md).
 
-Selection uses only the T11.2 functions, unchanged: Gate G-V (``select_recipe.gate``) and
+Selection uses only the T11_2_recipe functions, unchanged: Gate G-V (``select_recipe.gate``) and
 the integration composite (``compute_integration_metrics``, k=15, seed 42, labels
 ``cell_type_harmonised``; direction-corrected, min-max over the subset's passing runs,
 0.4 mixing + 0.6 biology). Ties go to the lower grid_id. The per-run report (Delta-alpha

@@ -1,7 +1,7 @@
-"""Shared inputs of the functional layer (05 section 7): residual readouts r1, r2, strata, gene
+"""Shared inputs of the functional layer (pre-specified analysis plan, section 7): residual readouts r1, r2, strata, gene
 sets and interaction graphs. Gene key: human Ensembl ID, through ``gene_ids`` only.
 
-r1 = rank-inverse-normal D, residualised on C + log variance. r2 = r1 further residualised on the
+r1 = rank-inverse-normal D, residualized on C + log variance. r2 = r1 further residualized on the
 64 ESM PCs. The same two designs give the count-evidence comparators S1, S2 (from S_ema). The
 prior comparator PI is rank-inverse-normal prior_raw on C without the prior, plus log variance.
 """
@@ -32,7 +32,7 @@ PRIMARY = ["liv_4sp", "liv_hmouse"]
 SECONDARY = ["test_3sp"]
 COVS = K.COVARIATE_COLUMNS + ["log_var"]
 N_PCS = 64
-INTEGRATED_SEEDS = [42, 43, 44, 47, 48, 51]  # amendment 2026-11-02
+INTEGRATED_SEEDS = [42, 43, 44, 47, 48, 51]  # amendment log of the pre-specified analysis plan (2026-11-02)
 
 
 def inverse_normal(x: np.ndarray) -> np.ndarray:
@@ -93,7 +93,7 @@ def residuals(tab: pd.DataFrame, Z: dict, extra: dict | None = None) -> pd.DataF
 
 
 def seed_runs(cohort: str) -> dict[int, str]:
-    """Seeds that make up D (T3.3 pooling record; CPU runs win over an MPS run of the same number)."""
+    """Seeds that make up D (T3_3_consensus pooling record; CPU runs win over an MPS run of the same number)."""
     return T43.seed_runs_used(cohort)
 
 
@@ -114,7 +114,7 @@ def seed_matrix(cohort: str, tab: pd.DataFrame, key: str = "D") -> pd.DataFrame:
 
 
 def integrated_D(tab: pd.DataFrame) -> np.ndarray:
-    """liv_hmouse D from the integrated seeds only (amendment 2026-11-02)."""
+    """liv_hmouse D from the integrated seeds only (amendment log of the pre-specified analysis plan, 2026-11-02)."""
     M = seed_matrix("liv_hmouse", tab, "D")
     v = M[INTEGRATED_SEEDS].mean(1).to_numpy()
     return v - np.median(v)

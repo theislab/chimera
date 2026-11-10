@@ -1,4 +1,4 @@
-"""D1: tidy rows in the benchmark schema and the mechanical decision table of rules.py.
+"""Tidy rows in the benchmark schema and the mechanical decision table of rules.py.
     python -m analysis.tasks.D1_sparse_genes.tidy
 Writes results/analysis/D1/tidy.csv, signal_cells.csv, target_test.csv.
 """

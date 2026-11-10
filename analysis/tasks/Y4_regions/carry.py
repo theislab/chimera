@@ -1,4 +1,4 @@
-"""Y4 (EXPLORATORY): apply the carry rule of rules.py to discovery_units.csv. Writes carried.json and the eligible table."""
+"""EXPLORATORY: apply the carry rule of rules.py to discovery_units.csv. Writes carried.json and the eligible table."""
 
 from __future__ import annotations
 
@@ -116,7 +116,7 @@ if __name__ == "__main__" and __import__("sys").argv[1:] != ["amended"]:
     main()
 
 
-# Amendment, written after the odd table and the decoy calibration were read and before any even gene is opened. See the ledger.
+# Added after the odd table and the decoy calibration were read and before any even gene was opened.
 # The mechanical list is kept as carried_mechanical.csv. Each unit below is eligible under the committed rule and beats every one
 # of the 30 same-size decoys of its cohort, gold and readout on its tier's statistic.
 CHOSEN = [

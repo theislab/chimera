@@ -1,4 +1,4 @@
-"""D1 statistics: rho_p through X4's rho_unit (T4.3 stats), one universe per call, tidy rows."""
+"""Statistics: rho_p through X4_where_differs's rho_unit (T4_3_scoreboard stats), one universe per call, tidy rows."""
 
 from __future__ import annotations
 

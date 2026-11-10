@@ -1,4 +1,4 @@
-"""E4 step 1: gene annotations from the downloads (definitions in rules.py). No read-out is touched here.
+"""Step 1: gene annotations from the downloads (definitions in rules.py). No read-out is touched here.
 
 Writes results/analysis/E4/annot/{genes.parquet, sets.parquet, disease_genes.parquet, target_drugs.parquet, checks.txt}.
 Downloads are read as data only; run with python -I through the module path:
@@ -67,7 +67,7 @@ def split_ids(s) -> list[str]:
 
 
 def gene_base() -> pd.DataFrame:
-    """Human Ensembl -> Entrez, Y2's mouse MGI and PubMed counts; MGI one-to-one homology must agree."""
+    """Human Ensembl -> Entrez, Y2_functional's mouse MGI and PubMed counts; MGI one-to-one homology must agree."""
     ph = pd.read_parquet(RU.REUSED["pheno"]).reset_index()
     base = ph[["hsapiens_gene_id", "ncbi", "mgi", "mouse_ens", "pubmed_h", "pubmed_m"]].copy()
     hom = pd.read_csv(D / "mgi" / "HOM_MouseHumanSequence.rpt", sep="\t", dtype=str)

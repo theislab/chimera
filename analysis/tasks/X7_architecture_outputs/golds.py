@@ -1,6 +1,6 @@
-"""X7 (EXPLORATORY): independent per-type and gene-by-type divergence, and the Murat tier gold for Lead B.
+"""EXPLORATORY: independent per-type and gene-by-type divergence, and the Murat tier gold for Lead B.
 
-Definitions in rules.py. Reads the Murat held-out species h5ads, the T4.1 ortholog map and the T4.3 H3
+Definitions in rules.py. Reads the Murat held-out species h5ads, the T4_1_gold ortholog map and the T4_3_scoreboard H3
 profiles; no Chimera readout is read here. Writes results/analysis/X7/golds/:
     murat_type_divergence.csv  per species pair and coarse type: 1 - Spearman across genes, n genes, cells,
                                and a split-library noise-adjusted version where each species has >= 2 libraries
@@ -8,7 +8,7 @@ profiles; no Chimera readout is read here. Writes results/analysis/X7/golds/:
     murat_gene_type.parquet    I_gk per tier (PP, PO, all) and type
     h3_type_divergence.csv     TS vs TMS per type
     h3_gene_type.parquet       I_gk per type
-    murat_tiers.parquet        G_H4 tier means zPP, zPO, zOO and Gt = zPP - zPO (T4.3 pipeline, 4 types)
+    murat_tiers.parquet        G_H4 tier means zPP, zPO, zOO and Gt = zPP - zPO (T4_3_scoreboard pipeline, 4 types)
 Usage: python -m analysis.tasks.X7_architecture_outputs.golds
 """
 
@@ -155,7 +155,7 @@ def h3():
 
 
 def murat_tiers():
-    """T4.3 H4 pipeline, 4 types; returns tier means and checks G_H4 against the gold table."""
+    """T4_3_scoreboard H4 pipeline, 4 types; returns tier means and checks G_H4 against the gold table."""
     inp = TG.h4_inputs()
     res = TG.h4_species_profiles(inp)
     n = len(inp["genes"])

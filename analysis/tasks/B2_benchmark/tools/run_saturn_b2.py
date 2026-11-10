@@ -1,4 +1,4 @@
-"""SATURN on a setting's object, the T5.2/T5.6 Adapter B call (unmodified train-saturn.py, published defaults plus pe_sim_penalty 1.0, every 1:1 gene), then S_deploy.
+"""SATURN on a setting's object, the Adapter B call of T5_2_adapters and T5_6_gene_level (unmodified train-saturn.py, published defaults plus pe_sim_penalty 1.0, every 1:1 gene), then S_deploy.
 Run in saturn_env. S_deploy (the frozen primary): r_m = Pearson across cell types with >= 30 cells in both species of human and mouse type means of macrogene m; weights wbar = mean of
 the two genes' final macrogene weights; S_deploy = sum wbar r / sum wbar over macrogenes with r defined. Writes results/analysis/B2/tool_scores/SATURN/<run>.csv
 """
@@ -71,7 +71,7 @@ def main():
         X = np.asarray(A.X, dtype=np.float64)
         np.save(d / "z_raw.npy", X)
         pd.Series(np.asarray(A.obs_names).astype(str)).to_csv(d / "obs_names.csv", index=False, header=False)
-        np.save(d / "z_mean.npy", X / np.linalg.norm(X, axis=1, keepdims=True))  # T5.2: SATURN enters L2-normalised
+        np.save(d / "z_mean.npy", X / np.linalg.norm(X, axis=1, keepdims=True))  # T5_2_adapters: SATURN enters L2-normalized
         (d / "config.json").write_text(json.dumps(dict(run=a.run, seed=a.seed, label_col=a.label_col, wall_s=time.time() - t0, peak_rss_gb=C.peak_rss_gb(),
                                                        adapter="1:1 orthologs (T5.6 Adapter B)", tool_state=C.tool_state(C.SATURN_DIR)), indent=1))
         shutil.rmtree(work)

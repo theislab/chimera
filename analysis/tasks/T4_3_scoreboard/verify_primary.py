@@ -1,6 +1,6 @@
 """Independent check of the H1-H4 point estimates, and the covariate decomposition of rho_p.
 
-Rebuilds each universe from the CSV inputs by an ENSG join and residualises with a different
+Rebuilds each universe from the CSV inputs by an ENSG join and residualizes with a different
 spline implementation (scikit-learn cubic B-splines, 5 knots at quantiles), without importing
 ``stats.py`` or ``controls.py``. A resampled-with-replacement gene bootstrap (500 draws, by row
 copying) checks the width of the gene-level CI. The decomposition adds C's covariates one at a

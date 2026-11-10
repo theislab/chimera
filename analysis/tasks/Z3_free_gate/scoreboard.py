@@ -1,11 +1,11 @@
-"""Z3: the T4.3 scoreboard (with the T5.6 tool scalars, as results/analysis/T5_6/scoreboard) on free-gate consensus D,
-beside the frozen row and a like-for-like canonical line. T4.3 code imported unchanged (units, RNG streams by unit id,
+"""The T4_3_scoreboard scoreboard (with the T5_6_gene_level tool scalars, as results/analysis/T5_6/scoreboard) on free-gate consensus D,
+beside the frozen row and a like-for-like canonical line. T4_3_scoreboard code imported unchanged (units, RNG streams by unit id,
 draws 10,000, permutations 10,000); only the seed runs behind D, S_ema, D_raw and the per-seed matrix are swapped, and
 units on count-supported and masked genes are added (Family 3). Frozen folders are only read.
 
 Lines (rules.py, lines.json): frozen (check: must reproduce T4_3 and T5_6/scoreboard), free5, can5, can_state. Testis 3-sp stays canonical.
 Baselines, covariates, tau, ESM blocks, golds and B1z (canonical latent clusters) stay frozen: the objects are the
-canonical objects. B3b is refitted on each line's D by T4.3's own code.
+canonical objects. B3b is refitted on each line's D by T4_3_scoreboard's own code.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Z3_free_gate.scoreboard --line free5 --workers 38
 Output: results/analysis/Z3/scoreboard_<line>/
@@ -31,8 +31,8 @@ from analysis.tasks.Z3_free_gate import rules as RU
 
 
 def shim() -> Path:
-    """R.RES stand-in: frozen golds, T2.5, input cache and baseline split halves; DONE present; no consensus-D B3b file
-    (B3b is refitted on each line's D, so T4.3's equality check against the frozen consensus does not apply)."""
+    """R.RES stand-in: frozen golds, T2_5_celltype_margin, input cache and baseline split halves; DONE present; no consensus-D B3b file
+    (B3b is refitted on each line's D, so T4_3_scoreboard's equality check against the frozen consensus does not apply)."""
     d = RU.OUT / "shim"
     (d / "T4_3").mkdir(parents=True, exist_ok=True)
     (d / "T3_3").mkdir(exist_ok=True)
@@ -45,7 +45,7 @@ def shim() -> Path:
 
 
 def healthy_runs(line: str, canonical_4sp: bool = False) -> dict:
-    """canonical_4sp: interim run before the 4-sp free seeds exist; 4-sp rows stay canonical (labelled)."""
+    """canonical_4sp: interim run before the 4-sp free seeds exist; 4-sp rows stay canonical (labeled)."""
     L = json.loads((RU.OUT / "lines.json").read_text())
     coh = [c for c in RU.COHORTS if not (canonical_4sp and c == "liv_4sp")]
     out = {c: {int(s): r for s, r in L[line][c].items()} for c in coh}
@@ -75,7 +75,7 @@ def patch(line: str, canonical_4sp: bool = False) -> None:
 
     def load(cohort, cache_dir, consensus=True):
         swap = runs is not None and cohort in runs
-        d = o_load(cohort, cache_dir, consensus=not swap)  # consensus=False: D = mean over the swapped seeds, median-centred
+        d = o_load(cohort, cache_dir, consensus=not swap)  # consensus=False: D = mean over the swapped seeds, median-centered
         t = d["tab"]
         if cohort in sup:
             cs = sup[cohort].reindex(t["var_name"]).to_numpy()

@@ -1,4 +1,4 @@
-"""T12.1: Ensembl 110 1:1 ortholog table for human, mouse lemur and mouse.
+"""Ensembl 110 1:1 ortholog table for human, mouse lemur and mouse.
 
 Source: Ensembl Compara 110 ``protein_default.homologies`` TSV dumps (FTP). The dump writes
 each homology once, under one of the two species, so the human-mouse pairs are split between

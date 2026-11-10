@@ -1,17 +1,18 @@
-"""T7.9: H-D4 program transfer and the Hrovatin anchor (plan section 8b). No Chimera readout.
+"""H-D4 program transfer and the Hrovatin anchor for the islet case (pre-specified analysis plan, section 8b).
+No Chimera readout.
 
 H-D4 (Family 2), per DE-able type:
   * universe: genes tested in the human T2D vs ND fit and, through an Ensembl Compara 110
     ``ortholog_one2one`` pair (both dumps), in the mouse primary (joint) fit; human symbols;
   * preranked GSEA on fixed-scale apeGLM log2FC (``log2fc_fixed``, prior scale 1) in both species,
-    as T7.3: the adaptive prior collapses the human fits, and a weighted KS on values near zero has
-    no meaning. Weighted KS (p = 1), 10,000 random gene sets of the same size per set size
-    (gene-set permutation), NES = ES / mean |null ES| of the same sign;
+    as in the liver MASH case (analysis/tasks/T7_3_mash): the adaptive prior collapses the human fits,
+    and a weighted KS on values near zero has no meaning. Weighted KS (p = 1), 10,000 random gene sets
+    of the same size per set size (gene-set permutation), NES = ES / mean |null ES| of the same sign;
   * sets: MSigDB Hallmark 2020 and Reactome 2024 (Enrichr GMT files), 15-500 genes in universe;
   * human p two-sided (same-sign null), BH over sets per type; mouse one-sided in the human
     direction, BH over the human-significant sets of that type;
   * transfers = human q < 0.05 and mouse oriented q < 0.05; opposite = human q < 0.05 and the mouse
-    one-sided p against the human direction has q < 0.05 (T7.3's call);
+    one-sided p against the human direction has q < 0.05 (the call of T7_3_mash);
   * gene-set permutation ignores correlation between genes, so these calls are judged against the
     fits with permuted condition labels (``hd4_null.py``), not on their own.
 
@@ -142,7 +143,7 @@ def load_type(t: str, contrast: str, o2o: pd.DataFrame):
 
 
 def call_programs(rh: pd.Series, rm: pd.Series, sets: dict, n_perm: int) -> pd.DataFrame:
-    """GSEA in both species and the section 8b calls, per library, BH over all sets of the type."""
+    """GSEA in both species and the calls of pre-specified analysis plan, section 8b, per library, BH over all sets of the type."""
     out = []
     for lib, st in sets.items():
         gh = gsea(rh, st, n_perm, SEED).add_prefix("h_").rename(columns={"h_set": "set", "h_size": "size"})

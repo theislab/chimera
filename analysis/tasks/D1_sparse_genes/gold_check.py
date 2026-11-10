@@ -1,4 +1,4 @@
-"""D1: can the gold measure sparse genes? Split-half reliability of TS vs TMS and Murat, masked against unmasked genes (T4.3 splits.npz, Spearman-Brown on the median over splits), gold-side detection
+"""Can the gold measure sparse genes? Split-half reliability of TS vs TMS and Murat, masked against unmasked genes (T4_3_scoreboard splits.npz, Spearman-Brown on the median over splits), gold-side detection
 in the TS and TMS liver atlases against training detection. Reads no Chimera readout value beyond the mask.
     python -m analysis.tasks.D1_sparse_genes.gold_check
 """

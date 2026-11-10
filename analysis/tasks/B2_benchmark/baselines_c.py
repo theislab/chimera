@@ -1,5 +1,5 @@
-"""B2 Track C: direct baselines for every Track C cohort, T4.2 and X4/X6 code on each cohort's h5ad, and B1z mean over up to three kept fits. No gold is read.
-Labels: canonical T4.2 labels; new cohorts cell_ontology_class. Library: T4.2 keys; kidney and islet sample_batch; bone marrow and eye batch. Reproduces T4.3 B1b_raw, B1c_raw, B2b and H1 B1 where they exist.
+"""Track C: direct baselines for every Track C cohort, the code of T4_2_gene_baselines, X4_where_differs and X6_adds_beyond on each cohort's h5ad, and B1z mean over up to three kept fits. No gold is read.
+Labels: canonical T4_2_gene_baselines labels; new cohorts cell_ontology_class. Library: T4_2_gene_baselines keys; kidney and islet sample_batch; bone marrow and eye batch. Reproduces B1b_raw, B1c_raw and B2b of T4_3_scoreboard and B1 of the H1_harmonise tables where they exist.
 Writes results/analysis/B2/track_C/baselines__<cohort>.parquet (index: human ENSG).
     python -m analysis.tasks.B2_benchmark.baselines_c <cohort>
 """

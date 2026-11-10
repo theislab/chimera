@@ -1,4 +1,4 @@
-"""Y6 use 3: drug targets, rules.py USE 3.
+"""Use 3: drug targets, rules.py USE 3.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.use3
 """

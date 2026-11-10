@@ -1,4 +1,4 @@
-"""T11.1: rebuild the Van Zyl aqueous-humor cohort from the GEO count matrices.
+"""Rebuild the Van Zyl aqueous-humor cohort from the GEO count matrices.
 
 Uses the ``chimera._data_utils`` pipeline unchanged:
 ``download_van_zyl_raw`` (reads the five GEO CSVs and the SATURN metafile),
@@ -8,7 +8,7 @@ Uses the ``chimera._data_utils`` pipeline unchanged:
 ``precompute_p_null``. The ortholog table ``data/processed/ortholog_table_van_zyl.csv``
 (Ensembl 110) is reference data; it is restricted to the groups measured in all five species
 and written, renumbered, to ``ortholog_table_van_zyl.csv`` in the output folder. Cell-type
-labels are harmonised with the committed map ``celltype_map.tsv``.
+labels are harmonized with the committed map ``celltype_map.tsv``.
 
 Measured genes: a group is kept only if, in every species, its gene is in that species' own
 count matrix, by symbol or by Ensembl ID (the rhesus and pig matrices name unannotated genes
@@ -20,8 +20,8 @@ QC: ``min_genes`` only. No mitochondrial filter in this cohort, a deviation from
 20%: mt genes are named ND1/COX1 in rhesus and pig, so the prefix rule cannot see them, and the
 cynomolgus matrix has none, so the filter could not act evenly across species.
 
-Thin types: a harmonised cell type is removed from a species where it has fewer than 20 cells
-(owner default rule), before any statistic; removals are listed in ``build_report.json``.
+Thin types: a harmonized cell type is removed from a species where it has fewer than 20 cells
+(the default rule for thin cell types), before any statistic; removals are listed in ``build_report.json``.
 
 Batches: ``obs['source_batch']`` is ``species|chemistry`` (10x v2 or v3, ``batch_chemistry.tsv``);
 ``obs['batch']`` keeps the 16 samples.
@@ -88,7 +88,7 @@ ESM2_FILES = {
     "sscrofa": "pig_embedding.torch",
 }
 QC = dict(min_genes=200, max_mt_pct=100.0)  # no mt filter in this cohort, see module docstring
-THIN_MIN = 20  # cells per (species, harmonised type); fewer are removed (owner default rule)
+THIN_MIN = 20  # cells per (species, harmonized type); fewer are removed (default rule for thin cell types)
 OWN_MATRIX = dict(zip(("mmusculus", "sscrofa", "hsapiens", "mfascicularis", "mmulatta"), CSVS))
 
 log = logging.getLogger("build_vanzyl")
@@ -192,7 +192,7 @@ def measured_table(table: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict, pd.Da
         name, gid = table[f"{sp}_gene_name"], table[f"{sp}_gene_id"]
         name_unique = ~name.duplicated(keep=False) & name.notna()
         # The Ensembl ID row is the table's gene; a symbol row is used only when the matrix has
-        # no row for the ID (audit R4 n1: in rhesus and pig a same-symbol row can be another gene).
+        # no row for the ID (in rhesus and pig a same-symbol row can be another gene).
         by_id = gid.isin(own)
         by_name = name_unique & name.isin(own) & ~by_id
         both = by_id & name_unique & name.isin(own)
@@ -264,7 +264,7 @@ def add_source_batch(obs: pd.DataFrame) -> pd.DataFrame:
 def class_filter(raw, class_min: int):
     """Filter a whole class from the model if a species that has it is below ``class_min`` cells.
 
-    Rule of the kidney and islet cohorts (checklist item 5), there with two species. Exception, reason
+    Rule of the kidney and islet cohorts, there with two species. Exception, reason
     recorded: V2 and V3 compare each species with human over outflow classes, so a class in van Zyl's
     conventional or uveoscleral outflow groups that human shares with another species stays.
     """
@@ -419,7 +419,7 @@ def main() -> int:
         report["raw"]["equals_data_raw_van_zyl_raw_h5ad"] = bool(same)
         del old_raw
 
-    # 2. Thin cell types (owner default rule): drop a harmonised type from a species where it
+    # 2. Thin cell types (default rule): drop a harmonized type from a species where it
     # has fewer than THIN_MIN cells, before any statistic is computed. No cap is applied.
     raw.obs = harmonise(raw.obs)
     counts = raw.obs.groupby(["species", "cell_type_harmonised"], observed=True).size()
@@ -484,14 +484,14 @@ def main() -> int:
     unified.varm["gene_features"] = features
     unified.uns["p_null"] = du.precompute_p_null(unified)
 
-    # 5. Harmonised labels.
+    # 5. Harmonized labels.
     unified.obs = add_source_batch(harmonise(unified.obs))
     report["cells_by_source_batch"] = unified.obs["source_batch"].astype(str).value_counts().to_dict()
     for col in ("species", "batch", "cell_type", "Cluster"):
         unified.obs[col] = pd.Categorical(unified.obs[col].astype(str))
     report["labels"] = shared_tables(unified.obs, out)
 
-    # 6. Ortholog-table assertion (third table: the T2.1 bug class).
+    # 6. Ortholog-table assertion: the genes of the object must be those of this cohort's own table (a third table beside liver and testis).
     report["assert_table_matches_spearman"] = gene_ids.assert_table_matches(unified, table.set_index("ortholog_group_id"))
     report["shape"] = list(unified.shape)
     report["n_batches"] = int(unified.obs["batch"].nunique())

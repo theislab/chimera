@@ -1,7 +1,7 @@
-"""T7.9: gate G-D3h (plan section 8b). Reads ``integration_vs_scvi.json`` of each seed run, written by
-``training/compare_vs_scvi.py --seed 42`` (scVI with batch_key = species, one cached seed-42
-reference for all seeds). Pass: >= 3 of 5 seeds meet E8.6 and E8.3. A seed without the file, or
-with a non-finite latent, counts as failing.
+"""Gate G-D3h of the islet case (pre-specified analysis plan, section 8b). Reads
+``integration_vs_scvi.json`` of each seed run, written by ``training/compare_vs_scvi.py --seed 42``
+(scVI with batch_key = species, one cached seed-42 reference for all seeds). Pass: >= 3 of 5 seeds
+meet E8.6 and E8.3. A seed without the file, or with a non-finite latent, counts as failing.
 
     python analysis/tasks/T7_9_islet/gd3h.py
 """

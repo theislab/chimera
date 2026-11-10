@@ -1,29 +1,30 @@
-"""T7.9: H-D1, H-D1b, controls and sensitivities for the islet T2D case (plan section 8b, amendments).
+"""H-D1, H-D1b, controls and sensitivities for the islet T2D case (pre-specified analysis plan, section 8b,
+with its amendment log).
 
 Outcome per DE-able type t: Q = sign(l^h) * m. l^h is the unshrunk human log2FC (``log2fc_mle``,
 ``human_t2d_vs_nd_<t>``); m is the adaptive apeGLM mouse joint log2FC (``log2fc_shrunk``,
-``mouse_joint_<t>``, ~ study + condition) as section 8b and its DE amendment say; SE(m) =
+``mouse_joint_<t>``, ~ study + condition) as plan, section 8b and its amendment on DE say; SE(m) =
 ``lfcse_shrunk``. Genes: islet vocabulary (testis 1:1 table, the vocabulary of D) detected
 (``det_frac``) in >= 5% of the type's cells in both species' DE units. Readout D from
 ``readout.py`` (seeds passing the health gate); C from the healthy training object.
 
-rho_p, one-sided null and CI: the T7.3 implementation (``T7_3_mash.hd1.rho_row``): ranks of Q and
-D residualised on C + splines of rank |l^h| and rank SE(m), Pearson; D residuals permuted within
+rho_p, one-sided null and CI: the implementation of the liver MASH case (``T7_3_mash.hd1.rho_row``): ranks of Q and
+D residualized on C + splines of rank |l^h| and rank SE(m), Pearson; D residuals permuted within
 pi_raw x expression strata; block bootstrap on the ESM modules; tertile test inside.
 
-Pass rule (8b): (i) beta rho_p > 0 and q < 0.05 (BH over DE-able types); (ii) >= ceil(n/2) DE-able
+Pass rule (plan, section 8b): (i) beta rho_p > 0 and q < 0.05 (BH over DE-able types); (ii) >= ceil(n/2) DE-able
 types with rho_p > 0 and q < 0.05; (iii) over types with >= 150 human-DE genes (FDR < 0.1) the mean
 top-minus-bottom D-tertile sign agreement >= 0.10, permutation p < 0.05 (one permutation of D within
-strata of the whole vocabulary, applied to every type; P13 amendment (b)). Not testable: beta has
-< 1,000 genes, or fewer than 3 types have >= 1,000 genes.
+strata of the whole vocabulary, applied to every type, as for the kidney case in the amendment log of
+the plan). Not testable: beta has < 1,000 genes, or fewer than 3 types have >= 1,000 genes.
 
-Beside D (Family 3): S_ema, D_raw, B1b. H-D1b: T7.3 ``nested`` (pi + expression, + B1b and B2b, + D).
+Beside D (Family 3): S_ema, D_raw, B1b. H-D1b: ``nested`` of T7_3_mash (pi + expression, + B1b and B2b, + D).
 
-Controls (8b): human condition labels permuted within sex x chemistry (``de/perm/human_<i>_<t>``,
-l^h = MLE, m the true mouse m), 20 draws, every type. Mouse: the 11 within-study relabellings of the
+Controls (plan, section 8b): human condition labels permuted within sex x chemistry (``de/perm/human_<i>_<t>``,
+l^h = MLE, m the true mouse m), 20 draws, every type. Mouse: the 11 within-study relabelings of the
 joint fit (``de/perm/mouse_<i>_<t>``); these fits carry only the fixed-scale prior, so they are read
 with m = ``log2fc_fixed`` and compared with the true-label fit read the same way. Draws whose mSTZ
-labels are the true ones are the within-db/db relabellings of 8b (5 besides the true one).
+labels are the true ones are the within-db/db relabelings of plan, section 8b (5 besides the true one).
 
 Sensitivities: db/db-only and mSTZ-only m (per-model fits ``mouse_{dbdb,mstz}_<t>``, adaptive, and
 fixed-scale beside), fixed-scale joint m, leave-one-out fits in ``de/loo`` (ND DE donors, mouse

@@ -1,4 +1,4 @@
-"""C1: program transfer per type (H-D4 of P13, its code unchanged) on a disease case; judged against the label null.
+"""Program transfer per type (H-D4 of P13_kidney, its code unchanged) on a disease case; judged against the label null.
 
 Universe: human-mouse pairs of the C1 ortholog rule (Compara 110, both dumps, high confidence, protein coding, no retrocopy target), independent of any model vocabulary.
 

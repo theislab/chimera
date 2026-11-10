@@ -1,4 +1,4 @@
-"""B1 Track A (semi-synthetic spike-in) and Track D: definitions, fixed before any run is scored.
+"""Track A (semi-synthetic spike-in) and Track D: definitions, fixed before any run is scored.
 
 Design in README.md, predictions in PREDICTIONS.md. Nothing in the chimera package changes; Chimera is
 retrained with the cohort's canonical recipe. Alteration code in alter.py, scoring in score_run.py and
@@ -19,7 +19,7 @@ TOOL_DIR = REPO / "data" / "analysis" / "B1" / "tools"
 TASK_DIR = REPO / "analysis" / "tasks" / "B1_ground_truth"
 
 # ---------------------------------------------------------------------------
-# Cohorts and recipes (unchanged canonical recipes: 07_EXPERIMENT_MATRIX, T3.2, P13)
+# Cohorts and recipes (unchanged canonical recipes: configs/canonical_recipes.tsv, T3_2_seeds, P13_kidney)
 # ---------------------------------------------------------------------------
 COHORTS = {
     "liv_hmouse": dict(
@@ -47,8 +47,8 @@ COHORTS = {
 SPECIES = ("Human", "Mouse")
 
 # ---------------------------------------------------------------------------
-# Grid: full factorial of alteration x effect x expression band x share x seed on all three cohorts (BENCHMARK_PLAN, second
-# amendment). Only cells that add no information leave: a share whose gene set equals a smaller share's (make_grid: duplicate_of).
+# Grid: full factorial of alteration x effect x expression band x share x seed on all three cohorts (design in README.md).
+# Only cells that add no information leave: a share whose gene set equals a smaller share's (make_grid: duplicate_of).
 # Central setting: strongest effect of each alteration, band midhigh, share 5%, seed 42. Tiers set the submission order, so central
 # settings and main effects finish before interactions:
 #   0 central effects and nulls at the central setting
@@ -57,7 +57,7 @@ SPECIES = ("Human", "Mouse")
 #   4 the remaining shares, seed 42
 #   5 seed 43
 # Tier 3 is the tools' main settings, tier 6 their other rows (make_queue.py).
-# Scope: tiers 0, 1, 2, 3, 10, 11 run and scored; 4, 5, 6 planned, not run (owner decision, BENCHMARK_PLAN.md).
+# Scope: tiers 0, 1, 2, 3, 10, 11 run and scored; 4, 5, 6 planned, not run.
 # ---------------------------------------------------------------------------
 ALTERATIONS = {
     # q: share of the move from the observed profile to the swapped profile
@@ -79,7 +79,7 @@ IDENTITY_BANDS = ["id_low", "id_mid", "id_high"]  # tertiles of pi_raw over all 
 # Selection
 MIN_COUNTS = 20        # gene needs >= 20 counts in each species, otherwise an alteration is empty
 MIN_CONTRAST_LOG2 = 1  # pattern, loss, and their controls: top vs bottom shared type >= 2-fold in the altered species
-MIN_TYPE_CELLS = 30    # shared types: >= 30 cells in both species (the T4.2 rule)
+MIN_TYPE_CELLS = 30    # shared types: >= 30 cells in both species (the T4_2_gene_baselines rule)
 MAX_PAIRS_FRAC = 0.5   # altered + control cannot exceed the eligible genes of the band
 
 # Tools. Main settings, tier 3: every alteration type (central effects) and the sham null, bands midhigh and low, share 5%, seed 42, plus the unaltered object.
@@ -97,7 +97,7 @@ ACTIVE_VAR = 0.01
 N_LATENT = 10
 
 
-# Gate arms (coordinator request after the interim, predictions in PREDICTIONS.md before scoring). Same altered objects as the main grid, recipe otherwise
+# Gate arms (added after the interim reading; the predictions in PREDICTIONS.md were written before scoring). Same altered objects as the main grid, recipe otherwise
 # unchanged. free: Config M, no GIN, one free c_g per gene. hybrid: GIN plus a per-gene bias (iter119). Tiers: 10 central alterations and nulls x 2 seeds with
 # unaltered fits, 11 the tier 1 main effects.
 ARMS = {"free": lambda r: r.replace("--config A", "--config M"), "hybrid": lambda r: r + " --use-per-gene-bias"}

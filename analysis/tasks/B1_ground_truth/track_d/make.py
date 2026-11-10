@@ -1,8 +1,9 @@
-"""B1 Track D: subsampled objects (testis H+Mouse 25%, 50%; same random cells for Chimera and the tools) and the job table.
+"""Track D: subsampled objects (testis H+Mouse 25%, 50%; same random cells for Chimera and the tools) and the job table.
 
-Cells: the rng(0) choice of the T5 adapters (prep_camex --subsample). Chimera objects keep the gene set and the canonical
-features with p_null recomputed and the expression columns moved as in alter.py. Tool inputs are the T5 input files subset to
-the same cells. Writes data/analysis/B1/trackD/ and jobs.tsv: one job per method x object x repeat, all on 16 CPUs, one node.
+Cells: the rng(0) choice of the SATURN and CAMEX adapters (analysis/tasks/T5_2_adapters, prep_camex --subsample). Chimera
+objects keep the gene set and the canonical features with p_null recomputed and the expression columns moved as in alter.py.
+Tool inputs are the input files of T5_2_adapters subset to the same cells. Writes data/analysis/B1/trackD/ and jobs.tsv: one
+job per method x object x repeat, all on 16 CPUs, one node.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ OUT = RU.REPO / "data" / "analysis" / "B1" / "trackD"
 HERE = Path(__file__).resolve().parent
 STEM = {"liv_hmouse": "camex_human_mouse", "test_hmouse": "camex_testis_human_mouse", "kidney": "kidney_healthy_train"}
 FRACS = {"f25": 0.25, "f50": 0.5}
-RECIPES_EXTRA = {  # more species, same runs as T3.2 and T5
+RECIPES_EXTRA = {  # more species, same runs as T3_2_seeds and T5_3_runs
     "test_3sp": ("data/processed/camex_testis_unified.h5ad",
                  "--config A --max-epochs 100 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85"),
     "liv_4sp": ("data/processed/camex_pancreas_unified.h5ad",

@@ -1,4 +1,5 @@
-"""P13: kidney AKI objects (plan section 8c), the T7.2 / T7.9 pipeline on the KPMP collection.
+"""Kidney AKI objects (pre-specified analysis plan, section 8c): the pipeline of the liver MASH objects
+(analysis/tasks/T7_2_disease_objects) and of the islet case (analysis/tasks/T7_9_islet) on the KPMP collection.
 
 Human: CELLxGENE snRNA v2.0 (``human_kidney_v2.h5ad``); mouse: snRNA v2.0
 (``mouse_kidney_v2.h5ad``); integer counts from ``raw/X``. Only nuclei of the units listed in
@@ -9,8 +10,8 @@ The human file (1.39 M nuclei) is streamed in row blocks of ``raw/X``; per-cell 
 block, so the result equals a whole-file run:
 
 1. ``_validate_raw_counts``, ``_standardize_obs_columns`` (batch = unit) and ``_qc_filter``
-   (>= 200 genes) from ``chimera._data_utils``. No mitochondrial filter in any species (plan
-   amendment after section 8c): it cannot act evenly. The human matrix has no MT- genes, mouse
+   (>= 200 genes) from ``chimera._data_utils``. No mitochondrial filter in any species (amendment
+   to section 8c in the amendment log of the plan): it cannot act evenly. The human matrix has no MT- genes, mouse
    has 11, the authors' ``percent.mt`` is missing for all Kirita nuclei and disagrees with the
    matrix-based fraction in mouse, and in human it would remove AKI nuclei preferentially. What
    the 20% rule would have removed is written to ``mt_filter_not_applied.csv``.
@@ -18,10 +19,10 @@ block, so the result equals a whole-file run:
 3. Per-unit pseudobulks per class for every unit (summed counts, ``layers['n_detected']``),
    all QC-passed nuclei, no caps, native gene space; per unit x class x ``CellStateLevel2``
    nucleus counts (descriptive state fractions).
-4. Gate G-D1k and the owner filter rule (``filters.csv``).
+4. Gate G-D1k and the rule that drops cell types with too few nuclei (``filters.csv``).
 5. Healthy kidney object from ``train_healthy`` units (human multiome nuclei only; mouse Ref):
    classes with >= 50 training nuclei in each species, caps of 2,000 nuclei per species x class
-   shared by units (T7.2 water-filling, seed 20261101), kidney ortholog table,
+   shared by units (water-filling of T7_2_disease_objects, seed 20261101), kidney ortholog table,
    ``compute_conservation_prior``, ESM-2 (human, mouse), ``pca_esm2``,
    ``compute_esm2_interspecies_variance``, ``construct_unified_adata``,
    ``compute_expression_stats`` and ``assemble_gin_features`` on these nuclei, genes in < 3
@@ -315,7 +316,7 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
         a = a[:, ~a.var_names.duplicated()].copy()
         a.obs = a.obs[obs_cols].copy()
         a.var = a.var[[]]
-        a.X = sp.csc_matrix(a.X)  # column reads in construct_unified_adata (T12.1 note)
+        a.X = sp.csc_matrix(a.X)  # column reads in construct_unified_adata (as in T12_1_bone_marrow)
         return a
 
     th, tm = _by_id(th), _by_id(tm)
@@ -334,7 +335,7 @@ def build_healthy(th: ad.AnnData, tm: ad.AnnData, roles: pd.DataFrame, table: pd
     unified.varm["gene_features"] = feats
     unified.uns["p_null"] = precompute_p_null(unified)
     # batch = technical source within a species (canonical builder: source dataset; donors
-    # live in sample_batch, never in batch; donor-level batch is the iter94 failure). The
+    # live in sample_batch, never in batch; donor-level batches fail in training). The
     # training object holds one source per species (human KPMP multiome, mouse KPMP multiome
     # Ref), so batch is one value per species, the same partition as species.
     unified.obs["sample_batch"] = unified.obs["sample"].astype(str)

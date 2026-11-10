@@ -1,4 +1,4 @@
-"""Y6 use 1, PH6 (post hoc, see ledger): an annotation fault should appear in every tissue. Median across rows of the within-row percentile, per species, even autosomes.
+"""Use 1, PH6 (post hoc): an annotation fault should appear in every tissue. Median across rows of the within-row percentile, per species, even autosomes.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Y6_uses.use1_consensus
 """

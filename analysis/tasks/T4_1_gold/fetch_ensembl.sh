@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T2.4 step 0 and the Ensembl items of T4.1. Pinned releases, FTP tree, not BioMart.
+# Ensembl files of the covariate audit (T2_4_covariates) and of the independent references. Pinned releases, FTP tree, not BioMart.
 # Usage: fetch_ensembl.sh <chimera_repo>
 C="$1"; F="$C/analysis/tasks/T4_1_gold/fetch_item.sh"
 E=https://ftp.ensembl.org/pub
@@ -16,7 +16,7 @@ D="$C/data/analysis/gold/G8"; M="$D/MANIFEST.tsv"
 D="$C/data/analysis/ensembl110"; M="$D/MANIFEST.tsv"
 "$F" E105C $E/release-105/tsv/ensembl-compara/homologies/homo_sapiens/Compara.105.protein_default.homologies.tsv.gz "$D/Compara.105.protein_default.homologies.tsv.gz" "$M"
 # dN/dS: release 102 (and 100, 101, 110) have the dn, ds columns but every value is NULL.
-# Release 99 (GRCh38, January 2020) is the last with values. Fetched as a candidate only;
-# using it in H8 needs an amendment to the frozen plan, whose fallback chain is OrthoMaM.
+# Release 99 (GRCh38, January 2020) is the last with values; H8 uses it
+# (amendment log of the pre-specified analysis plan, 2026-11-01).
 D="$C/data/analysis/gold/G8"; M="$D/MANIFEST.tsv"
 "$F" G8 $E/release-99/tsv/ensembl-compara/homologies/homo_sapiens/Compara.99.protein_default.homologies.tsv.gz "$D/Compara.99.protein_default.homologies.tsv.gz" "$M"

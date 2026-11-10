@@ -1,4 +1,4 @@
-"""Y1 (c), (c2): does X in tissue T predict independent pattern agreement in T better than X from another tissue, given C of T?
+"""(c), (c2): does X in tissue T predict independent pattern agreement in T better than X from another tissue, given C of T?
 
 Joint block draws: one multiplicity per ESM module per draw, shared by all golds and scores. rules.py fixes the family and sensitivities.
 
@@ -331,7 +331,7 @@ def run_within(D: Data, CNT) -> None:
                 return np.average(dG[hi], weights=w[hi]) - np.average(dG[lo], weights=w[lo])
             flips.append(summarise(f"{g1} vs {g2}", eff(np.ones(len(g))), np.array([eff(weights(D, g, cnt) + 1e-12) for cnt in CNT]), score=n,
                                    pair=f"{g1}|{g2}", n_hi=int(hi.sum()), n_lo=int(lo.sum())))
-        # head-to-head on disagreement (X4's frame): S says T1 > T2 and B1 says T1 < T2, or the reverse; > 0 sides with S
+        # head-to-head on disagreement (X4_where_differs's frame): S says T1 > T2 and B1 says T1 < T2, or the reverse; > 0 sides with S
         sS, sB = dd["S"], dd["B1"]
         ts, tb = 0.5 * sS.std(), 0.5 * sB.std()
         A1, A2 = (sS > ts) & (sB < -tb), (sS < -ts) & (sB > tb)

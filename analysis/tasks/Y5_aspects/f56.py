@@ -1,4 +1,4 @@
-"""Y5 F5 species x type margins, F6 X linkage in testis. Usage: python -m analysis.tasks.Y5_aspects.f56 f5|f6|cases"""
+"""F5 species x type margins, F6 X linkage in testis. Usage: python -m analysis.tasks.Y5_aspects.f56 f5|f6|cases"""
 from __future__ import annotations
 import sys
 import numpy as np
@@ -12,7 +12,7 @@ MAP_LIVER = {"Hepatocytes": "hepatocyte", "Endothelial": "endothelial", "fibrobl
 
 
 def contrast_table(c):
-    """X_gsk per mouse exception; pseudobulk direct from X7 gene_type_direct."""
+    """X_gsk per mouse exception; pseudobulk direct from X7_architecture_outputs gene_type_direct."""
     S, names, var = K.gsk(c, key="cell_type", min_cells=30)
     d = pd.DataFrame(S, index=pd.Index(var, name="var_name"), columns=[f"{a}|{b}" for a, b in names])
     return d, names
@@ -61,7 +61,7 @@ def f5():
             rev = {v: u for u, v in MAP_LIVER.items()}
             gl["k"] = gl.kk.map(rev)
         q = q.merge(gl[["hsapiens_gene_id", "k", "I"]], on=["hsapiens_gene_id", "k"])
-        # direct gene x type gap, level and detection from X7 (wide: Ddir_<t>, det_<t>, x_<t> or level_<t>)
+        # direct gene x type gap, level and detection from X7_architecture_outputs (wide: Ddir_<t>, det_<t>, x_<t> or level_<t>)
         dd = direct.set_index("hsapiens_gene_id") if "hsapiens_gene_id" in direct else direct.set_index("var_name")
         idc = "hsapiens_gene_id" if "hsapiens_gene_id" in direct else "var_name"
         print(sorted({x.split("_")[0] for x in dd.columns}), flush=True)

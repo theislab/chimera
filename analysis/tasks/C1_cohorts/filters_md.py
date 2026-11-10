@@ -1,4 +1,4 @@
-"""C1: section of drafts/tables/data_preparation_filters.md from the build reports, same words across cohorts. Prints markdown; the ledger holder pastes it in once.
+"""Data-preparation filters of the cohorts as a Markdown section, written from the build reports with the same words across cohorts. Prints markdown.
 
     python -I analysis/tasks/C1_cohorts/filters_md.py
 """

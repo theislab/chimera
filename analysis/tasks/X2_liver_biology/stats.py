@@ -1,10 +1,10 @@
-"""X2 (EXPLORATORY): shared statistics for the liver analyses.
+"""EXPLORATORY: shared statistics for the liver analyses.
 
-Matched excess (as T2.6 / X1): for each set gene, the 40 nearest non-set genes in standardised
+Matched excess (as T2_6_matched / X1_testis_discovery): for each set gene, the 40 nearest non-set genes in standardized
 rank space of the covariates C = (prior_raw, species-balanced log CP10K, species-balanced
 detection, log CDS length); one drawn per set gene, B draws; excess = set mean - null mean,
 d = excess / SD of the score over all genes, two-sided empirical p. Matching C_hep adds tau and
-hepatocyte enrichment. Uncentred delta-alpha is
+hepatocyte enrichment. Uncentered delta-alpha is
 never tested against zero. Residual scale: rank, OLS on natural-spline design of C
 (``controls.design``).
 """

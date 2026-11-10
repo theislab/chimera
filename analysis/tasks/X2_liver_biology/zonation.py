@@ -1,4 +1,4 @@
-"""X2 (EXPLORATORY): porto-central zonation of liver hepatocytes against Chimera's D and margin.
+"""EXPLORATORY: porto-central zonation of liver hepatocytes against Chimera's D and margin.
 
 Inputs: zone-resolved forward sums (``forward.py``), per-gene tables (``build.py``), the frozen
 sets (``sets.py``). Species enter only if their landmark axis passes the check fixed in

@@ -1,7 +1,7 @@
-"""Y4 (EXPLORATORY): checks on the survivors, chosen after even genes were read. None of them counts as a replication.
+"""EXPLORATORY: checks on the survivors, chosen after even genes were read. None of them counts as a replication.
 
 1. Mechanism of the level survivor: rho_p of the direct margin's pattern and level terms with EVEE, inside and outside the region.
-2. A second, independent level gold: TS vs TMS per-type level agreement (X4 cache), inside and outside the region.
+2. A second, independent level gold: TS vs TMS per-type level agreement (X4_where_differs cache), inside and outside the region.
 3. The region by predominant type: hepatocyte-peak against non-parenchymal-peak genes.
 4. Named genes with the readout's raw sign matching its residual sign, with per-type expression in each species.
 """
@@ -25,7 +25,7 @@ TYPES = ["hepatocyte", "macrophage", "endothelial", "NK", "B", "stellate"]
 
 
 def atlas_level(t: pd.DataFrame) -> pd.Series:
-    """-mean over types of |TS - TMS| log expression, each type's difference centred on its median over genes detected in both."""
+    """-mean over types of |TS - TMS| log expression, each type's difference centered on its median over genes detected in both."""
     a = pd.read_parquet(SC.REPO / "results/analysis/X4/cache/atlas_h3.parquet")
     ds = []
     for k in TYPES:
@@ -49,7 +49,7 @@ def poly_rho(T: pd.DataFrame, x: str, g: str, covs: list[str]) -> float:
 
 def extra_checks():
     rows = []
-    # 1. all genes against T4.3
+    # 1. all genes against T4_3_scoreboard
     for c, g in (("liv_hmouse", "G_H1"), ("liv_hmouse", "G_H3"), ("test_hmouse", "G_H2"), ("test_hmouse", "G_H4")):
         t = SC.table(c)
         cv = RP.cov_of(c, g)

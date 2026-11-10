@@ -1,4 +1,4 @@
-"""Y1: T2.5 checkpoint forward pass (code unchanged), grouped by label x random cell half.
+"""T2_5_celltype_margin checkpoint forward pass (code unchanged), grouped by label x random cell half.
 
 Gives per seed the species x type margin and two cell halves for the technical reliability of S on the fixed model.
 Stratified 50/50 within species x group, seeded. Nothing is written to run directories.

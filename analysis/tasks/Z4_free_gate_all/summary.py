@@ -1,5 +1,5 @@
-"""Z4 summary: one row per cohort (health, count dependence, agreement of the two gates, masked genes, separate axis, expression) and one
-row per independent-reference unit with the comparison rule of the ledger (Z3's): free better if delta >= 0.03 and CI lower > 0, worse if
+"""Summary: one row per cohort (health, count dependence, agreement of the two gates, masked genes, separate axis, expression) and one
+row per independent-reference unit with the comparison rule of Z3_free_gate: free better if delta >= 0.03 and CI lower > 0, worse if
 delta <= -0.03 and CI upper < 0, otherwise no difference shown; cohort verdicts on count-supported genes and on all genes.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Z4_free_gate_all.summary
@@ -18,7 +18,7 @@ from analysis.tasks.Z4_free_gate_all import rules as RU
 
 REF = RU.OUT / "references"
 DELTA = 0.03
-FLAT_SD = 0.015  # amendment 1
+FLAT_SD = 0.015  # below this SD of D the gate counts as flat
 
 
 def call(d, lo, hi) -> str:
@@ -128,7 +128,7 @@ def main():
     S = pd.DataFrame(rows)
     S["expr_gap_free"] = (S.get("rho_D_expr_free") - S.get("rho_S_expr_free")).abs()
     S["expr_gap_can"] = (S.get("rho_D_expr_can") - S.get("rho_S_expr_can")).abs()
-    # amendment 1: flat free gate (SD of D on count-supported genes < FLAT_SD): ranks are read, amplitude readouts reported only
+    # flat free gate (SD of D on count-supported genes < FLAT_SD): ranks are read, amplitude readouts reported only
     S["flat_free"] = S.get("sd_D_support_free") < FLAT_SD
     S.to_csv(RU.OUT / "summary_cohorts.csv", index=False)
     T = references()

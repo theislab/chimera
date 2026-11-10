@@ -1,4 +1,4 @@
-"""Y5 F2: phylogenetic depth. Independent axis: Murat held-out species only.
+"""F2: phylogenetic depth. Independent axis: Murat held-out species only.
 
 Sections: gold, tests, programs. Usage: python -m analysis.tasks.Y5_aspects.f2 <section>
 """
@@ -57,7 +57,7 @@ def table(c):
     drop = [k for k in g.columns if k.startswith(("C_", "Csp_"))]
     g = g.drop(columns=drop).merge(K.contribs(c), on="var_name", how="left")
     f = K.OUT / "F3" / f"b1z__{c}.parquet"
-    if f.exists():                     # B1z on healthy seeds, and on the scVI latent (T3.4), replace the canonical T4.2 value
+    if f.exists():                     # B1z on healthy seeds, and on the scVI latent (test T3.4 of this task), replace the canonical T4_2_gene_baselines value
         z = pd.read_parquet(f)
         chim = [k for k in z.columns if k.startswith("B1z_chimera") and z[k].notna().any()]
         g["B1z"] = g.hsapiens_gene_id.map(z.set_index("hsapiens_gene_id")[chim].mean(1).to_dict())

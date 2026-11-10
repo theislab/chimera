@@ -1,4 +1,4 @@
-"""P13: per-run health report for every kidney grid and seed run. Descriptive; selects nothing.
+"""Per-run health report for every kidney grid and seed run. Descriptive; selects nothing.
 
 For each finished run: Delta-alpha sign profile against the prior the run anchored on
 (``final_state`` ``prior``, clamped on clamped recipes) and against the raw prior
@@ -8,7 +8,7 @@ seed 42) and the final adversarial accuracy.
 
 Flag, fixed before any seed run: a seed whose ``knn_mixing_entropy`` is below 0.75 x that of the
 selected grid run is listed as poorly mixed and reported separately; the primary D stays the mean
-over seeds (section 2 rule).
+over seeds (rule of the pre-specified analysis plan, section 2).
 
     python -I analysis/tasks/P13_recipe/run_report.py
 """

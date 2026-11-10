@@ -1,8 +1,8 @@
-"""Y4 (EXPLORATORY): one gene table per cohort. No association with a gold is computed here.
+"""EXPLORATORY: one gene table per cohort. No association with a gold is computed here.
 
-Readouts as X3/X4 (T3.3 consensus D, mean S_g EMA), T4.2 baselines (T4.3 consensus-D run for B3a where it exists),
-gold table, Compara age and paralogs, classes, per-type expression, variability and level gap. The direct margin
-of X4 is taken from its cache, or computed here for the three cohorts X4 did not cover.
+Readouts as X3_cross_cohort and X4_where_differs (T3_3_consensus consensus D, mean S_g EMA), T4_2_gene_baselines baselines (T4_3_scoreboard
+consensus-D run for B3a where it exists), gold table, Compara age and paralogs, classes, per-type expression, variability and level gap.
+The direct margin of X4_where_differs is taken from its cache, or computed here for the three cohorts it did not cover.
 """
 
 from __future__ import annotations
@@ -94,7 +94,7 @@ def type_stats(c: str, a) -> pd.DataFrame:
     df["peak_y"] = np.array(types, dtype=object)[top]
     df.loc[silent, "peak_y"] = None
     df["peak_margin"] = srt[:, -1] - srt[:, -2]
-    # peak agreement and level gap, Human against the partner (X4 definition on these per-type means)
+    # peak agreement and level gap, Human against the partner (X4_where_differs definition on these per-type means)
     part = RU.PARTNER[c]
     shared = [t for t in types if ("Human", t) in M and (part, t) in M]
     if len(shared) >= 2:
@@ -129,7 +129,7 @@ def sdir(c: str) -> pd.DataFrame:
 
 
 def local_moran(t: pd.DataFrame, value: str, knn: int = 15) -> np.ndarray:
-    """Local agreement of the residual of ``value`` (given C) with its ESM neighbours; no gold enters."""
+    """Local agreement of the residual of ``value`` (given C) with its ESM neighbors; no gold enters."""
     from sklearn.neighbors import NearestNeighbors
 
     ok = t[RU.C + [value]].notna().all(1).to_numpy()

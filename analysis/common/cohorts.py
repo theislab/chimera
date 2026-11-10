@@ -19,7 +19,7 @@ RUNS_DIR = gene_ids.REPO_ROOT / "training" / "runs"
 MIN_CELLS_FQR = 20  # chimera/_constants.py: genes need >= 20 expressing cells in a 256-cell batch
 BATCH_SIZE = 256
 
-# cohort -> canonical s42 run (07_EXPERIMENT_MATRIX.md)
+# cohort -> canonical s42 run (configs/canonical_recipes.tsv)
 CANONICAL = {
     "liv_hmonkey": "iter90-150ep-s42",
     "liv_hmouse": "xds-hmouse-iter90-150ep-s42",
@@ -98,7 +98,7 @@ def tau_index(M: np.ndarray) -> np.ndarray:
 
 
 def gene_covariates(adata) -> pd.DataFrame:
-    """Per-gene covariates, definitions as in the earlier read-only analysis, plus species-balanced versions.
+    """Per-gene covariates (expression level, detection, variance, cell-type specificity), plus species-balanced versions.
 
     Pooled over cells: ``log_mean`` = log1p mean count, ``detection``, ``log_var``.
     ``tau`` uses species-balanced cell-type means of CP10K (types with >= 20 cells,

@@ -1,4 +1,4 @@
-"""Z2 tables: within-label vs scVI by cohort; encoder tests; factorial trade-off with the decision rule; tidy rows for the benchmark overview.
+"""Tables: within-label vs scVI by cohort; encoder tests; factorial trade-off with the decision rule; tidy rows for the benchmark overview.
 python -m analysis.tasks.Z2_embedding.tables   Output: results/analysis/Z2/{within_label.csv, encoded.csv, factorial.csv, factorial_seeds.csv, decision.csv, Z2_tidy.csv}"""
 from __future__ import annotations
 
@@ -143,7 +143,7 @@ def main():
 
 
 def levels(c: str) -> pd.DataFrame:
-    """Level means over seeds that pass the Z1 health rule; unhealthy seeds counted and left out (discarded, amendment rule)."""
+    """Level means over seeds that pass the Z1_retune health rule; unhealthy seeds counted and left out (discarded)."""
     f = RU.OUT / f"factorial_seeds_{c}.csv"
     t = pd.read_csv(f)
     t["healthy"] = t.healthy.fillna(False).astype(bool)

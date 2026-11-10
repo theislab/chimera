@@ -1,9 +1,9 @@
-"""T5.4b: controlled testis label ablation (decision D19, Family 3). Canonical testis recipes with only the
-cell-type-conditional MMD removed (same MMD weight, then global), seeds 42-44, against the labelled runs.
+"""Controlled testis label ablation (Family 3; amendment log of the pre-specified analysis plan, 2026-11-02). Canonical testis recipes with only the
+cell-type-conditional MMD removed (same MMD weight, then global), seeds 42-44, against the labeled runs.
 
-Runs (manifest.tsv): rev-ctl-<cohort>-nolab-s{42,43,44} for test_hmac, test_hmouse, test_3sp. Labelled
+Runs (manifest.tsv): rev-ctl-<cohort>-nolab-s{42,43,44} for test_hmac, test_hmouse, test_3sp. Labeled
 comparators: canonical s42 (MPS) on every cohort; CPU seeds rev-test_hmouse-s43..s51 and rev-test_3sp-s43..s46
-(T3.2); the CPU s42 platform run rev-cpu-test_hmouse-s42. test_hmac has no labelled seed beyond s42.
+(T3_2_seeds); the CPU s42 platform run rev-cpu-test_hmouse-s42. test_hmac has no labeled seed beyond s42.
 
 Sections (``--sections``, in this order; the first three read no gold):
 
@@ -13,34 +13,34 @@ health       per run: non-finite values; active z dims (Var over cells of z_mean
              failed expectations from summary.json; config keys that differ from the canonical recipe.
 integration  compute_integration_metrics (training/compare_vs_scvi.py, unmodified; k=15, seed=42;
              obs species, obs cell_type as in the master table) on z_mean of every label-free run and every
-             labelled same-seed run. Composite: T5.5 score_table (direction correction, per-row min-max,
+             labeled same-seed run. Composite: T5_5_benchmark score_table (direction correction, per-row min-max,
              0.4 mixing + 0.6 biology) on the 10-model panel of master_table_ext.csv. The 10-model composite
              is rebuilt from its raw columns and must equal the stored one (unchanged). Each run is then
              added as an 11th column, one run at a time ("extra"); a second view replaces the Chimera column
              by the run ("substitute", 10 models).
 readouts     per cohort: Spearman of D = alpha - prior (clamped), D_raw = alpha - prior_raw, S_g (S_g_ema),
-             alpha and the MLP correction between label-free and labelled runs: same seed; 3-seed means
-             (42-44) of both; label-free 3-seed mean against the labelled all-seed consensus. Residual scale:
-             rank, residualise on C (controls.design), Pearson. Floors: labelled cross-seed pairs, labelled
-             leave-one-seed-out, labelled split means of disjoint seed sets (3 vs 3 of 42-47 on H+Mouse;
+             alpha and the MLP correction between label-free and labeled runs: same seed; 3-seed means
+             (42-44) of both; label-free 3-seed mean against the labeled all-seed consensus. Residual scale:
+             rank, residualize on C (controls.design), Pearson. Floors: labeled cross-seed pairs, labeled
+             leave-one-seed-out, labeled split means of disjoint seed sets (3 vs 3 of 42-47 on H+Mouse;
              3 vs 2 of 42-46 on 3-sp), and the same pairs among label-free seeds. Call (controls.call) of a
-             same-seed rho against the labelled cross-seed pair rhos, of the 3-seed-mean rho against the
-             labelled split-mean rhos. Sign profile and Spearman with log mean expression (species-mean
+             same-seed rho against the labeled cross-seed pair rhos, of the 3-seed-mean rho against the
+             labeled split-mean rhos. Sign profile and Spearman with log mean expression (species-mean
              log1p CP10K, covariate log_cp10k_spmean).
-validity     Family 3, cannot change any status, row or modifier. rho_p as T4.3 (stats.py; T4.3 cache for
-             covariates, tau and ESM blocks; T4.3 gold table) of D and S_g with H2 (EVEE level, C) and H4
+validity     Family 3, cannot change any status, row or modifier. rho_p as T4_3_scoreboard (stats.py; T4_3_scoreboard cache for
+             covariates, tau and ESM blocks; T4_3_scoreboard gold table) of D and S_g with H2 (EVEE level, C) and H4
              (Murat pattern, C_pat + H4_nsp; primates C_pat + H4_npri beside it) on testis H+Mouse, and H2,
-             H4 on testis 3-sp (sensitivity, as the T4.3 multi-species estimate). Scores: labelled
-             consensus D and S (the scoreboard's, must reproduce T4.3), labelled 3-seed mean (42-44, same
+             H4 on testis 3-sp (sensitivity, as the T4_3_scoreboard multi-species estimate). Scores: labeled
+             consensus D and S (the scoreboard's, must reproduce T4_3_scoreboard), labeled 3-seed mean (42-44, same
              seeds), label-free 3-seed mean, D_raw for both, and each label-free seed. One block bootstrap
-             (10,000 draws, the T4.3 unit's seed) for all scores of a unit, so differences label-free minus
-             labelled have percentile CIs. D is the 3-seed mean of alpha - prior minus its median.
-x6           X6 label-degradation section (testis H+Mouse) rerun with the label-free readouts: X6 is first
-             reproduced on its own universe; then on one universe where the X6 scores, the labelled 3-seed
+             (10,000 draws, the T4_3_scoreboard unit's seed) for all scores of a unit, so differences label-free minus
+             labeled have percentile CIs. D is the 3-seed mean of alpha - prior minus its median.
+x6           X6_adds_beyond label-degradation section (testis H+Mouse) rerun with the label-free readouts: X6_adds_beyond is first
+             reproduced on its own universe; then on one universe where the X6_adds_beyond scores, the labeled 3-seed
              D and S, the label-free 3-seed D, D_raw and S, and B1z on the label-free s42 latent are all
-             defined, every score on the same 2,000 draws (X6 joint), noise replicates averaged per draw.
-             B1z_nolab: T4.2 B1z (15-NN, Leiden resolution 1, seed 0, pseudobulk per library, E) on z_mean
-             of rev-ctl-test_hmouse-nolab-s42; the method is checked on the canonical z_mean against T4.2.
+             defined, every score on the same 2,000 draws (X6_adds_beyond joint), noise replicates averaged per draw.
+             B1z_nolab: T4_2_gene_baselines B1z (15-NN, Leiden resolution 1, seed 0, pseudobulk per library, E) on z_mean
+             of rev-ctl-test_hmouse-nolab-s42; the method is checked on the canonical z_mean against T4_2_gene_baselines.
 
 Outputs: results/analysis/T5_4b/*.csv, DONE last.
 
@@ -90,7 +90,7 @@ def nolab(c: str, s: int) -> str:
 
 
 def labelled(c: str) -> dict[int, str]:
-    """All labelled seed runs of the canonical recipe (s42 canonical MPS, CPU seeds of T3.2)."""
+    """All labeled seed runs of the canonical recipe (s42 canonical MPS, CPU seeds of T3_2_seeds)."""
     out = {42: C.CANONICAL[c]}
     out.update(T33.cpu_runs(c))
     return {s: r for s, r in out.items() if K.run_finished(r)}
@@ -199,7 +199,7 @@ def prior_raw_of(c: str) -> np.ndarray:
 
 
 def sec_health_integration():
-    from score_external import score_table  # T5.5, unmodified
+    from score_external import score_table  # T5_5_benchmark, unmodified
 
     rt = runs_table()
     write(rt, "runs.csv")
@@ -383,7 +383,7 @@ def sec_readouts():
                               rho_S_logmean=float(spearmanr(Sg, logm)[0]), rho_D_S=float(spearmanr(D, Sg)[0])))
     P = pd.DataFrame(pairs)
     F = pd.DataFrame(floors)
-    # calls against the labelled floor (residual scale)
+    # calls against the labeled floor (residual scale)
     calls = []
     for r in P.itertuples():
         f = F[(F.cohort == r.cohort) & (F.key == r.key) & (F.arm == "labelled")]
@@ -393,7 +393,7 @@ def sec_readouts():
         if r.comparison == "same_seed":
             lab = [s for s in labelled(r.cohort)]
             ss = sorted(s for s in lab if isinstance(s, int))
-            # reference: labelled cross-seed pair residual rhos
+            # reference: labeled cross-seed pair residual rhos
             pr = _pair_residuals(r.cohort, r.key, ss)
             calls.append(dict(cohort=r.cohort, key=r.key, comparison=r.comparison, label_free=r.label_free,
                               labelled=r.labelled, residual=r.residual, floor="labelled cross-seed pairs",
@@ -439,7 +439,7 @@ def _split_residuals(c, k):
 
 
 # ====================================================================== validity (Family 3)
-VALID_UNITS = [  # hyp, cohort, gold, covariate set, T4.3 unit id (its bootstrap seed)
+VALID_UNITS = [  # hyp, cohort, gold, covariate set, T4_3_scoreboard unit id (its bootstrap seed)
     ("H2", "test_hmouse", "G_H2", "C", "H2:D"),
     ("H4", "test_hmouse", "G_H4", "C_pat_nsp", "H4:D"),
     ("H4_primates", "test_hmouse", "G_H4_primates", "C_pat_npri", "H4:primates_only"),
@@ -453,7 +453,7 @@ def centred(x):
 
 
 def validity_table(c: str) -> pd.DataFrame:
-    """T4.3 cache (covariates, tau, blocks) + gold table + the readouts compared here."""
+    """T4_3_scoreboard cache (covariates, tau, blocks) + gold table + the readouts compared here."""
     res = REPO / "results/analysis"
     tab = pd.read_parquet(res / f"T4_3/cache/{c}__inputs.parquet")
     gold = pd.read_csv(res / "T4_3/golds/gold_table.csv", index_col=0)
@@ -526,7 +526,7 @@ def sec_validity(draws: int = N_DRAWS):
         res = list(ex.map(_valid_unit, jobs))
     V = pd.DataFrame([x for r in res for x in r[0]])
     Dl = pd.DataFrame([x for r in res for x in r[1]])
-    # reproduction of the scoreboard (labelled consensus D) and of the T4.3 S_ema Family 3 rows
+    # reproduction of the scoreboard (labeled consensus D) and of the T4_3_scoreboard S_ema Family 3 rows
     sb = pd.concat([pd.read_csv(REPO / "results/analysis/T4_3/scoreboard.csv"),
                     pd.read_csv(REPO / "results/analysis/T4_3/family3.csv")])
     chk = []
@@ -556,7 +556,7 @@ def sec_validity(draws: int = N_DRAWS):
         raise SystemExit("T4.3 not reproduced")
 
 
-# ====================================================================== X6 rerun
+# ====================================================================== X6_adds_beyond rerun
 def b1z_from_z(c: str, z: np.ndarray) -> np.ndarray:
     import scipy.sparse as sp
 
@@ -604,7 +604,7 @@ def sec_x6():
     for gold, _, covs in RU.GOLDS[c]:
         if gold not in RU.DEG_GOLDS[c]:
             continue
-        # 1. reproduce X6 on its universe
+        # 1. reproduce X6_adds_beyond on its universe
         chim = ["D", "S", "B1z_raw", "D_raw"]
         rows = g[[gold] + covs + chim + deg].replace([np.inf, -np.inf], np.nan).notna().all(1).to_numpy()
         est, _ = X6.joint(g, gold, covs, chim + deg, rows)

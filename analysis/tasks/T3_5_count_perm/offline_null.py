@@ -1,4 +1,4 @@
-"""T3.5 offline null: 1,000-permutation closed-form ridge projection (no training).
+"""Offline null of the count-permutation control: 1,000-permutation closed-form ridge projection (no training).
 
 Model of a count-permuted run without training: the GIN output is taken as a ridge
 projection of the fit-quality margin onto the features, ``c_hat = a + b * P_F S`` with
@@ -13,11 +13,11 @@ of ``make_control_h5ad.py``) and records rho of ``D_hat`` with the reference D:
 * slot: against ``D_ref[g]`` (what sequence would preserve),
 * moved: against ``D_ref[perm[g]]`` (what counts would carry),
 
-on the Spearman scale and on the covariate-residual scale (05 section 3; the control's
+on the Spearman scale and on the covariate-residual scale (pre-specified analysis plan, section 3; the control's
 covariates have the count covariates moved, the slot covariates in place). The central 95%
-of the draws is the null interval of section 9: slot rho is high only above its 97.5th
-percentile. ``c_spearman_slot`` is A2's statistic, rho(c_ref, P_F S_perm), for comparison
-with A2 (free 99th pct |rho| and within-bin mean; ``projection.csv`` of T2.4).
+of the draws is the null interval of plan, section 9: slot rho is high only above its 97.5th
+percentile. ``c_spearman_slot`` is the projection statistic rho(c_ref, P_F S_perm), for comparison with
+``projection.csv`` of analysis/tasks/T2_4_covariates (free 99th pct |rho| and within-bin mean).
 
 Usage::
 

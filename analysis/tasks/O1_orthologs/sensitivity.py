@@ -1,5 +1,5 @@
-"""O1 part B: the T4.3 scoreboard with flagged genes left out of every test. D, baselines, draws and seeds as frozen; only the gene universes shrink.
-Written to results/analysis/O1/scoreboard_<tier>/; the official folder is not touched. See rules.py and the ledger.
+"""Part B: the T4_3_scoreboard scoreboard with flagged genes left out of every test. D, baselines, draws and seeds as frozen; only the gene universes shrink.
+Written to results/analysis/O1/scoreboard_<tier>/; the official folder is not touched. See rules.py.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.sensitivity --tier T2 [--workers 12]
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.sensitivity --random-drop

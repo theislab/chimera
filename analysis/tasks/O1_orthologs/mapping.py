@@ -1,4 +1,4 @@
-"""O1 step 1b: which raw row fed each ortholog group of the canonical objects. Counts of the training objects and raw CAMEX matrices; no readout or gold.
+"""Step 1b: which raw row fed each ortholog group of the canonical objects. Counts of the training objects and raw CAMEX matrices; no readout or gold.
 
 The canonical build joins on the species gene symbol (``construct_unified_adata`` picks the column that matches more var names; all matrices are indexed by
 symbol). Raw files keep an Ensembl ID where they have one (liver human and mouse ``gene_ids``, testis ``gene``). So for every group and species:

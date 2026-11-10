@@ -1,4 +1,4 @@
-"""Z3, gold-free: health of every free and canonical candidate seed, mixing, count dependence, relation to the prior;
+"""Gold-free: health of every free and canonical candidate seed, mixing, count dependence, relation to the prior;
 selection of the lines (rules.py) and their consensus tables. Reads final_state.npz only (read-only); no gold, set or test
 file is opened.
 
@@ -54,7 +54,7 @@ def gate(run: str, praw: np.ndarray) -> dict:
     r["frac_count_supported"] = float(sup.mean())
     r["rho_D_S_supported"] = float(spearmanr(D[sup], S[sup])[0])
     r["healthy_committed_rule"] = r["healthy"]
-    if st["config"].get("ablation_config") == "M":  # amendment in rules.py
+    if st["config"].get("ablation_config") == "M":  # see rules.py
         r["healthy"] = bool(base and r["sat_high"] <= RU.SAT_MAX and r["sat_low"] <= RU.SAT_MAX
                             and r["rho_D_S_supported"] >= RU.FREE_RHO_MIN)
     r["rho_alpha_prior"] = float(spearmanr(a, p)[0])
@@ -91,7 +91,7 @@ def main():
         praws[c] = C.raw_prior(c, C.CANONICAL[c], a.var["conservation_prior"].to_numpy(dtype=float))
         vns[c] = pd.Index(a.var_names.astype(str))
         cand = [("free", s, r) for s, r in RU.FREE[c].items()] + [("canonical_cpu", s, r) for s, r in RU.CAN_CPU[c].items()]
-        if c == "liv_hmouse":  # the T3.3 pool, for the state-matched line
+        if c == "liv_hmouse":  # the T3_3_consensus pool, for the state-matched line
             cand += [("canonical_pool", s, r) for s, r in pool[c].items() if r not in RU.CAN_CPU[c].values()]
         for kind, s, r in cand:
             g = gate(r, praws[c])
@@ -100,7 +100,7 @@ def main():
             rows.append(dict(cohort=c, kind=kind, seed=s, in_frozen_pool=r in pool[c].values(), **g))
         a.file.close()
     H = pd.DataFrame(rows)
-    # liver H+Mouse training state: O2's four markers, midpoints between T3.3's integrated and poorly mixed seeds
+    # liver H+Mouse training state: the four markers of O1_orthologs/repair_compare.py, midpoints between T3_3_consensus's integrated and poorly mixed seeds
     ref = pd.read_csv(RU.REPO / "results/analysis/T3_1b/seed_integration.csv")
     ref = ref[ref.cohort == "liv_hmouse"].set_index("run")
     M = []

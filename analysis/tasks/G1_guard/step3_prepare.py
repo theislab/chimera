@@ -1,4 +1,4 @@
-"""G1 step 3: one guard-arm row. Builds the row's object with the owning task's own code (B2 perturb.build, through D1's registry for D1 settings), prints the training words: the owning recipe
+"""Step 3: one guard-arm row. Builds the row's object with the owning task's own code (B2_benchmark perturb.build, through the registry of D1_sparse_genes for its settings), prints the training words: the owning recipe
 unchanged, the depth-law anchor of analysis/common/depth_anchor.py for law rows, and --clamp-z-logvar. The object is the same draw as the unguarded row of the same (cohort, setting, rep).
     python -m analysis.tasks.G1_guard.step3_prepare --index I [--build]
 """

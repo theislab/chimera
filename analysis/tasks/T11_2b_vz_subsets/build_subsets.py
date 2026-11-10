@@ -1,6 +1,6 @@
-"""T11.2b: Van Zyl subsets and their fixed recipe grids (rule in README.md).
+"""Van Zyl subsets and their fixed recipe grids (rule in README.md).
 
-Builds five subsets of the T11.1 object: human paired with M. fascicularis, M. mulatta, pig
+Builds five subsets of the T11_1_vanzyl object: human paired with M. fascicularis, M. mulatta, pig
 and mouse, and the primates (human, M. fascicularis, M. mulatta), with
 ``training/build_subset.py::build_subset`` unchanged, as notebook 01 cells 34 and 46 do
 (``drop_empty_genes=True, min_cells_per_gene=3``; prior and gene features carried over from
@@ -11,7 +11,7 @@ only the levels present in the subset; runs ``analysis.common.check_cohort`` wit
 ``--batch-key source_batch``; and writes each subset's grid from the README rule
 (``grid.tsv``, and ``manifest.tsv`` holding every subset's rows for one array).
 
-Run only after the coordinator confirms the R4 re-audit of the T11.1 object is clean.
+Run only after the object of T11_1_vanzyl has passed its verification (``T11_1_vanzyl/verify_build.py``).
 
     python analysis/tasks/T11_2b_vz_subsets/build_subsets.py
 """
@@ -36,7 +36,7 @@ from analysis.common.check_cohort import check  # noqa: E402
 TASK = Path(__file__).resolve().parent
 VZ = REPO / "data" / "analysis" / "van_zyl"
 SOURCE = VZ / "van_zyl_unified.h5ad"
-SUBSETS = {  # tag -> species in obs['species'] (owner instruction 2026-11-02; notebook 01 cell 46)
+SUBSETS = {  # tag -> species in obs['species'] (as in notebooks/01_data_preparation.ipynb)
     "hmfas": ("human", "macaca_fascicularis"),
     "hmmul": ("human", "macaca_mulatta"),
     "hpig": ("human", "pig"),
@@ -47,7 +47,7 @@ CATEGORICAL = ("species", "batch", "source_batch", "chemistry", "cell_type", "Cl
                "cell_type_harmonised", "cell_ontology_class", "cell_class")
 BATCH_KEY, CT_KEY = "source_batch", "cell_ontology_class"
 
-# Canonical rows (07_EXPERIMENT_MATRIX.md) and the section 11 base at K = 2 and K = 3.
+# Canonical rows (configs/canonical_recipes.tsv) and the base rule of pre-specified analysis plan, section 11 at K = 2 and K = 3.
 ROWS = {
     "rule_base_k2": dict(epochs=150, adv=100, anchor=0.003, mmd=50, fb=0.5, ct=True, clamp=0.85,
                          role="section 11 base: testis 3-sp row form (conditional MMD, clamp 0.85) with K = 2 weights (Laws 1-5)"),

@@ -1,4 +1,4 @@
-"""B1 type I error: placebo gene sets on unaltered fits. No count is touched.
+"""Type I error: placebo gene sets on unaltered fits. No count is touched.
 
 For every unaltered fit of a cohort: 200 draws per family (level rule, contrast rule) x band, each nested over the three
 shares; the same selection and matching as a real run. Per method and share: reject05 (one-sided signed-rank) mean,

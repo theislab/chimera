@@ -1,6 +1,6 @@
-"""T3.6: matched-cell-type h5ad for liver 4-sp (Hepatocytes + Endothelial only).
+"""Matched-cell-type h5ad for liver 4-sp (Hepatocytes + Endothelial only).
 
-Mirrors ``training/build_subset.py`` with its keep-all-genes behaviour: cells are subset,
+Mirrors ``training/build_subset.py`` with its keep-all-genes behavior: cells are subset,
 every gene is kept (8,879), ``var`` and ``varm["gene_features"]`` are carried over unchanged
 (the full-cohort StandardScaled features, as ``build_subset.py`` does), ``species`` and
 ``batch`` lose unused categories, and ``uns["p_null"]`` is recomputed on the subset with

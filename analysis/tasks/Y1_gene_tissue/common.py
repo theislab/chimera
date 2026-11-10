@@ -1,4 +1,4 @@
-"""Y1: tissue registry and readers. Gene identity through analysis.common.gene_ids only."""
+"""Tissue registry and readers. Gene identity through analysis.common.gene_ids only."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def species_names(obs_species) -> tuple[str, str]:
 
 
 def read(t: str):
-    """Training object of tissue t with obs['y1_group'] = the T4.2 groups (testis coarse map)."""
+    """Training object of tissue t with obs['y1_group'] = the T4_2_gene_baselines groups (testis coarse map)."""
     d = TISSUES[t]
     a = ad.read_h5ad(d["h5ad"])
     lab = a.obs[d["group"]].astype(str)

@@ -1,4 +1,4 @@
-"""D1 (c): held-out chromosomes. Rows in results/analysis/D1/c_rho.csv.
+"""(c): held-out chromosomes. Rows in results/analysis/D1/c_rho.csv.
     python -m analysis.tasks.D1_sparse_genes.c_heldout
 """
 

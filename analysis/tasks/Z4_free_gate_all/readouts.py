@@ -1,9 +1,9 @@
-"""Z4 readouts in H1's format: free-gate per-gene tables built by H1's own build_cohort on the kept free seeds, and per cohort the
-comparison with the canonical (H1) reading: count dependence, agreement of the two gates, expression, masked genes, separate axis.
+"""Readouts in the format of H1_harmonise: free-gate per-gene tables built by its own build_cohort on the kept free seeds, and per cohort
+the comparison with the canonical reading (H1_harmonise): count dependence, agreement of the two gates, expression, masked genes, separate axis.
 
     PYTHONPATH=$PWD python -m analysis.tasks.Z4_free_gate_all.readouts [--jobs 4] [--force]
 Inputs: results/analysis/Z4/kept.json (health.py), results/analysis/H1/genes/<cohort>.parquet (canonical).
-Output: results/analysis/Z4/h1/genes/<cohort>.parquet (H1 schema, free gate), h1/identity_checks.csv, cohort_compare.csv, axis_free.csv,
+Output: results/analysis/Z4/h1/genes/<cohort>.parquet (H1_harmonise schema, free gate), h1/identity_checks.csv, cohort_compare.csv, axis_free.csv,
 axis_compare.csv, genes_compare/<cohort>.parquet (both gates side by side).
 """
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import os
 
-os.environ["H1_OUT"] = str(__import__("analysis.common.gene_ids", fromlist=["x"]).REPO_ROOT / "results/analysis/Z4/h1")  # before H1 imports
+os.environ["H1_OUT"] = str(__import__("analysis.common.gene_ids", fromlist=["x"]).REPO_ROOT / "results/analysis/Z4/h1")  # before H1_harmonise is imported
 
 import argparse  # noqa: E402
 import json  # noqa: E402

@@ -1,7 +1,7 @@
 """Runs tried and finished, per method and setting: a method's failure under a setting is itself a result of the robustness track. Failures stay out of the scores and are reported here and in the overview.
 
 Chimera: tried = a run folder or health record exists for the grid row; finished = healthy under the health rule (alpha, z, S_g finite, 10 active latent dims).
-Chimera also: finished_gate_tail, finished with gate tails of at least 2% (the larger of the two tails beyond 0.05, D1's definition): a flat gate finishes without a reading.
+Chimera also: finished_gate_tail, finished with gate tails of at least 2% (the larger of the two tails beyond 0.05, D1_sparse_genes's definition): a flat gate finishes without a reading.
 Tools: tried = a score file or a recorded attempt; finished = a score file with at least one finite score. A job lost to a bad node is infrastructure, not a tool failure, and is run again: its attempt is not recorded.
 Writes results/analysis/B2/completion.csv: cohort, setting, method, tried, finished.    python -m analysis.tasks.B2_benchmark.completion
 """
@@ -25,7 +25,7 @@ def table() -> pd.DataFrame:
         tried = h.exists() or (CO.RUNS_DIR / r["run"]).exists()
         d = json.loads(h.read_text()) if h.exists() else {}
         fin = h.exists() and not d["discard"]
-        tails = max(d.get("tail_pos") or 0.0, d.get("tail_neg") or 0.0)  # as D1: share of genes beyond +-0.05 of the raw prior, the larger side
+        tails = max(d.get("tail_pos") or 0.0, d.get("tail_neg") or 0.0)  # as D1_sparse_genes: share of genes beyond +-0.05 of the raw prior, the larger side
         rows.append(dict(cohort=r["cohort"], setting=r["setting"], rep=r["rep"], method="Chimera", tried=int(tried), finished=int(fin), finished_gate_tail=int(fin and tails >= 0.02)))
     g = pd.read_csv(RU.TASK_DIR / "tools" / "tool_grid.tsv", sep="\t")
     for tool in RU.TOOLS:

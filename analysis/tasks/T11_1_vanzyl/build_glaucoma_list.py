@@ -1,7 +1,7 @@
-"""T11.1 step 3: fix the glaucoma gene list before any association (plan section 11).
+"""Step 3: fix the glaucoma gene list before any association (pre-specified analysis plan, section 11).
 
 Rule: Mendelian and GWAS glaucoma genes named in van Zyl et al. 2020 (PNAS 117:10339,
-doi 10.1073/pnas.2001250117, PMC7229661), plus candidates prioritised in Gharahkhani et al.
+doi 10.1073/pnas.2001250117, PMC7229661), plus candidates prioritized in Gharahkhani et al.
 2021 (Nat Commun 12:1258, doi 10.1038/s41467-020-20851-4).
 
 Operational definition, fixed here:
@@ -18,7 +18,7 @@ Operational definition, fixed here:
                     gene-based MAGMA, eQTL/sQTL of PAINTOR variants). n_evidence counts the
                     columns naming the gene; nearest gene alone does not qualify.
 Symbols map to Ensembl through HGNC (approved, then previous, then alias; ambiguous dropped),
-the same mapper as T4.1. Coverage is against data/processed/ortholog_table_van_zyl.csv.
+the same mapper as T4_1_gold. Coverage is against data/processed/ortholog_table_van_zyl.csv.
 No expression value and no Chimera readout is read.
 
 Usage: python -I build_glaucoma_list.py <chimera_repo> <out.tsv>

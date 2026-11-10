@@ -6,7 +6,7 @@ symbol, repeated symbols (first kept) and genes detected in fewer than 3 cells o
 (same rule as Adapter A). `--hv-genes` is set above G in the run, so every remaining gene stays.
 
 Writes <inputs>/<stem>/saturn_1to1/{<species>.h5ad, run.csv, manifest.json, gene_map.csv}.
-gene_map.csv: var_name, hsapiens_gene_id and the symbol of each species, the join used in T5.6.
+gene_map.csv: var_name, hsapiens_gene_id and the symbol of each species, the join used in T5_6_gene_level.
 """
 from __future__ import annotations
 

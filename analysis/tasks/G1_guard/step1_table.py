@@ -1,4 +1,4 @@
-"""G1 step 1: table per cohort from step1_runs.csv and the training trace of the non-finite bone-marrow seeds. Adds the lower bound of the largest z_logvar at any logged step, log(var_max): the largest
+"""Step 1: table per cohort from step1_runs.csv and the training trace of the non-finite bone-marrow seeds. Adds the lower bound of the largest z_logvar at any logged step, log(var_max): the largest
 exp(z_logvar) in a batch is at least the batch mean.    python -m analysis.tasks.G1_guard.step1_table
 """
 

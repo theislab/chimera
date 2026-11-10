@@ -1,7 +1,8 @@
 """G-D1, human side: nuclei per coarse type per sample from the GSE202379 Seurat metadata.
 
 Reads only the @meta.data TSV written by extract_seurat_meta.R (author annotation
-``cell.annotation``). No expression value is read. The mouse side needs T7.2 annotation.
+``cell.annotation``). No expression value is read. The mouse side needs the annotation of
+analysis/tasks/T7_2_disease_objects.
 
 Usage: python -I gd1_human_counts.py <GSE202379_meta.data.tsv.gz> <out_dir>
 """
@@ -13,7 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 
-TYPES = {  # plan section 8 types -> author labels
+TYPES = {  # types of the pre-specified analysis plan, section 8 -> author labels
     "hepatocyte": ["Hepatocytes"],
     "hsc_fibroblast": ["Stellate"],
     "endothelial": ["Endothelial"],

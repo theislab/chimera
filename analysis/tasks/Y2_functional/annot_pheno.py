@@ -1,4 +1,4 @@
-"""Y2 (EXPLORATORY): gene-level phenotype, viability, essentiality and study-depth annotation.
+"""EXPLORATORY: gene-level phenotype, viability, essentiality and study-depth annotation.
 
 Reads only downloaded files (run with ``python -I``); no Chimera readout enters. Key: human Ensembl gene ID.
 Usage (from chimera/): mamba run --no-capture-output -n chimera_env python -I analysis/tasks/Y2_functional/annot_pheno.py

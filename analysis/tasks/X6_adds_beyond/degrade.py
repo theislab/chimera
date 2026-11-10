@@ -1,9 +1,9 @@
-"""X6 (EXPLORATORY): label sets and the label-dependent direct scores under each (rules.py). No gold is read.
+"""EXPLORATORY: label sets and the label-dependent direct scores under each (rules.py). No gold is read.
 
 Writes results/analysis/X6/cache/labels__<cohort>.parquet (one column per condition),
 leiden_match__<cohort>.csv (cluster pairs, r, majority true label, purity), and
 degraded__<cohort>.parquet (B1b_raw, B1c_raw, B2b, Sdir per condition, keyed by var_name), and
-checks that the full condition reproduces T4.2 (B1b_raw, B1c_raw, B2b) and X4 (Sdir).
+checks that the full condition reproduces T4_2_gene_baselines (B1b_raw, B1c_raw, B2b) and X4_where_differs (Sdir).
 """
 
 from __future__ import annotations
@@ -136,7 +136,7 @@ def leiden_matched(X, spc: np.ndarray, lab_true: np.ndarray, c: str):
 
 
 def specificity_cos(x: dict, f: dict, species: list[str], n: int) -> np.ndarray:
-    """B2b on the groups shared by all species, for any K >= 2 (T4.2 formula)."""
+    """B2b on the groups shared by all species, for any K >= 2 (T4_2_gene_baselines formula)."""
     groups = T42.shared_groups(x, species, species)
     if len(groups) < 2:
         return np.full(n, np.nan)

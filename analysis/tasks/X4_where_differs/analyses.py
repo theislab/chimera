@@ -1,7 +1,7 @@
-"""X4 (EXPLORATORY): where Chimera differs from sequence constraint and direct baselines, and whether
+"""EXPLORATORY: where Chimera differs from sequence constraint and direct baselines, and whether
 independent data backs it. Definitions in rules.py. Nothing here changes a scoreboard output.
 
-Sections (--sections): repro, map (card 1), right (card 2), disagree (card 3), explain (cards 4, 5),
+Sections (--sections): repro, map (item 1), right (item 2), disagree (item 3), explain (items 4, 5),
 x3, x1, x2 (item 7), drivers (item 8), adds (item 9). Writes results/analysis/X4/*.csv.
 """
 
@@ -96,7 +96,7 @@ def repro(G):
     assert (t.D_margin - t.D_margin_T43).abs().max() < 1e-6
 
 
-# ---------------------------------------------------------------------------- card 1
+# ---------------------------------------------------------------------------- item 1
 def conservation_map(G):
     cross, cls, assoc = [], [], []
     for c in MAP_COHORTS:
@@ -143,7 +143,7 @@ def conservation_map(G):
     write(pd.DataFrame(assoc), "map_association.csv")
 
 
-# ---------------------------------------------------------------------------- card 2
+# ---------------------------------------------------------------------------- item 2
 def who_is_right(G):
     units = []
     for c in MAP_COHORTS:
@@ -194,7 +194,7 @@ def who_is_right(G):
     write(pd.DataFrame(rows), "right_contrasts.csv")
 
 
-# ---------------------------------------------------------------------------- card 3
+# ---------------------------------------------------------------------------- item 3
 def atlas_columns(g):
     a = pd.read_parquet(CM.CACHE / "atlas_h3.parquet")
     g = g.join(a[[k for k in a.columns if k not in g.columns]], on="hsapiens_gene_id")
@@ -299,7 +299,7 @@ def disagreement(G):
 
 def head_to_head(G):
     """Symmetric test of a disagreement, added after the one-sided contrasts of ``disagreement`` were seen:
-    those condition on B1b, which favours any second noisy measure of the same quantity. Here the two
+    those condition on B1b, which favors any second noisy measure of the same quantity. Here the two
     opposite classes meet directly. excess = gold(B1b high, X low) - gold(B1b low, X high), matched on the
     gold's covariates; > 0 sides with B1b, < 0 with X. Baseline pairs calibrate what two measures give."""
     rows = []
@@ -318,7 +318,7 @@ def head_to_head(G):
     write(pd.DataFrame(rows), "disagree_head_to_head.csv")
 
 
-# ---------------------------------------------------------------------------- cards 4, 5
+# ---------------------------------------------------------------------------- items 4, 5
 def t25_long(c, kind):
     return pd.read_parquet(CM.RES / f"T2_5/{c}__{kind}.parquet")
 
@@ -364,7 +364,7 @@ def explain(G):
             names = g.loc[f & g.nameable.to_numpy()].copy()
             names["cls"] = nm
             named.append(names)
-        # vignettes (rules.py): top by |rD| then |S|, S must point the way of the class (amendment)
+        # vignettes (rules.py): top by |rD| then |S|, S must point the way of the class
         for nm in ("constrained_lowD", "relaxed_highD", "B1bhigh_Dlow", "B1blow_Dhigh"):
             T = g.loc[sets[nm] & g.nameable.to_numpy() & (np.sign(g.S.to_numpy()) == CLASS_DIR[nm])].copy()
             T["a"], T["b"] = T.rD.abs(), T.S.abs()
@@ -796,7 +796,7 @@ def adds(G):
 
 
 def disease(G):
-    """Hepatocyte MASH transfer, read-only from T7.3 (card item 2), EXPLORATORY and separate from T7.3's H-D1.
+    """Hepatocyte MASH transfer, read-only from T7_3_mash (item 2), EXPLORATORY and separate from T7_3_mash's H-D1.
 
     Q = sign(l_h) m, shrunken logFC, genes detected in >= 5% of nuclei in both species, rho_p given C + splines
     of rank |l_h| and rank SE(m). Readouts are the 10-seed consensus here (H-D1 specifies 5 seeds)."""
@@ -882,7 +882,7 @@ def species_direct(G):
 
 
 def mechanism(G):
-    """Tests of ledgers/CHIMERA_MECHANISM.md, added on the coordinator's request after results were known."""
+    """Tests of the mechanism (what the readouts measure), added after results were known."""
     lst = pd.read_csv(CM.RES / "X2/divergent_conserved.csv")
     prog = sorted(set(lst[lst.cohort == "liv_4sp"].symbol) - {"MT-CO1"})
     sets = {"prog63_noMT": prog, "core15": PROG_CORE, "fasting6": FASTING}
@@ -934,7 +934,7 @@ def mechanism(G):
         units.append(dict(g=g, gold=gold, covs=covs, scores=["S_integrated", "S_poorly_mixed", "D_integrated", "D_poorly_mixed", "Sdir"],
                           ref="S_integrated", label=dict(cohort="liv_hmouse", analysis="seed_state")))
     write(run_units(units), "mechanism_rho.csv")
-    # X2 program: predicted signature is pattern gain kept, level cost large
+    # X2_liver_biology program: predicted signature is pattern gain kept, level cost large
     sig = []
     for c in ("liv_4sp", "liv_hmouse"):
         g = frames[c].copy()

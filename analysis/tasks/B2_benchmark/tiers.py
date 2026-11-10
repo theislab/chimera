@@ -1,4 +1,4 @@
-"""Run tiers of B2, fixed by the plan's stopping rule while liver alone had been scored in Track B: the narrative pass takes every tier complete at 2026-11-04 14:00, by time alone, never by results.
+"""Run tiers of the benchmark on real data, fixed while liver alone had been scored in Track B: the narrative pass takes every tier complete at 2026-11-04 14:00, by time alone, never by results.
 
 Main settings: full, relabel25, coarse, nolabel, type_missing, size_1to5, cells25, depth25, extra_batch, chemistry (one per kind of problem, the middle severity, fixed before any scoring as TOOL_SETTINGS).
 tier 0  main settings, replicate r0: Chimera and direct baselines, testis and kidney (liver: complete in all tiers). Reference fits scored.
@@ -134,7 +134,7 @@ def queue(path):
 
 
 def freeze():
-    """NOT USED: the owner withdrew the stopping time (plan amendment, 2026-11-04); every tier runs to completion and is scored whole as it completes.
+    """NOT USED: the stopping time was dropped (2026-11-04); every tier runs to completion and is scored whole as it completes.
     At the stopping time: write which settings and replicates enter scoring, from whole tiers only, by time alone."""
     import json
     import time

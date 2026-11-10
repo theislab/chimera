@@ -1,12 +1,13 @@
-"""T7.8: second contrast and perturbation (plan section 8), Family 3, no training, runs in
-``revision_de_env``.
+"""Liver case: second contrast and perturbation (pre-specified analysis plan, section 8), Family 3, no training,
+runs in ``revision_de_env``.
 
 Second contrast. GSE136103 (Ramachandran 2019), H-D1 with the same D on macrophages. Human: hepatic
 CD45+ libraries of 5 healthy and 5 cirrhotic donors (blood and CD45- excluded); mouse: one healthy
-and one CCl4 sample of sorted mononuclear phagocytes. GEO gives no cell labels, so cells are labelled
-here: QC as T7.2 (>= 200 genes, mitochondrial fraction < 20%), log CP10K, 2,000 HVG, 30 PCs, Leiden
+and one CCl4 sample of sorted mononuclear phagocytes. GEO gives no cell labels, so cells are labeled
+here: QC as for the liver MASH objects, analysis/tasks/T7_2_disease_objects (>= 200 genes,
+mitochondrial fraction < 20%), log CP10K, 2,000 HVG, 30 PCs, Leiden
 (resolution 2.0) per species; each cluster takes the marker class with the highest mean score,
-class "mono_mac" is the macrophage class, as T7.2 labels Kupffer-like and monocyte-derived cells
+class "mono_mac" is the macrophage class, as T7_2_disease_objects labels Kupffer-like and monocyte-derived cells
 together. Human DE: donors with >= 20 cells, ~ sex + condition when both sexes occur in both arms,
 else ~ condition; PyDESeq2, l^h unshrunk as in hd1.py. Mouse n = 1 per arm, so no dispersion exists: m is the
 log2 ratio of CP10K with pseudocount 0.1, SE(m) the Poisson SE on summed counts. This is
@@ -15,7 +16,7 @@ cell-level, not replicated, and is reported as such.
 Perturbation. rho_p of D against Hagai 2018 response divergence, G = -response_divergence, so that
 positive means a conserved response. Fibroblast dsRNA sheet, 955 genes with human padj < 0.01 (the
 plan's set), all genes beside it. Bone-marrow phagocyte LPS sheet (mouse, rat, rabbit, pig; no human)
-joined on the mouse ID, exploratory. Covariates C only, null and CI as section 3; |human logFC|
+joined on the mouse ID, exploratory. Covariates C only, null and CI as in plan, section 3; |human logFC|
 spline is a sensitivity analysis.
 
 Neither dataset is a drug response, and Hagai is cultured fibroblasts and phagocytes, not liver.
@@ -113,7 +114,7 @@ def annotate(a: ad.AnnData, species: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         scores[c] = pd.Series(np.asarray(x[:, g].X.mean(1)).ravel(), index=x.obs_names)
     sc_df = pd.DataFrame(scores)
     m = sc_df.groupby(x.obs["cl"]).mean()
-    rel = m / m.max(0)  # ratio rule of T7.2: a class's mean relative to its best cluster
+    rel = m / m.max(0)  # ratio rule of T7_2_disease_objects: a class's mean relative to its best cluster
     label = rel.idxmax(1)
     tab = m.round(3)
     tab.insert(0, "label", label)

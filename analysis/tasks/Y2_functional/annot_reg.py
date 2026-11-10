@@ -1,4 +1,4 @@
-"""Y2 (EXPLORATORY): regulatory annotation per human gene: phyloP and GC per region, CpG island, TATA, ABC links.
+"""EXPLORATORY: regulatory annotation per human gene: phyloP and GC per region, CpG island, TATA, ABC links.
 
 Reads only downloaded files and the Ensembl 110 GTF (run with ``python -I``); no Chimera readout enters.
 Regions from the Ensembl canonical transcript: promoter [-1000, +200], 5'UTR, 3'UTR, CDS. Bases in any annotated

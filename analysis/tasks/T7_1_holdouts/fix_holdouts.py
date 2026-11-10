@@ -1,4 +1,4 @@
-"""T7.1: fix the GSE192742 mouse hold-out before any expression is read.
+"""Fix the GSE192742 mouse hold-out before any expression is read.
 
 Rule (pre-specified analysis plan, section 8): hold out 1 Western-diet (WD) and 1
 standard-diet (SD) mouse at each of 24 and 36 weeks. Candidates are the nuclei diet

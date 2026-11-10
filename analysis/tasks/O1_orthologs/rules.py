@@ -1,11 +1,11 @@
-"""O1: audit of the ortholog pairs of all 14 cohorts against Ensembl Compara 110. Definitions, fixed before any readout or gold is read.
+"""Audit of the ortholog pairs of all 14 cohorts against Ensembl Compara 110. Definitions, fixed before any readout or gold is read.
 
 Unit. A pair is (species, human gene, species gene) of a cohort's table, restricted to the cohort's genes and species. A gene of a cohort
 is flagged when any of the cohort's non-human pairs is flagged; ``any species of the table`` is a separate sensitivity, because the prior
 of a two-species subset of a canonical cohort averages identity over every species of the table.
 
 Sources. Compara 110 ``protein_default`` and ``ncrna_default`` homology dumps, every species' dump (a dump writes each homology once, under
-one of the two species). Compara 105 (human dump) and 116 (from Y6) for the same pair. Ensembl 110 GTFs for biotype, CDS exons and names.
+one of the two species). Compara 105 (human dump) and 116 (from Y6_uses) for the same pair. Ensembl 110 GTFs for biotype, CDS exons and names.
 
 Pair flags, none of them uses counts:
   F_absent     pair absent from both Compara 110 dumps, under any homology type;
@@ -14,18 +14,18 @@ Pair flags, none of them uses counts:
   F_biotype    human or species gene not protein_coding in the Ensembl 110 GTF, or absent from it;
   F_lowconf    is_high_confidence = 0 in Compara 110 (protein dump);
   F_nosynt     GOC = 0 and WGA = 0 (both reported), a sub-label of low support; descriptive;
-  F_retro      species gene has at most 1 coding exon, human gene at least 3 (Y6 PH2);
-  F_named_raw  species gene's name differs from the human symbol and another gene of the species in Ensembl 110 carries it (Y6 PH5);
-  F_named      F_named_raw, unless GOC and WGA are both above 50 (the plan's section 13 ortholog rule, 2026-11-02: synteny outweighs a name);
+  F_retro      species gene has at most 1 coding exon, human gene at least 3 (Y6_uses PH2);
+  F_named_raw  species gene's name differs from the human symbol and another gene of the species in Ensembl 110 carries it (Y6_uses PH5);
+  F_named      F_named_raw, unless GOC and WGA are both above 50 (ortholog rule of the pre-specified analysis plan, section 13: synteny outweighs a name);
   F_later      pair not ortholog_one2one in Compara 116 (descriptive: release drift);
   F_earlier    pair not ortholog_one2one in the Compara 105 human dump (descriptive; only where that species' pairs are in that dump).
 
 Tiers, nested, used for every impact table:
   T1 "not one-to-one protein": F_absent | F_type | F_ncrna | F_biotype. Fails the definition the tables state.
-  T2 "core": T1 | F_lowconf | F_retro | F_named. Equal to the plan's section 13 rule for C1 cohorts; the wrong named cases of Y6 should fall here.
+  T2 "core": T1 | F_lowconf | F_retro | F_named. Equal to the plan's section 13 rule for the cohorts of C1_cohorts; the wrong named cases of Y6_uses should fall here.
   T3 "core + mapping": T2 | M_wrong_row | M_false_zero (mapping.py). Canonical cohorts only add anything here.
   T2L "core + drift": T2 | F_later (sensitivity: pairs gone by Compara 116; LYZ to 9530003J23Rik falls here and nowhere earlier).
-  TZ "zero": T3 | gene with an exact zero count total in any species of the cohort (structural zeros, Y6 macaque testis, C36 zebrafish).
+  TZ "zero": T3 | gene with an exact zero count total in any species of the cohort (structural zeros: macaque testis in Y6_uses, zebrafish in four-species liver).
   R2, R3 (post hoc, after reading PODXL and SPINK2 in the named list; no gold seen): R2 = T1 | F_retro | F_named | (F_lowconf and not (GOC >= 50 and WGA >= 50)). R3 = R2 + mapping flags.
 Count mapping flags (mapping.py; canonical cohorts, which were joined by gene symbol; raw matrices carry the Ensembl ID where available):
   M_wrong_row  the row picked by the table's species symbol carries an Ensembl ID that differs from the table's species ID and is a
@@ -75,7 +75,7 @@ COHORT_TABLE = {"liv_hmonkey": "liver", "liv_hmouse": "liver", "liv_hzeb": "live
                 "test_3sp": "testis", "bone_marrow": "bone_marrow", "kidney": "kidney", "islet": "testis", "vz_hmouse": "van_zyl", "vz_hmmul": "van_zyl",
                 "vz_primates": "van_zyl", "vz_full": "van_zyl"}
 COHORTS = {k: dict(h5ad=Path(v["h5ad"]), table=COHORT_TABLE[k], label=v["label"]) for k, v in H1_COHORTS.items()}
-# The two eye pair fits that joined H1 after the 14 (extra_runs.tsv): flagged too, so H1's recurrence code can run; reported apart.
+# The two eye pair fits that H1_harmonise lists beside the 14 (extra_runs.tsv): flagged too, so its recurrence code can run; reported apart.
 _EXTRA = {k: v for k, v in H1_load_extra().items() if k not in COHORTS}
 for k, v in _EXTRA.items():
     COHORT_TABLE[k] = "van_zyl"

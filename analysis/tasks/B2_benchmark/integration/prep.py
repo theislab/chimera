@@ -1,4 +1,4 @@
-"""Per-species inputs of SATURN and CAMEX for the integration benchmark (1:1 orthologs), from the H1 object. Run in chimera_env.  python -m ...integration.prep <cohort>"""
+"""Per-species inputs of SATURN and CAMEX for the integration benchmark (1:1 orthologs), from the cohort's object as in H1_harmonise. Run in chimera_env.  python -m ...integration.prep <cohort>"""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ ESM2 = RI.REPO / "data" / "raw" / "saturn_esm2" / "protein_embeddings_export" / 
 
 
 def leiden_within(x: ad.AnnData) -> np.ndarray:
-    """T5.2 rule."""
+    """T5_2_adapters rule."""
     b = x.copy()
     sc.pp.normalize_total(b, target_sum=1e4)
     sc.pp.log1p(b)

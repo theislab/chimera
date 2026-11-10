@@ -96,7 +96,7 @@ def scvi_encoder(path: str, cohort: str):
     a = K.read(cohort)
     m = scvi.model.SCVI.load(path, adata=a)
     f = Path(path) / "batch_key.txt"
-    key = f.read_text().strip() if f.exists() else ("sample_batch" if cohort.startswith("test") else "batch")   # Y5 models carry the library key on testis
+    key = f.read_text().strip() if f.exists() else ("sample_batch" if cohort.startswith("test") else "batch")   # Y5_aspects models carry the library key on testis
     bmap = a.obs.groupby("species", observed=True)[key].first().astype(str).to_dict()
     z_train = np.load(Path(path) / "z_mean.npy")
 

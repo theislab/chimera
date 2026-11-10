@@ -1,4 +1,4 @@
-"""O1 part B: scoreboard per tier beside the frozen row. Frozen files are read, never written.
+"""Part B: scoreboard per tier beside the frozen row. Frozen files are read, never written.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.compare_tiers
 """

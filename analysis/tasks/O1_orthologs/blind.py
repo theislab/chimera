@@ -1,4 +1,4 @@
-"""O1 part A, no gold: where do flagged genes sit on D, S_ema and B1? Per cohort and tier. Reads the H1 per-gene tables and the flags.
+"""Part A, no gold: where do flagged genes sit on D, S_ema and B1? Per cohort and tier. Reads the per-gene tables of H1_harmonise and the flags.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.blind
 """

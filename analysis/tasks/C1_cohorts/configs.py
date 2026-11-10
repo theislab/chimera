@@ -1,4 +1,5 @@
-"""C1: one configuration per cohort. Every cohort goes through the same `build.py`, grid rule, readout and H1 schema.
+"""One configuration per cohort. Every cohort goes through the same `build.py`, grid rule, readout and table schema
+(the schema of analysis/tasks/H1_harmonise).
 
 A *source* is what is read from disk: per species, the files, the label column and map, the unit (donor) column and
 filters. A *cohort* is a model: which species of a source enter, with which ortholog table. Pairs are either subsets of
@@ -6,7 +7,7 @@ a built cohort, as the CAMEX splits (`training/build_subset.py` unchanged: prior
 parent; p_null recomputed), or cohorts of their own with their own table where the parent's vocabulary would cut genes
 that the pair's use needs (brain_m1_hmouse: the marmoset list has 14,409 genes, and the pair feeds the Alzheimer case).
 
-Reasons for filters are in the same words across cohorts (checklist item 10), written to `filters.csv` by build.py.
+Reasons for filters are in the same words across cohorts, written to `filters.csv` by build.py.
 """
 
 from __future__ import annotations
@@ -22,10 +23,10 @@ DATA = ROOT / "data" / "analysis" / "new_usecases"
 BUILD = DATA / "c1_build"
 RES = ROOT / "results" / "analysis" / "C1"
 
-# Near the size of the three-species testis cohort, the size all recipes were tuned at (T12.2b).
+# Near the size of the three-species testis cohort, the size all recipes were tuned at (T12_2b_recipe).
 MAX_CELLS = 28854
 MIN_GENES = 200
-MIN_CELLS_MODEL = 50  # checklist item 5
+MIN_CELLS_MODEL = 50  # cells a class needs in each species that has it
 SEED = 20261102
 
 DL = DATA / "brain_dlpfc"
@@ -69,7 +70,7 @@ SOURCES = {
 COHORTS = {
     # K = 4: the question of near-identical proteins. Pairs are CAMEX-style subsets below.
     # esm_species: gene features from the species with SATURN embeddings; chimpanzee and marmoset embeddings cost 37.6 M residues on CPU,
-    # so they enter as a sensitivity when ready (`*_esmfull`), plan amendment.
+    # so they enter as a sensitivity when ready (`*_esmfull`; amendment log of the pre-specified analysis plan).
     "brain_dlpfc": dict(source="dlpfc", species=["hsapiens", "ptroglodytes", "mmulatta", "cjacchus"], esm_species=["hsapiens", "mmulatta"], tissue="cortex", label="DLPFC 4 primates"),
     # K = 3: human, marmoset, mouse in one region.
     "brain_m1": dict(source="m1", species=["hsapiens", "cjacchus", "mmusculus"], esm_species=["hsapiens", "mmusculus"], tissue="cortex", label="M1 human, marmoset, mouse"),
@@ -119,7 +120,7 @@ SOURCES["mtg"] = dict(
              "cjacchus": dict(name="Marmoset", files=[MT / "c556b8e8-e348-49b9-b4da-08b05cd43350.h5ad"], source="Jorstad2023")})
 
 
-# Model on young donors of the cell fraction, one chemistry per species; DE (prepare_de.py) on other donors, cell fraction, plan section 13f.
+# Model on young donors of the cell fraction, one chemistry per species; DE (prepare_de.py) on other donors, cell fraction, pre-specified analysis plan, section 13f.
 SOURCES["muscle"] = dict(
     reference="Kedlian 2024 Nature Aging, CELLxGENE collection 2d40e6a7; cell suspensions, human intercostal 10x 3' v3, mouse hindlimb 10x 3' v2",
     map=MAPS / "muscle_ageing.tsv", unit_col="donor_id",
@@ -130,6 +131,6 @@ SOURCES["muscle"] = dict(
 COHORTS["muscle_ageing"] = dict(source="muscle", species=["hsapiens", "mmusculus"], tissue="skeletal muscle", label="Muscle human, mouse")
 
 
-# Check of the feature choice (coordinator): human + macaque with its own table, prior on human-macaque identity and ESM of both species, as the canonical pairs;
+# Check of the feature choice: human + macaque with its own table, prior on human-macaque identity and ESM of both species, as the canonical pairs;
 # compared with brain_dlpfc_hmac (subset of the 4-species object) on shared genes.
 COHORTS["brain_dlpfc_hmac_own"] = dict(source="dlpfc", species=["hsapiens", "mmulatta"], tissue="cortex", label="DLPFC human, macaque, own table")

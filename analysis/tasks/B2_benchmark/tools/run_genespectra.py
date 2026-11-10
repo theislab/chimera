@@ -9,7 +9,7 @@ PRIMARY SCALAR, declared before any comparison:
     diagonal says how conserved a shared class is, and a gene that changed class did not conserve it.
 
 Workflow: the README example (run_classification_sum_cell_pools.py) with its defaults: sum counts
-per label within a species, normalise each pool to 1e6, filter_low_counts(min_count=1), classify with
+per label within a species, normalize each pool to 1e6, filter_low_counts(min_count=1), classify with
 exp_lim=1, enr_fold=4, max_group_n=half of the labels. The tool's Ensembl BioMart query is replaced
 by the 1:1 ortholog group of the input (var_name), same merge. A gene is covered if it passes the
 filter in both species. Labels are compared within a species only, so they need not be shared.

@@ -1,18 +1,18 @@
-"""X1 (EXPLORATORY): per-gene tables for the testis discovery analysis.
+"""EXPLORATORY: per-gene tables for the testis discovery analysis.
 
 For each testis cohort (canonical s42 run, and any extra seed passed with ``--seed-run``):
 
-* Chimera readouts from the T2.5 gene table: alpha, prior (clamped), prior_raw, S_g_ema,
+* Chimera readouts from the T2_5_celltype_margin gene table: alpha, prior (clamped), prior_raw, S_g_ema,
   margin-support flag; D_raw = (alpha - prior_raw) - cohort median (primary here) and
   D_clamp = (alpha - prior) - cohort median.
-* Stage decomposition of S_g: the T2.5 per-(species, fine type) margins S_gsk are summed
-  into the six coarse stages of T4.2 (SG, SC, rSD, eSD, Sertoli, Other_somatic) with the
-  T2.5 weights w_sk = n_sk / (n_s K), so sum over stages of C_g,stage = S_g exactly. Also
+* Stage decomposition of S_g: the T2_5_celltype_margin per-(species, fine type) margins S_gsk are summed
+  into the six coarse stages of T4_2_gene_baselines (SG, SC, rSD, eSD, Sertoli, Other_somatic) with the
+  T2_5_celltype_margin weights w_sk = n_sk / (n_s K), so sum over stages of C_g,stage = S_g exactly. Also
   per species (C_g,s,stage, which sums over species to C_g,stage) and per-cell means
   (Sbar_g,s,stage), for the per-species null (meanz) and the within-type null.
-* Simple baselines: per species x stage pseudobulk log2(1 + CPM) (T4.2 definition, libraries
-  with >= 30 cells), the species-centred difference to human per stage, the raw per-stage
-  log fold change to human, and B1b / B1b_raw from T4.2.
+* Simple baselines: per species x stage pseudobulk log2(1 + CPM) (T4_2_gene_baselines definition, libraries
+  with >= 30 cells), the species-centered difference to human per stage, the raw per-stage
+  log fold change to human, and B1b / B1b_raw from T4_2_gene_baselines.
 * Chromosome and biotype of the human gene from the Ensembl 110 GTF.
 
 Liver cohorts get the readouts and chromosome only (tissue control).
@@ -72,7 +72,7 @@ def readouts(genes: pd.DataFrame) -> pd.DataFrame:
 
 
 def stage_decomposition(S_long: pd.DataFrame) -> pd.DataFrame:
-    """Coarse-stage contributions from the fine-type T2.5 table (cell_type key)."""
+    """Coarse-stage contributions from the fine-type T2_5_celltype_margin table (cell_type key)."""
     s = S_long.copy()
     unk = set(s["cell_type"]) - set(T42.TESTIS_COARSE)
     if unk:

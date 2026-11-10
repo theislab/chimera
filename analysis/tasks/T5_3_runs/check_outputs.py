@@ -1,4 +1,4 @@
-"""Check T5.3 latents: shape (n_obs, d), finite, config fields, h5ad order. Run in revision_de_env."""
+"""Check the latents of the SATURN and CAMEX runs: shape (n_obs, d), finite, config fields, h5ad order. Run in revision_de_env."""
 import json, sys
 from pathlib import Path
 import anndata as ad

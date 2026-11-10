@@ -1,6 +1,6 @@
 """Score many units in one job with a process pool, so that scoring takes few queue slots.
     python -m analysis.tasks.B2_benchmark.pool b     Track B, every (cohort, setting) with scores
-    python -m analysis.tasks.B2_benchmark.pool c     Track C units, lists and Y4 replication
+    python -m analysis.tasks.B2_benchmark.pool c     Track C units, lists and Y4_regions replication
 """
 
 from __future__ import annotations

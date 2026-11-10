@@ -1,4 +1,4 @@
-"""Per-gene readouts of one D1 fit on its own object; reads no gold. Depth rows: B2 score_run's definitions (S_g, S_fwd, D, D_raw, B1z, B1, B1c, B2b, B3a, Sdir, Lfc), with Lfc as the mean over
+"""Per-gene readouts of one fit of this task on its own object; reads no gold. Depth rows: the definitions of B2_benchmark/score_run.py (S_g, S_fwd, D, D_raw, B1z, B1, B1c, B2b, B3a, Sdir, Lfc), with Lfc as the mean over
 species pairs, the Track C form, so that more than two species are scored. Held-out rows: alpha, S_g, D, D_raw, correction; arm E also D_E0 (held-out genes forward through the fitted gate with
 expression columns at their mean).
     python -m analysis.tasks.D1_sparse_genes.score_fit --index I --h5ad path

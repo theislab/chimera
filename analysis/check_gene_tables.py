@@ -1,6 +1,6 @@
-"""Recompute the per-gene tables of the harmonised cohorts from the archived run states.
+"""Recompute the per-gene tables of the harmonized cohorts from the archived run states.
 
-Checks the two per-gene tables of every harmonised cohort against ``final_state.npz`` of the seeds they pool:
+Checks the two per-gene tables of every harmonized cohort against ``final_state.npz`` of the seeds they pool:
 
 - canonical gate (protein-feature GIN, ``--config A``): ``results/analysis/H1/genes/<cohort>.parquet``,
   seeds = rows of ``results/analysis/H1/runs.tsv`` with ``kept`` true;
@@ -35,7 +35,7 @@ import pandas as pd
 ROOT = Path(os.environ.get("CHIMERA_ROOT", Path(__file__).resolve().parents[1]))
 RUNS = ROOT / "training" / "runs"
 RES = ROOT / "results" / "analysis"
-MASK_EPS, SAT_HI = 1e-6, 0.95  # rules.py of H1
+MASK_EPS, SAT_HI = 1e-6, 0.95  # analysis/tasks/H1_harmonise/rules.py
 FLOATS = ["alpha", "pi_clamped", "delta_alpha", "D", "S_ema"]
 RAW = ["pi_raw", "D_raw"]
 FLAGS = ["count_support", "sign_D_stable", "sign_S_stable", "saturated_flag", "strict_support"]

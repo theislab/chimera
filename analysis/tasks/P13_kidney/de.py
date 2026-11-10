@@ -1,4 +1,4 @@
-"""P13: pseudobulk differential expression for the kidney AKI case (plan section 8c).
+"""Pseudobulk differential expression for the kidney AKI case (pre-specified analysis plan, section 8c).
 
 Runs in ``revision_de_env`` (PyDESeq2 0.5.2), never ``chimera_env``. No Chimera readout is read.
 
@@ -14,14 +14,15 @@ t (the G-D1k unit filter), with roles from ``unit_roles.tsv``:
 
 A covariate constant over a fit's units is dropped and logged. Wald tests; PyDESeq2's apeGLM
 shrinkage of the condition coefficient (``lfc_shrink``), twice: ``log2fc_shrunk`` with the adaptive
-prior (the default, which collapses thin fits to zero, see T7.3) and ``log2fc_fixed`` with prior
-scale 1 (``adapt=False``). H-D1 uses ``log2fc_mle`` for l^h and ``log2fc_fixed`` for m; H-D4 ranks on
-``log2fc_fixed`` (plan amendment). Genes with < 10 counts summed over the units are not tested.
-``det_frac`` = nuclei with count > 0 / nuclei, over the units used (section 8c's 5% rule).
+prior (the default, which collapses thin fits to zero, see the liver MASH case,
+analysis/tasks/T7_3_mash) and ``log2fc_fixed`` with prior scale 1 (``adapt=False``). H-D1 uses
+``log2fc_mle`` for l^h and ``log2fc_fixed`` for m; H-D4 ranks on ``log2fc_fixed`` (amendment log of
+the plan). Genes with < 10 counts summed over the units are not tested.
+``det_frac`` = nuclei with count > 0 / nuclei, over the units used (the 5% rule of plan, section 8c).
 
 ``--perm <type index>`` fits the primary models of one DE-able type on permuted condition labels
 (human within sex x collection, mouse within stage, ``N_PERM`` = 200 draws each, or all distinct
-relabellings where fewer exist, never the observed
+relabelings where fewer exist, never the observed
 labels or their swap), with the fixed-scale prior only, for the H-D4 and H-D1 label null. Output
 ``de/perm/{human,mouse}_perm<ii>_<type>.tsv``.
 
@@ -112,7 +113,7 @@ def fit(sub: ad.AnnData, covariates: list[str], n_cpus: int, adaptive: bool = Tr
 
 
 def permuted_labels(obs: pd.DataFrame, strata: list[str], rng, n: int) -> list:
-    """n distinct relabellings within strata, never the observed labels or their exact swap."""
+    """n distinct relabelings within strata, never the observed labels or their exact swap."""
     real = obs["condition"].astype(str).to_numpy()
     swap = np.where(real == "control", "disease", "control")
     groups = list(obs.reset_index(drop=True).groupby([obs[c].astype(str).to_numpy() for c in strata]).indices.values())
@@ -134,7 +135,7 @@ def permuted_labels(obs: pd.DataFrame, strata: list[str], rng, n: int) -> list:
 def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int, chunk: int = 0, n_chunks: int = 1) -> None:
     """Permuted-label fits for type t, draws i with i % n_chunks == chunk.
 
-    The relabellings come from the same generator and rule as the first 20-draw run, so draws
+    The relabelings come from the same generator and rule as the first 20-draw run, so draws
     0-19 are identical to it; an existing fit of the same draw (same controls) is kept.
     """
     out = OUT / "perm"
@@ -169,7 +170,7 @@ def run_perm(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int, chunk: int
 
 
 def run_loo(t: str, pb_h: ad.AnnData, pb_m: ad.AnnData, n_cpus: int) -> None:
-    """Leave-one-out primary fits (section 8c): each healthy DE-half donor (human), each mouse.
+    """Leave-one-out primary fits (plan, section 8c): each healthy DE-half donor (human), each mouse.
 
     Fixed-scale prior only. Output ``de/loo/{human,mouse}_loo_<unit>_<type>.tsv`` and ``loo_<type>.tsv``.
     """

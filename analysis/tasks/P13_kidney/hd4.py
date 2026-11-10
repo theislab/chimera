@@ -1,19 +1,20 @@
-"""P13: H-D4 program transfer (plan section 8c), AKI vs IRI. No Chimera readout.
+"""H-D4 program transfer for the kidney case (pre-specified analysis plan, section 8c), AKI vs IRI. No Chimera readout.
 
 Per DE-able type (``results/analysis/P13/de/de_meta.json``):
   * universe: genes tested in the human primary fit (AKI vs healthy DE half, multiome) and, through
     the kidney human-mouse 1:1 table (both Ensembl 110 Compara dumps), in the mouse primary fit
     (IRI vs Sham, ~ stage + condition); human symbols;
   * preranked GSEA on fixed-scale apeGLM log2FC (``log2fc_fixed``, prior scale 1; the adaptive
-    prior collapses thin fits, see T7.3), weighted KS (p = 1), 10,000 random gene sets of the same
-    size per set size (gene-set permutation), NES = ES / mean |null ES| of the same sign
-    (the T7.9 implementation, copied here unchanged);
+    prior collapses thin fits, see the liver MASH case, analysis/tasks/T7_3_mash), weighted KS (p = 1),
+    10,000 random gene sets of the same size per set size (gene-set permutation), NES = ES / mean
+    |null ES| of the same sign (the implementation of the islet case, analysis/tasks/T7_9_islet,
+    copied here unchanged);
   * sets: MSigDB Hallmark 2020 and Reactome 2024 (Enrichr GMT files), 15-500 genes in universe;
   * human p two-sided (same-sign null), BH over sets per type; mouse one-sided in the human
     direction, BH over the human-significant sets of that type;
   * transfers = human q < 0.05 and mouse oriented q < 0.05.
 
-Gene-set permutation ignores correlation between genes and is anti-conservative (T7.3), so calls
+Gene-set permutation ignores correlation between genes and is anti-conservative (see T7_3_mash), so calls
 are judged against ``--null``: the same calls on the permuted-label fits of ``de.py --perm``
 (permuted human vs observed mouse, and observed human vs permuted mouse, 2,000 gene-set
 permutations), per type with ``--null --null-type <t>`` (``hd4_null_<t>.tsv``) and combined with

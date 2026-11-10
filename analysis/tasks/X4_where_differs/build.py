@@ -1,7 +1,8 @@
-"""X4 (EXPLORATORY): one gene table per cohort from existing outputs. Nothing is trained or tested here.
+"""EXPLORATORY: one gene table per cohort from existing outputs. Nothing is trained or tested here.
 
-Reads T4.3 cache, T3.3 consensus, per-seed final states (read-only), T4.3 baselines and gold table, T2.5
-flags, X1/X2/X3 tables (stage peaks, hepatocyte enrichment, contributions, per-type pseudobulk, classes).
+Reads T4_3_scoreboard cache, T3_3_consensus consensus, per-seed final states (read-only), T4_3_scoreboard baselines and gold table, T2_5_celltype_margin
+flags, tables of X1_testis_discovery, X2_liver_biology and X3_cross_cohort (stage peaks, hepatocyte enrichment, contributions, per-type
+pseudobulk, classes).
 Writes results/analysis/X4/genes/<cohort>.parquet.
 """
 

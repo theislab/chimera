@@ -1,4 +1,4 @@
-"""T7.3 post-hoc reading of H-D4, descriptive, no Chimera readout. Added after h4.tsv was seen.
+"""Liver MASH: post-hoc reading of H-D4, descriptive, no Chimera readout. Added after h4.tsv was seen.
 
 Two explanations of the primary calls are checked.
 
@@ -15,8 +15,8 @@ Two explanations of the primary calls are checked.
 Calibration. Gene-set permutation ignores correlation between genes, and h4_null.tsv shows it: with
 permuted mouse labels it still calls about as many "transfers" as the real labels. h4_sample_perm.tsv
 therefore gives each program sample-label empirical p-values, from the 50 permuted fits of each
-species (NES against NES of the same program under permuted labels). Mouse draws keep only labellings
-orthogonal to diet (3 of the 6 true SD mice among the 6 labelled SD).
+species (NES against NES of the same program under permuted labels). Mouse draws keep only labelings
+orthogonal to diet (3 of the 6 true SD mice among the 6 labeled SD).
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T7_3_mash/post.py [--n-perm 2000]
 """

@@ -1,8 +1,8 @@
-"""Y6: independent references computed from downloads. No Chimera readout is read. Run with python -I after setting the path argument.
+"""Independent references computed from downloads. No Chimera readout is read. Run with python -I after setting the path argument.
 
-Liver primate gold: Tabula Sapiens (10x 3' v3) vs Tabula Microcebus liver (10x 3' v2, lemur; a held-out primate), T4.3 H3 recipe, on the five types with at
+Liver primate gold: Tabula Sapiens (10x 3' v3) vs Tabula Microcebus liver (10x 3' v2, lemur; a held-out primate), T4_3_scoreboard H3 recipe, on the five types with at
 least 30 cells in each atlas (hepatocyte, macrophage, endothelial, nk, b_cell; TM has 8 fibroblasts, so stellate is dropped). G_H3_5 = the same five types of the TS vs
-TMS profiles (T4.3 h3_profiles.npz), so the two golds differ only in the species.
+TMS profiles (T4_3_scoreboard h3_profiles.npz), so the two golds differ only in the species.
 
 Hybrid cis reference: allele counts of human-chimpanzee hybrid cells, see rules.py USE 4. No fit is touched.
 
@@ -30,7 +30,7 @@ ASE_TYPES = ["CM", "HP", "MN", "PP", "SKM", "RPE"]
 
 
 def profile_corr(A, B, ok_a, ok_b):
-    """Pearson across types of the atlas-centred profiles (T4.3 profile_corr); NaN for a constant profile or a gene not detected."""
+    """Pearson across types of the atlas-centered profiles (T4_3_scoreboard profile_corr); NaN for a constant profile or a gene not detected."""
     a, b = A - A.mean(1, keepdims=True), B - B.mean(1, keepdims=True)
     sa, sb = np.sqrt((a ** 2).sum(1)), np.sqrt((b ** 2).sum(1))
     with np.errstate(invalid="ignore", divide="ignore"):
@@ -62,7 +62,7 @@ def lemur_liver():
     want = np.array([m1.get(g, "") for g in genes])
     col = var.get_indexer(want)
     usable = col >= 0
-    # Library size over the human-lemur 1:1 genes with the mapped vocabulary (T4.3: over the shared vocabulary).
+    # Library size over the human-lemur 1:1 genes with the mapped vocabulary (T4_3_scoreboard: over the shared vocabulary).
     Xv = X[:, col[usable]].astype(np.float64)
     lm = lab[keep]
     P, F, N = [], [], []

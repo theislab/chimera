@@ -1,14 +1,14 @@
-"""Y2 (EXPLORATORY, Family 3): does the deployment axis have consequences outside expression?
+"""EXPLORATORY, Family 3: does the deployment axis have consequences outside expression?
 
-Definitions fixed and committed before any association between a Chimera readout or baseline and a
+Definitions fixed before any association between a Chimera readout or baseline and a
 functional annotation is computed. Nothing here changes a status, row or modifier of the plan.
 
-Readouts. D (T3.3 consensus; clamped prior on testis), D_raw, S (S_g EMA, mean over seeds). Beside them,
-no-model terms from X4: Sdir, Sdir_pattern, Sdir_level. Baselines: B1b_raw, B1c_raw, B1z_raw, B2b, B3a.
-Replication tables (bone marrow P12, kidney P13) carry D, S_ema and B1b (kidney also B2b), nothing else.
+Readouts. D (T3_3_consensus consensus; clamped prior on testis), D_raw, S (S_g EMA, mean over seeds). Beside them,
+no-model terms from X4_where_differs: Sdir, Sdir_pattern, Sdir_level. Baselines: B1b_raw, B1c_raw, B1z_raw, B2b, B3a.
+Replication tables (bone-marrow cohort, kidney P13_kidney) carry D, S_ema and B1b (kidney also B2b), nothing else.
 
-Universes. U_ms (primary, as instructed): T2.5 margin_support. That flag selects on sign(S) = sign(D) and
-|S| >= median |S|, so inside it S is selected and S-vs-baseline differences favour S (X4 disclosure). U_un
+Universes. U_ms (primary): T2_5_celltype_margin margin_support. That flag selects on sign(S) = sign(D) and
+|S| >= median |S|, so inside it S is selected and S-vs-baseline differences favor S (X4_where_differs disclosure). U_un
 (unmasked, |S| >= 1e-6) is not selected on sign or size, and is the universe for any S-versus-baseline
 head-to-head claim. Every table has both. Masked genes are never used.
 
@@ -44,12 +44,12 @@ per biosample (Nasser 2021, all biosamples; liver-ENCODE and hepatocyte-ENCODE f
 blocks, for every X. Regulatory vs coding: on C_CMP, for each X, rho_p(X, promoter) and rho_p(X, 3'UTR) against rho_p(X, CDS
 phyloP), rho_p(X, -log dN/dS) and rho_p(X, -LOEUF), with differences on the same draws.
 
-(c) Discordant genes. Within a cohort, rS = residual rank of the score on C = pi, expression, detection, length (X4 scale).
+(c) Discordant genes. Within a cohort, rS = residual rank of the score on C = pi, expression, detection, length (X4_where_differs scale).
 Class PC-low: pi top tertile, residual tertile 1 of score. Class PD-high: pi bottom tertile, residual tertile 3.
 Chimera classes: on D, in margin_support with S of the class sign (primary); on S, unmasked. Baseline classes: on B1b_raw, B1c_raw,
-in unmasked genes. Also the fixed X2 list (64 genes, 4-sp rule, divergent_conserved.csv). Excess of each outcome against the 40 nearest
+in unmasked genes. Also the fixed X2_liver_biology list (64 genes, 4-sp rule, divergent_conserved.csv). Excess of each outcome against the 40 nearest
 class-free genes in rank space of pi, expression, detection, length, tau, hepatocyte enrichment on liver, log PubMed
-(X4 ``matched``); margin-supported pool for Chimera classes, unmasked pool for baselines. Outcomes: y_system (matched
+(X4_where_differs ``matched``); margin-supported pool for Chimera classes, unmasked pool for baselines. Outcomes: y_system (matched
 system, restricted to U_k), M_any, H_any, mouse lethal, phyloP promoter, 5'UTR, 3'UTR, CpG, n_ABC. BH over each cohort x class set.
 
 (d) Literature cases. The list (``literature_cases.tsv``) was curated from the literature blind to any readout, in a separate session with no access to

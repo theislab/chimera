@@ -1,4 +1,4 @@
-"""T12.2b: diagnostic objects for the bone-marrow training failure (health only, no readout).
+"""T12_2b_recipe: diagnostic objects for the bone-marrow training failure (health only, no readout).
 
 Each object is drawn from a parent bone-marrow h5ad by a rule on cell counts and per-cell
 totals only. Genes, ``var``, ``varm`` and the cohort prior are kept as in the parent;

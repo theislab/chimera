@@ -1,13 +1,13 @@
-"""Y2 (EXPLORATORY): attempts to explain the results of analyses.py another way. All of this was written after reading them; none of it is a search for a
+"""EXPLORATORY: attempts to explain the results of analyses.py another way. All of this was written after reading them; none of it is a search for a
 Chimera positive and none is reported as one.
 
 F1  what removes the C-only tissue-matched signal: add tau, then dN/dS and LOEUF, then PubMed, one at a time.
-F2  B3a's tissue-matched signal: does it survive gene class (X3 classes) and 20 or 64 ESM PCs? Same for S, B1b.
+F2  B3a's tissue-matched signal: does it survive gene class (X3_cross_cohort classes) and 20 or 64 ESM PCs? Same for S, B1b.
 F3  testis Delta-alpha against promoter phyloP, CpG class and essentiality: given CpG class, given S, given 64 ESM PCs; D_raw and B3b beside.
 F4  bone-marrow S on hematopoietic concordance: given log variance, given B1b; human-mouse only profile correlation beside.
 F5  discordant classes on phyloP: rematch on the region's GC and log length; calibration on random sets of the same size from the same pi band.
 F6  testis PD-high on reproductive concordance: matched also on spread and pleiotropy; rank partial correlation inside pi tertiles.
-F7  calibration of all class excesses in (c) on random sets from the class's pi band, because nearest-neighbour matching leaves part of pi in the excess.
+F7  calibration of all class excesses in (c) on random sets from the class's pi band, because nearest-neighbor matching leaves part of pi in the excess.
 F4b replication diagonals with IMPC-only mouse side and ClinGen genes.
 Usage (from chimera/): PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.Y2_functional.followup
 """

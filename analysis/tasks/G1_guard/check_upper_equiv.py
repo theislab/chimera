@@ -1,4 +1,4 @@
-"""G1: the hook form of upper_only.py, run symmetric, gives the same loss and gradients as the package option clamp_z_logvar=True (VAMP on); and upper-only differs from it only where
+"""The hook form of upper_only.py, run symmetric, gives the same loss and gradients as the package option clamp_z_logvar=True (VAMP on); and upper-only differs from it only where
 log-variance is below -10. Synthetic data, forced log-variance on both sides of the range.    python -m analysis.tasks.G1_guard.check_upper_equiv
 """
 

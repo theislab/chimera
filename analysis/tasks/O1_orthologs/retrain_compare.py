@@ -1,6 +1,6 @@
-"""O1 part C: does dropping flagged pairs move D on the genes that stay? Definitions in the ledger, fixed before the runs existed.
+"""Part C: does dropping flagged pairs move D on the genes that stay? Definitions fixed before the runs existed.
 
-Genes shared with the canonical liver H+Mouse object, joined on human Ensembl ID. Canonical = the 10 seeds of T3.3. D per run = alpha - prior, centred on the median over the shared genes.
+Genes shared with the canonical liver H+Mouse object, joined on human Ensembl ID. Canonical = the 10 seeds of T3_3_consensus. D per run = alpha - prior, centered on the median over the shared genes.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.retrain_compare
 """
@@ -96,7 +96,7 @@ def main():
             res[f"{name}|{universe}"] = dict(newA=newA, newB=newB)
     R = pd.DataFrame(rows)
     R.to_csv(OUT / "comparison.csv", index=False)
-    # The rule. The plan said "matching mixing state" without fixing a classifier, and entropy alone splits these two seeds against the other markers of T3.3
+    # The rule. The plan said "matching mixing state" without fixing a classifier, and entropy alone splits these two seeds against the other markers of T3_3_consensus
     # (adversary, SD of D, negative tail). So the rule is evaluated under every assignment of the two seeds to a state; the verdict is reported per assignment.
     states = ("integrated", "poorly mixed", "all seeds")
     D = R[(R.readout == "D") & (R.universe == "all")].set_index("seeds_in_reference")

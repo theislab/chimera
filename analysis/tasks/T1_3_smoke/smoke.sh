@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T1.3: lock file, imports, tests, checkpoint load. Calibration runs are a separate array.
+# Environment check: lock file, imports, tests, checkpoint load. Calibration runs are a separate array.
 source analysis/slurm/_body.sh
 OUT=results/analysis/T1_3; mkdir -p "$OUT"
 L=analysis/envs/chimera_env.linux-64.lock.txt

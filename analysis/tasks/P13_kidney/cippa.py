@@ -1,16 +1,17 @@
-"""P13: external anchor E-K3, Cippa et al. 2018 human-specific vs shared injury genes (plan section 8c).
+"""External anchor E-K3 of the kidney case: Cippa et al. 2018 human-specific vs shared injury genes
+(pre-specified analysis plan, section 8c).
 
 Family 3. Source: ``data/analysis/disease_kidney/raw/cippa2018/jci.insight.123151.sdt1-11.xlsx``
 (Table S3 primary: acute, human post- vs pre-reperfusion and mouse 4 h IRI; Table S9 secondary: late).
 Human symbols map to the kidney table by unique ``hsapiens_gene_name``; ambiguous or absent symbols
 are dropped and counted. "Mouse specific" lists are reported only as counts.
 
-Mechanics (fixed before reading D against the lists; amendment-log row of 2026-11-02):
+Mechanics (fixed before reading D against the lists; amendment log of the plan, row of 2026-11-02):
 * primary: stratified AUROC of D, Shared (set) vs Human specific (comparison), within strata of
   rank pi_raw tertile x rank expression tertile computed over the whole vocabulary (the lists are
-  too small for section 4's decile cells and 5:1 background rule); strata need >= 1 gene of each
+  too small for the decile cells and 5:1 background rule of plan, section 4); strata need >= 1 gene of each
   list; one-sided permutation p (list labels permuted within strata, 10,000 draws); raw AUROC beside;
-* each list against matched vocabulary background with section 4's rule (pi_raw x expression
+* each list against matched vocabulary background with the rule of plan, section 4 (pi_raw x expression
   decile cells, >= 5 background genes per list gene), and the difference Shared minus Human specific;
 * the same for B1b_raw (pseudobulk correlation) and D_raw, beside D.
 
@@ -98,7 +99,7 @@ def main() -> int:
                        n_overlap_dropped=len(both), n_strata=int(len(np.unique(l_))), auroc_stratified=auc,
                        p_one_sided=float((1 + (null >= auc).sum()) / (1 + len(null))), null_mean=float(null.mean()),
                        auroc_raw=raw)
-            # each list vs matched vocabulary background (section 4 rule)
+            # each list vs matched vocabulary background (rule of pre-specified analysis plan, section 4)
             vv = np.isfinite(v)
             for nm, st in (("shared", sh), ("human_specific", hs)):
                 ins = np.zeros(len(tab), bool)

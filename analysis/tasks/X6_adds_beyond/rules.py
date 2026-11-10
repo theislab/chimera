@@ -1,42 +1,43 @@
-"""X6 (EXPLORATORY): definitions, fixed before any X6 association with a gold was computed.
+"""EXPLORATORY: definitions, fixed before any association of this task with a gold was computed.
 
-Every test here was chosen after G3 and after X4, so none is pre-specified and none changes a
+Every test here was chosen after the decision row, its modifiers and the Family 3 values were known, and after
+X4_where_differs, so none is pre-specified and none changes a
 scoreboard output, status, row or modifier (row 4, PATTERN-ONLY, REVERSED-TESTIS stand).
 
-Cohorts: liver H+Mouse (liv_hmouse), testis H+Mouse (test_hmouse). Gene tables are the X4 tables
+Cohorts: liver H+Mouse (liv_hmouse), testis H+Mouse (test_hmouse). Gene tables are the X4_where_differs tables
 (results/analysis/X4/genes), so D, D_raw, S, B1b_raw, B1c_raw, B1z_raw, B2b, B3a, golds, covariates and
-ESM-module blocks are exactly those of T4.3 / X4. Sdir is the X4 direct margin (no model, cell labels).
+ESM-module blocks are exactly those of T4_3_scoreboard / X4_where_differs. Sdir is the X4_where_differs direct margin (no model, cell labels).
 
-Statistic. rho_p as T4.3 (stats.py): mid-ranks within the universe, OLS residuals on intercept + natural
+Statistic. rho_p as T4_3_scoreboard (stats.py): mid-ranks within the universe, OLS residuals on intercept + natural
 cubic spline (df 4, rank quartile knots) of each covariate, Pearson of residuals. CI: block bootstrap on
 ESM-module blocks, 2,000 draws, percentile, all scores of one unit on the same draws (so deltas and
-replicate means have CIs). Conditioning on a score = adding its rank spline to the design, as X4.
+replicate means have CIs). Conditioning on a score = adding its rank spline to the design, as X4_where_differs.
 
-Golds and base covariates (rules of X4 / T4.3):
+Golds and base covariates (rules of X4_where_differs / T4_3_scoreboard):
     H1 liver EVEE level, C           H3 liver TS vs TMS pattern, C_pat
     H2 testis EVEE level, C          H4 testis Murat 8 held-out species, C_pat + H4_nsp
     H4p testis Murat primates, C_pat + H4_npri
 C = rank pi_raw, expression, detection, CDS length; C_pat = C + tau over shared types.
 
 Part 1, incremental information (one universe per gold: genes with gold, covariates and every one of
-D, D_raw, S, Sdir, B1b, B1c, B1z, B2b, B3a; this equals the X4 'given_panel' universe).
+D, D_raw, S, Sdir, B1b, B1c, B1z, B2b, B3a; this equals the X4_where_differs 'given_panel' universe).
     simple baselines P = {B1b, B1c, B2b, B1z, B3a}
     D, D_raw, S, Sdir   : given C* + all of P
     D                   : given C* + P + S;   S : given C* + P + D;   S : given C* + P + Sdir
     each B in P         : given C* + P minus B
     variant             : the same with dN/dS and LOEUF added to the conditioning set (smaller universe)
-    reproduction        : X4 panel (B1b, B1c, B1z, B2b, no B3a) for D_raw, S, Sdir must give X4's numbers
+    reproduction        : X4_where_differs panel (B1b, B1c, B1z, B2b, no B3a) for D_raw, S, Sdir must give its numbers
                           (liver H3 D 0.068, S 0.095; testis H4 S 0.055) before anything else is read.
 Testis D is the scoreboard D (clamped prior); D_raw (raw prior) is reported beside it.
 
 Part 2, label degradation. Recomputed with each label set: B1b_raw (E), B1c_raw (L), B2b, and also the
-X4 direct margin Sdir (added to the card here because Sdir is the labelled likelihood margin the
-reply cites; defined now, before any association). Same code paths as T4.2 (pseudobulk per library,
+X4_where_differs direct margin Sdir (added here because Sdir is the labeled likelihood margin;
+defined now, before any association). Same code paths as T4_2_gene_baselines (pseudobulk per library,
 log2 1+CPM, detection >= 1% in one group in both species, E on groups shared by the pair, L and B2b on
-groups shared by all species) and X4 (Sdir). Minimum cells per (species, group, library): 30 for label
-groups, 20 for Leiden clusters (T4.2's cluster rule).
-    full     : the T4.2 labels (liver obs.cell_type; testis T4.2 coarse map SG, SC, rSD, eSD, Sertoli,
-               Other_somatic). Must reproduce T4.2 B1b_raw, B1c_raw, B2b and X4 Sdir.
+groups shared by all species) and X4_where_differs (Sdir). Minimum cells per (species, group, library): 30 for label
+groups, 20 for Leiden clusters (T4_2_gene_baselines's cluster rule).
+    full     : the T4_2_gene_baselines labels (liver obs.cell_type; testis T4_2_gene_baselines coarse map SG, SC, rSD, eSD, Sertoli,
+               Other_somatic). Must reproduce T4_2_gene_baselines B1b_raw, B1c_raw, B2b and X4_where_differs Sdir.
     coarse3  : liver epithelial = {Hepatocytes, Cholangio}, endothelial = {Endothelial},
                stromal_immune = {fibroblasts, Kupffer cells, Macrophages, B Plasma cells, HsPCs};
                testis germ_early = {SG, SC}, germ_late = {rSD, eSD}, somatic = {Sertoli, Other_somatic}.
@@ -56,7 +57,7 @@ groups, 20 for Leiden clusters (T4.2's cluster rule).
                replacement, gets a different label drawn from the other types present in that species
                with probability proportional to their abundance (exactly q wrong). Three replicates
                (r0, r1, r2). Testis noise acts on the coarse-map labels.
-    leiden_r02 : sensitivity, the same clusters and matching with r >= 0.2. Added 2026-11-02 after reading
+    leiden_r02 : sensitivity, the same clusters and matching with r >= 0.2. Added after reading
                the testis match table (spermatid and Sertoli clusters reached best r 0.19-0.30 and stayed
                unmatched at 0.3) and before any degradation association was computed; no gold was read.
 Universe U_deg per gold: genes with gold, covariates, D, S, B1z_raw and every condition's B1b_raw,
@@ -67,8 +68,8 @@ label-free) and of every degraded score; deltas S - B and D - B on the same draw
 averaged per draw. Secondary: S and D given C* + that condition's B1b, B1c, B2b + B1z + B3a.
 Golds scored: liver H3 and H1; testis H4 (primates H4p beside it).
 
-Order of work is recorded in the ledger (definitions committed before labels were built; labels and
-degraded scores built and checked before any gold was joined).
+Order of work: definitions fixed before labels were built; labels and
+degraded scores built and checked before any gold was joined.
 """
 
 from __future__ import annotations

@@ -1,13 +1,13 @@
-"""Y1: independent pattern golds for kidney and pancreas, T4.3 H3 recipe unchanged. No Chimera readout is read.
+"""Independent pattern golds for kidney and pancreas, T4_3_scoreboard H3 recipe unchanged. No Chimera readout is read.
 
 Tabula Sapiens (10x 3' v3 cells only) vs Tabula Muris Senis (10x), raw counts in ``raw.X``, ages pooled. Types: committed
 ``gold_label_map.tsv``, every coarse type >= 30 cells in both atlases (checked). Per atlas and type: counts pooled over all
 cells, x = log2(1 + 1e6 C / sum C), library size over the human-mouse 1:1 vocabulary (kidney ortholog table, the 16,010 groups
 of Compara 110 from both dumps) present in both atlases. Scorable if detected in >= 1% of the cells of at least one type in both
-atlases. G = Pearson across the K types of the atlas-centred profiles (T4.3 ``profile_corr``). NaN for a constant profile.
+atlases. G = Pearson across the K types of the atlas-centered profiles (T4_3_scoreboard ``profile_corr``). NaN for a constant profile.
 
 Also written: atlas covariates (mean log2 CPM, detection, amplitude = SD across types, mean of the two atlases) and cell-half
-reliability (TS kidney has one donor, TS pancreas two usable, so donor halves do not exist; labelled technical).
+reliability (TS kidney has one donor, TS pancreas two usable, so donor halves do not exist; labeled technical).
 
     python -I analysis/tasks/Y1_gene_tissue/launch.py analysis.tasks.Y1_gene_tissue.atlas_gold
 """

@@ -6,7 +6,7 @@ embedding (k=15), Leiden at resolutions 0.2, 0.4, ..., 2.0, keep the
 clustering with the highest NMI (sklearn, arithmetic mean), report ARI
 (sklearn) of that clustering. Also reports resolution 1.0. Fixed before the
 pilot ran: primary = optimal-resolution values; SATURN primary latent = raw
-`.X` (z_raw.npy), L2-normalised z_mean.npy reported beside it.
+`.X` (z_raw.npy), L2-normalized z_mean.npy reported beside it.
 
 Published anchors (CAMEX Source Data, Fig. S1d, 4-species liver):
 CAMEX ARI 0.919, NMI 0.834; SATURN ARI 0.269, NMI 0.627.

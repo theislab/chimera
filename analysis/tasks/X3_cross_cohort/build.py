@@ -1,18 +1,18 @@
-"""X3 (EXPLORATORY): per-gene tables for the cross-cohort synthesis of the seven cohorts.
+"""EXPLORATORY: per-gene tables for the cross-cohort synthesis of the seven cohorts.
 
 For each cohort, every finished seed of the canonical recipe (canonical s42 MPS run plus the
-T3.2 / T3.2b CPU seeds; the T3.1 pooling rule kept every seed, see
+T3_2_seeds / T3_2b_extra_seeds CPU seeds; the seed-pooling rule of T3_3_consensus kept every seed, see
 ``results/analysis/X3/t3_3_provisional`` and ``results/analysis/T3_3``):
 
 * ``alpha`` (mean over seeds), ``prior_raw`` (unclamped mean ortholog identity),
   ``D_raw = alpha - prior_raw - cohort median`` (primary scale), ``D_clamp`` (against the
   clamped prior the testis recipes anchor on), ``S`` (mean ``S_g_ema`` over seeds), per-seed
   ``D_raw`` in ``seeds/<cohort>.parquet``.
-* Covariates from the T2.5 gene table (same definitions as ``analysis/common/cohorts.py``)
-  and log human CDS length (T2.4 cache); pair-specific protein identity from the ortholog table.
-* Baselines from T4.2 (``B1b_raw`` cross-species cell-type profile correlation, ``B1b`` its
+* Covariates from the T2_5_celltype_margin gene table (same definitions as ``analysis/common/cohorts.py``)
+  and log human CDS length (T2_4_covariates cache); pair-specific protein identity from the ortholog table.
+* Baselines from T4_2_gene_baselines (``B1b_raw`` cross-species cell-type profile correlation, ``B1b`` its
   residual, ``B1c_raw`` / ``B1c`` rank-matched level, ``B3b`` features-only ridge of s42 Δα).
-* Cell-type decomposition of S_g from T2.5 (canonical s42 checkpoint; weighted ``C_gk``,
+* Cell-type decomposition of S_g from T2_5_celltype_margin (canonical s42 checkpoint; weighted ``C_gk``,
   mean-z mode; testis on ``cell_ontology_class``), as ``C_<type>`` columns, and per-species
   contributions ``Csp_<species>`` (sum over types of w_sk S_gsk).
 * The 64 ESM-2 PCs of ``varm['gene_features']`` (``esm_<i>``).
@@ -67,13 +67,13 @@ def seed_runs(cohort: str) -> dict[int, str]:
 
 
 def group_of(cohort: str, cell_type):
-    """Liver: the cell type; testis: the T4.2 coarse stage (SG, SC, rSD, eSD, Sertoli, Other_somatic)."""
+    """Liver: the cell type; testis: the T4_2_gene_baselines coarse stage (SG, SC, rSD, eSD, Sertoli, Other_somatic)."""
     ct = pd.Series(cell_type).astype(str)
     return ct.map(T42.TESTIS_COARSE).to_numpy() if C.is_testis(cohort) else ct.to_numpy()
 
 
 def celltype_columns(cohort: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """T2.5 weighted contributions, testis fine types summed into coarse stages (identity kept)."""
+    """T2_5_celltype_margin weighted contributions, testis fine types summed into coarse stages (identity kept)."""
     Cg = pd.read_parquet(T25 / f"{cohort}__C_gk.parquet")
     Cg["cell_type"] = group_of(cohort, Cg["cell_type"])
     if Cg["cell_type"].isna().any():
@@ -91,7 +91,7 @@ def celltype_columns(cohort: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
 
 
 def type_pseudobulk(cohort: str) -> pd.DataFrame:
-    """T4.2 pseudobulk per (species, group); species-centred difference to human per group.
+    """T4_2_gene_baselines pseudobulk per (species, group); species-centered difference to human per group.
 
     ``dc_<sp>_<t>`` = (x_sp,t - mean_t' x_sp,t') - (x_H,t - mean_t' x_H,t') over the groups shared by
     human and that species (libraries with >= 30 cells), the per-type simple baseline for S_g.

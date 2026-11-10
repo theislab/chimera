@@ -1,4 +1,4 @@
-"""Y2 (EXPLORATORY): gene tables per cohort = X4 tables (readouts, baselines, covariates) + annotations + no-model terms.
+"""EXPLORATORY: gene tables per cohort = X4_where_differs tables (readouts, baselines, covariates) + annotations + no-model terms.
 
 No association is computed here. Prints coverage counts only.
 Usage (from chimera/): PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.Y2_functional.build
@@ -68,9 +68,9 @@ def main():
         t["un"] = t["S"].abs() >= 1e-6
         tabs[tissue] = t
         t.to_parquet(OUT / f"genes_{tissue}.parquet")
-    # replication: bone marrow and kidney. Margin flag recomputed by the T2.5 rule on the consensus (no canonical-seed table here).
+    # replication: bone marrow and kidney. Margin flag recomputed by the T2_5_celltype_margin rule on the consensus (no canonical-seed table here).
     gs = {"bone_marrow": RES / "P12/readout/bm_genes.parquet", "kidney": RES / "P13/readout/kidney_genes.parquet"}
-    # four-species liver, only for the fixed X2 list in (c)
+    # four-species liver, only for the fixed X2_liver_biology list in (c)
     g = pd.read_parquet(RES / "X4/genes/liv_4sp.parquet")
     t = g[[k for k in g.columns if not k.startswith(("cls_", "C_", "x_", "f_", "esm"))]]
     t = t.merge(ph.drop(columns=["ncbi", "mouse_ncbi", "mgi", "mouse_ens"], errors="ignore"), left_on="hsapiens_gene_id", right_index=True, how="left")

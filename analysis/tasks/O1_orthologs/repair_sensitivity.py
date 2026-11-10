@@ -1,4 +1,4 @@
-"""O2, after the gate only: T4.3 tests on repaired D, beside the frozen row. Rules in ledgers/O2_repair.md. Frozen folders are read, never written.
+"""After the gate of repair_compare.py only: the tests of T4_3_scoreboard on D of the identifier-joined ("repaired") objects, beside the frozen row. Frozen folders are read, never written.
 
 Arms, each a whole scoreboard run with the frozen draws, seeds and golds:
   can3        canonical D of seeds 42, 43, 44, frozen covariates and baselines: the like-for-like comparator for a 3-seed D;
@@ -43,7 +43,7 @@ TOOLS = RU.REPO / "results/analysis/T5_6/tools_primary.csv"
 
 
 def gate_open() -> None:
-    """Coordinator decisions after the gate (amendment log 2026-11-02): H+Mouse and testis H+Mouse passed; 4-sp beyond, marginal, opened as a labelled exception. H+Monkey stays closed here."""
+    """Outcome of the gate (amendment log of the pre-specified analysis plan, 2026-11-02): H+Mouse and testis H+Mouse passed; 4-sp beyond, marginal, opened as a labeled exception. H+Monkey stays closed here."""
     g = json.loads((OUT / "gate.json").read_text())
     for c in ("liv_hmouse", "test_hmouse"):
         if g[c]["all"]["beyond"] or g[c]["unrepaired"]["beyond"]:
@@ -74,7 +74,7 @@ def baselines() -> None:
 
 
 def shim() -> Path:
-    """R.RES stand-in: golds, T2.5 and DONE as frozen, no consensus-D B3b check, no baseline halves."""
+    """R.RES stand-in: golds, T2_5_celltype_margin and DONE as frozen, no consensus-D B3b check, no baseline halves."""
     d = OUT / "shim"
     (d / "T4_3").mkdir(parents=True, exist_ok=True)
     (d / "T3_3").mkdir(exist_ok=True)

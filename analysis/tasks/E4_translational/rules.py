@@ -1,49 +1,52 @@
-"""E4: translational reading of deployment. Card: definitions and predictions, fixed before any E4 association was computed.
+"""Translational reading of deployment. Definitions and predictions, fixed before any association of this task was computed.
 
-EXPLORATORY throughout. Nothing here changes a status, row or modifier of the plan or an H1, Z4 or E1 table. Vocabulary:
-CHIMERA_MECHANISM.md (canonical gate = main model; per-gene gate = companion read-out). Delta-alpha is "deployment relative to the
-protein prior", never conservation or selection. The gap between the two read-outs is task X8 and is not analysed here; agreement of
-the two is used only to define robust named calls, as E1 did.
+EXPLORATORY throughout. Nothing here changes a status, row or modifier of the plan or a table of analysis/tasks/H1_harmonise,
+Z4_free_gate_all or E1_atlas. Vocabulary: canonical gate (the protein-feature gate) = main model; per-gene gate = companion
+read-out. Delta-alpha is "deployment relative to the protein prior", never conservation or selection. The gap between the two
+read-outs is the subject of X8_gate_divergence and is not analyzed here; agreement of the two is used only to define robust named
+calls, as E1_atlas did.
 
 Question
 --------
 Does the placement of a human gene's cell-state deployment against its protein prior, read in a human+model-species fit of healthy
 tissue, say anything about how faithfully that model species represents the human gene? Four angles: (Q1) mouse model concordance
 with the human disease of the same gene; (Q2) where drug targets sit per tissue; (Q3) monogenic disease genes of a tissue's organ
-system in that tissue, mouse and primate pairs; (Q4) gene-level link to the disease-programme transfer results (P13 kidney, T7.9
-islet, T7.3 liver), descriptive.
+system in that tissue, mouse and primate pairs; (Q4) gene-level link to the disease-program transfer results (P13_kidney kidney, T7_9_islet
+islet, T7_3_mash liver), descriptive.
 
 What I knew when writing this
 -----------------------------
-E1 (tissue programmes on both gates, recurrent genes: cytokine receptors and junction scaffolds above; nuclear RNA machinery below;
-liver metabolism at or below the prior in its own tissue while pseudobulk ranks it first), H1, Z4 (per-gene gate validates on every
-gene-level gold), Y2 (MGI/IMPC phenotype-system concordance vs canonical D and S on liver, testis, marrow, kidney: not usable; only
-marrow S_g +0.117 own-system; built on pre-Z4 tables), Y6 use 3 (approved vs failed targets, Minikel: a lean for S, not a result;
-target vs not falls to ~0 with tau and PubMed), P13/T7.3/T7.9 H-D1 (healthy D does not predict gene-level disease transfer), the
-van Zyl glaucoma result (glaucoma genes AUROC 0.55 on D). No E4 resource has been joined to any read-out. I have not looked at where
+E1_atlas (tissue programs on both gates, recurrent genes: cytokine receptors and junction scaffolds above; nuclear RNA machinery
+below; liver metabolism at or below the prior in its own tissue while pseudobulk ranks it first), H1_harmonise, Z4_free_gate_all
+(per-gene gate validates on every gene-level gold), Y2_functional (MGI/IMPC phenotype-system concordance vs canonical D and S on
+liver, testis, marrow, kidney: not usable; only marrow S_g +0.117 own-system; built on tables from before Z4_free_gate_all),
+Y6_uses use 3 (approved vs failed targets, Minikel: a lean for S, not a result; target vs not falls to ~0 with tau and PubMed),
+H-D1 of P13_kidney, T7_3_mash and T7_9_islet (healthy D does not predict gene-level disease transfer), the van Zyl glaucoma
+result (glaucoma genes AUROC 0.55 on D). No resource of this task has been joined to any read-out. I have not looked at where
 any named drug target or disease gene sits in any cohort.
 
-Read-outs (per cohort, H1 schema, centred within cohort; table from E1 genes.calls, i.e. E1 cohort_table)
-------------------------------------------------------------------------------------------------------
-D_can   canonical gate (H1 tables), the main model.            D_free  per-gene gate (Z4 tables, Z4 kept seeds).
+Read-outs (per cohort, schema of H1_harmonise, centered within cohort; table from genes.calls of E1_atlas, i.e. its cohort_table)
+---------------------------------------------------------------------------------------------------------------------------------
+D_can   canonical gate (H1_harmonise tables), the main model.    D_free  per-gene gate (Z4_free_gate_all tables and kept seeds).
 S       count-evidence margin S_ema (canonical fits).            B1      pseudobulk cross-species profile correlation (the simple
-                                                                          pseudobulk comparison asked for in one clause per result).
-Universe = E1's: count-supported in both fits, one row per human Ensembl ID. Every value enters as its inverse-normal rank (INT)
-within the cohort universe. Covariates: pi_raw (identity), expr, det_human, det_partner_min (detection), tau (cell-type specificity),
-log PubMed counts human and mouse (Y2 annot/pheno.parquet, NCBI gene2pubmed of 2026-11-02). Mouse ortholog for disease joins:
-MGI HOM_MouseHumanSequence one-to-one class; it must agree with the Ensembl/MGI mapping Y2 used (else dropped).
+                                                                          pseudobulk comparison, stated in one clause per result).
+Universe = that of E1_atlas: count-supported in both fits, one row per human Ensembl ID. Every value enters as its inverse-normal
+rank (INT) within the cohort universe. Covariates: pi_raw (identity), expr, det_human, det_partner_min (detection), tau (cell-type
+specificity), log PubMed counts human and mouse (Y2_functional annot/pheno.parquet, NCBI gene2pubmed of 2026-11-02). Mouse
+ortholog for disease joins: MGI HOM_MouseHumanSequence one-to-one class; it must agree with the Ensembl/MGI mapping Y2_functional
+used (else dropped).
 
 Cohorts
 -------
-HM thread (human+mouse, one per tissue; marrow and lung are human, lemur, mouse fits): H1 PRIMARY.
+HM thread (human+mouse, one per tissue; marrow and lung are human, lemur, mouse fits): `PRIMARY` of H1_harmonise/rules.py.
 HM extra: muscle_ageing (sensitivity tissue), tumour_zilionis (not healthy: Q2 descriptive only).
 Primate pairs for Q3 replication: liv_hmonkey, test_hmac, vz_hmmul, vz_hmfas, brain_dlpfc_hchimp, brain_dlpfc_hmac, brain_dlpfc_hmarm
-(cortex primates are another study, DLPFC, than cortex mouse, M1; labelled). Other cohorts (pig, zebrafish, multi-species) not used.
+(cortex primates are another study, DLPFC, than cortex mouse, M1; labeled). Other cohorts (pig, zebrafish, multi-species) not used.
 
-Named calls (robust layer) = E1 rule unchanged: nameable on both gates (strict support, seed-stable signs, O1/C1 flags, no zero or
-quiet species, not a reference artefact), saturated in neither, |INT| >= 1 on both gates with the same sign. "below" = call -1,
-"above" = +1, "at" = tested, no call. Mitochondrially encoded genes never named. Every named gene is printed with pi, S, B1,
-detection human/partner and both INT values.
+Named calls (robust layer) = rule of E1_atlas unchanged: nameable on both gates (strict support, seed-stable signs, flags of
+O1_orthologs and C1_cohorts, no zero or quiet species, not a reference artifact), saturated in neither, |INT| >= 1 on both gates
+with the same sign. "below" = call -1, "above" = +1, "at" = tested, no call. Mitochondrially encoded genes never named. Every
+named gene is printed with pi, S, B1, detection human/partner and both INT values.
 
 Q1 Mouse model concordance (MGI human-mouse disease connection; IMPC Phenodigm via Open Targets as replication)
 ----------------------------------------------------------------------------------------------------------
@@ -68,10 +71,11 @@ approved = target of >= 1 drug with maxClinicalStage APPROVAL or PHASE_4; clinic
 approved; withdrawn-only targets are neither. Tissue-indicated approved = an approved drug-target pair whose indications include a
 non-oncology disease below the tissue's TA_OT ancestor (Open Targets disease index ancestors; oncology = ancestor MONDO_0004992
 cancer or EFO_0000616 neoplasm).
-Set statistic = H1/E1's: mean INT(read-out) of members minus the mean under permutation within pi x expression strata (10,000
-draws thread, 2,000 others); effect in SD units, z, two-sided p, BH within question. tau-strata sensitivity. Partial effect: OLS
-INT(read-out) ~ member + spline covariates (pi, expr, det_human, det_partner_min, tau, log PubMed human), member coefficient with
-gene bootstrap CI (1,000). Call shares: fraction of members called below / above against the stratum-matched expectation.
+Set statistic = that of H1_harmonise and E1_atlas: mean INT(read-out) of members minus the mean under permutation within pi x
+expression strata (10,000 draws thread, 2,000 others); effect in SD units, z, two-sided p, BH within question. tau-strata
+sensitivity. Partial effect: OLS INT(read-out) ~ member + spline covariates (pi, expr, det_human, det_partner_min, tau, log
+PubMed human), member coefficient with gene bootstrap CI (1,000). Call shares: fraction of members called below / above against
+the stratum-matched expectation.
 Naming: per tissue, tissue-indicated approved targets (then any approved) with a robust call; "mouse deployment differs" = below,
 with pi in the top half of the cohort (protein conserved); "well modelled" = above or at prior with B1 in the top half.
 
@@ -80,14 +84,14 @@ Q3 Disease-gene classes (Genomics England PanelApp green genes; DO organ classes
 Own-organ disease set per tissue = union of green (confidence 3) genes of PANELS[tissue]; each panel also alone. Testis: PanelApp
 DSD plus HPO genes annotated to Male infertility (HP:0003251) or descendants. Second source: MGI_DO human genes with the tissue's
 ORGAN_DO ancestor. Statistic as Q2 (set effect within pi x expr strata; tau sensitivity; partial with PubMed). Own versus other:
-z in the own tissue minus mean z of the same set in the other seven thread tissues, null from the same draws (E1's contrast).
+z in the own tissue minus mean z of the same set in the other seven thread tissues, null from the same draws (E1_atlas contrast).
 Retinal disorders panel is scored in eye as an off-tissue check (anterior segment, no photoreceptors; no expectation).
 Primate replication: own set in the primate pairs of the same tissue.
 
 Q4 Disease cohorts (descriptive)
 -------------------------------
-Kidney P13 primary DE (human AKI vs control, mouse IRI vs sham; PT, TAL, DCT, PC, EC, FIB), islet T7.9 (human T2D vs ND, mouse
-joint db/db + STZ; beta, alpha, delta), liver T7.3 hepatocytes. For own-organ disease genes and tissue-indicated targets in the
+Kidney P13_kidney primary DE (human AKI vs control, mouse IRI vs sham; PT, TAL, DCT, PC, EC, FIB), islet T7_9_islet (human T2D vs ND, mouse
+joint db/db + STZ; beta, alpha, delta), liver T7_3_mash hepatocytes. For own-organ disease genes and tissue-indicated targets in the
 universe: human DE (padj < 0.1) in a type, mouse log2FC same sign (transfer) or not; cross-tabulated with the healthy call
 (below / at / above). One Fisher test per tissue on (below vs rest) x (transfer vs not) among human-DE genes; named examples only.
 
@@ -95,13 +99,13 @@ Predictions (before any association)
 -----------------------------------
 E4-P1 Q1: pooled log OR per SD for D_free and S small positive (OR 1.02-1.15), CI likely including 1 on all disease genes;
       organ-matched larger but wider; D_can nearer 1; B1 about the same as S; PubMed the largest covariate. Y_impc same sign as
-      Y_mgi. Reason: Y2 found nothing at system level; a shared cell-state deployment of the gene in the affected organ should help
+      Y_mgi. Reason: Y2_functional found nothing at system level; a shared cell-state deployment of the gene in the affected organ should help
       a knockout reproduce the disease, but most Mendelian failures of mouse models are compensation, lifespan and dosage, which
       deployment does not see.
 E4-P2 Q2: approved targets above the prior (effect +0.1 to +0.3 SD) in most tissues on all four read-outs, smaller with tau;
       tissue-indicated approved targets at or above in their own tissue in kidney, islet, marrow, cortex, eye; liver-indicated at
-      or below in liver (E1's liver exception). Below-prior targets will be mostly enzymes and nuclear proteins with conserved
-      sequence; above-prior targets receptors, channels, transporters.
+      or below in liver (liver exception of E1_atlas). Below-prior targets will be mostly enzymes and nuclear proteins with
+      conserved sequence; above-prior targets receptors, channels, transporters.
 E4-P3 Q3: own-organ disease genes above matched genes in their own tissue in >= 5 of 8 tissues on D_free and S (disease genes
       have cell-type patterns), most of it gone with tau strata; liver at or below; own-versus-other contrast positive in >= 3
       tissues; B1 the same direction (pseudobulk shows it too); primate pairs the same direction. Retinal panel in eye: no
@@ -132,7 +136,7 @@ SEED = 20261104
 
 # reused downloads of earlier tasks (each pinned in its own MANIFEST.tsv)
 REUSED = {
-    "pheno": RES / "Y2" / "annot" / "pheno.parquet",            # PubMed counts (gene2pubmed 2026-11-02) and Y2's mouse mapping
+    "pheno": RES / "Y2" / "annot" / "pheno.parquet",            # PubMed counts (gene2pubmed 2026-11-02) and the mouse mapping of Y2_functional
     "hpo_g2p": REPO / "data" / "analysis" / "Y2" / "hpo" / "genes_to_phenotype.txt",
     "hp_obo": REPO / "data" / "analysis" / "Y2" / "onto" / "hp.obo",
 }
@@ -184,7 +188,7 @@ ORGAN_DO = {
     "skeletal muscle": {"DOID:0080000": "muscular disease"},
 }
 
-# Open Targets therapeutic ancestors for tissue-indicated targets. Amendment 1 (before any association): the 2026-09 disease index is
+# Open Targets therapeutic ancestors for tissue-indicated targets. Changed before any association was computed: the 2026-09 disease index is
 # MONDO-based and has none of the EFO names first written here, so each is replaced by the MONDO term of the same name ("disorder").
 TA_OT = {
     "liver": {"MONDO_0005154": "liver disorder"},
@@ -205,7 +209,7 @@ CLINICAL_STAGES = {"PHASE_1", "PHASE_1_2", "PHASE_2", "PHASE_2_3", "PHASE_3", "E
 DISEASE_DE = {
     "kidney": dict(human="P13/de/human_primary_{t}.tsv", mouse="P13/de/mouse_primary_{t}.tsv", types=["pt", "tal", "dct", "pc", "ec", "fib"]),
     "islet": dict(human="T7_9/de/human_t2d_vs_nd_{t}.tsv", mouse="T7_9/de/mouse_joint_{t}.tsv", types=["beta", "alpha", "delta"]),
-    # liver: primary contrast and the biopsy-type control sensitivity (T7.3: confounded by control tissue source; descriptive only)
+    # liver: primary contrast and the biopsy-type control sensitivity (T7_3_mash: confounded by control tissue source; descriptive only)
     "liver": dict(human="T7_3/de/human_primary.tsv", mouse="T7_3/de/mouse_primary.tsv", types=["hepatocyte"],
                   human_sens="T7_3/de/human_biopsy_controls.tsv"),
 }

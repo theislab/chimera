@@ -1,8 +1,8 @@
-"""Y5 (EXPLORATORY, Family 3): what else Chimera reveals, beyond the single-gene score against golds.
+"""EXPLORATORY, Family 3: what else Chimera reveals, beyond the single-gene score against golds.
 
-Fixed here before any Y5 association is computed. All Y5 tests are chosen after G3 and X1-X7 were known, so none
-is pre-specified in the sense of the analysis plan; none changes a status, row or modifier. Vocabulary follows
-ledgers/CHIMERA_MECHANISM.md. Predictions and the reading of each statistic are in ledgers/Y5_aspects.md.
+Fixed here before any association of this task is computed. All its tests are chosen after the decision row, its modifiers,
+the Family 3 values and the analyses X1_testis_discovery to X7_architecture_outputs were known, so none is pre-specified in the sense of the analysis plan; none
+changes a status, row or modifier.
 
 Hold-out. Genes are split by human chromosome: discovery = odd autosomes, replication = even autosomes. X, Y, MT
 and scaffolds are in neither half (X enters family F6 only, where the odd/even rule cannot apply and the replication
@@ -11,30 +11,31 @@ is an independent cohort). Where cells are the unit: independent cohort (TS, TMS
 Survivor rule (every family). BH across ALL discovery p-values of Chimera readouts over ALL families (one global
 list, `tried.csv`), q < 0.05; replication half same sign and p < 0.05 one-sided; a direct baseline or another tool is
 reported beside it on the same genes or cells. Effects with |rho_p| < 0.05 in either half are called "replicated,
-small". Named genes: X4 `nameable` only (margin-supported, seed-stable).
+small". Named genes: X4_where_differs `nameable` only (margin-supported, seed-stable).
 
-Seeds. G-V training-health gate (T12_2b select_recipe.gate; amendment a82eaad): no NaN, saturation <= 5% per tail,
+Seeds. G-V training-health gate (T12_2b_recipe/select_recipe.py, ``gate``; amendment log of the pre-specified analysis plan): no NaN, saturation <= 5% per tail,
 10/10 active z dims, both tails >= 2% of genes. Read on the canonical cohorts (results/analysis/Y5/seed_health.csv, health
 quantities only) the literal gate leaves: liv_4sp 42-46; liv_hmouse 42-45, 47, 49, 50; test_3sp 43, 44, 46; none of
 test_hmouse, test_hmac (the negative tail is measured against the 0.85-clamped prior, where it is empty by construction),
 liv_hmonkey (saturation 5.8-6.5%) or liv_hzeb (no negative tail). Rule, fixed on those quantities only: a survivor needs the
 literal-gate seeds. On testis that means test_3sp 43, 44, 46. test_hmouse and test_hmac seeds pass the gate with the tail
-measured on the raw prior (`pass_GV_rawtail`, all 9 and 1): they are reported as a labelled sensitivity beside test_3sp and
+measured on the raw prior (`pass_GV_rawtail`, all 9 and 1): they are reported as a labeled sensitivity beside test_3sp and
 cannot create a survivor. liv_hmonkey and liv_hzeb are descriptive only. Poorly mixed healthy seeds stay and are reported
 (the damage from poor mixing falls on D, not on S).
 
-Readouts. S = mean of S_g_ema over healthy seeds. D_raw = mean(alpha - pi_raw) over healthy seeds, centred on the cohort
+Readouts. S = mean of S_g_ema over healthy seeds. D_raw = mean(alpha - pi_raw) over healthy seeds, centered on the cohort
 median. c_full = MLP(f); c_esm = MLP(f with expr3 columns set to 0, the scaled mean); c_expr = MLP(f with esm64 and
 esm_var set to 0), mean over healthy seeds. These two are the GIN's protein-only and expression-only responses;
 identity scalars stay in both. A masked gene's D is feature extrapolation: analyses of S use unmasked genes.
 
 Statistic. rho_p = rank partial correlation given C4 = spline(pi_raw) + spline(log_cp10k_spmean) +
-spline(detection_spmean) + spline(log_cds_length) (T4.3 stats, X4 rho_unit); length as a property is tested without
-the length term. Sensitivity C_pat = C4 + tau_shared, because S and D first reward having a pattern (P12). CI and p from
-the block bootstrap over the T4.3 ESM gene modules (500 draws in scans, 2000 for survivors), p two-sided normal approx.
+spline(detection_spmean) + spline(log_cds_length) (T4_3_scoreboard stats, X4_where_differs rho_unit); length as a property is tested without
+the length term. Sensitivity C_pat = C4 + tau_shared, because S and D first reward having a pattern (bone-marrow cohort,
+T12_3_tests). CI and p from the block bootstrap over the T4_3_scoreboard ESM gene modules (500 draws in scans, 2000 for survivors),
+p two-sided normal approx.
 
-Comparators beside every gene result: B1b, B1c, B2b from T4.2; Sdir (X4 labelled no-model margin; pattern gain minus
-level cost) where X4 has it. Cell results: scVI, scANVI, sysVI, Harmony, PCA, SATURN, CAMEX latents on the same cells.
+Comparators beside every gene result: B1b, B1c, B2b from T4_2_gene_baselines; Sdir (X4_where_differs labeled no-model margin; pattern gain minus
+level cost) where X4_where_differs has it. Cell results: scVI, scANVI, sysVI, Harmony, PCA, SATURN, CAMEX latents on the same cells.
 """
 
 from __future__ import annotations
@@ -45,9 +46,9 @@ DRAWS_SCAN, DRAWS_SURVIVOR = 500, 2000
 ALPHA_Q = 0.05
 SMALL = 0.05
 
-PRIMARY = ["liv_hmouse", "liv_4sp", "test_3sp"]             # literal G-V seeds; X4 tables (Sdir, gold, block)
-SENS_RAWTAIL = ["test_hmouse"]                               # raw-prior tail; X4 tables; cannot create a survivor
-DESCRIPTIVE = ["liv_hmonkey", "liv_hzeb", "test_hmac"]       # literal G-V fails; no X4 table
+PRIMARY = ["liv_hmouse", "liv_4sp", "test_3sp"]             # literal G-V seeds; X4_where_differs tables (Sdir, gold, block)
+SENS_RAWTAIL = ["test_hmouse"]                               # raw-prior tail; X4_where_differs tables; cannot create a survivor
+DESCRIPTIVE = ["liv_hmonkey", "liv_hzeb", "test_hmac"]       # literal G-V fails; no X4_where_differs table
 EXTERNAL_TISSUE = {"vz_hmouse": "results/analysis/T11/readout/genes_hmouse.parquet",
                    "vz_full": "results/analysis/T11/readout/genes_full.parquet",
                    "vz_hmmul": "results/analysis/T11/readout/genes_hmmul.parquet",
@@ -122,7 +123,7 @@ ZONE = {
     "fibroblast": {
         "up": ["LRAT", "RELN", "PDGFRB", "COLEC11", "HGF", "NGFR", "LUM", "CXCL12"],
         "dn": ["MSLN", "UPK3B", "ELN", "PI16", "MYH11", "ACTA2", "TAGLN", "KRT19"]},
-    # Resident Kupffer programme vs monocyte-like: Guilliams 2022 (Cell), MacParland 2018.
+    # Resident Kupffer program vs monocyte-like: Guilliams 2022 (Cell), MacParland 2018.
     "macrophage": {
         "up": ["MARCO", "CD5L", "VSIG4", "SLC40A1", "CD163", "FOLR2", "TIMD4", "C1QA", "C1QB"],
         "dn": ["S100A8", "S100A9", "VCAN", "FCN1", "CCR2", "ITGAL", "PLAC8", "SELL"]},

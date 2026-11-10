@@ -6,7 +6,7 @@ Tools: tried = a score file or a recorded attempt (results/analysis/B1/attempts/
 Not counted as tried: a row still in the queue or not reached, and a job lost to a bad node (it stops before a run folder or an attempt record exists).
 
 Scope: tiers 0, 1, 2, 3, 10, 11 run (status "run"); tiers 4-6 planned, not run (status "planned, not run", tried = finished = 0). SAMap runs on tier 3 only if
-B2's BLAST graph exists before tier 3 is scored; otherwise every SAMap row is "not run: no BLAST graph".
+B2_benchmark's BLAST graph exists before tier 3 is scored; otherwise every SAMap row is "not run: no BLAST graph".
 
 Writes results/analysis/B1/completion.csv: track, task, setting, method, tried, finished, status; setting as in B1_tidy.csv, full cells and the marginals per cohort,
 per task and per task x band.   python -m analysis.tasks.B1_ground_truth.completion

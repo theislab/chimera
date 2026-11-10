@@ -1,4 +1,4 @@
-"""D1 (a) and (d): masked genes on every cohort with a gold, coverage, gold-free controls, incremental rho. Rows in results/analysis/D1/a_*.csv.
+"""(a) and (d): masked genes on every cohort with a gold, coverage, gold-free controls, incremental rho. Rows in results/analysis/D1/a_*.csv.
     python -m analysis.tasks.D1_sparse_genes.a_masked units      list of units
     python -m analysis.tasks.D1_sparse_genes.a_masked run        all units, joblib over SLURM cpus
     python -m analysis.tasks.D1_sparse_genes.a_masked goldfree   gold-free controls, no gold read
@@ -107,7 +107,7 @@ def goldfree():
             r[f"rho_D_{s}"] = float(spearmanr(t.loc[m, "D"][ok], t.loc[m, s][ok])[0])
             if s != "prior_raw" and ok.all():
                 r[f"prho_D_{s}"] = CM.partial(t.loc[m, "D"].to_numpy(float), t.loc[m, s].to_numpy(float), Z)
-        # cross-fitted R2 of D on the 64 ESM PCs, within masked and within unmasked (X4 mechanism_masked_r2); and trained on unmasked, applied on masked
+        # cross-fitted R2 of D on the 64 ESM PCs, within masked and within unmasked (X4_where_differs mechanism_masked_r2); and trained on unmasked, applied on masked
         for nm, rows_ in (("masked", m), ("unmasked", um)):
             y = t.loc[rows_, "D"].to_numpy(float)
             X = E[rows_]

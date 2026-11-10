@@ -1,4 +1,4 @@
-"""T4.1 checks on the gold standards: identifiers, scales and coverage only.
+"""Checks on the independent references (gold standards): identifiers, scales and coverage only.
 
 No Chimera readout is read here, and no gold value is related to any readout.
 Every number this script writes is a count, a scale summary or an ID overlap.

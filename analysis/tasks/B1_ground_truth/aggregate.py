@@ -1,4 +1,4 @@
-"""B1 tidy tables, in the schema of the benchmark overview: track, task, setting, method, metric, value, ci_lo, ci_hi, n, rank_direction.
+"""Tidy tables, in the schema of the benchmark overview: track, task, setting, method, metric, value, ci_lo, ci_hi, n, rank_direction.
 
 task: the alteration (pattern, level, loss) or null (sham_swap, thin_both, placebo). setting: 'cohort=..;effect=..;band=..;share=..;identity=..;fit=..',
 'all' where marginal. A failed fit removes only Chimera rows. A value is the mean over the fits of the setting; the CI is the 2.5-97.5 percentile of the mean of the fits' pair-bootstrap

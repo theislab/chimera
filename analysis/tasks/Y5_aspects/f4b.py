@@ -1,7 +1,7 @@
-"""Y5 F4 follow-up (amendment 9): why S_gsk profile similarity marks STRING partners on liver H+Mouse, and is it Chimera's.
+"""Follow-up of F4: why S_gsk profile similarity marks STRING partners on liver H+Mouse, and is it Chimera's.
 
-Profiles on the same (species, label) groups, unmasked genes: S (healthy-seed mean), each healthy seed, the X4 no-model margin per group
-(Sd), its pattern part (Sp) and level part (Sl), pseudobulk log CPM (PB), species-centred pseudobulk difference per type (Dpb).
+Profiles on the same (species, label) groups, unmasked genes: S (healthy-seed mean), each healthy seed, the X4_where_differs no-model margin per group
+(Sd), its pattern part (Sp) and level part (Sl), pseudobulk log CPM (PB), species-centered pseudobulk difference per type (Dpb).
 Golds: STRING physical experiments >= 700 and >= 400, HuRI (yeast two-hybrid, not abundance-biased), Reactome, Hallmark.
 Strata: 10 x 10 deciles of the two genes' species-balanced expression. All pairs, and pairs with neither gene in abundant machinery
 (MACHINERY regex, fixed here). Jackknife over 10 gene folds.
@@ -80,7 +80,7 @@ def task(i):
     key = "cell_ontology_class" if c.startswith("test") else "cell_type"
     S, PB, names, var = F4.profiles(c)
     Sd, Sp, Sl = direct_profiles(c, names)
-    # species-centred pseudobulk difference
+    # species-centered pseudobulk difference
     Dpb = PB.copy()
     lb = np.array([l for _, l in names])
     for l in np.unique(lb):

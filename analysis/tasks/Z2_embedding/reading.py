@@ -1,5 +1,5 @@
-"""Gene reading per run (Z1 diagnostics) and agreement with the canonical consensus (H1 tables): Spearman of D with consensus D on the consensus count-supported genes, S_g_ema likewise.
-Leave-one-out among canonical seeds first, as the reference. No gold is read; columns taken from H1 are alpha per seed, prior, D, S_ema, count support.
+"""Gene reading per run (Z1_retune diagnostics) and agreement with the canonical consensus (tables of analysis/tasks/H1_harmonise): Spearman of D with consensus D on the consensus count-supported genes, S_g_ema likewise.
+Leave-one-out among canonical seeds first, as the reference. No gold is read; columns taken from H1_harmonise are alpha per seed, prior, D, S_ema, count support.
 python -m analysis.tasks.Z2_embedding.reading [cohorts...]  Output: results/analysis/Z2/reading.csv, reading_loo.csv"""
 from __future__ import annotations
 

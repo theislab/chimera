@@ -1,4 +1,4 @@
-"""T2.5: cell-type decomposition of the fit-quality margin S_g from checkpoints.
+"""Cell-type decomposition of the fit-quality margin S_g (the count evidence) from checkpoints.
 
 A checkpoint-only forward pass (no training, nothing written to run dirs) recomputes,
 for every cell, the per-gene log-likelihood ratio the model uses for S_g

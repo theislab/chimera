@@ -1,6 +1,6 @@
-"""I1 exploratory, labelled: does the gate decide how much of the within-hepatocyte programme the shared head (and so z) must carry?
+"""Exploratory, labeled: does the gate decide how much of the within-hepatocyte program the shared head (and so z) must carry?
 
-Per seed of both gates (liver H+Mouse, liver 4-sp lines): mean alpha of the Z2 zonation markers present in the object, of the top 200 and
+Per seed of both gates (liver H+Mouse, liver 4-sp lines): mean alpha of the Z2_embedding zonation markers present in the object, of the top 200 and
 2000 genes by within-hepatocyte variance (log CP10K, all species pooled), and of all genes; beside the seed's zone AUROC from I1 units.
     python -m analysis.tasks.I1_free_gate_integration.mechanism
 Writes results/analysis/I1/mechanism_alpha.csv.

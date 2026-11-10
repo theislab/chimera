@@ -1,9 +1,9 @@
-"""05 section 6, Steps 1-4, applied mechanically to the scoreboard tables. Prints the row and
-the modifiers and writes ``row.json``. Only D enters (section 6, last rule).
+"""Decision procedure of the pre-specified analysis plan (section 6, Steps 1-4), applied mechanically to the
+scoreboard tables. Prints the row and the modifiers and writes ``row.json``. Only D enters (plan, section 6, last rule).
 
-Re-runnable: when T5.6 adds tool columns, ``run.py --tools <csv>`` adds the ``F1_tools`` rows
+Re-runnable: when analysis/tasks/T5_6_gene_level adds tool columns, ``run.py --tools <csv>`` adds the ``F1_tools`` rows
 (Delta_tool = rho_p(D_3) - rho_p(tool) on the paired universe) and this script then evaluates
-TOOL-LOSS; until then TOOL-LOSS is "pending" (it can only reduce a claim, 05 section 5).
+TOOL-LOSS; until then TOOL-LOSS is "pending" (it can only reduce a claim; plan, section 5).
 
 Usage: python -m analysis.tasks.T4_3_scoreboard.decide <outdir>
 """
@@ -44,7 +44,7 @@ def status(rho: float, lo: float, hi: float, p_holm: float) -> str:
 
 
 def head_to_head(d: pd.DataFrame) -> tuple[str, bool, dict]:
-    """Step 2 for one H_i over J; and the section 5 'Equivalent' rule."""
+    """Step 2 for one H_i over J; and the 'Equivalent' rule of pre-specified analysis plan, section 5."""
     d = d.set_index("comparator").reindex(J)
     if d["delta"].isna().any():
         missing = d.index[d["delta"].isna()].tolist()
@@ -72,7 +72,7 @@ def decide(outdir: Path) -> dict:
     for h in HYP:
         r = prim.loc[h]
         if h == "H3" and K_h3 < 3:
-            st[h] = "N"  # 05 section 4: K < 3 gives p = 1 and status N
+            st[h] = "N"  # pre-specified analysis plan, section 4: K < 3 gives p = 1 and status N
             continue
         st[h] = status(r.rho_p, r.ci_lo, r.ci_hi, r.p_holm)
     # Step 2
@@ -100,7 +100,7 @@ def decide(outdir: Path) -> dict:
                               and (stc["H1"] == "V" or stc["H2"] == "V") and stc["H3"] not in VW and stc["H4"] not in VW)
     mods["REVERSED-LIVER"] = st["H1"] == "R" or st["H3"] == "R"
     mods["REVERSED-TESTIS"] = st["H2"] == "R" or st["H4"] == "R"
-    # FEATURES-ONLY (05 section 5): on more than half of V golds, rho_p(D | C + 64 PCs) < 0.03
+    # FEATURES-ONLY (plan, section 5): on more than half of V golds, rho_p(D | C + 64 PCs) < 0.03
     # or rho_p(B3b, G) >= rho_p(D, G) - 0.03
     fo = {}
     for h in HYP:

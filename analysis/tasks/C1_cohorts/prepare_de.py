@@ -1,4 +1,4 @@
-"""C1: per-unit pseudobulks for the disease contrasts (plan sections 13b, 13c). No Chimera readout is read here.
+"""Per-unit pseudobulks for the disease contrasts (pre-specified analysis plan, sections 13b, 13c). No Chimera readout is read here.
 
 Output per case and species: results/analysis/C1/<case>/pb_<species>.h5ad, X summed counts, layers['n_detected'], obs unit,
 cell_ontology_class, condition (control or disease), covariates, n_nuclei; var_names symbol, var['gene_ids'] Ensembl ID.
@@ -31,7 +31,7 @@ SEAAD = {"microglia": CF.DATA / "ad_seaad/ab53c08f-03a3-4e0e-973a-44beabd78f60.h
          "oligodendrocyte": CF.DATA / "ad_seaad/021a2e09-19c6-42eb-9e52-3ed2cf3d6032.h5ad"}
 ZHOU = {"GSM4173504_WT_1": "control", "GSM4173505_WT_2": "control", "GSM4173506_WT_3": "control",
         "GSM4173510_WT_5XFAD_1": "disease", "GSM4173511_WT_5XFAD_2": "disease", "GSM4173512_WT_5XFAD_3": "disease"}
-# Fixed in plan section 13b before any contrast.
+# Fixed in pre-specified analysis plan, section 13b before any contrast.
 MARKERS = {"microglia": ["Csf1r", "Cx3cr1", "P2ry12"], "astrocyte": ["Aqp4", "Gfap", "Aldh1l1"], "oligodendrocyte": ["Mog", "Plp1", "Mbp"],
            "opc": ["Pdgfra", "Cspg4"], "excitatory": ["Slc17a7"], "inhibitory": ["Gad1", "Gad2"], "endothelial": ["Flt1"]}
 HAB = {"Macrophages": "macrophage", "AT2": "at2", "Endothelial Cells": "endothelial", "T Cells": "t", "cDCs": "dc", "Fibroblasts": "fibroblast", "Myofibroblasts": "fibroblast"}
@@ -221,7 +221,7 @@ def muscle_mouse() -> None:
 
 
 def sym_ids(symbols: pd.Series, tag: str) -> pd.Series:
-    """Symbols through the release of the matrix (checklist 2b): Habermann Ensembl 84 (33,660 of 33,694 names, Cell Ranger GRCh38 1.2), Strunz Ensembl 75 (23,400 of 23,400)."""
+    """Symbols through the release of the matrix: Habermann Ensembl 84 (33,660 of 33,694 names, Cell Ranger GRCh38 1.2), Strunz Ensembl 75 (23,400 of 23,400)."""
     return symbols.map(OR.release_names(tag))
 
 

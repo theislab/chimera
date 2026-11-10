@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Submits SAMap on the tier-3 rows once B2's BLAST graph exists; gives up at the deadline (date -d form). Run from chimera/.
+# Submits SAMap on the tier-3 rows once B2_benchmark's BLAST graph exists; gives up at the deadline (date -d form). Run from chimera/.
 DEADLINE=${1:-"2026-11-04 13:00"}
 G=data/analysis/B2/tools/samap/graph
 until [[ -d $G && -n "$(ls -A $G 2>/dev/null)" ]]; do

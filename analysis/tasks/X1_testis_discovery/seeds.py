@@ -1,6 +1,6 @@
-"""X1 (EXPLORATORY): T2.5 margin decomposition on extra testis seeds (checkpoint forward pass only).
+"""EXPLORATORY: T2_5_celltype_margin margin decomposition on extra testis seeds (checkpoint forward pass only).
 
-Uses the T2.5 forward pass and decomposition code unchanged (``T2_5_celltype_margin/run.py``,
+Uses the T2_5_celltype_margin forward pass and decomposition code unchanged (``T2_5_celltype_margin/run.py``,
 ``margin.py``) on finished seed runs (``summary.json`` present). Only the fine
 ``cell_type`` key is decomposed (the coarse stages are summed from it in ``build.py``).
 Writes ``results/analysis/X1/forward/<cohort>_s<seed>__{S_gsk,genes}.parquet``; nothing is

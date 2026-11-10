@@ -1,23 +1,23 @@
-"""T5.6 analysis of the tool scalars (chimera_env), after scalars.py. Fixed before any result was read.
+"""Analysis of the tool scalars (chimera_env), after scalars.py. Fixed before any result was read.
 
-D_3 = mean of alpha - prior over seeds 42-44, centred on the cohort median (signs within a cohort
-only). Covariates C3 = spline of rank pi_raw, rank log mean, rank detection (the M4 rule, 05 section 5);
-C3 + rank log CDS length is reported beside it (the section 3 set C).
+D_3 = mean of alpha - prior over seeds 42-44, centered on the cohort median (signs within a cohort
+only). Covariates C3 = spline of rank pi_raw, rank log mean, rank detection (pre-specified analysis plan, section 5);
+C3 + rank log CDS length is reported beside it (the covariate set C of plan, section 3).
 
 Reliability. For a scalar over seeds 42-44: pairwise Spearman (median) and r = mean pairwise
 correlation of rank residuals on C3, stepped up to the three-seed mean, rel = 3r / (1 + 2r). Same for
-D_3 on the same genes. A4: rel below 0.5 is labelled unstable. "Seed reliability measures
-determinism": it says nothing about validity (CHIMERA_MECHANISM.md).
+D_3 on the same genes. rel below 0.5 is labeled unstable. Seed reliability measures
+determinism: it says nothing about validity.
 
 L1. Spearman of each scalar with alpha (mean of three seeds), D_3 and pi_raw; headline partial
-Spearman with D_3 given C3. CI: ESM-module block bootstrap, 10,000 draws (05 section 3). p: two-sided,
+Spearman with D_3 given C3. CI: ESM-module block bootstrap, 10,000 draws (plan, section 3). p: two-sided,
 10,000 permutations of residuals within pi decile x expression decile; BH over the whole grid. Class on
 the observed |rho_p|: concordant >= 0.3, orthogonal < 0.1, otherwise partial; disattenuated by
 sqrt(rel_scalar rel_D3) in brackets, never used for the class.
 
 L2. Per seed, per arm. Modules: SATURN macrogenes (weight >= 0.5, else top 10 per species); CAMEX
 Leiden modules at resolution 1.0. Weighted-mean Delta-alpha, mixed-sign index 1 - |n+ - n-| / (n+ + n-)
-among members with |D_3| > 0.05 (the T2.5 tail floor) in modules with at least 5 such members. Hard
+among members with |D_3| > 0.05 (the T2_5_celltype_margin tail floor) in modules with at least 5 such members. Hard
 module: largest mean weight (SATURN), human member's module (CAMEX). eta^2 of D_3 by hard module.
 Null: D_3 permuted within pi decile x expression decile, 10,000 draws. p_coherent = P(null eta^2 >=
 observed), p_mixed = P(null mixed-sign >= observed).
@@ -26,14 +26,14 @@ Native arm, descriptive. SATURN: per species and shared type, macrogene Wilcoxon
 other cells of the species on the macrogene values (BH < 0.05, score > 0); conserved macrogene: up in
 both species for the type; divergent: up in one; a macrogene in both unions over types leaves both
 lists. Genes: top 10 by weight per macrogene and species. Curated sets outside 15-500 genes in the
-universe are not tested by the GSEA (T7.9 machinery).
-Fisher ORA of the union lists on the curated sets of T4.3 (C1, C2, V1, V2, V3) and MSigDB Hallmark
+universe are not tested by the GSEA (T7_9_islet machinery).
+Fisher ORA of the union lists on the curated sets of T4_3_scoreboard (C1, C2, V1, V2, V3) and MSigDB Hallmark
 2020, background the arm's genes (human symbols), BH per list. CAMEX: Fisher ORA of each module at
 resolution 1.0 (10 or more genes), BH over modules x sets; a set is recovered if any module passes.
-Delta-alpha: preranked weighted-KS GSEA of D_3 (T7.9 machinery, 10,000 gene-set permutations), BH.
+Delta-alpha: preranked weighted-KS GSEA of D_3 (T7_9_islet machinery, 10,000 gene-set permutations), BH.
 A tool recovers a set if q < 0.05 in at least 2 of 3 seeds.
 
-Primary scalars for T4.3: results/analysis/T5_6/tools_primary.csv (S_deploy_native, S_deploy_1to1,
+Primary scalars for T4_3_scoreboard: results/analysis/T5_6/tools_primary.csv (S_deploy_native, S_deploy_1to1,
 C_cos). TOOL-LOSS is read on these three columns (both SATURN arms, since the plan reports both and
 the modifier can only reduce a claim); secondary scalars never enter it.
 """

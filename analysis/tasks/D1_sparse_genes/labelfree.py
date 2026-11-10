@@ -1,4 +1,4 @@
-"""D1 test L: S_fwd against a label-free direct margin (rules.py). Reads no gold in `latent`.
+"""Test L: S_fwd against a label-free direct margin (rules.py). Reads no gold in `latent`.
     python -m analysis.tasks.D1_sparse_genes.labelfree grid             write lf_grid.tsv
     python -m analysis.tasks.D1_sparse_genes.labelfree latent --index I  one latent, clusters, Sdir on them
     python -m analysis.tasks.D1_sparse_genes.labelfree score            head-to-heads, results/analysis/D1/L_rho.csv, L_calls.csv

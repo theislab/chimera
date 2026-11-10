@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Existing models through encoders, skipping finished ones. liv_hmouse: healthy seeds and Y5 scVI; test_hmouse: healthy seeds and Y5 scVI.
+# Existing models through encoders, skipping finished ones. liv_hmouse: healthy seeds and Y5_aspects scVI; test_hmouse: healthy seeds and Y5_aspects scVI.
 export PYTHONPATH=$PWD OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 PYTHONUNBUFFERED=1
 PY="mamba run --no-capture-output -n chimera_env python"
 for r in xds-hmouse-iter90-150ep-s42 xds-hmouse-iter90-150ep-s43 xds-hmouse-iter90-150ep-s44 rev-liv_hmouse-s45 rev-liv_hmouse-s46 rev-liv_hmouse-s47 rev-liv_hmouse-s48 rev-liv_hmouse-s49 rev-liv_hmouse-s50 rev-liv_hmouse-s51; do

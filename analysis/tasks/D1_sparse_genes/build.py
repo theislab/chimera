@@ -1,4 +1,4 @@
-"""D1 gene tables, one per cohort: readouts, covariates, golds, flags, strata, feature-only comparators. No association with a gold is computed here.
+"""Gene tables, one per cohort: readouts, covariates, golds, flags, strata, feature-only comparators. No association with a gold is computed here.
     python -m analysis.tasks.D1_sparse_genes.build paralogs      closest paralog pairs from Compara 110
     python -m analysis.tasks.D1_sparse_genes.build <cohort>      writes results/analysis/D1/genes/<cohort>.parquet, features/<cohort>.npy
 """
@@ -51,7 +51,7 @@ def knn_mean(E: np.ndarray, train: np.ndarray, values: dict[str, np.ndarray], k:
     pick = idx[ind]
     self_hit = pick == np.arange(len(E))[:, None]
     w = (~self_hit).astype(float)
-    w[~self_hit.any(1), -1] = 0.0  # non-train gene: first k neighbours
+    w[~self_hit.any(1), -1] = 0.0  # non-train gene: first k neighbors
     w /= w.sum(1, keepdims=True)
     for n, v in values.items():
         vv = v[pick]
@@ -61,7 +61,7 @@ def knn_mean(E: np.ndarray, train: np.ndarray, values: dict[str, np.ndarray], k:
 
 
 def feature_only(t: pd.DataFrame, F: np.ndarray, train: np.ndarray, S: str = "S_ema") -> pd.DataFrame:
-    """Ridge and neighbour comparators built on genes in ``train`` only; a gene outside it is predicted by models that never saw it."""
+    """Ridge and neighbor comparators built on genes in ``train`` only; a gene outside it is predicted by models that never saw it."""
     Fp = F[:, RU.PROT_COLS]
     E = F[:, RU.ESM_COLS]
     out = pd.DataFrame(index=t.index)

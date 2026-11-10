@@ -1,4 +1,4 @@
-"""O1 part B4, B5: H1 recurrence and the X4, X6 statistics behind C38-C43 without flagged genes. Same code as the owners, frames filtered at the loader, outputs under results/analysis/O1/.
+"""Recurrence of H1_harmonise and the statistics of X4_where_differs and X6_adds_beyond that the paper cites, recomputed without flagged genes. Same code as the owning tasks, frames filtered at the loader, outputs under results/analysis/O1/.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.findings h1 --tier T3
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.findings x6 --tier T3
@@ -33,14 +33,14 @@ def h1(tier: str, jobs: int) -> None:
     (out / "genes").mkdir(parents=True, exist_ok=True)
     for c, x in F.items():
         src = RU.REPO / f"results/analysis/H1/genes/{c}.parquet"
-        if not src.exists():  # the two eye fits not yet in H1's own tables
+        if not src.exists():  # the two eye fits that are not in H1_harmonise's own tables
             continue
         g = pd.read_parquet(src)
         g = g[~g.hsapiens_gene_id.isin(set(x.hsapiens_gene_id[x[tier]]))]
         g.to_parquet(out / "genes" / f"{c}.parquet")
     for f in ("runs.tsv",):
         shutil.copy(RU.REPO / f"results/analysis/H1/{f}", out / f)
-    env = dict(os.environ, H1_OUT=str(out), PYTHONPATH=str(RU.REPO), H1_EXTRA=str(out / "no_extra_runs.tsv"))  # the 14 cohorts of H1's tables
+    env = dict(os.environ, H1_OUT=str(out), PYTHONPATH=str(RU.REPO), H1_EXTRA=str(out / "no_extra_runs.tsv"))  # the 14 cohorts of the H1_harmonise tables
     subprocess.run([sys.executable, str(RU.REPO / "analysis/tasks/H1_harmonise/recurrence.py"), "--jobs", str(jobs)], env=env, check=True)
 
 
@@ -85,7 +85,7 @@ def x4(tier: str, jobs: int) -> None:
 
 
 def signature(A, CM, G, out) -> None:
-    """The X2 programme block of X4 ``mechanism``, alone: the full section needs every gene in run order."""
+    """The X2_liver_biology program block of X4_where_differs ``mechanism``, alone: the full section needs every gene in run order."""
     lst = pd.read_csv(CM.RES / "X2/divergent_conserved.csv")
     prog = sorted(set(lst[lst.cohort == "liv_4sp"].symbol) - {"MT-CO1"})
     sets = {"prog63_noMT": prog, "core15": A.PROG_CORE, "fasting6": A.FASTING}

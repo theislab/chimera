@@ -1,7 +1,7 @@
-"""T6.1 ID coverage of the functional-layer sources. Counts only.
+"""ID coverage of the functional-layer sources. Counts only.
 
 No Chimera readout is read. Each number is an ID count in the liver (8,879) and testis
-(15,732) ortholog-table vocabularies, the same denominators as A7 section 2.6.
+(15,732) ortholog-table vocabularies.
 
 Usage: python -I coverage.py <chimera_repo> <out_dir>
 """

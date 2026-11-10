@@ -4,7 +4,7 @@
 #SBATCH --qos=cpu_normal
 #SBATCH --time=23:50:00
 #SBATCH --exclude=cpusrv114
-# Z4 Config M (free per-gene gate) seeds on every harmonised cohort; recipe = the cohort's chosen canonical recipe with --config M (as Z3).
+# Z4 Config M (free per-gene gate) seeds on every harmonized cohort; recipe = the cohort's chosen canonical recipe with --config M (as Z3_free_gate).
 # Usage (from chimera/): sbatch --array=<rows>%<n> -c 8 --mem=<mem of those rows> --output=results/analysis/Z4/logs/%x_%A_%a.out analysis/tasks/Z4_free_gate_all/train.sbatch
 source analysis/slurm/_body.sh
 M=${Z4_MANIFEST:-analysis/tasks/Z4_free_gate_all/manifest.tsv}; I=$SLURM_ARRAY_TASK_ID

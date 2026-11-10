@@ -1,10 +1,10 @@
-"""C1: Ensembl 110 one-to-one ortholog table for a set of species, joined on the human gene.
+"""Ensembl 110 one-to-one ortholog table for a set of species, joined on the human gene.
 
-Same rules as T12.1 and P13 (``T12_1_bone_marrow/build_orthologs.py``): Compara 110
+Same rules as T12_1_bone_marrow and P13_kidney (``T12_1_bone_marrow/build_orthologs.py``): Compara 110
 ``protein_default.homologies`` dumps of both species of each pair, because a dump writes each
 homology once under one of its two species; rows with ``homology_type == ortholog_one2one``; 1:1
 enforced on both sides; ``<sp>_identity`` = Compara percent of the human protein identical to the
-other protein (the quantity BioMart reports, checked by T12.1 against the canonical testis table);
+other protein (the quantity BioMart reports, checked by T12_1_bone_marrow against the canonical testis table);
 ``mean_identity`` = mean over the non-human species of the table; symbols from the Ensembl 110 GTFs.
 Human is the hub in every table, also for the regeneration cohort, which has no human cells: Ensembl
 IDs of human are the only valid join across cohorts (``analysis/common/gene_ids.py``), and the prior
@@ -13,9 +13,9 @@ then reads as identity to human in every cohort.
 Also kept: ``<sp>_dn``, ``<sp>_ds`` (Compara, human against that species; NaN where absent) for the
 per-cohort dN/dS beside the human-mouse gold.
 
-Filters on each human-partner pair, counted in the report (coordinator, after Y6 found wrong one-to-one pairs in older tables, PIN1 to Pin1rt1, GJA1 to Gja6, RPL36AL to Gm6525):
+Filters on each human-partner pair, counted in the report (analysis/tasks/Y6_uses found wrong one-to-one pairs in tables without these filters: PIN1 to Pin1rt1, GJA1 to Gja6, RPL36AL to Gm6525):
 `is_high_confidence == 1`; `protein_coding` biotype in both species (GTF); no retrocopy target, meaning a target with one exon against a human gene with at least
-three exons in their longest transcripts (Y6 shape) unless GOC and WGA are both above 50; no target that differs in name from the human gene while a different gene of the partner species carries the
+three exons in their longest transcripts (Y6_uses shape) unless GOC and WGA are both above 50; no target that differs in name from the human gene while a different gene of the partner species carries the
 human name, case-insensitive (the shape of the wrong pairs above; flagged only when GOC and WGA are both above 50). GOC and WGA are kept as `<sp>_goc`, `<sp>_wga`.
 
 A group is kept only if every gene is in the measured feature list of its species (``measured``):
@@ -109,7 +109,7 @@ OLD = gene_ids.REPO_ROOT / "data" / "analysis" / "new_usecases" / "ensembl_old"
 
 
 def release_names(tag: str) -> pd.Series:
-    """Symbol -> stable Ensembl ID in the release a symbol-only matrix was built on (checklist 2b), names unique within that release. tag: hs91, mm81, hs84, mm75."""
+    """Symbol -> stable Ensembl ID in the release a symbol-only matrix was built on, names unique within that release. tag: hs91, mm81, hs84, mm75."""
     t = gtf_table(OLD / f"{tag}.gtf.gz")["name"].dropna()
     u = t[~t.duplicated(keep=False)]
     return pd.Series(u.index, index=u.values)
@@ -153,7 +153,7 @@ def pair_rows(partner: str, cache: dict | None = None) -> tuple[pd.DataFrame, di
     weak0 = ~((d["goc_score"] > 50) & (d["wga_coverage"] > 50))
     shape = (ep <= 1) & (eh >= 3)
     # One exon against three is also the shape of genuine intronless genes with an extra annotated human isoform, so the shape removes only with weak synteny labels
-    # (GOC or WGA at most 50). A true gene with weak labels still goes (mouse: 4 pairs, Jun among them), stated in the ledger.
+    # (GOC or WGA at most 50). A true gene with weak labels still goes (mouse: 4 pairs, Jun among them).
     retro = shape & weak0
     rep["retrocopy_shape_strong_labels_kept"] = int((shape & ~weak0).sum())
     rep["removed_retrocopy_shape"] = int(retro.sum())

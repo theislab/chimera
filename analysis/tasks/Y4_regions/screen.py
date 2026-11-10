@@ -1,4 +1,4 @@
-"""Y4 (EXPLORATORY): compute T1-T4 for every unit on one split (definitions in rules.py).
+"""EXPLORATORY: compute T1-T4 for every unit on one split (definitions in rules.py).
 
 `python -m analysis.tasks.Y4_regions.screen coverage`  coverage only, no gold value compared
 `python -m analysis.tasks.Y4_regions.screen discovery` odd autosomes, all regions and decoys

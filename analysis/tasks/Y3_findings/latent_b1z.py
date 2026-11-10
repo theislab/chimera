@@ -1,24 +1,24 @@
-"""Y3 (EXPLORATORY): does the liver-pattern information of B1z belong to Chimera's latent?
+"""EXPLORATORY: does the liver-pattern information of B1z belong to Chimera's latent?
 
-X6 found that profile correlation over Leiden clusters of Chimera's latent (B1z) carries the most unique
+X6_adds_beyond found that profile correlation over Leiden clusters of Chimera's latent (B1z) carries the most unique
 liver-pattern information (0.104), and left open whether another integrator's latent does as well. This
-applies the T4.2 B1z recipe, unchanged, to the other latents already on disk. No training. Chosen after the
-scoreboard and after X6, so it is exploratory and changes no status, row or modifier.
+applies the T4_2_gene_baselines B1z recipe, unchanged, to the other latents already on disk. No training. Chosen after the
+scoreboard and after X6_adds_beyond, so it is exploratory and changes no status, row or modifier.
 
 Definitions, fixed before any association below was computed:
-    cohorts   liv_hmouse, test_hmouse (X6's two cohorts).
-    latents   Chimera canonical s42 (must reproduce T4.2 B1z_raw); scVI s42 with species as batch and with
+    cohorts   liv_hmouse, test_hmouse (X6_adds_beyond's two cohorts).
+    latents   Chimera canonical s42 (must reproduce T4_2_gene_baselines B1z_raw); scVI s42 with species as batch and with
               library as batch; SATURN s42 and CAMEX s42 as scored in the benchmark (z_mean.npy).
     recipe    T4_2 leiden_clusters (15-NN exact, resolution 1, igraph, fixed seed), pseudobulk per library with
               at least 20 cells per cluster, pooled_E over the species pair.
-    golds     G_H3 (C_pat), G_H4 (C_pat + H4_nsp), G_H4_primates (C_pat + H4_npri), as X6; level golds G_H1, G_H2
+    golds     G_H3 (C_pat), G_H4 (C_pat + H4_nsp), G_H4_primates (C_pat + H4_npri), as X6_adds_beyond; level golds G_H1, G_H2
               (C) reported beside them.
-    universe  one per gold and variant: genes with the gold, covariates, D, S, the X6 panel, B1z_chimera and that variant.
-              Amendment after the first run, in which no association was computed because the joint universe was
+    universe  one per gold and variant: genes with the gold, covariates, D, S, the X6_adds_beyond panel, B1z_chimera and that variant.
+              Changed after the first run, in which no association was computed because the joint universe was
               empty: scVI and SATURN latents leave at most 1-9 Leiden clusters holding both species, so B1z is
               undefined for most genes on them. The cluster table is therefore itself a result.
     tests     (a) rho_p of each variant given covariates; delta to Chimera's B1z, joint block bootstrap.
-              (b) each variant given covariates + the other simple baselines B1b, B1c, B2b, B3a (X6's 'other
+              (b) each variant given covariates + the other simple baselines B1b, B1c, B2b, B3a (X6_adds_beyond's 'other
               simple baselines'). (c) Chimera's B1z given the variant, and the variant given Chimera's B1z.
 
 Writes results/analysis/Y3/b1z_latents.csv, b1z_clusters.csv and cache/b1z__<cohort>.parquet.

@@ -1,4 +1,4 @@
-"""G1 step 2: exact comparison of the short fits. Every tensor of the state dict with torch.equal, every array of final_state.npz by bytes, the end RNG states, per group.
+"""Step 2: exact comparison of the short fits. Every tensor of the state dict with torch.equal, every array of final_state.npz by bytes, the end RNG states, per group.
     python bitproof_compare.py <before tree> <after tree> <out.csv>
 """
 

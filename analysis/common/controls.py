@@ -7,7 +7,7 @@ Definitions follow the pre-specified analysis plan:
   is irrelevant for rank statistics and is not subtracted here.
 * Covariates C: natural cubic splines (df 4, knots at the rank quartiles) of rank raw prior,
   rank species-mean log1p CP10K, rank species-mean detection and rank log human CDS length.
-* Residual scale: rank each score, residualise on C by OLS, Pearson of the residuals.
+* Residual scale: rank each score, residualize on C by OLS, Pearson of the residuals.
 * Floor F: for each of the cohort's seeds, rho(seed, mean of the other seeds), on the same scale.
   Calls (residual scale): preserved if rho >= min F, lost if rho < 0.5 * median F, partial otherwise.
 """

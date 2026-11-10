@@ -1,10 +1,11 @@
-"""P13: Ensembl 110 human-mouse 1:1 ortholog table for the kidney cohort (plan section 8c).
+"""Ensembl 110 human-mouse 1:1 ortholog table for the kidney cohort (pre-specified analysis plan, section 8c).
 
 Source: Ensembl Compara 110 ``protein_default.homologies`` TSV dumps, both the Homo sapiens
 file (``data/analysis/ensembl110/``) and the Mus musculus file
-(``data/analysis/bone_marrow/ensembl110/``, fetched in T12.1). The dump writes each homology
-once, under one of its two species, so about a third of the human-mouse pairs exist only in the
-mouse file; mouse-file rows are re-oriented (T12.1, ``build_orthologs.read_compara`` logic).
+(``data/analysis/bone_marrow/ensembl110/``, fetched for the bone-marrow cohort,
+analysis/tasks/T12_1_bone_marrow). The dump writes each homology once, under one of its two
+species, so about a third of the human-mouse pairs exist only in the mouse file; mouse-file rows
+are re-oriented (logic of ``build_orthologs.read_compara`` in T12_1_bone_marrow).
 Rows with ``homology_type == ortholog_one2one``; 1:1 enforced on both sides.
 
 Columns, in the canonical (BioMart-built) layout: ``ortholog_group_id``, ``hsapiens_gene_id``,

@@ -1,8 +1,8 @@
-"""B2 Track C: atlas level golds, written before any readout is joined. No Chimera readout is read.
+"""Track C: atlas level golds, written before any readout is joined. No Chimera readout is read.
 
-G_lvl_<tissue>: per-type rank-matched level between two independent atlases, the B1c formula on the atlas profiles: within each type, genes are rank-normalised per
+G_lvl_<tissue>: per-type rank-matched level between two independent atlases, the B1c formula on the atlas profiles: within each type, genes are rank-normalized per
 atlas (mid-ranks / n), L = -mean over types of |r_TS - r_TMS|; defined if detected in >= 1% of the cells of at least one type in both atlases. Liver from the H3 profiles;
-kidney and pancreas from the committed Y1 label maps (TS vs TMS). Writes results/analysis/B2/inputs/atlas_level_golds.parquet (index: human ENSG).
+kidney and pancreas from the committed Y1_gene_tissue label maps (TS vs TMS). Writes results/analysis/B2/inputs/atlas_level_golds.parquet (index: human ENSG).
 """
 
 from __future__ import annotations

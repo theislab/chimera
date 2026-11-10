@@ -1,16 +1,16 @@
-"""P13: apply the pre-committed selection rule to the kidney healthy-model recipe grid (README.md).
+"""Apply the selection rule, fixed before training, to the kidney healthy-model recipe grid (README.md).
 
 1. Gate G-D2 on each finished grid run (s42): no NaN; saturation <= 5% in each alpha tail;
    10/10 active z dims; both tails of alpha - prior present.
 2. Among runs that pass, the integration composite from
    ``training/compare_vs_scvi.py::compute_integration_metrics`` (k=15, seed=42) on ``z_mean``
    with ``obs["cell_ontology_class"]`` (the kidney SubclassLevel1 classes): the six metrics
-   direction-corrected and min-max normalised across the passing runs, then
+   direction-corrected and min-max normalized across the passing runs, then
    0.4 * mixing + 0.6 * biology (formula of notebooks/07_baselines_master.ipynb). Highest
    composite wins; ties (|diff| < 1e-9) go to the lower grid_id.
 
 No Delta-alpha statistic beyond the gate's tail check, no DE, disease or biology
-readout is read here (plan section 8c).
+readout is read here (pre-specified analysis plan, section 8c).
 
     python -I analysis/tasks/P13_recipe/select_recipe.py [--write-seed-manifest [--all-jobs-ended]]
 """
@@ -40,7 +40,7 @@ SEEDS = (43, 44, 45, 46)
 BATCH_KEYS = ["knn_species_purity", "knn_mixing_entropy", "sil_species"]
 BIO_KEYS = ["knn_celltype_purity", "sil_celltype", "label_transfer_acc"]
 
-# Gate G-D2 thresholds (plan sections 8b, 8c) (fixed before training).
+# Gate G-D2 thresholds (pre-specified analysis plan, sections 8b, 8c) (fixed before training).
 SAT_MAX = 0.05          # each alpha tail: frac(alpha > 0.95) and frac(alpha < 0.05)
 ZVAR_MIN = 0.01         # a z dim is active if Var over cells of z_mean >= 0.01
 N_ACTIVE = 10

@@ -1,10 +1,12 @@
-"""B1: SATURN (1:1 arm, Adapter B) and CAMEX on altered objects, main settings. Same adapters and parameters as T5.
+"""SATURN (1:1 arm, Adapter B) and CAMEX on altered objects, main settings.
+
+Same adapters and parameters as the cell-level runs of the two tools (analysis/tasks/T5_2_adapters, T5_3_runs).
 
 Subcommands, each in its own env:
   build         chimera_env   altered object into data/analysis/B1/tools/<run>/altered.h5ad
   prep_saturn   saturn_env    per-species h5ads by the Adapter B rule (prep_saturn_1to1.py)
-  prep_camex    camex_env     T5 input files with the altered columns replaced; kidney inputs built from the object
-  score_saturn  chimera_env   per-ortholog S_deploy, S_cos (T5.6 definitions) -> results/analysis/B1/tool_scores/saturn__<run>.parquet
+  prep_camex    camex_env     input files of T5_2_adapters with the altered columns replaced; kidney inputs built from the object
+  score_saturn  chimera_env   per-ortholog S_deploy, S_cos (T5_6_gene_level definitions) -> results/analysis/B1/tool_scores/saturn__<run>.parquet
   score_camex   chimera_env   C_cos -> tool_scores/camex__<run>.parquet
 Rows: rules.TOOL_ROWS x bands x seeds at share 5%, plus unaltered objects (run b1-<cohort>-none-s<seed>); tier 3 are the main settings.
 """

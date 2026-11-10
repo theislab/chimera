@@ -1,20 +1,21 @@
-"""P13: kidney gene table for H-D1, H-D1b and E-K3 (plan sections 2, 3, 5 and 8c).
+"""Kidney gene table for H-D1, H-D1b and E-K3 (pre-specified analysis plan, sections 2, 3, 5 and 8c).
 
 One row per kidney vocabulary gene of ``kidney_healthy_train.h5ad``:
 
-* covariates C (section 3) on the healthy training object: raw prior (the run's
+* covariates C (plan, section 3) on the healthy training object: raw prior (the run's
   ``conservation_prior_raw.npy``, checked against the h5ad prior), species-balanced mean log1p
   CP10K and detection (``cohorts.gene_covariates``), log human CDS length (``controls.cds_table``);
-* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PC features (``T4_3 inputs.esm_blocks``);
-* D (section 2): mean over the seed runs in ``P13_recipe/seed_map.tsv`` (s42 = selected grid run,
+* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PC features (``T4_3_scoreboard/inputs.py::esm_blocks``);
+* D (plan, section 2): mean over the seed runs in ``P13_recipe/seed_map.tsv`` (s42 = selected grid run,
   s43-s46) of alpha - prior as anchored (clamped 0.85 here), minus the cohort median; ``D_raw`` =
   mean alpha - pi_raw minus its median (named sensitivity); ``S_ema`` = mean ``S_g_ema``; leave-one-seed-out
   D per seed; per-seed leave-one-out rho on the C-residual scale; rel(D|C) over the 10 2-vs-3 splits;
-* baselines on the same object (T4.2 functions): B1b_raw = E (cross-species pseudobulk profile
-  correlation over the shared classes, units = ``sample_batch`` with >= 30 cells), B1b = E
-  residualised on prior, expression and detection splines, B2b (specificity cosine, K >= 4).
+* baselines on the same object (functions of the direct baselines, analysis/tasks/T4_2_gene_baselines):
+  B1b_raw = E (cross-species pseudobulk profile correlation over the shared classes, units =
+  ``sample_batch`` with >= 30 cells), B1b = E residualized on prior, expression and detection splines,
+  B2b (specificity cosine, K >= 4).
 
-All CPU seeds, so the section 2 MPS pooling clause does not apply. No gold, logFC or gene list is read.
+All CPU seeds, so the MPS pooling clause of plan, section 2 does not apply. No gold, logFC or gene list is read.
 
     PYTHONPATH=<chimera repo> python -I analysis/tasks/P13_kidney/readout.py
 """
@@ -115,7 +116,7 @@ def main() -> int:
         rs.append(float(np.corrcoef(e1, e2)[0, 1]))
     r = float(np.mean(rs)) if rs else float("nan")
 
-    # baselines B1b, B2b (T4.2 definitions) on the healthy object
+    # baselines B1b, B2b (definitions of T4_2_gene_baselines) on the healthy object
     X = a.X.tocsr() if sp.issparse(a.X) else sp.csr_matrix(a.X)
     X = X.astype(np.float64)
     species = a.obs["species"].astype(str).to_numpy()

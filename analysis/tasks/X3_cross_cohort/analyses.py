@@ -1,24 +1,24 @@
-"""X3 (EXPLORATORY): cross-cohort synthesis of Chimera readouts over the seven cohorts.
+"""EXPLORATORY: cross-cohort synthesis of Chimera readouts over the seven cohorts.
 
-Nothing here is pre-specified, enters section 6 of the frozen plan, or can change a status,
+Nothing here is pre-specified, enters section 6 of the pre-specified analysis plan, or can change a status,
 row or modifier. Inputs are the per-gene tables of ``build.py`` (consensus over all finished
 seeds) and the gene classes of ``annotations.py`` (committed before any class was compared
 with a readout). Cross-cohort joins use ``hsapiens_gene_id`` only.
 
 Readouts: ``D_raw`` = mean-over-seeds alpha minus the raw prior, minus the cohort median
-(primary scale); ``D_clamp`` (testis recipes' clamped anchor); ``S`` = mean S_g_ema; T2.5
-cell-type contributions. Uncentred delta-alpha is never compared across cohorts.
+(primary scale); ``D_clamp`` (testis recipes' clamped anchor); ``S`` = mean S_g_ema; T2_5_celltype_margin
+cell-type contributions. Uncentered delta-alpha is never compared across cohorts.
 Baselines beside every Chimera row: ``B1b_raw`` (cross-species cell-type profile correlation,
 i.e. pseudobulk correlation per pair), ``B1c_raw`` (rank-matched level), per-type pseudobulk
-species-centred differences (``dc_*``).
+species-centered differences (``dc_*``).
 
 Covariates: C4 = raw prior, species-balanced log CP10K, species-balanced detection, log human
-CDS length (plan section 3 C); C_pat = C4 + cell-type specificity tau.
+CDS length (pre-specified analysis plan, section 3 C); C_pat = C4 + cell-type specificity tau.
 
 * Matched excess: per set gene the 40 nearest non-set genes in rank space of the covariates,
   one drawn per set gene, B draws; excess = (set mean - null mean) / SD over the universe;
   two-sided empirical p (floor 1/(B+1)). BH within cohort x score x matching where many sets.
-* Residual scale: rank, residualise on spline(C4) by OLS (``analysis/common/controls.py``).
+* Residual scale: rank, residualize on spline(C4) by OLS (``analysis/common/controls.py``).
 * Reliability of a consensus: Spearman-Brown of the median pairwise seed Spearman of D_raw.
 
 Sections (``--sections``): depth (analysis 1), core (2), classes (3), esm (4), agreement (5).
@@ -99,7 +99,7 @@ def bh(p: np.ndarray) -> np.ndarray:
 
 
 def resid(g: pd.DataFrame, col: str, covs=C4) -> pd.Series:
-    """Rank of ``col`` residualised on spline(rank covariates); NaN where anything is missing."""
+    """Rank of ``col`` residualized on spline(rank covariates); NaN where anything is missing."""
     ok = g[col].notna() & g[covs].notna().all(1)
     out = pd.Series(np.nan, index=g.index)
     if ok.sum() < 50:
@@ -259,7 +259,7 @@ def depth(G: dict, B: int, rng, write) -> None:
 
     # lineage contrast inside a joint fit: per-species mean margin (C_sp / species weight), the
     # difference of ranks between two species, against the same contrast in the direct baselines
-    # (pair-cohort B1b_raw difference; mean |species-centred pseudobulk difference| per type).
+    # (pair-cohort B1b_raw difference; mean |species-centered pseudobulk difference| per type).
     rows = []
     T25 = gene_ids.REPO_ROOT / "results" / "analysis" / "T2_5"
     for joint, (s1, c1), (s2, c2) in [("liv_4sp", ("Monkey", "liv_hmonkey"), ("Mouse", "liv_hmouse")),
@@ -472,7 +472,7 @@ def strata(g: pd.DataFrame) -> np.ndarray:
 
 
 def strat_perm(v: np.ndarray, st: np.ndarray, rng) -> np.ndarray:
-    """Permutation of ``v`` within strata ``st`` (vectorised)."""
+    """Permutation of ``v`` within strata ``st`` (vectorized)."""
     base = np.argsort(st, kind="stable")
     perm = np.lexsort((rng.random(len(v)), st))
     out = np.empty_like(v)
@@ -520,7 +520,7 @@ def esm(G: dict, B: int, rng, write) -> None:
             mor_rows.append(dict(cohort=c, score=col, n=int(ok.sum()), morans_I=obs, null_mean=null.mean(),
                                  null_sd=null.std(), z=(obs - null.mean()) / null.std(),
                                  p=(1 + np.sum(null >= obs)) / (B + 1), null=kind))
-        # protein families: between-family variance of residualised scores vs permutation
+        # protein families: between-family variance of residualized scores vs permutation
         cl = classes_for(g.index)
         fam = cl["family"].copy()
         res = AN.reserved_share(g.index)
@@ -554,7 +554,7 @@ def esm(G: dict, B: int, rng, write) -> None:
     write(pd.DataFrame(fam_rows), "esm_family_coherence.csv")
     write(pd.DataFrame(load_rows), "esm_family_means.csv")
 
-    # cross-cohort agreement: ESM-predictable part vs the rest of the residualised D
+    # cross-cohort agreement: ESM-predictable part vs the rest of the residualized D
     rows = []
     for a, b in [("liv_hmonkey", "liv_hmouse"), ("liv_hmouse", "liv_4sp"), ("liv_hmouse", "liv_hzeb"),
                  ("test_hmac", "test_hmouse"), ("test_hmouse", "test_3sp"),
@@ -645,7 +645,7 @@ def agreement(G: dict, B: int, rng, write) -> None:
                                  share_pos=pos[cc] / pos.sum(), share_neg=neg[cc] / neg.sum(),
                                  pos_per_weight=pos[cc] / pos.sum() / wt, neg_per_weight=neg[cc] / neg.sum() / wt))
         # baseline: does the type with the most negative contribution match the type with the
-        # largest species-centred pseudobulk difference? (types with pseudobulk only)
+        # largest species-centered pseudobulk difference? (types with pseudobulk only)
         dcols = [x for x in g.columns if x.startswith("dc_")]
         sp_list = sorted({x.split("_")[1] for x in dcols})
         for sp_ in sp_list:

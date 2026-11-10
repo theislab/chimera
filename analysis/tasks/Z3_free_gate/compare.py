@@ -1,12 +1,12 @@
-"""Z3 comparison tables, after the scoreboard lines (rule in the private ledger Z3_free_gate.md, committed first).
+"""Comparison tables of the per-gene gate, after the scoreboard lines (the rule was fixed first).
 
 Sections:
   check     frozen line through the harness against results/analysis/T5_6/scoreboard (and T4_3), every shared value
   tables    H1-H4 (all, count-supported, masked), status and row, head-to-heads, tools, sets, 4-sp estimates, paired
             free-vs-canonical deltas and the verdict by the committed rule
   reversal  H2 raw Spearman, rho_pi, rho_p by line
-  x5        X5 run.py definitions on each line's consensus (frozen reproduced first)
-  y3        X4 re_x1 (spermatocyte-peak genes, C42) and re_x2 (catabolic genes, C43) matched excess, X4 code and keys
+  x5        X5_sequence_axis run.py definitions on each line's consensus (frozen reproduced first)
+  y3        X4_where_differs re_x1 (spermatocyte-peak genes) and re_x2 (catabolic genes) matched excess, X4_where_differs code and keys
             unchanged, line columns swapped in (frozen reproduced first)
 
     PYTHONPATH=$PWD python -m analysis.tasks.Z3_free_gate.compare check tables reversal x5 y3
@@ -221,7 +221,7 @@ def y3():
                     rows.append(dict(item="C43", cohort=c, line=line, group=k, value=v, subset="count_supported",
                                      **matched(g, f & cs, pool & cs, v, chep, key=f"{c}{k}{v}cs")))
     t = pd.DataFrame(rows)
-    # frozen reproduction against X4
+    # frozen reproduction against X4_where_differs
     x1 = pd.read_csv(RU.RES / "X4/reread_x1_stages.csv")
     x2 = pd.read_csv(RU.RES / "X4/reread_x2_program.csv")
     a = t[(t.line == "frozen") & (t.item == "C42") & t.subset.isin(["all", "margin_supported"])].merge(x1, on=["cohort", "group", "value", "subset"], suffixes=("", "_x4"))

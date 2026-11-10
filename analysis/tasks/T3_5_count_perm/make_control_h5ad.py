@@ -1,4 +1,4 @@
-"""T3.5: count-permutation control h5ads (keep sequence, destroy counts).
+"""Count-permutation control h5ads (keep sequence, destroy counts).
 
 One gene permutation ``perm`` per control: slot ``g`` of the control keeps everything that
 belongs to the sequence of gene ``g`` (``var_names``, ``var["conservation_prior"]``, the ESM-2
@@ -6,7 +6,7 @@ and identity columns of ``varm["gene_features"]``) and receives the counts of ge
 in every species: ``X_new[:, g] = X[:, perm[g]]`` and ``uns["p_null"][:, g] = p_null[:, perm[g]]``
 (``p_null`` is ``(K, G)``; ``layers`` is empty, so ``X`` is the only count matrix).
 
-Arms (07_EXPERIMENT_MATRIX names ``permA``, ``permB``, ``permC``):
+Arms (``permA``, ``permB``, ``permC`` in the run and h5ad names):
 
 * ``a``: free permutation of all genes; the three expression scalars
   (``gene_features`` columns 66-68: log mean, log variance, fraction non-zero) stay at their

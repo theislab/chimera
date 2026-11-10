@@ -1,5 +1,5 @@
-"""E4 step 3: named genes (robust calls, E1 rule) for drug targets and disease genes per tissue, with mouse-model status, replication in
-other cohorts, and the disease-cohort response (Q4, descriptive).
+"""Step 3: named genes (robust calls, rule of E1_atlas) for drug targets and disease genes per tissue, with mouse-model status,
+replication in other cohorts, and the disease-cohort response (Q4, descriptive).
 
 Writes results/analysis/E4/{names_targets.csv, names_disease.csv, q4_disease_response.csv, q4_fisher.csv}.
 

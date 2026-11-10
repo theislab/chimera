@@ -1,28 +1,28 @@
-"""T11.6: glaucoma gene translation on Van Zyl, V1-V3 of section 11 (Family 3, descriptive).
+"""Glaucoma gene translation on Van Zyl, V1-V3 of the pre-specified analysis plan, section 11 (Family 3, descriptive).
 
-Primary dataset fixed before any glaucoma readout (ledger T11_6): the full five-species cohort.
+Primary dataset fixed before any glaucoma readout: the full five-species cohort.
 The other usable datasets (``vz.usable_datasets``) are reported beside it. Gene list:
-``analysis/tasks/T11_1_vanzyl/glaucoma_genes.tsv`` (committed at T11.1), restricted to genes in the
+``analysis/tasks/T11_1_vanzyl/glaucoma_genes.tsv`` (committed at T11_1_vanzyl), restricted to genes in the
 dataset vocabulary. Integration quality of each dataset is written beside every readout.
 
 * V1: D of glaucoma genes against background in the same raw prior x expression decile cells
-  (strata kept with >= 5 background genes per set gene; T4.3 functions). Stratified AUROC, 1,000
+  (strata kept with >= 5 background genes per set gene; T4_3_scoreboard functions). Stratified AUROC, 1,000
   gene bootstraps, two-sided permutation p (5,000 draws within strata). No direction is claimed.
-  Beside it: the same for B1b (direct pseudobulk baseline, residualised) and S_ema. Subsets: all
+  Beside it: the same for B1b (direct pseudobulk baseline, residualized) and S_ema. Subsets: all
   list genes; genes named in van Zyl 2020.
 * V2: per-species fidelity of each gene across the outflow classes (``cell_class`` conventional or
   uveoscleral outflow) that species s shares with human.
   - Chimera per-species residual (the plan's readout): residual-head RMS per gene (``residuals.py``),
     mean over those classes and over the seeds in D; lower means closer to the shared program.
-  - Chimera per-species fit margin S_gs (T2.5 forward pass, ``cell_ontology_class`` groups), mean
+  - Chimera per-species fit margin S_gs (T2_5_celltype_margin forward pass, ``cell_ontology_class`` groups), mean
     over those classes and over the seeds in D; higher means better fit by the shared program.
   - Direct pseudobulk: Pearson r between the human and species-s pseudobulk profiles over the same
-    classes (T4.2 ``pair_corr``; units ``obs['batch']`` with >= 30 cells).
+    classes (T4_2_gene_baselines ``pair_corr``; units ``obs['batch']`` with >= 30 cells).
   Reported per species: mean over glaucoma genes (absolute; published expectation: macaques closer
   to human than pig and mouse), the same for matched background, and the background-relative
   percentile (glaucoma genes' mean within-species percentile). Contrast macaques - (pig, mouse) with
   a 1,000-draw gene bootstrap CI.
-* V3: for each glaucoma gene, the cell types that carry its divergence: Chimera C_gk (harmonised
+* V3: for each glaucoma gene, the cell types that carry its divergence: Chimera C_gk (harmonized
   fine types; top divergent type = argmax of max(-C_gk, 0)) beside the pseudobulk leave-one-class-out
   driver (T12-style increase of E when a class is removed) and the human top-expressing fine type.
 
@@ -98,7 +98,7 @@ def v1(g: pd.DataFrame, gl: pd.DataFrame, rng) -> list[dict]:
 
 
 def forward_mean(ds: str, key: str, var_names) -> dict:
-    """Mean over the seeds in D of the T2.5 decomposition for one grouping key."""
+    """Mean over the seeds in D of the T2_5_celltype_margin decomposition for one grouping key."""
     decs = []
     for s in vz.seeds_in_D(ds):
         fw = dict(np.load(vz.OUT / "drivers" / f"fw_{ds}_s{s}.npz", allow_pickle=False))

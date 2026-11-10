@@ -1,4 +1,4 @@
-"""T7.9: per-run health report for every islet grid and seed run. Descriptive; selects nothing.
+"""Per-run health report for every islet grid and seed run. Descriptive; selects nothing.
 
 For each finished run: Delta-alpha sign profile against the prior the run anchored on
 (``final_state`` ``prior``, clamped on clamped recipes) and against the raw prior
@@ -8,7 +8,7 @@ seed 42) and the final adversarial accuracy.
 
 Flag, fixed before any seed run: a seed whose ``knn_mixing_entropy`` is below 0.75 x that of the
 selected grid run is listed as poorly mixed and reported separately; the primary D stays the mean
-over seeds (section 2 rule).
+over seeds (rule of the pre-specified analysis plan, section 2).
 
 Gate G-D2 (``select_recipe.gate``, thresholds unchanged) is applied to every run, the seeds
 included, for disclosure only: the gate selected the s42 grid run and selects nothing here.

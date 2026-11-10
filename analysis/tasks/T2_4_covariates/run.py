@@ -1,4 +1,4 @@
-"""T2.4: seven-cohort covariate audit of delta-alpha.
+"""Seven-cohort covariate audit of delta-alpha.
 
 1. Spearman of delta-alpha with log mean, detection, log variance, cell-type specificity tau,
    prior pi (clamped and raw), S_g_ema, human CDS length and GC (Ensembl 110), and the
@@ -51,7 +51,7 @@ COV_LABEL = {"log_mean": "log mean", "detection": "detection", "log_var": "log v
              "S_g_ema": "fit-quality margin S", "log_cds_length": "CDS length", "gc": "CDS GC",
              "partial_S_given_expr": "partial ρ(Δα, S | expression)"}
 
-# Reference values from the earlier read-only analysis (response plan, section 2.5 table),
+# Reference values of an independent computation of the same table, for comparison,
 # two decimals, cohorts in COHORT_ORDER. Its per-cohort CSVs can be passed with
 # --reference-tables for a full-precision comparison.
 REFERENCE = {

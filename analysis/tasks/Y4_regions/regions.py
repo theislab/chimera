@@ -1,8 +1,8 @@
-"""Y4 (EXPLORATORY): the list of regions, as functions of a cohort's gene table. No gold value enters a region.
+"""EXPLORATORY: the list of regions, as functions of a cohort's gene table. No gold value enters a region.
 Quantile bands are computed on all genes of the cohort, both splits. Fixed before any association of this task.
 
-Axes and mechanism-guided hypotheses (``MECH``). Direction and reasoning are stated in the ledger before the screen.
-``SEEN`` marks axes whose strata were looked at on all genes in X1-X6 or T4.3, so they are not naive on even genes.
+Axes and mechanism-guided hypotheses (``MECH``). Direction and reasoning were fixed before the screen.
+``SEEN`` marks axes whose strata were looked at on all genes in X1-X6 or T4_3_scoreboard, so they are not naive on even genes.
 """
 
 from __future__ import annotations

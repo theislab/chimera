@@ -1,15 +1,15 @@
-"""T5.6: per-ortholog scalars of SATURN and CAMEX (chimera_env, reads run outputs only).
+"""Per-ortholog scalars of SATURN and CAMEX (chimera_env, reads run outputs only).
 
-Fixed before any tool scalar was joined to a gold standard (05 section 5, A4 action 5). The scalars
+Fixed before any tool scalar was joined to a gold standard (pre-specified analysis plan, section 5). The scalars
 are our derivations, a fair-faith attempt, not outputs the tools were built to give.
 
-Cohorts liv_hmouse, test_hmouse; seeds 42, 43, 44. Arms: ``saturn_native`` (T5.3 s42, T5.6 s43, s44),
-``saturn_1to1`` (Adapter B), ``camex`` (T5.3). A pair (h, m) is the cohort's 1:1 ortholog; symbols
+Cohorts liv_hmouse, test_hmouse; seeds 42, 43, 44. Arms: ``saturn_native`` (s42 from T5_3_runs, s43 and s44 from this task),
+``saturn_1to1`` (Adapter B), ``camex`` (T5_3_runs). A pair (h, m) is the cohort's 1:1 ortholog; symbols
 from the ortholog table.
 
 SATURN, w = final gene-to-macrogene weights (``*_genes_to_macrogenes.pkl``):
-  S_deploy  PRIMARY. r_m = Pearson across the cohort's shared cell types (T4.2 ``all_species_types``;
-            testis through the T4.2 coarse map) of human and mouse cell-type means of the macrogene
+  S_deploy  PRIMARY. r_m = Pearson across the cohort's shared cell types (T4_2_gene_baselines ``all_species_types``;
+            testis through the T4_2_gene_baselines coarse map) of human and mouse cell-type means of the macrogene
             value (final h5ad ``obsm["macrogenes"]``). S_deploy = sum_m wbar_m r_m / sum_m wbar_m,
             wbar_m = (w_h,m + w_m,m) / 2; macrogenes with undefined r_m leave both sums.
   S_cos     cos(w_h, w_m). S_shift = S_cos(final) - S_cos(initial, ``centroids_s<seed>.pkl``).
@@ -21,7 +21,7 @@ CAMEX, h = gene embedding (``gene_integration_hidden.h5ad``):
 Secondary scalars are exploratory. The seed value of a scalar is the mean over the three seeds and
 needs a value in all three, matching D_3 (mean of alpha - prior over seeds 42-44).
 
-Writes results/analysis/T5_6/<cohort>__<arm>.csv (one row per gene the arm covers) and, for T5.6
+Writes results/analysis/T5_6/<cohort>__<arm>.csv (one row per gene the arm covers) and, for
 scalar_analysis.py, results/analysis/T5_6/modules/<cohort>__<arm>__s<seed>.npz.
 """
 from __future__ import annotations
@@ -129,7 +129,7 @@ def saturn_seed(arm: str, cohort: str, tab: pd.DataFrame, seed: int, mod_dir: Pa
     jac = np.array([len(set(a) & set(b)) / len(set(a) | set(b)) for a, b in zip(th, tm)])
     res = pd.DataFrame({"var_name": tab["var_name"].to_numpy()[ok], "S_deploy": dep, "S_cos": sc_f,
                         "S_shift": sc_f - sc_i, "S_topk": jac, "S_top1": (th[:, 0] == tm[:, 0]).astype(float)})
-    # Module membership for L2: weight >= 0.5, else the top 10 of the species (A4 action 6)
+    # Module membership for L2: weight >= 0.5, else the top 10 of the species
     idx = np.where(ok)[0]
     rows, cols = [], []
     n_m = Wh.shape[1]

@@ -1,19 +1,19 @@
-"""I1: does the free per-gene gate (Config M) give a better cell embedding than the canonical protein-feature gate?
+"""Does the free per-gene gate (Config M) give a better cell embedding than the canonical protein-feature gate?
 
-Fixed before any free-gate integration value was computed by this task (see ledger I1_free_gate_integration.md for what had been seen).
+Fixed before any integration value of the per-gene gate was computed by this task.
 
 Metrics, code and keys are the paper's, imported unmodified:
-  * Fig 3 / T5.5: ``compute_integration_metrics`` (training/compare_vs_scvi.py), k 15, seed 42, ``species`` and ``cell_type`` of the seven
-    T5.5 objects; direction correction, min-max and 0.4/0.6 composite from ``T5_5_benchmark/score_external.score_table``. A seed of either
+  * Fig 3 / T5_5_benchmark: ``compute_integration_metrics`` (training/compare_vs_scvi.py), k 15, seed 42, ``species`` and ``cell_type`` of the seven
+    T5_5_benchmark objects; direction correction, min-max and 0.4/0.6 composite from ``T5_5_benchmark/score_external.score_table``. A seed of either
     gate is placed on the frozen 10-model panel's per-cohort bounds (``master_table_ext.csv``), so no other method's value moves; the
     replace-the-Chimera-column composite is a sensitivity.
-  * Harmonised cohorts / H1: the same function on H1's object and cell-type key (``H1_harmonise.tables.integration_row``).
-  * Z2 within-label: ``Z2_embedding.common.all_rows`` on Z2's cached targets (zone, PT segment, beta stress, marrow maturation, testis
-    stages; within-label variance and library R2), Z2's encoder sets (TS and TMS hepatocytes through liver H+Mouse models, macaque testis
+  * Harmonized cohorts / H1_harmonise: the same function on its object and cell-type key (``H1_harmonise.tables.integration_row``).
+  * Z2_embedding within-label: ``Z2_embedding.common.all_rows`` on its cached targets (zone, PT segment, beta stress, marrow maturation, testis
+    stages; within-label variance and library R2), its encoder sets (TS and TMS hepatocytes through liver H+Mouse models, macaque testis
     through testis H+Mouse models) via ``Z2_embedding.encode``.
-Lines: Z3 cohorts as Z3 fixed them (``results/analysis/Z3/lines.json``): free5 against can5, liver also free_int against can_int.
-Other cohorts: canonical = H1 kept runs; free = Z4 fits with gate health (Z3 amendment 1) passing, mixing NOT used for inclusion (it is the
-outcome here); Z4's own healthy flag (gate + mixing) is a labelled sensitivity, applied to both sides.
+Lines: Z3_free_gate cohorts as Z3_free_gate fixed them (``results/analysis/Z3/lines.json``): free5 against can5, liver also free_int against can_int.
+Other cohorts: canonical = kept runs of H1_harmonise; free = Z4_free_gate_all fits with gate health (Z3_free_gate/rules.py) passing, mixing NOT used for
+inclusion (it is the outcome here); the healthy flag of Z4_free_gate_all (gate + mixing) is a labeled sensitivity, applied to both sides.
 """
 from __future__ import annotations
 
@@ -29,14 +29,14 @@ RES = REPO / "results" / "analysis"
 OUT = RES / "I1"
 RUNS = REPO / "training" / "runs"
 Z3_COHORTS = ["liv_hmouse", "test_hmouse", "liv_4sp"]
-# cohort -> T5.5 dataset key (Fig 3 rows)
+# cohort -> T5_5_benchmark dataset key (Fig 3 rows)
 FIG3 = {"liv_hmonkey": "panc_hmonkey", "liv_hmouse": "panc_hmouse", "liv_hzeb": "panc_hzeb", "liv_4sp": "panc_4sp",
         "test_hmac": "test_hmac", "test_hmouse": "test_hmouse", "test_3sp": "test_3sp"}
 FIG3_METRICS = ["knn_species_purity", "knn_mixing_entropy", "sil_species", "knn_celltype_purity", "sil_celltype", "label_transfer_acc"]
 # Primary metrics, in the verdict. Higher is better for all of them.
 PRIMARY_FIG3 = ["mixing", "biology", "total_score"]          # Fig 3 rows, frozen-panel bounds
-PRIMARY_H1 = ["knn_mixing_entropy", "label_transfer_acc"]   # every cohort, H1 key
-PRIMARY_Z2 = ["within_auroc"]                                # Z2 cohorts: mean in-model AUROC (logistic) over the cohort's within-label tasks
+PRIMARY_H1 = ["knn_mixing_entropy", "label_transfer_acc"]   # every cohort, H1_harmonise key
+PRIMARY_Z2 = ["within_auroc"]                                # Z2_embedding cohorts: mean in-model AUROC (logistic) over the cohort's within-label tasks
 LOWER_BETTER = {"knn_species_purity", "sil_species", "lib_r2", "pc1_share"}
 CI_LEVEL = 0.95
 
@@ -69,7 +69,7 @@ def lines() -> pd.DataFrame:
             gate_ok = bool(r.healthy_gate) and bool(r.no_nan)
             rows.append(dict(cohort=r.cohort, gate="free", seed=int(r.seed), run=r.run, line="main", source="Z4", included=gate_ok,
                              included_mix=gate_ok and bool(r.healthy)))
-    from analysis.tasks.I1_free_gate_integration import replication  # amendment 1: liver H+Monkey replication line
+    from analysis.tasks.I1_free_gate_integration import replication  # liver H+Monkey replication line
     rows += replication.lines()
     return pd.DataFrame(rows)
 
@@ -118,7 +118,7 @@ def compare(free: np.ndarray, can: np.ndarray, paired: bool, higher_better: bool
 
 
 def verdict(calls: pd.DataFrame, metrics: list[str]) -> dict:
-    """calls: one row per (cohort, metric) with 'call'. Owner's hypothesis (free integrates better):
+    """calls: one row per (cohort, metric) with 'call'. Hypothesis (the per-gene gate integrates better):
     supported if, on at least one primary metric, cohorts better beyond seed range exceed cohorts worse by at least a third of the cohorts
     compared (at least 1), and on no primary metric worse exceeds better; refuted on the mirror; mixed if one metric each way;
     otherwise no consistent difference."""

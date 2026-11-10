@@ -1,4 +1,4 @@
-"""O1 part B4: H1 recurrence and set positions without flagged genes, beside H1's own outputs.
+"""Part B4: recurrence and set positions of analysis/tasks/H1_harmonise without flagged genes, beside its own outputs.
 
     PYTHONPATH=$PWD python -m analysis.tasks.O1_orthologs.compare_h1
 """

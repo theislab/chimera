@@ -1,4 +1,4 @@
-"""Y1 post hoc additions A-G (ledger, written after the first reading). Section names as in the ledger.
+"""Post hoc additions A-G, written after the first reading.
 
     python -I launch.py analysis.tasks.Y1_gene_tissue.posthoc [--sections A,B,C,D,E,F,G]
 """
@@ -402,7 +402,7 @@ def sec_H(D, CNT):
 
 
 def fine_direct(t: str, key: str):
-    """Direct margin on finer author labels (species x class x state), same code as X4; is S's lead over the labelled margin within-label state?"""
+    """Direct margin on finer author labels (species x class x state), same code as X4_where_differs; is S's lead over the labeled margin within-label state?"""
     from analysis.common import cohorts as C_
     from analysis.tasks.X4_where_differs import direct_margin as DM
 
@@ -417,7 +417,7 @@ def fine_direct(t: str, key: str):
 
 
 def sec_I(D, CNT):
-    """Added after H: S kept 0.13-0.14 beyond B1 and the labelled margin on kidney golds, 0.12 on liver. Reweighting of the two parts, or more?"""
+    """Added after H: S kept 0.13-0.14 beyond B1 and the labeled margin on kidney golds, 0.12 on liver. Reweighting of the two parts, or more?"""
     OUT.mkdir(exist_ok=True)
     zz = {}
     for t, key in (("kidney", "CellStateLevel2"), ("liver", "SubAnno")):
@@ -447,7 +447,7 @@ def sec_I(D, CNT):
             Z = CT.design_T(D, T, g, PAT, col, ex[cond] if cond else None)
             _, e_, d_ = CT.rho_table(D, col, g, {x: ex[x]}, Z, CNT)
             rows.append(CT.summarise(nm_, e_[0], d_[:, 0], gold=gold, n_genes=len(g)))
-        # per seed: S given B1 and the labelled margin
+        # per seed: S given B1 and the labeled margin
         sm = pd.read_parquet(MAT / f"seedS__{T}.parquet").reindex(g)
         Z = CT.design_T(D, T, g, PAT, col, ex[["B1_T", "Sdir_T"]])
         vals = []

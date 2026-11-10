@@ -1,9 +1,9 @@
-"""X7 (EXPLORATORY): baselines beside the per-cell residual share and the species margins (rules.py).
+"""EXPLORATORY: baselines beside the per-cell residual share and the species margins (rules.py).
 
-Per run label: cell table with the Chimera per-cell outputs (forward npz) and normalised kNN species purity in
-Chimera z and (canonical runs) scVI z. Per cohort, from the training counts (T4.2 pseudobulk): per-type direct
+Per run label: cell table with the Chimera per-cell outputs (forward npz) and normalized kNN species purity in
+Chimera z and (canonical runs) scVI z. Per cohort, from the training counts (T4_2_gene_baselines pseudobulk): per-type direct
 divergence between species, gene x type direct divergence Ddir_gk with level and detection, and pairwise E per
-species pair (T4.2 E on that pair's shared types). Writes results/analysis/X7/baselines/.
+species pair (T4_2_gene_baselines E on that pair's shared types). Writes results/analysis/X7/baselines/.
 
 Usage: python -m analysis.tasks.X7_architecture_outputs.baselines
 """
@@ -72,7 +72,7 @@ def cell_tables():
             if zs.shape[0] != len(t):
                 raise AssertionError(f"{c}: scVI cells {zs.shape[0]} vs {len(t)}")
             t["npur_scvi"] = npurity(zs, spn)
-            # order check: scVI neighbours should share cell type far above chance
+            # order check: scVI neighbors should share cell type far above chance
             nn = NearestNeighbors(n_neighbors=16).fit(zs)
             _, idx = nn.kneighbors(zs)
             same = (ct[idx[:, 1:]] == ct[:, None]).mean()
@@ -127,7 +127,7 @@ def direct(c: str):
         for j, s in enumerate(have):
             gt[f"x_{s}_{t}"] = Xs[:, j]
             gt[f"f_{s}_{t}"] = Fs[:, j]
-    # pairwise E (T4.2 definition, each pair's shared coarse types)
+    # pairwise E (T4_2_gene_baselines definition, each pair's shared coarse types)
     pe = pd.DataFrame(dict(var_name=vn, hsapiens_gene_id=hs))
     for s1, s2 in itertools.combinations(species, 2):
         g = T42.shared_groups(x, species, [s1, s2])

@@ -1,4 +1,4 @@
-"""T3.4 analysis: keep counts, destroy features. Run once the arm runs and the seed runs have finished.
+"""Analysis of the control that keeps the counts and destroys the features. Run once the arm runs and the seed runs have finished.
 
 For each arm run ``rev-ctl-<cohort>-<arm>-s<seed>`` (``manifest.tsv``), against the cohort
 consensus of D over seeds 42-46 excluding the arm's own seed (``analysis/common/controls.py``):
