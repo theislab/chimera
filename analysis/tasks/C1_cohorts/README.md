@@ -40,6 +40,5 @@ The cohorts of cerebral cortex (dorsolateral prefrontal and primary motor), lung
 - `data/processed/`
 - `data/raw/`
 - `training/runs/`
-- code of `F1_figures`
 
 **Notes.** configs.py holds one configuration per cohort; grids/ the recipe grids; references.tsv the downloads. esm_embed.py computes ESM-2 gene embeddings for species outside the SATURN export. Labeled exploratory in the paper.

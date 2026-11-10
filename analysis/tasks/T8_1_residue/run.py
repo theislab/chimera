@@ -411,7 +411,7 @@ def main():
         r"$|\text{attention}|$ was recomputed with each protein's attribution replaced by another protein's (gene swap, a "
         f"derangement of the $70$ proteins) or by a random direction of the same norm in the $64$-PC attribution space, "
         f"${draws_tex}$ draws each, fixed seed. Statistic: per-protein difference of category medians divided by the "
-        r"protein's median attention, summarised as the median across proteins. Empirical $p$ is two-sided, "
+        r"protein's median attention, summarized as the median across proteins. Empirical $p$ is two-sided, "
         r"$(1+\#\{|\text{null}|\ge|\text{observed}|\})/(1+\text{draws})$. ``Swaps $p<0.05$'' is the share of swap draws "
         r"whose per-gene Wilcoxon test reaches $p<0.05$ with the observed sign. Wilcoxon $p$ is the published per-gene "
         r"test on unscaled differences. Rows below the second rule use data-defined classes; curated M is the hand-assigned class. "
