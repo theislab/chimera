@@ -35,8 +35,7 @@ FIGS = {
                "the count evidence comes more from the lemur than from the mouse cells, while expression "
                "profiles are more alike between human and lemur than between human and mouse.")),
     "supp_gate_gap": Figure(
-        Col(Row(X("supp_gate_gap/scatter", "a"), X("supp_gate_gap/cohorts", "b")),
-            Row(X("supp_gate_gap/neighbors", "c"), X("supp_gate_gap/covariates", "d"))),
+        Row(X("supp_gate_gap/scatter", "a"), X("supp_gate_gap/cohorts", "b")),
         label="fig:supp-gate-gap",
         title="Where the two readouts agree and differ",
         shows=("Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets "
@@ -49,7 +48,12 @@ FIGS = {
                "training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's "
                "seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to "
                "0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to "
-               "32 % in all. Panel c asks whether proteins that look alike to a protein language model (the 15 nearest "
+               "32 % in all. Panels c and d are on the next page.")),
+    "supp_gate_gap_2": Figure(
+        Row(X("supp_gate_gap/neighbors", "c"), X("supp_gate_gap/covariates", "d")),
+        label="fig:supp-gate-gap", part=2,
+        title="Where the two readouts agree and differ, continued",
+        shows=("Panel c asks whether proteins that look alike to a protein language model (the 15 nearest "
                "neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median "
                "0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default "
                "gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the "
@@ -58,7 +62,7 @@ FIGS = {
                "seven properties together explain 12 to 49 % of it.")),
     "supp_gate_gap_classes": Figure(
         Col(Row(X("supp_gate_gap_classes/cross_tissue", "a"), X("supp_gate_gap_classes/sets", "b")),
-            X("supp_gate_gap_classes/references", "c"), X("supp_gate_gap_classes/sequence", "d")),
+            X("supp_gate_gap_classes/references", "c")),
         label="fig:supp-gate-gap-cont",
         title="The difference between the readouts by tissue, gene class and independent reference",
         shows=("This figure asks what the difference between the two readouts of a gene is made of. Panel a compares "
@@ -75,9 +79,13 @@ FIGS = {
                "Panel c tests each readout against independent data while holding the other fixed, one row per cohort "
                "and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level "
                "references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout "
-               "still adds agreement on liver pattern and on fine kidney cell types. Panel d shows that the difference "
-               "is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and "
-               "+0.10).")),
+               "still adds agreement on liver pattern and on fine kidney cell types. Panel d is on the next page.")),
+    "supp_gate_gap_classes_2": Figure(
+        X("supp_gate_gap_classes/sequence", "d"),
+        label="fig:supp-gate-gap-cont", part=2,
+        title="The difference between the readouts by tissue, gene class and independent reference, continued",
+        shows=("Panel d shows that the difference between the two readouts is unrelated to how constrained a gene's "
+               "sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).")),
     "supp_gate_gap_named": Figure(
         X("supp_gate_gap_named/named"),
         width=330,

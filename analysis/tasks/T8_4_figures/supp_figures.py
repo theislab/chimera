@@ -1,17 +1,12 @@
-"""Supplementary panels: seed reliability, and panels made by their own tasks, taken unchanged.
+"""Supplementary panels on seed reliability.
 
-Drawn here:
-  supp_celltype_seed_stability  re-render of T2.5 ``fig_supp_seed_stability`` from ``seed_stability.csv``:
-                          agreement between seeds of each cell type's contribution to S_g.
+  supp_celltype_seed_stability  agreement between seeds of each cell type's contribution to S_g
+                          (``results/analysis/T2_5/seed_stability.csv``)
   supp_seed_reliability   pairwise seed agreement of Delta-alpha, alpha and S_g per cohort (T3.3
-                          ``seed_pairs.csv``) with the reliability of the seed mean (``reliability.csv``).
-Taken as panels (made and checked by their tasks; every copy is re-checked for fonts and run names):
-  supp_covariate_audit        T2.4 ``fig_supp_covariate_audit``  (7-cohort covariate audit)
-  supp_celltype_closure       T2.5 ``fig_supp_closure``
-  supp_relations_density      X4 ``fig_relations_density``
-  supp_relations_heatmap      X4 ``fig_relations_heatmap``
-The two integration panels of T5.5 (``raw_metrics_10models``, ``composite_mixing_bio_10models``) are read by their figure
-specs from ``notebooks/figures/baselines_master_ext/`` and are not copied.
+                          ``seed_pairs.csv``) with the reliability of the seed mean (``reliability.csv``)
+
+The covariate audit, the closure of the cell-type decomposition and the two relation figures are drawn by their own
+tasks (T2_4_covariates, T2_5_celltype_margin, X4_where_differs) straight into ``figures/panels/``; nothing is copied here.
 
 Panels go to ``figures/panels/`` under the names of ``figures/panel_names.tsv``.
 """
@@ -28,14 +23,6 @@ from analysis.tasks.T8_4_figures import common as cm
 REL_COHORTS = ["liv_hmonkey", "liv_hmouse", "liv_4sp", "test_hmouse", "test_3sp"]
 READOUTS = [("spearman_D", "D", "Δα"), ("spearman_S", "S", "count-evidence margin $S_g$"),
             ("spearman_alpha", None, "α")]
-
-COPIES = {
-    "supp_covariate_audit": cm.RES / "T2_4" / "fig_supp_covariate_audit.pdf",
-    "supp_celltype_closure": cm.RES / "T2_5" / "fig_supp_closure.pdf",
-    "supp_relations_density": cm.RES / "X4" / "figures" / "fig_relations_density.pdf",
-    "supp_relations_heatmap": cm.RES / "X4" / "figures" / "fig_relations_heatmap.pdf",
-}
-
 
 def panel_seed_reliability() -> plt.Figure:
     pairs = pd.read_csv(cm.RES / "T3_3" / "seed_pairs.csv")
@@ -95,8 +82,6 @@ def main() -> list:
     cm.setup()
     out = [cm.save(panel_seed_reliability(), "supp_seed_reliability"),
            cm.save(panel_celltype_seed_stability(), "supp_celltype_seed_stability")]
-    for name, src in COPIES.items():
-        out.append(cm.copy_pdf(src, name))
     return out
 
 

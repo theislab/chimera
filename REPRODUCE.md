@@ -231,7 +231,7 @@ change when numbers do. Panel letters are given in parentheses where a task feed
 | Supplementary Figure S6 | `fig:supp-integration-metrics`; figure key `supp_integration_metrics` | Raw integration metrics, seven-method panel | - | `notebooks/07_baselines_master.ipynb` |
 | Supplementary Figure S7 | `fig:supp-integration-testis-umap`; figure key `supp_integration_umap_testis` | UMAP by method, three-species testis | - | `notebooks/08_chimera_umap.ipynb` |
 | Supplementary Figure S8 | `fig:supp-integration-liver-umap`; figure key `supp_integration_umap_liver` | UMAP by method, liver Human+Monkey | - | `notebooks/08_chimera_umap.ipynb` |
-| Supplementary Figure S9 | `fig:supp-integration-purity`; figure key `supp_integration_ten_methods` | Integration: mixing and conservation, ten-method panel | `T5_5_benchmark`, `F1_figures` | - |
+| Supplementary Figure S9 | `fig:supp-integration-purity`; figure key `supp_integration_ten_methods` | Integration: mixing and conservation, ten-method panel | `T5_5_benchmark` | - |
 | Supplementary Figure S10 | `fig:supp-integration-raw`; figure key `supp_integration_raw_metrics` | Raw integration metrics, ten-method panel | `T5_5_benchmark` | - |
 | Supplementary Figure S11 | `fig:supp-integration-ext`; figure key `supp_integration_eleven_cohorts` | Integration benchmark on eleven cohorts | `T11_4_vz_integration`, `B2_benchmark`, `T8_4_figures` | - |
 | Supplementary Table S22 | `tab:benchmark-label-use` | Use of cell-type labels by each integration method | `T5_4b_label_ablation` | text of the manuscript (no computed values) |
@@ -247,7 +247,7 @@ change when numbers do. Panel letters are given in parentheses where a task feed
 | Supplementary Figure S19 | `fig:supp-dalpha-liver-detailed`; figure key `supp_categories_liver` | Δα by gene category, four-species liver, all 38 categories | - | `notebooks/04_delta_alpha_biology.ipynb` |
 | Supplementary Figure S20 | `fig:supp-dalpha-testis-detailed`; figure key `supp_categories_testis` | Δα by gene category, testis Human+Macaque | `T2_2_regen`, `F1_figures` (a, b) | `notebooks/04_delta_alpha_biology.ipynb` |
 | Supplementary Figure S21 | `fig:supp-dalpha-hallmark`; figure key `supp_hallmark` | Hallmark pathway enrichment of Δα | `T2_2_regen` (c), `F1_figures` (a, b, c) | `notebooks/06_pathway_analysis.ipynb` |
-| Supplementary Figure S22 | `fig:supp-celltype-closure`; figure key `supp_celltype_closure` | Closure of the cell-type decomposition of the count evidence | `T2_5_celltype_margin`, `F1_figures` | - |
+| Supplementary Figure S22 | `fig:supp-celltype-closure`; figure key `supp_celltype_closure` | Closure of the cell-type decomposition of the count evidence | `T2_5_celltype_margin` | - |
 | Supplementary Figure S23 | `fig:supp-celltype-seeds`; figure key `supp_celltype_seeds` | Seed stability of cell-type contributions to the count evidence | `T2_5_celltype_margin` | - |
 | Supplementary Figure S24 | `fig:supp-functional-layer`; figure key `supp_functional_layer` | Pathway and network coherence and conservation | `T6_3_pathway`, `T6_4_network`, `T6_6_regulatory`, `T6_9_assemble` | - |
 | Supplementary Figure S25 | `fig:supp-covariate-audit`; figure key `supp_covariate_audit` | Covariate audit of Δα in seven cohorts | `T2_4_covariates` | - |

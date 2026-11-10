@@ -34,6 +34,5 @@ Protein architecture and gene history: Pfam domains, protein families, complexes
 - `data/analysis/functional/`
 - `data/analysis/gold/`
 - `data/analysis/x3_annotations/`
-- code of `F1_figures`
 
 **Notes.** Labeled exploratory in the paper. Definitions in rules.py.

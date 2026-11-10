@@ -33,6 +33,6 @@ Regulatory input and gene architecture: enhancer number, promoter class, regulon
 - `data/analysis/Y2/`
 - `data/analysis/ensembl110/`
 - `data/analysis/x3_annotations/`
-- code of `E2_protein`, `F1_figures`
+- code of `E2_protein`
 
 **Notes.** Labeled exploratory in the paper. Uses the loader and scan statistic of E2_protein. Definitions in rules.py.

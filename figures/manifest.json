@@ -1,5 +1,5 @@
 {
- "figures_pdf_sha256": "42932971661c0266a15da0d496eb4a03b5158a94a5ffc173b5280760a09d2564",
+ "figures_pdf_sha256": "851a3ed8a5f9a78f337c9955565cad5f26aef5d74521f8e223bf2d0868e17232",
  "crop": "pdf-crop-margins -v -p 0 -t 250 -c gr -x 300 -y 300 -a -0.5",
  "figures": [
   {
@@ -2905,10 +2905,10 @@
    "part": 1,
    "number": "S27",
    "title": "Where the two readouts agree and differ",
-   "width_bp": 481.24,
-   "height_bp": 518.8,
+   "width_bp": 480.76,
+   "height_bp": 240.76,
    "spec": "specs/supp_validation.py",
-   "n_panels": 4,
+   "n_panels": 2,
    "panels": [
     {
      "letters": [
@@ -2939,7 +2939,34 @@
      "h": 236.26,
      "exact": true,
      "clipped": false
-    },
+    }
+   ],
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "dd15406aaf91c2fe99b717c829fa0fd94e105a10bf94247e9f0149a8c55f931c",
+   "shows": "Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, 430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to 0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to 32 % in all. Panels c and d are on the next page.",
+   "signature": "2e5e8167c2b32370c80cc48ac0250976e3c72074c7a892d589e2355abb2a6dea",
+   "shrink": 1.0,
+   "composed_size": [
+    486.0,
+    245.762
+   ],
+   "problems": {},
+   "listed": {}
+  },
+  {
+   "page": 41,
+   "key": "supp_gate_gap_2",
+   "label": "fig:supp-gate-gap",
+   "part": 2,
+   "number": "",
+   "title": "Where the two readouts agree and differ, continued",
+   "width_bp": 481.0,
+   "height_bp": 267.04,
+   "spec": "specs/supp_validation.py",
+   "n_panels": 2,
+   "panels": [
     {
      "letters": [
       "c"
@@ -2949,7 +2976,7 @@
      "region": null,
      "scale": 0.9999,
      "x": 0.0,
-     "y": 251.76,
+     "y": 0.0,
      "w": 281.98,
      "h": 262.3,
      "exact": true,
@@ -2964,7 +2991,7 @@
      "region": null,
      "scale": 0.9999,
      "x": 288.98,
-     "y": 251.76,
+     "y": 0.0,
      "w": 197.02,
      "h": 262.3,
      "exact": true,
@@ -2974,28 +3001,28 @@
    "smallest_text_pt": 5.5,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "3b1ae67f477f96192dd77fcf883d0b5927bd6b5396f4cd1b184696b5e05796c8",
-   "shows": "Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, 430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to 0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to 32 % in all. Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median 0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.",
-   "signature": "42d7ddcb25a80737d6164184a843c43f093b61779ac9f4e23a34fe37e406ff0d",
+   "sha256": "1dc09af0b651009cf193b42011c7bb5ea13a9c9672a7a5e791870eea3c8560fb",
+   "shows": "Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median 0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.",
+   "signature": "c77625c1bb3412429e8123c421d1b339eb6ddc24bf69db412cf99d0011eb6d0f",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    523.56
+    271.798
    ],
    "problems": {},
    "listed": {}
   },
   {
-   "page": 41,
+   "page": 42,
    "key": "supp_gate_gap_classes",
    "label": "fig:supp-gate-gap-cont",
    "part": 1,
    "number": "S28",
    "title": "The difference between the readouts by tissue, gene class and independent reference",
    "width_bp": 481.0,
-   "height_bp": 584.04,
+   "height_bp": 414.22,
    "spec": "specs/supp_validation.py",
-   "n_panels": 4,
+   "n_panels": 3,
    "panels": [
     {
      "letters": [
@@ -3041,7 +3068,34 @@
      "h": 217.92,
      "exact": true,
      "clipped": false
-    },
+    }
+   ],
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "8db09bce23d6b1ed434e43ce02c5f7c850f483b4a6fcb8740826afe034e856d8",
+   "shows": "This figure asks what the difference between the two readouts of a gene is made of. Panel a compares cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene gate than with the protein-feature gate in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right print the mean of each readout: both place these classes on the same side of the prior, the protein-feature gate further out. Panel c tests each readout against independent data while holding the other fixed, one row per cohort and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout still adds agreement on liver pattern and on fine kidney cell types. Panel d is on the next page.",
+   "signature": "948a816ef276e63902f6eb98ae66b017246c830131f9eb75c24e020464a0de81",
+   "shrink": 1.0,
+   "composed_size": [
+    486.0,
+    418.977
+   ],
+   "problems": {},
+   "listed": {}
+  },
+  {
+   "page": 43,
+   "key": "supp_gate_gap_classes_2",
+   "label": "fig:supp-gate-gap-cont",
+   "part": 2,
+   "number": "",
+   "title": "The difference between the readouts by tissue, gene class and independent reference, continued",
+   "width_bp": 398.68,
+   "height_bp": 158.82,
+   "spec": "specs/supp_validation.py",
+   "n_panels": 1,
+   "panels": [
     {
      "letters": [
       "d"
@@ -3051,7 +3105,7 @@
      "region": null,
      "scale": 1.0,
      "x": 0.0,
-     "y": 424.98,
+     "y": 0.0,
      "w": 486.0,
      "h": 154.32,
      "exact": true,
@@ -3061,19 +3115,19 @@
    "smallest_text_pt": 5.5,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "911a35f22c61352f886e8d21e2e3e3bfb78b81824231f5d4e2e746ada3c780ef",
-   "shows": "This figure asks what the difference between the two readouts of a gene is made of. Panel a compares cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene gate than with the protein-feature gate in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right print the mean of each readout: both place these classes on the same side of the prior, the protein-feature gate further out. Panel c tests each readout against independent data while holding the other fixed, one row per cohort and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout still adds agreement on liver pattern and on fine kidney cell types. Panel d shows that the difference is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).",
-   "signature": "4b5d5c7aaa5179bc0bbaa127278613d3d7595b39bc59d31aefafac2e7575b822",
+   "sha256": "dadc69c175536353a60d11a617605f987d5b249103f80c8c234c5b032a706365",
+   "shows": "Panel d shows that the difference between the two readouts is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).",
+   "signature": "15444a684864b38f575dd1dca9455725f0efe2c94f8ce8a1cd409bcdc089338c",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    588.797
+    163.82
    ],
    "problems": {},
    "listed": {}
   },
   {
-   "page": 42,
+   "page": 44,
    "key": "supp_gate_gap_named",
    "label": "fig:supp-gate-gap-named",
    "part": 1,
@@ -3113,7 +3167,7 @@
    "listed": {}
   },
   {
-   "page": 43,
+   "page": 45,
    "key": "supp_published_differences",
    "label": "fig:supp-e6",
    "part": 1,
@@ -3170,7 +3224,7 @@
    "listed": {}
   },
   {
-   "page": 44,
+   "page": 46,
    "key": "supp_ground_truth",
    "label": "fig:supp-b1",
    "part": 1,
@@ -3227,7 +3281,7 @@
    "listed": {}
   },
   {
-   "page": 45,
+   "page": 47,
    "key": "supp_ground_truth_2",
    "label": "fig:supp-b1",
    "part": 2,
@@ -3284,7 +3338,7 @@
    "listed": {}
   },
   {
-   "page": 46,
+   "page": 48,
    "key": "supp_ground_truth_3",
    "label": "fig:supp-b1",
    "part": 3,
@@ -3341,7 +3395,7 @@
    "listed": {}
   },
   {
-   "page": 47,
+   "page": 49,
    "key": "supp_ground_truth_4",
    "label": "fig:supp-b1",
    "part": 4,
@@ -3398,7 +3452,7 @@
    "listed": {}
   },
   {
-   "page": 48,
+   "page": 50,
    "key": "supp_ground_truth_5",
    "label": "fig:supp-b1",
    "part": 5,
@@ -3440,7 +3494,7 @@
    "listed": {}
   },
   {
-   "page": 49,
+   "page": 51,
    "key": "supp_benchmark_overview",
    "label": "fig:supp-b2-overview",
    "part": 1,
@@ -3480,7 +3534,7 @@
    "listed": {}
   },
   {
-   "page": 50,
+   "page": 52,
    "key": "supp_benchmark_tasks",
    "label": "fig:supp-b2-tasks",
    "part": 1,
@@ -3520,7 +3574,7 @@
    "listed": {}
   },
   {
-   "page": 51,
+   "page": 53,
    "key": "supp_tissues_recurrence",
    "label": "fig:supp-h1-recurrence-all",
    "part": 1,
@@ -3560,7 +3614,7 @@
    "listed": {}
   },
   {
-   "page": 52,
+   "page": 54,
    "key": "supp_programs_recurrent",
    "label": "fig:supp-e1",
    "part": 1,
@@ -3617,7 +3671,7 @@
    "listed": {}
   },
   {
-   "page": 53,
+   "page": 55,
    "key": "supp_programs_by_tissue",
    "label": "fig:supp-e1-cont",
    "part": 1,
@@ -3657,7 +3711,7 @@
    "listed": {}
   },
   {
-   "page": 54,
+   "page": 56,
    "key": "supp_programs_named_genes",
    "label": "fig:supp-e1-genes",
    "part": 1,
@@ -3697,7 +3751,7 @@
    "listed": {}
   },
   {
-   "page": 55,
+   "page": 57,
    "key": "supp_tissue_bone_marrow",
    "label": "fig:supp-h1-bone-marrow",
    "part": 1,
@@ -3889,7 +3943,7 @@
    "listed": {}
   },
   {
-   "page": 56,
+   "page": 58,
    "key": "supp_tissue_kidney",
    "label": "fig:supp-h1-kidney",
    "part": 1,
@@ -4081,7 +4135,7 @@
    "listed": {}
   },
   {
-   "page": 57,
+   "page": 59,
    "key": "supp_tissue_islet",
    "label": "fig:supp-h1-islet",
    "part": 1,
@@ -4273,7 +4327,7 @@
    "listed": {}
   },
   {
-   "page": 58,
+   "page": 60,
    "key": "supp_tissue_eye",
    "label": "fig:supp-h1-eye",
    "part": 1,
@@ -4465,7 +4519,7 @@
    "listed": {}
   },
   {
-   "page": 59,
+   "page": 61,
    "key": "supp_tissue_cortex",
    "label": "fig:supp-h1-cortex",
    "part": 1,
@@ -4657,7 +4711,7 @@
    "listed": {}
   },
   {
-   "page": 60,
+   "page": 62,
    "key": "supp_tissue_lung",
    "label": "fig:supp-h1-lung",
    "part": 1,
@@ -4849,7 +4903,7 @@
    "listed": {}
   },
   {
-   "page": 61,
+   "page": 63,
    "key": "supp_tissue_muscle",
    "label": "fig:supp-h1-muscle",
    "part": 1,
@@ -5041,7 +5095,7 @@
    "listed": {}
   },
   {
-   "page": 62,
+   "page": 64,
    "key": "supp_tissue_tumor_myeloid",
    "label": "fig:supp-h1-tumour",
    "part": 1,
@@ -5233,7 +5287,7 @@
    "listed": {}
   },
   {
-   "page": 63,
+   "page": 65,
    "key": "supp_tissues_lineage",
    "label": "fig:supp-h1-lineage",
    "part": 1,
@@ -5273,7 +5327,7 @@
    "listed": {}
   },
   {
-   "page": 64,
+   "page": 66,
    "key": "supp_bone_marrow_reference",
    "label": "fig:supp-bone-marrow",
    "part": 1,
@@ -5390,7 +5444,7 @@
    "listed": {}
   },
   {
-   "page": 65,
+   "page": 67,
    "key": "supp_cell_compartments",
    "label": "fig:supp-e3-compartments",
    "part": 1,
@@ -5447,7 +5501,7 @@
    "listed": {}
   },
   {
-   "page": 66,
+   "page": 68,
    "key": "supp_cell_lineages",
    "label": "fig:supp-e3-lineages",
    "part": 1,
@@ -5504,7 +5558,7 @@
    "listed": {}
   },
   {
-   "page": 67,
+   "page": 69,
    "key": "supp_primate_branches",
    "label": "fig:supp-e3-primates",
    "part": 1,
@@ -5576,7 +5630,7 @@
    "listed": {}
   },
   {
-   "page": 68,
+   "page": 70,
    "key": "supp_protein_architecture",
    "label": "fig:supp-e2",
    "part": 1,
@@ -5648,7 +5702,7 @@
    "listed": {}
   },
   {
-   "page": 69,
+   "page": 71,
    "key": "supp_regulatory_architecture",
    "label": "fig:supp-e5",
    "part": 1,
@@ -5720,7 +5774,7 @@
    "listed": {}
   },
   {
-   "page": 70,
+   "page": 72,
    "key": "supp_disease_genes",
    "label": "fig:supp-e4",
    "part": 1,
@@ -5792,7 +5846,7 @@
    "listed": {}
   },
   {
-   "page": 71,
+   "page": 73,
    "key": "supp_drug_targets",
    "label": "fig:supp-e4-targets",
    "part": 1,
@@ -5832,7 +5886,7 @@
    "listed": {}
   },
   {
-   "page": 72,
+   "page": 74,
    "key": "supp_gin_linear_baseline",
    "label": "fig:supp-gin-esm2-linear-baseline",
    "part": 1,
@@ -5889,7 +5943,7 @@
    "listed": {}
   },
   {
-   "page": 73,
+   "page": 75,
    "key": "supp_gin_attribution_suite",
    "label": "fig:supp-gin-esm2-attribution-suite",
    "part": 1,
@@ -6036,7 +6090,7 @@
    "listed": {}
   },
   {
-   "page": 74,
+   "page": 76,
    "key": "supp_gin_method_consensus",
    "label": "fig:supp-gin-esm2-method-consensus",
    "part": 1,
@@ -6093,7 +6147,7 @@
    "listed": {}
   },
   {
-   "page": 75,
+   "page": 77,
    "key": "supp_gin_orthogonality",
    "label": "fig:supp-gin-esm2-orthogonality",
    "part": 1,
@@ -6150,7 +6204,7 @@
    "listed": {}
   },
   {
-   "page": 76,
+   "page": 78,
    "key": "supp_gin_per_pc",
    "label": "fig:supp-gin-esm2-per-pc",
    "part": 1,
@@ -6252,7 +6306,7 @@
    "listed": {}
   },
   {
-   "page": 77,
+   "page": 79,
    "key": "supp_atlas_spatial_autocorrelation",
    "label": "fig:supp-esm2-umap-spatial-autocorr",
    "part": 1,
@@ -6382,7 +6436,7 @@
    "listed": {}
   },
   {
-   "page": 78,
+   "page": 80,
    "key": "supp_atlas_archetype_trajectory",
    "label": "fig:supp-esm2-umap-archetype-trajectory",
    "part": 1,
@@ -6422,7 +6476,7 @@
    "listed": {}
   },
   {
-   "page": 79,
+   "page": 81,
    "key": "supp_atlas_archetype_enrichment",
    "label": "fig:supp-esm2-umap-archetype-enrichment",
    "part": 1,
@@ -6479,7 +6533,7 @@
    "listed": {}
   },
   {
-   "page": 80,
+   "page": 82,
    "key": "supp_residue_audit",
    "label": "fig:supp-main-gin-protein",
    "part": 1,
@@ -6566,7 +6620,7 @@
    "listed": {}
   },
   {
-   "page": 81,
+   "page": 83,
    "key": "supp_residue_audit_2",
    "label": "fig:supp-main-gin-protein",
    "part": 2,
@@ -6670,7 +6724,7 @@
    }
   },
   {
-   "page": 82,
+   "page": 84,
    "key": "supp_residue_mixed_effects",
    "label": "fig:supp-gin-protein-residue-beta",
    "part": 1,
@@ -6710,7 +6764,7 @@
    "listed": {}
   },
   {
-   "page": 83,
+   "page": 85,
    "key": "supp_residue_cliffs_delta",
    "label": "fig:supp-gin-protein-cliffs-delta",
    "part": 1,
@@ -6750,7 +6804,7 @@
    "listed": {}
   },
   {
-   "page": 84,
+   "page": 86,
    "key": "supp_residue_attention_by_feature",
    "label": "fig:supp-gin-protein-attention-by-feature",
    "part": 1,
@@ -6795,7 +6849,7 @@
    "listed": {}
   },
   {
-   "page": 85,
+   "page": 87,
    "key": "supp_residue_card_etv1",
    "label": "fig:supp-gin-protein-etv1",
    "part": 1,
@@ -6835,7 +6889,7 @@
    "listed": {}
   },
   {
-   "page": 86,
+   "page": 88,
    "key": "supp_residue_card_hprt1",
    "label": "fig:supp-gin-protein-hprt1",
    "part": 1,
@@ -6875,7 +6929,7 @@
    "listed": {}
   },
   {
-   "page": 87,
+   "page": 89,
    "key": "supp_residue_card_runx1",
    "label": "fig:supp-gin-protein-runx1",
    "part": 1,

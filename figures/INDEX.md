@@ -45,54 +45,56 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 37 | Supplementary Figure S24 | `supp_functional_layer` | Pathway and network coherence and conservation | 484 x 274 | `specs/supp_deployment.py` |
 | 38 | Supplementary Figure S25 | `supp_covariate_audit` | Covariate audit of Δα in seven cohorts | 340 x 232 | `specs/supp_deployment.py` |
 | 39 | Supplementary Figure S26 | `supp_seed_reliability` | Agreement between training seeds | 340 x 192 | `specs/supp_deployment.py` |
-| 40 | Supplementary Figure S27 | `supp_gate_gap` | Where the two readouts agree and differ | 481 x 519 | `specs/supp_validation.py` |
-| 41 | Supplementary Figure S28 | `supp_gate_gap_classes` | The difference between the readouts by tissue, gene class and independent reference | 481 x 584 | `specs/supp_validation.py` |
-| 42 | Supplementary Figure S29 | `supp_gate_gap_named` | Named genes where the two readouts differ | 309 x 229 | `specs/supp_validation.py` |
-| 43 | Supplementary Figure S30 | `supp_published_differences` | Published species differences on the count evidence | 477 x 528 | `specs/supp_validation.py` |
-| 44 | Supplementary Figure S31 | `supp_ground_truth` | Ground-truth benchmark: level alterations and protein identity | 480 x 564 | `specs/supp_validation.py` |
-| 45 | Supplementary Figure S31 (continued) | `supp_ground_truth_2` | Ground-truth benchmark: pattern alterations and share of altered genes | 481 x 586 | `specs/supp_validation.py` |
-| 46 | Supplementary Figure S31 (continued) | `supp_ground_truth_3` | Ground-truth benchmark: loss alterations and practical cost | 481 x 586 | `specs/supp_validation.py` |
-| 47 | Supplementary Figure S31 (continued) | `supp_ground_truth_4` | Ground-truth benchmark: expression quartiles and false-positive rate | 481 x 517 | `specs/supp_validation.py` |
-| 48 | Supplementary Figure S31 (continued) | `supp_ground_truth_5` | Ground-truth benchmark: alterations in raw counts | 481 x 357 | `specs/supp_validation.py` |
-| 49 | Supplementary Figure S32 | `supp_benchmark_overview` | Gene-level benchmark: overview | 643 x 371 | `specs/supp_validation.py` |
-| 50 | Supplementary Figure S33 | `supp_benchmark_tasks` | Gene-level benchmark: every task | 637 x 336 | `specs/supp_validation.py` |
-| 51 | Supplementary Figure S34 | `supp_tissues_recurrence` | All gene sets that recur across tissues | 449 x 490 | `specs/supp_tissues.py` |
-| 52 | Supplementary Figure S35 | `supp_programs_recurrent` | Gene programs that recur across eight tissues | 484 x 374 | `specs/supp_tissues.py` |
-| 53 | Supplementary Figure S36 | `supp_programs_by_tissue` | Tissue programs in each tissue | 479 x 338 | `specs/supp_tissues.py` |
-| 54 | Supplementary Figure S37 | `supp_programs_named_genes` | Named genes that recur across tissues | 473 x 235 | `specs/supp_tissues.py` |
-| 55 | Supplementary Figure S38 | `supp_tissue_bone_marrow` | The reading in bone marrow | 483 x 526 | `specs/supp_tissues.py` |
-| 56 | Supplementary Figure S39 | `supp_tissue_kidney` | The reading in kidney | 484 x 526 | `specs/supp_tissues.py` |
-| 57 | Supplementary Figure S40 | `supp_tissue_islet` | The reading in pancreatic islet | 483 x 526 | `specs/supp_tissues.py` |
-| 58 | Supplementary Figure S41 | `supp_tissue_eye` | The reading in the eye | 483 x 547 | `specs/supp_tissues.py` |
-| 59 | Supplementary Figure S42 | `supp_tissue_cortex` | The reading in cerebral cortex | 483 x 547 | `specs/supp_tissues.py` |
-| 60 | Supplementary Figure S43 | `supp_tissue_lung` | The reading in lung | 483 x 526 | `specs/supp_tissues.py` |
-| 61 | Supplementary Figure S44 | `supp_tissue_muscle` | The reading in skeletal muscle | 483 x 526 | `specs/supp_tissues.py` |
-| 62 | Supplementary Figure S45 | `supp_tissue_tumor_myeloid` | The reading in lung-tumor myeloid cells | 483 x 526 | `specs/supp_tissues.py` |
-| 63 | Supplementary Figure S46 | `supp_tissues_lineage` | Lineage marker sets across tissues | 486 x 287 | `specs/supp_tissues.py` |
-| 64 | Supplementary Figure S47 | `supp_bone_marrow_reference` | Bone marrow against sorted-lineage conservation of expression | 479 x 275 | `specs/supp_validation.py` |
-| 65 | Supplementary Figure S48 | `supp_cell_compartments` | Home compartments of genes against Δα | 481 x 418 | `specs/supp_tissues.py` |
-| 66 | Supplementary Figure S49 | `supp_cell_lineages` | Cell types that carry shared deployment | 482 x 360 | `specs/supp_tissues.py` |
-| 67 | Supplementary Figure S50 | `supp_primate_branches` | Species-specific departures along the primate phylogeny | 481 x 172 | `specs/supp_tissues.py` |
-| 68 | Supplementary Figure S51 | `supp_protein_architecture` | Protein architecture and gene history against Δα | 481 x 380 | `specs/supp_protein.py` |
-| 69 | Supplementary Figure S52 | `supp_regulatory_architecture` | Regulatory and gene-architecture features against Δα | 481 x 380 | `specs/supp_protein.py` |
-| 70 | Supplementary Figure S53 | `supp_disease_genes` | Disease genes and drug targets by organ system | 481 x 524 | `specs/supp_tissues.py` |
-| 71 | Supplementary Figure S54 | `supp_drug_targets` | Approved drug targets against the protein prior | 481 x 194 | `specs/supp_tissues.py` |
-| 72 | Supplementary Figure S56 | `supp_gin_linear_baseline` | Linear surrogate and scalar-correlation controls of the gate correction | 480 x 122 | `specs/supp_protein.py` |
-| 73 | Supplementary Figure S57 | `supp_gin_attribution_suite` | Attribution of the gate correction to input groups, all methods | 481 x 515 | `specs/supp_protein.py` |
-| 74 | Supplementary Figure S58 | `supp_gin_method_consensus` | Consensus of the attribution methods | 404 x 269 | `specs/supp_protein.py` |
-| 75 | Supplementary Figure S59 | `supp_gin_orthogonality` | ESM-2 and expression inputs: orthogonality and ablation | 480 x 157 | `specs/supp_protein.py` |
-| 76 | Supplementary Figure S60 | `supp_gin_per_pc` | Contribution of single ESM-2 principal components | 482 x 272 | `specs/supp_protein.py` |
-| 77 | Supplementary Figure S62 | `supp_atlas_spatial_autocorrelation` | Neighborhood coherence of α and Δα on the ESM-2 graph | 483 x 328 | `specs/supp_protein.py` |
-| 78 | Supplementary Figure S63 | `supp_atlas_archetype_trajectory` | Δα of the archetypes during training | 238 x 179 | `specs/supp_protein.py` |
-| 79 | Supplementary Figure S64 | `supp_atlas_archetype_enrichment` | Gene categories enriched in the archetypes | 385 x 439 | `specs/supp_protein.py` |
-| 80 | Supplementary Figure S65 | `supp_residue_audit` | Residue-level attribution audit | 483 x 480 | `specs/supp_protein.py` |
-| 81 | Supplementary Figure S65 (continued) | `supp_residue_audit_2` | Residue-level attribution audit, continued | 486 x 508 | `specs/supp_protein.py` |
-| 82 | Supplementary Figure S66 | `supp_residue_mixed_effects` | Residue-level mixed-effects regression | 301 x 203 | `specs/supp_protein.py` |
-| 83 | Supplementary Figure S67 | `supp_residue_cliffs_delta` | Protein-replicated effect sizes of residue features | 486 x 273 | `specs/supp_protein.py` |
-| 84 | Supplementary Figure S68 | `supp_residue_attention_by_feature` | Per-residue attribution by structural feature | 486 x 154 | `specs/supp_protein.py` |
-| 85 | Supplementary Figure S69 | `supp_residue_card_etv1` | Per-gene card: ETV1 | 486 x 376 | `specs/supp_protein.py` |
-| 86 | Supplementary Figure S70 | `supp_residue_card_hprt1` | Per-gene card: HPRT1 | 486 x 376 | `specs/supp_protein.py` |
-| 87 | Supplementary Figure S71 | `supp_residue_card_runx1` | Per-gene card: RUNX1 | 486 x 376 | `specs/supp_protein.py` |
+| 40 | Supplementary Figure S27 | `supp_gate_gap` | Where the two readouts agree and differ | 481 x 241 | `specs/supp_validation.py` |
+| 41 | `fig:supp-gate-gap`, part 2 | `supp_gate_gap_2` | Where the two readouts agree and differ, continued | 481 x 267 | `specs/supp_validation.py` |
+| 42 | Supplementary Figure S28 | `supp_gate_gap_classes` | The difference between the readouts by tissue, gene class and independent reference | 481 x 414 | `specs/supp_validation.py` |
+| 43 | `fig:supp-gate-gap-cont`, part 2 | `supp_gate_gap_classes_2` | The difference between the readouts by tissue, gene class and independent reference, continued | 399 x 159 | `specs/supp_validation.py` |
+| 44 | Supplementary Figure S29 | `supp_gate_gap_named` | Named genes where the two readouts differ | 309 x 229 | `specs/supp_validation.py` |
+| 45 | Supplementary Figure S30 | `supp_published_differences` | Published species differences on the count evidence | 477 x 528 | `specs/supp_validation.py` |
+| 46 | Supplementary Figure S31 | `supp_ground_truth` | Ground-truth benchmark: level alterations and protein identity | 480 x 564 | `specs/supp_validation.py` |
+| 47 | Supplementary Figure S31 (continued) | `supp_ground_truth_2` | Ground-truth benchmark: pattern alterations and share of altered genes | 481 x 586 | `specs/supp_validation.py` |
+| 48 | Supplementary Figure S31 (continued) | `supp_ground_truth_3` | Ground-truth benchmark: loss alterations and practical cost | 481 x 586 | `specs/supp_validation.py` |
+| 49 | Supplementary Figure S31 (continued) | `supp_ground_truth_4` | Ground-truth benchmark: expression quartiles and false-positive rate | 481 x 517 | `specs/supp_validation.py` |
+| 50 | Supplementary Figure S31 (continued) | `supp_ground_truth_5` | Ground-truth benchmark: alterations in raw counts | 481 x 357 | `specs/supp_validation.py` |
+| 51 | Supplementary Figure S32 | `supp_benchmark_overview` | Gene-level benchmark: overview | 643 x 371 | `specs/supp_validation.py` |
+| 52 | Supplementary Figure S33 | `supp_benchmark_tasks` | Gene-level benchmark: every task | 637 x 336 | `specs/supp_validation.py` |
+| 53 | Supplementary Figure S34 | `supp_tissues_recurrence` | All gene sets that recur across tissues | 449 x 490 | `specs/supp_tissues.py` |
+| 54 | Supplementary Figure S35 | `supp_programs_recurrent` | Gene programs that recur across eight tissues | 484 x 374 | `specs/supp_tissues.py` |
+| 55 | Supplementary Figure S36 | `supp_programs_by_tissue` | Tissue programs in each tissue | 479 x 338 | `specs/supp_tissues.py` |
+| 56 | Supplementary Figure S37 | `supp_programs_named_genes` | Named genes that recur across tissues | 473 x 235 | `specs/supp_tissues.py` |
+| 57 | Supplementary Figure S38 | `supp_tissue_bone_marrow` | The reading in bone marrow | 483 x 526 | `specs/supp_tissues.py` |
+| 58 | Supplementary Figure S39 | `supp_tissue_kidney` | The reading in kidney | 484 x 526 | `specs/supp_tissues.py` |
+| 59 | Supplementary Figure S40 | `supp_tissue_islet` | The reading in pancreatic islet | 483 x 526 | `specs/supp_tissues.py` |
+| 60 | Supplementary Figure S41 | `supp_tissue_eye` | The reading in the eye | 483 x 547 | `specs/supp_tissues.py` |
+| 61 | Supplementary Figure S42 | `supp_tissue_cortex` | The reading in cerebral cortex | 483 x 547 | `specs/supp_tissues.py` |
+| 62 | Supplementary Figure S43 | `supp_tissue_lung` | The reading in lung | 483 x 526 | `specs/supp_tissues.py` |
+| 63 | Supplementary Figure S44 | `supp_tissue_muscle` | The reading in skeletal muscle | 483 x 526 | `specs/supp_tissues.py` |
+| 64 | Supplementary Figure S45 | `supp_tissue_tumor_myeloid` | The reading in lung-tumor myeloid cells | 483 x 526 | `specs/supp_tissues.py` |
+| 65 | Supplementary Figure S46 | `supp_tissues_lineage` | Lineage marker sets across tissues | 486 x 287 | `specs/supp_tissues.py` |
+| 66 | Supplementary Figure S47 | `supp_bone_marrow_reference` | Bone marrow against sorted-lineage conservation of expression | 479 x 275 | `specs/supp_validation.py` |
+| 67 | Supplementary Figure S48 | `supp_cell_compartments` | Home compartments of genes against Δα | 481 x 418 | `specs/supp_tissues.py` |
+| 68 | Supplementary Figure S49 | `supp_cell_lineages` | Cell types that carry shared deployment | 482 x 360 | `specs/supp_tissues.py` |
+| 69 | Supplementary Figure S50 | `supp_primate_branches` | Species-specific departures along the primate phylogeny | 481 x 172 | `specs/supp_tissues.py` |
+| 70 | Supplementary Figure S51 | `supp_protein_architecture` | Protein architecture and gene history against Δα | 481 x 380 | `specs/supp_protein.py` |
+| 71 | Supplementary Figure S52 | `supp_regulatory_architecture` | Regulatory and gene-architecture features against Δα | 481 x 380 | `specs/supp_protein.py` |
+| 72 | Supplementary Figure S53 | `supp_disease_genes` | Disease genes and drug targets by organ system | 481 x 524 | `specs/supp_tissues.py` |
+| 73 | Supplementary Figure S54 | `supp_drug_targets` | Approved drug targets against the protein prior | 481 x 194 | `specs/supp_tissues.py` |
+| 74 | Supplementary Figure S56 | `supp_gin_linear_baseline` | Linear surrogate and scalar-correlation controls of the gate correction | 480 x 122 | `specs/supp_protein.py` |
+| 75 | Supplementary Figure S57 | `supp_gin_attribution_suite` | Attribution of the gate correction to input groups, all methods | 481 x 515 | `specs/supp_protein.py` |
+| 76 | Supplementary Figure S58 | `supp_gin_method_consensus` | Consensus of the attribution methods | 404 x 269 | `specs/supp_protein.py` |
+| 77 | Supplementary Figure S59 | `supp_gin_orthogonality` | ESM-2 and expression inputs: orthogonality and ablation | 480 x 157 | `specs/supp_protein.py` |
+| 78 | Supplementary Figure S60 | `supp_gin_per_pc` | Contribution of single ESM-2 principal components | 482 x 272 | `specs/supp_protein.py` |
+| 79 | Supplementary Figure S62 | `supp_atlas_spatial_autocorrelation` | Neighborhood coherence of α and Δα on the ESM-2 graph | 483 x 328 | `specs/supp_protein.py` |
+| 80 | Supplementary Figure S63 | `supp_atlas_archetype_trajectory` | Δα of the archetypes during training | 238 x 179 | `specs/supp_protein.py` |
+| 81 | Supplementary Figure S64 | `supp_atlas_archetype_enrichment` | Gene categories enriched in the archetypes | 385 x 439 | `specs/supp_protein.py` |
+| 82 | Supplementary Figure S65 | `supp_residue_audit` | Residue-level attribution audit | 483 x 480 | `specs/supp_protein.py` |
+| 83 | Supplementary Figure S65 (continued) | `supp_residue_audit_2` | Residue-level attribution audit, continued | 486 x 508 | `specs/supp_protein.py` |
+| 84 | Supplementary Figure S66 | `supp_residue_mixed_effects` | Residue-level mixed-effects regression | 301 x 203 | `specs/supp_protein.py` |
+| 85 | Supplementary Figure S67 | `supp_residue_cliffs_delta` | Protein-replicated effect sizes of residue features | 486 x 273 | `specs/supp_protein.py` |
+| 86 | Supplementary Figure S68 | `supp_residue_attention_by_feature` | Per-residue attribution by structural feature | 486 x 154 | `specs/supp_protein.py` |
+| 87 | Supplementary Figure S69 | `supp_residue_card_etv1` | Per-gene card: ETV1 | 486 x 376 | `specs/supp_protein.py` |
+| 88 | Supplementary Figure S70 | `supp_residue_card_hprt1` | Per-gene card: HPRT1 | 486 x 376 | `specs/supp_protein.py` |
+| 89 | Supplementary Figure S71 | `supp_residue_card_runx1` | Per-gene card: RUNX1 | 486 x 376 | `specs/supp_protein.py` |
 
 ## Page 1: Overview: what the model takes, does and returns
 
@@ -577,29 +579,47 @@ Panels:
 
 Supplementary Figure S27, key `supp_gate_gap`, label `fig:supp-gate-gap`.
 
-Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, 430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to 0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to 32 % in all. Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median 0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.
+Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, 430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to 0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to 32 % in all. Panels c and d are on the next page.
 
 Panels:
 
 - (a) `figures/panels/supp_gate_gap/scatter.pdf`, scale 1.00
 - (b) `figures/panels/supp_gate_gap/cohorts.pdf`, scale 1.00
+
+## Page 41: Where the two readouts agree and differ, continued
+
+`fig:supp-gate-gap`, part 2, key `supp_gate_gap_2`, label `fig:supp-gate-gap`.
+
+Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median 0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.
+
+Panels:
+
 - (c) `figures/panels/supp_gate_gap/neighbors.pdf`, scale 1.00
 - (d) `figures/panels/supp_gate_gap/covariates.pdf`, scale 1.00
 
-## Page 41: The difference between the readouts by tissue, gene class and independent reference
+## Page 42: The difference between the readouts by tissue, gene class and independent reference
 
 Supplementary Figure S28, key `supp_gate_gap_classes`, label `fig:supp-gate-gap-cont`.
 
-This figure asks what the difference between the two readouts of a gene is made of. Panel a compares cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene gate than with the protein-feature gate in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right print the mean of each readout: both place these classes on the same side of the prior, the protein-feature gate further out. Panel c tests each readout against independent data while holding the other fixed, one row per cohort and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout still adds agreement on liver pattern and on fine kidney cell types. Panel d shows that the difference is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).
+This figure asks what the difference between the two readouts of a gene is made of. Panel a compares cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene gate than with the protein-feature gate in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right print the mean of each readout: both place these classes on the same side of the prior, the protein-feature gate further out. Panel c tests each readout against independent data while holding the other fixed, one row per cohort and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout still adds agreement on liver pattern and on fine kidney cell types. Panel d is on the next page.
 
 Panels:
 
 - (a) `figures/panels/supp_gate_gap_classes/cross_tissue.pdf`, scale 1.00
 - (b) `figures/panels/supp_gate_gap_classes/sets.pdf`, scale 1.00
 - (c) `figures/panels/supp_gate_gap_classes/references.pdf`, scale 1.00
+
+## Page 43: The difference between the readouts by tissue, gene class and independent reference, continued
+
+`fig:supp-gate-gap-cont`, part 2, key `supp_gate_gap_classes_2`, label `fig:supp-gate-gap-cont`.
+
+Panel d shows that the difference between the two readouts is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).
+
+Panels:
+
 - (d) `figures/panels/supp_gate_gap_classes/sequence.pdf`, scale 1.00
 
-## Page 42: Named genes where the two readouts differ
+## Page 44: Named genes where the two readouts differ
 
 Supplementary Figure S29, key `supp_gate_gap_named`, label `fig:supp-gate-gap-named`.
 
@@ -609,7 +629,7 @@ Panels:
 
 - `figures/panels/supp_gate_gap_named/named.pdf`, scale 1.00
 
-## Page 43: Published species differences on the count evidence
+## Page 45: Published species differences on the count evidence
 
 Supplementary Figure S30, key `supp_published_differences`, label `fig:supp-e6`.
 
@@ -620,7 +640,7 @@ Panels:
 - (a) `figures/panels/supp_published_differences/matched.pdf`, scale 1.00
 - (b) `figures/panels/supp_published_differences/conserved.pdf`, scale 1.00
 
-## Page 44: Ground-truth benchmark: level alterations and protein identity
+## Page 46: Ground-truth benchmark: level alterations and protein identity
 
 Supplementary Figure S31, key `supp_ground_truth`, label `fig:supp-b1`.
 
@@ -631,7 +651,7 @@ Panels:
 - (a) `figures/panels/supp_ground_truth/task_level.pdf`, scale 1.00
 - (b) `figures/panels/supp_ground_truth/identity.pdf`, scale 1.00
 
-## Page 45: Ground-truth benchmark: pattern alterations and share of altered genes
+## Page 47: Ground-truth benchmark: pattern alterations and share of altered genes
 
 Supplementary Figure S31 (continued), key `supp_ground_truth_2`, label `fig:supp-b1`.
 
@@ -642,7 +662,7 @@ Panels:
 - (c) `figures/panels/supp_ground_truth/task_pattern.pdf`, scale 1.00
 - (d) `figures/panels/supp_ground_truth/share.pdf`, scale 1.00
 
-## Page 46: Ground-truth benchmark: loss alterations and practical cost
+## Page 48: Ground-truth benchmark: loss alterations and practical cost
 
 Supplementary Figure S31 (continued), key `supp_ground_truth_3`, label `fig:supp-b1`.
 
@@ -653,7 +673,7 @@ Panels:
 - (e) `figures/panels/supp_ground_truth/task_loss.pdf`, scale 1.00
 - (f) `figures/panels/supp_ground_truth/practical_cost.pdf`, scale 1.00
 
-## Page 47: Ground-truth benchmark: expression quartiles and false-positive rate
+## Page 49: Ground-truth benchmark: expression quartiles and false-positive rate
 
 Supplementary Figure S31 (continued), key `supp_ground_truth_4`, label `fig:supp-b1`.
 
@@ -664,7 +684,7 @@ Panels:
 - (g) `figures/panels/supp_ground_truth/low_expression.pdf`, scale 1.00
 - (h) `figures/panels/supp_ground_truth/type1_error.pdf`, scale 1.00
 
-## Page 48: Ground-truth benchmark: alterations in raw counts
+## Page 50: Ground-truth benchmark: alterations in raw counts
 
 Supplementary Figure S31 (continued), key `supp_ground_truth_5`, label `fig:supp-b1`.
 
@@ -674,7 +694,7 @@ Panels:
 
 - (i) `figures/panels/supp_ground_truth/raw_counts.pdf`, scale 1.00
 
-## Page 49: Gene-level benchmark: overview
+## Page 51: Gene-level benchmark: overview
 
 Supplementary Figure S32, key `supp_benchmark_overview`, label `fig:supp-b2-overview`.
 
@@ -684,7 +704,7 @@ Panels:
 
 - `figures/panels/supp_benchmark_overview/overview.pdf`, scale 1.00
 
-## Page 50: Gene-level benchmark: every task
+## Page 52: Gene-level benchmark: every task
 
 Supplementary Figure S33, key `supp_benchmark_tasks`, label `fig:supp-b2-tasks`.
 
@@ -694,7 +714,7 @@ Panels:
 
 - `figures/panels/supp_benchmark_overview/tasks.pdf`, scale 1.00
 
-## Page 51: All gene sets that recur across tissues
+## Page 53: All gene sets that recur across tissues
 
 Supplementary Figure S34, key `supp_tissues_recurrence`, label `fig:supp-h1-recurrence-all`.
 
@@ -704,7 +724,7 @@ Panels:
 
 - `figures/panels/supp_tissues_recurrence/recurrence_all.pdf`, scale 0.93
 
-## Page 52: Gene programs that recur across eight tissues
+## Page 54: Gene programs that recur across eight tissues
 
 Supplementary Figure S35, key `supp_programs_recurrent`, label `fig:supp-e1`.
 
@@ -715,7 +735,7 @@ Panels:
 - (a) `figures/panels/supp_programs_recurrent/atlas.pdf`, scale 1.00
 - (b) `figures/panels/supp_programs_recurrent/distance.pdf`, scale 1.00
 
-## Page 53: Tissue programs in each tissue
+## Page 55: Tissue programs in each tissue
 
 Supplementary Figure S36, key `supp_programs_by_tissue`, label `fig:supp-e1-cont`.
 
@@ -725,7 +745,7 @@ Panels:
 
 - `figures/panels/supp_programs_by_tissue/tissue.pdf`, scale 1.00
 
-## Page 54: Named genes that recur across tissues
+## Page 56: Named genes that recur across tissues
 
 Supplementary Figure S37, key `supp_programs_named_genes`, label `fig:supp-e1-genes`.
 
@@ -735,7 +755,7 @@ Panels:
 
 - `figures/panels/supp_programs_named_genes/genes.pdf`, scale 1.00
 
-## Page 55: The reading in bone marrow
+## Page 57: The reading in bone marrow
 
 Supplementary Figure S38, key `supp_tissue_bone_marrow`, label `fig:supp-h1-bone-marrow`.
 
@@ -755,7 +775,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_bone_marrow/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_bone_marrow/k.pdf`, scale 1.00
 
-## Page 56: The reading in kidney
+## Page 58: The reading in kidney
 
 Supplementary Figure S39, key `supp_tissue_kidney`, label `fig:supp-h1-kidney`.
 
@@ -775,7 +795,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_kidney/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_kidney/k.pdf`, scale 1.00
 
-## Page 57: The reading in pancreatic islet
+## Page 59: The reading in pancreatic islet
 
 Supplementary Figure S40, key `supp_tissue_islet`, label `fig:supp-h1-islet`.
 
@@ -795,7 +815,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_islet/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_islet/k.pdf`, scale 1.00
 
-## Page 58: The reading in the eye
+## Page 60: The reading in the eye
 
 Supplementary Figure S41, key `supp_tissue_eye`, label `fig:supp-h1-eye`.
 
@@ -815,7 +835,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_eye/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_eye/k.pdf`, scale 1.00
 
-## Page 59: The reading in cerebral cortex
+## Page 61: The reading in cerebral cortex
 
 Supplementary Figure S42, key `supp_tissue_cortex`, label `fig:supp-h1-cortex`.
 
@@ -835,7 +855,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_cortex/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_cortex/k.pdf`, scale 1.00
 
-## Page 60: The reading in lung
+## Page 62: The reading in lung
 
 Supplementary Figure S43, key `supp_tissue_lung`, label `fig:supp-h1-lung`.
 
@@ -855,7 +875,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_lung/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_lung/k.pdf`, scale 1.00
 
-## Page 61: The reading in skeletal muscle
+## Page 63: The reading in skeletal muscle
 
 Supplementary Figure S44, key `supp_tissue_muscle`, label `fig:supp-h1-muscle`.
 
@@ -875,7 +895,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_muscle/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_muscle/k.pdf`, scale 1.00
 
-## Page 62: The reading in lung-tumor myeloid cells
+## Page 64: The reading in lung-tumor myeloid cells
 
 Supplementary Figure S45, key `supp_tissue_tumor_myeloid`, label `fig:supp-h1-tumour`.
 
@@ -895,7 +915,7 @@ Panels:
 - (j) `figures/panels/supp_tissue_tumor_myeloid/j.pdf`, scale 1.00
 - (k) `figures/panels/supp_tissue_tumor_myeloid/k.pdf`, scale 1.00
 
-## Page 63: Lineage marker sets across tissues
+## Page 65: Lineage marker sets across tissues
 
 Supplementary Figure S46, key `supp_tissues_lineage`, label `fig:supp-h1-lineage`.
 
@@ -905,7 +925,7 @@ Panels:
 
 - `figures/panels/supp_tissues_lineage/lineage.pdf`, scale 1.02
 
-## Page 64: Bone marrow against sorted-lineage conservation of expression
+## Page 66: Bone marrow against sorted-lineage conservation of expression
 
 Supplementary Figure S47, key `supp_bone_marrow_reference`, label `fig:supp-bone-marrow`.
 
@@ -920,7 +940,7 @@ Panels:
 - (e) `figures/panels/supp_bone_marrow_reference/e.pdf`, scale 1.00
 - (f) `figures/panels/supp_bone_marrow_reference/f.pdf`, scale 1.00
 
-## Page 65: Home compartments of genes against Δα
+## Page 67: Home compartments of genes against Δα
 
 Supplementary Figure S48, key `supp_cell_compartments`, label `fig:supp-e3-compartments`.
 
@@ -931,7 +951,7 @@ Panels:
 - (a) `figures/panels/supp_cell_compartments/compartments.pdf`, scale 1.00
 - (b) `figures/panels/supp_cell_compartments/pattern_vs_level.pdf`, scale 1.00
 
-## Page 66: Cell types that carry shared deployment
+## Page 68: Cell types that carry shared deployment
 
 Supplementary Figure S49, key `supp_cell_lineages`, label `fig:supp-e3-lineages`.
 
@@ -942,7 +962,7 @@ Panels:
 - (a) `figures/panels/supp_cell_lineages/lineages.pdf`, scale 1.00
 - (b) `figures/panels/supp_cell_lineages/named.pdf`, scale 1.00
 
-## Page 67: Species-specific departures along the primate phylogeny
+## Page 69: Species-specific departures along the primate phylogeny
 
 Supplementary Figure S50, key `supp_primate_branches`, label `fig:supp-e3-primates`.
 
@@ -954,7 +974,7 @@ Panels:
 - (b) `figures/panels/supp_primate_branches/mtg.pdf`, scale 1.00
 - (c) `figures/panels/supp_primate_branches/human_lineage.pdf`, scale 1.00
 
-## Page 68: Protein architecture and gene history against Δα
+## Page 70: Protein architecture and gene history against Δα
 
 Supplementary Figure S51, key `supp_protein_architecture`, label `fig:supp-e2`.
 
@@ -966,7 +986,7 @@ Panels:
 - (b) `figures/panels/supp_protein_architecture/domains.pdf`, scale 1.00
 - (c) `figures/panels/supp_protein_architecture/age_duplication.pdf`, scale 1.00
 
-## Page 69: Regulatory and gene-architecture features against Δα
+## Page 71: Regulatory and gene-architecture features against Δα
 
 Supplementary Figure S52, key `supp_regulatory_architecture`, label `fig:supp-e5`.
 
@@ -978,7 +998,7 @@ Panels:
 - (b) `figures/panels/supp_regulatory_architecture/regulons.pdf`, scale 1.00
 - (c) `figures/panels/supp_regulatory_architecture/dose.pdf`, scale 1.00
 
-## Page 70: Disease genes and drug targets by organ system
+## Page 72: Disease genes and drug targets by organ system
 
 Supplementary Figure S53, key `supp_disease_genes`, label `fig:supp-e4`.
 
@@ -990,7 +1010,7 @@ Panels:
 - (b) `figures/panels/supp_disease_genes/partial.pdf`, scale 1.00
 - (c) `figures/panels/supp_disease_genes/q1.pdf`, scale 1.00
 
-## Page 71: Approved drug targets against the protein prior
+## Page 73: Approved drug targets against the protein prior
 
 Supplementary Figure S54, key `supp_drug_targets`, label `fig:supp-e4-targets`.
 
@@ -1000,7 +1020,7 @@ Panels:
 
 - `figures/panels/supp_drug_targets/targets.pdf`, scale 1.00
 
-## Page 72: Linear surrogate and scalar-correlation controls of the gate correction
+## Page 74: Linear surrogate and scalar-correlation controls of the gate correction
 
 Supplementary Figure S56, key `supp_gin_linear_baseline`, label `fig:supp-gin-esm2-linear-baseline`.
 
@@ -1011,7 +1031,7 @@ Panels:
 - (a) `figures/panels/supp_gin_linear_baseline/r2_by_input_set.pdf`, scale 1.00
 - (b) `figures/panels/supp_gin_linear_baseline/spearman_single_inputs.pdf`, scale 1.00
 
-## Page 73: Attribution of the gate correction to input groups, all methods
+## Page 75: Attribution of the gate correction to input groups, all methods
 
 Supplementary Figure S57, key `supp_gin_attribution_suite`, label `fig:supp-gin-esm2-attribution-suite`.
 
@@ -1028,7 +1048,7 @@ Panels:
 - (f) `figures/panels/supp_gin_attribution_suite/weight_path_top20.pdf`, scale 1.00
 - (h) `figures/panels/supp_gin_attribution_suite/ig_by_group.pdf`, scale 1.00
 
-## Page 74: Consensus of the attribution methods
+## Page 76: Consensus of the attribution methods
 
 Supplementary Figure S58, key `supp_gin_method_consensus`, label `fig:supp-gin-esm2-method-consensus`.
 
@@ -1039,7 +1059,7 @@ Panels:
 - (a) `figures/panels/supp_gin_method_consensus/consensus_bars.pdf`, scale 1.00
 - (b) `figures/panels/supp_gin_method_consensus/consensus_heatmap.pdf`, scale 1.00
 
-## Page 75: ESM-2 and expression inputs: orthogonality and ablation
+## Page 77: ESM-2 and expression inputs: orthogonality and ablation
 
 Supplementary Figure S59, key `supp_gin_orthogonality`, label `fig:supp-gin-esm2-orthogonality`.
 
@@ -1050,7 +1070,7 @@ Panels:
 - (a) `figures/panels/supp_gin_orthogonality/r2_components_from_expression.pdf`, scale 1.00
 - (b) `figures/panels/supp_gin_orthogonality/delta_alpha_inputs_zeroed.pdf`, scale 1.00
 
-## Page 76: Contribution of single ESM-2 principal components
+## Page 78: Contribution of single ESM-2 principal components
 
 Supplementary Figure S60, key `supp_gin_per_pc`, label `fig:supp-gin-esm2-per-pc`.
 
@@ -1064,7 +1084,7 @@ Panels:
 - (d) `figures/panels/supp_gin_per_pc/component_rank2.pdf`, scale 1.00
 - (e) `figures/panels/supp_gin_per_pc/component_rank3.pdf`, scale 1.00
 
-## Page 77: Neighborhood coherence of α and Δα on the ESM-2 graph
+## Page 79: Neighborhood coherence of α and Δα on the ESM-2 graph
 
 Supplementary Figure S62, key `supp_atlas_spatial_autocorrelation`, label `fig:supp-esm2-umap-spatial-autocorr`.
 
@@ -1080,7 +1100,7 @@ Panels:
 - (f) `figures/panels/supp_atlas_spatial_autocorrelation/moran_prior.pdf`, scale 1.00
 - `figures/panels/supp_atlas_spatial_autocorrelation/legend.pdf`, scale 1.00
 
-## Page 78: Δα of the archetypes during training
+## Page 80: Δα of the archetypes during training
 
 Supplementary Figure S63, key `supp_atlas_archetype_trajectory`, label `fig:supp-esm2-umap-archetype-trajectory`.
 
@@ -1090,7 +1110,7 @@ Panels:
 
 - `figures/panels/supp_atlas_archetype_trajectory/trajectory.pdf`, scale 1.03
 
-## Page 79: Gene categories enriched in the archetypes
+## Page 81: Gene categories enriched in the archetypes
 
 Supplementary Figure S64, key `supp_atlas_archetype_enrichment`, label `fig:supp-esm2-umap-archetype-enrichment`.
 
@@ -1101,7 +1121,7 @@ Panels:
 - (a) `figures/panels/supp_atlas_archetype_enrichment/categories.pdf`, scale 1.00
 - (b) `figures/panels/supp_atlas_archetype_enrichment/broad_categories.pdf`, scale 1.00
 
-## Page 80: Residue-level attribution audit
+## Page 82: Residue-level attribution audit
 
 Supplementary Figure S65, key `supp_residue_audit`, label `fig:supp-main-gin-protein`.
 
@@ -1114,7 +1134,7 @@ Panels:
 - (c) `figures/panels/supp_residue_audit/variance.pdf`, scale 1.00
 - (d) `figures/panels/supp_residue_audit/diagnostic.pdf`, scale 1.00
 
-## Page 81: Residue-level attribution audit, continued
+## Page 83: Residue-level attribution audit, continued
 
 Supplementary Figure S65 (continued), key `supp_residue_audit_2`, label `fig:supp-main-gin-protein`.
 
@@ -1129,7 +1149,7 @@ Panels:
 
 Not yet in the house style: text (see `specs/_allow.py`).
 
-## Page 82: Residue-level mixed-effects regression
+## Page 84: Residue-level mixed-effects regression
 
 Supplementary Figure S66, key `supp_residue_mixed_effects`, label `fig:supp-gin-protein-residue-beta`.
 
@@ -1139,7 +1159,7 @@ Panels:
 
 - `figures/panels/supp_residue_mixed_effects/forest.pdf`, scale 1.02
 
-## Page 83: Protein-replicated effect sizes of residue features
+## Page 85: Protein-replicated effect sizes of residue features
 
 Supplementary Figure S67, key `supp_residue_cliffs_delta`, label `fig:supp-gin-protein-cliffs-delta`.
 
@@ -1149,7 +1169,7 @@ Panels:
 
 - `figures/panels/supp_residue_cliffs_delta/forest.pdf`, scale 1.01
 
-## Page 84: Per-residue attribution by structural feature
+## Page 86: Per-residue attribution by structural feature
 
 Supplementary Figure S68, key `supp_residue_attention_by_feature`, label `fig:supp-gin-protein-attention-by-feature`.
 
@@ -1159,7 +1179,7 @@ Panels:
 
 - (a, b, c, d) `figures/panels/supp_residue_attention_by_feature/distributions.pdf`, scale 1.01
 
-## Page 85: Per-gene card: ETV1
+## Page 87: Per-gene card: ETV1
 
 Supplementary Figure S69, key `supp_residue_card_etv1`, label `fig:supp-gin-protein-etv1`.
 
@@ -1169,7 +1189,7 @@ Panels:
 
 - `figures/panels/supp_residue_card_etv1/card.pdf`, scale 1.02
 
-## Page 86: Per-gene card: HPRT1
+## Page 88: Per-gene card: HPRT1
 
 Supplementary Figure S70, key `supp_residue_card_hprt1`, label `fig:supp-gin-protein-hprt1`.
 
@@ -1179,7 +1199,7 @@ Panels:
 
 - `figures/panels/supp_residue_card_hprt1/card.pdf`, scale 1.02
 
-## Page 87: Per-gene card: RUNX1
+## Page 89: Per-gene card: RUNX1
 
 Supplementary Figure S71, key `supp_residue_card_runx1`, label `fig:supp-gin-protein-runx1`.
 

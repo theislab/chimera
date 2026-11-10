@@ -4,7 +4,7 @@ Every panel is one PDF in ``figures/panels/<family>/`` (fonts embedded as TrueTy
 ``figures.style``; the figures of the paper are composed from the panels by ``figures/build.sh``. A PNG preview of each
 panel goes to ``results/analysis/T8_4/preview/``. Scripts read result tables only; no model is loaded.
 
-``save``, ``save_axes`` and ``copy_pdf`` take the former file name of a panel and look up its place in
+``save`` and ``save_axes`` take the former file name of a panel and look up its place in
 ``figures/panel_names.tsv``; a name that is not in the table is an error. New code calls
 ``figures.style.save_panel(fig, "family/name")`` directly. Set ``CHIMERA_FIGURES_OUT=<folder>`` for a dry run.
 
@@ -117,16 +117,6 @@ def save_axes(fig: plt.Figure, name: str, axes: list, out_dir: Path | None = Non
     for a in others:
         a.set_visible(True)
     return pdf
-
-
-def copy_pdf(src: Path, name: str) -> Path:
-    """Take a panel made by its own task as the panel that had the file name ``name``."""
-    dst = style.copy_panel(src, style.panel_for(name))
-    png = src.with_suffix(".png")
-    if png.exists():
-        PREVIEW.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(png, PREVIEW / f"{name}.png")
-    return dst
 
 
 def check_pdf(path: Path) -> dict:

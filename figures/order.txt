@@ -40,7 +40,9 @@ supp_functional_layer
 supp_covariate_audit
 supp_seed_reliability
 supp_gate_gap
+supp_gate_gap_2
 supp_gate_gap_classes
+supp_gate_gap_classes_2
 supp_gate_gap_named
 supp_published_differences
 supp_ground_truth
