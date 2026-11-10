@@ -1,10 +1,14 @@
-"""H1: write chimera-manuscript/supplementary/harmonised_cohorts.tex from results/analysis/H1/. Every number comes from a result table, so a re-run with new cohorts rewrites the text.
+"""H1: write the cohort tables and the figure captions of the tissue figures as LaTeX, from results/analysis/H1/.
 
-    PYTHONPATH=<chimera repo> python analysis/tasks/H1_harmonise/tex.py
+Every number comes from a result table, so a re-run with new cohorts rewrites the text. The output is
+``results/analysis/H1/cohort_tables_generated.tex`` (``--out`` for another place); nothing is written into the
+manuscript repository, whose ``supplementary/cohort_tables.tex`` takes the tables from this file by hand.
+
+    PYTHONPATH=<chimera repo> python analysis/tasks/H1_harmonise/tex.py [--out FILE]
 """
 from __future__ import annotations
 
-import os
+import argparse
 from pathlib import Path
 
 import numpy as np
@@ -13,7 +17,7 @@ import pandas as pd
 from analysis.tasks.H1_harmonise import rules as RU
 
 OUT = RU.OUT
-MS = Path(os.environ.get("CHIMERA_MANUSCRIPT", RU.REPO.parent / "chimera-manuscript"))
+GENERATED = OUT / "cohort_tables_generated.tex"
 TAG = "% @@REV1:NEW@@ {what}. Why: harmonise all cohorts. [H1]"
 T_SRC = {
     "liver": "Liver: \\textit{Guilliams et al.} 2022 (human, macaque, mouse) and \\textit{Wang et al.} 2023 (zebrafish), as processed by CAMEX",
@@ -68,7 +72,7 @@ def cohort_rows(t: pd.DataFrame, audit: pd.DataFrame) -> str:
     return "\n".join(out[:-1])
 
 
-def main() -> int:
+def main(out: Path = GENERATED) -> int:
     t = pd.read_csv(OUT / "cohort_table.csv")
     audit = pd.read_csv(OUT / "audit_cohorts.csv")
     ax = pd.read_csv(OUT / "axis.csv")
@@ -342,10 +346,13 @@ def main() -> int:
                  "    \\caption[Supplementary figure]{\\textbf{Lineage genes reach count support mostly in their own tissue, and sit above matched genes there.} Lineage marker sets fixed in advance (rows) in each tissue (columns); $z$ as in \\cref{fig:one-reading}c, on $\\Delta\\alpha$ and on $S_g$. Boxes, the set's own tissue. Dash, fewer than five count-supported genes. Exploratory, not a test of conservation: the margin rewards having a cell-state pattern, and these sets are chosen for one.}\n"
                  "    \\label{fig:supp-h1-lineage}\n  \\end{center}\n\\end{figure*}\n")
     txt = "\n".join(lines)
-    (MS / "supplementary" / "harmonised_cohorts.tex").write_text(txt)
-    print(MS / "supplementary" / "harmonised_cohorts.tex", len(txt))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(txt)
+    print(out, len(txt))
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--out", type=Path, default=GENERATED, help="file to write (default: results/analysis/H1/cohort_tables_generated.tex)")
+    raise SystemExit(main(ap.parse_args().out))

@@ -7,68 +7,24 @@ letters, unreadable_text_layer. An entry whose check passes is an error, so the 
 
 ALLOW: dict = {
     # specs/main.py
-    "main_alpha_vs_prior": dict.fromkeys(["text", "text_single", "font_family", "scale"],
-                           "page assembled by hand, placed as it printed; to be rebuilt from its panels"),
-    "main_delta_alpha_liver": dict.fromkeys(["text", "text_single", "scale"],
-                              "holds a region of a page assembled by hand; its panels are to be redrawn at print size"),
-    "main_delta_alpha_liver_2": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn",
-        "letters": "letters to be put in reading order together with the caption"},
-    "main_validation_2": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "main_tissues": {"spelling": "British spelling on the panels; to change when they are redrawn"},
-    "main_tissues_2": {"text": "text under the floor; panels to be redrawn at print size"},
-    "main_tissues_3": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "text_single": "single characters under the floor; panels to be redrawn at print size",
-        "scale": "panels placed below 0.9 of their drawn size; to be redrawn at print size",
-        "words": "internal names on the panels; to change when they are redrawn"},
+    "main_protein_3": {
+        "scale": "panel j is the panel stored by the notebook (it needs the trained gate network); it is drawn for a "
+                 "larger page and placed at 0.775, where its smallest text prints at 5.0 pt"},
+    "main_tissues_3": {"words": "internal names on the panels; to change when they are redrawn"},
     "main_tissues_4": {
         "text": "text under the floor; panels to be redrawn at print size",
         "scale": "panels placed below 0.9 of their drawn size; to be redrawn at print size",
         "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "main_protein": dict.fromkeys(["text", "scale"],
-                    "holds a region of a page assembled by hand; its panels are to be redrawn at print size"),
-    "main_protein_2": dict.fromkeys(["text", "text_single", "font_family", "scale", "unreadable_text_layer"],
-                      "holds a region of a page assembled by hand; its panels are to be redrawn at print size"),
     # specs/supp_deployment.py
     "supp_categories_broad": {
         "text": "text under the floor; panels to be redrawn at print size",
         "scale": "panels placed below 0.9 of their drawn size; to be redrawn at print size"},
-    "supp_categories_testis": {"spelling": "British spelling on the panels; to change when they are redrawn"},
     "supp_hallmark": {"text": "text under the floor; panels to be redrawn at print size"},
     # specs/supp_protein.py
-    "supp_residue_audit": dict.fromkeys(["text", "text_single", "scale"],
+    "supp_residue_audit": dict.fromkeys(["text", "text_single", "scale", "unreadable_text_layer"],
                           "holds a region of a page assembled by hand; its panels are to be redrawn at print size"),
+    "supp_residue_audit_2": {"text": "holds regions of a page assembled by hand; its panels are to be redrawn at print size"},
     # specs/supp_tissues.py
-    "supp_tissue_bone_marrow": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_kidney": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_islet": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_eye": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_cortex": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_lung": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_muscle": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissue_tumor_myeloid": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_tissues_recurrence": {"text": "text under the floor; panels to be redrawn at print size"},
-    "supp_tissues_lineage": {"spelling": "British spelling on the panels; to change when they are redrawn"},
     # specs/supp_deployment.py
     "supp_known_measures": {"text": "text under the floor; panels to be redrawn at print size"},
     "supp_functional_layer": {"letters": "letters to be put in reading order together with the caption"},
@@ -133,34 +89,9 @@ ALLOW: dict = {
         "text": "text under the floor; panels to be redrawn at print size",
         "text_single": "single characters under the floor; panels to be redrawn at print size",
         "scale": "shrunk as a whole, as it was in LaTeX; to be laid out at full width"},
-    "supp_benchmark_overview": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "scale": "panels placed below 0.9 of their drawn size; to be redrawn at print size",
-        "words": "internal names on the panels; to change when they are redrawn",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_benchmark_tasks": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "scale": "panels placed below 0.9 of their drawn size; to be redrawn at print size",
-        "words": "internal names on the panels; to change when they are redrawn"},
     # specs/supp_model.py
     "supp_integration_eleven_cohorts": {
         "text": "text under the floor; panels to be redrawn at print size",
         "scale": "shrunk as a whole, as it was in LaTeX; to be laid out at full width"},
     # specs/supp_validation.py
-    "supp_ground_truth": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "text_single": "single characters under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_ground_truth_2": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "text_single": "single characters under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_ground_truth_3": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "text_single": "single characters under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
-    "supp_ground_truth_4": {
-        "text": "text under the floor; panels to be redrawn at print size",
-        "text_single": "single characters under the floor; panels to be redrawn at print size",
-        "spelling": "British spelling on the panels; to change when they are redrawn"},
 }

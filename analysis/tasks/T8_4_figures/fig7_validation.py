@@ -42,8 +42,9 @@ def panel_forest() -> plt.Figure:
     row = json.loads((T43 / "row.json").read_text())
     status = row["step1_status"]
     # Exact size and axes, shared with the set panel beside it (F1): same axis baseline and height.
-    fig = plt.figure(figsize=(2.98, 2.3))
-    ax = fig.add_axes([0.98 / 2.98, 0.56 / 2.3, 1.62 / 2.98, 1.62 / 2.3])
+    H = 2.42  # 0.12 in above the axes for the key of the status letters; the axes sit as in the panel beside it
+    fig = plt.figure(figsize=(2.98, H))
+    ax = fig.add_axes([0.98 / 2.98, 0.56 / H, 1.62 / 2.98, 1.62 / H])
     yt, yl, y = [], [], 0.0
     rows = []
     for h in HS:
@@ -75,7 +76,7 @@ def panel_forest() -> plt.Figure:
     ax.set_ylim(y - 1.2, -1.0)
     ax.set_xlim(-0.3, 0.2)
     ax.set_xticks([-0.3, -0.2, -0.1, 0, 0.1, 0.2])
-    ax.set_xlabel("Δα vs independent measure, $\\rho_p$ (95% CI)", fontsize=6.5, labelpad=1)
+    ax.set_xlabel("Δα vs independent data, $\\rho_p$ (95% CI)", fontsize=6.5, labelpad=1)
     ax.text(1.02, -0.95, "status", transform=ax.get_yaxis_transform(), ha="left", va="bottom",
             fontsize=6, color=cm.MUTED)
     fig.legend(handles=[Line2D([], [], marker="o", color=cm.STY["D"][0], ls="none", ms=4, label="primary cohort"),
@@ -83,6 +84,8 @@ def panel_forest() -> plt.Figure:
                                label="multi-species cohort")],
                loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=2, fontsize=5.8, handletextpad=0.2, frameon=False,
                borderpad=0)
+    fig.text(0.995, 0.995, "status: V supported, N null, R reversed; –, outside the test", fontsize=5.6, ha="right", va="top",
+             color=cm.MUTED)
     return fig
 
 
@@ -133,7 +136,7 @@ def panel_head_to_head() -> plt.Figure:
                     fontsize=5.8, color=cm.MUTED, style="italic", zorder=3)
         ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
         ax.axhline(len(order) - 0.45, color=cm.RULE, lw=0.4)
-        ax.set_title(f"{cm.GOLD_SHORT[h]} ({h})\nresult: {outcome[h].lower()}", fontsize=6.5)
+        ax.set_title(f"{cm.GOLD_SHORT[h]} ({h})", fontsize=6.5)  # the outcome of each comparison is in the caption and the table
         ax.set_xlim(-0.5, 0.3)
         ax.set_xticks([-0.4, -0.2, 0, 0.2])
     axes[0].set_yticks(ys)
@@ -143,7 +146,7 @@ def panel_head_to_head() -> plt.Figure:
                  transform=axes[0].get_yaxis_transform(), ha="right", va="center", fontsize=5.3,
                  color=cm.MUTED, style="italic")
     fig.text(0.5 * (2.42 / 6.75 + 0.995), 0.01, "difference in $\\rho_p$, Δα minus comparator (95% CI; thin: simultaneous)\n"
-             "← comparator closer to independent measure        Δα closer →", fontsize=6.3, ha="center", va="bottom")
+             "← comparator closer to independent data        Δα closer →", fontsize=6.3, ha="center", va="bottom")
     return fig
 
 
@@ -220,7 +223,7 @@ def panel_incremental() -> plt.Figure:
     axes[0].set_yticklabels([cm.STY[k][2] for k, _, _ in INC_SCORES], fontsize=6)
     axes[0].set_ylim(ys[-1] + 0.6, -0.6)
     fig.text(0.5 * (2.42 / 6.75 + 0.995), 0.01,
-             "$\\rho_p$ with independent measure, given covariates and all other simple baselines (95% CI)",
+             "$\\rho_p$ with independent data, given covariates and all other simple baselines (95% CI)",
              fontsize=6.3, ha="center", va="bottom")
     return fig
 
@@ -257,10 +260,10 @@ def panel_sequence_axis() -> plt.Figure:
     ax.set_xlim(-1, 1)
     ax.tick_params(axis="x", labelsize=6)
     ax.set_xlabel("Spearman ρ across genes, one point per cohort", fontsize=6, labelpad=1)
-    h = [Line2D([], [], marker=m, color=col, ls="none", ms=3.2, mew=0, label=t) for t, (m, col) in SEQ_TISSUE.items()]
+    h = [Line2D([], [], marker=m, color=col, ls="none", ms=3.2, mew=0, label=t.capitalize()) for t, (m, col) in SEQ_TISSUE.items()]
     h.append(Line2D([], [], marker="o", color=cm.INK, mfc="white", mew=0.6, ls="none", ms=3.2,
-                    label="open: genes with count evidence only"))
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=4, fontsize=5.3, handletextpad=0.1,
+                    label="open: count evidence only"))
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=4, fontsize=5.7, handletextpad=0.1,
                columnspacing=0.7, frameon=False, borderpad=0, labelspacing=0.15)
     return fig
 

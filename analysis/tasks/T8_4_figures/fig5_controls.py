@@ -22,7 +22,7 @@ from matplotlib.patches import Patch
 
 from analysis.tasks.T8_4_figures import common as cm
 
-FEAT = {"m": "no gene features (free per-gene offset)", "rand": "random gene features",
+FEAT = {"m": "no gene features (per-gene gate)", "rand": "random gene features",
         "zesm": "protein-language features set to zero", "zexpr": "expression features set to zero"}
 PERM = {"a": "counts shuffled across genes (all features detached)",
         "b": "counts shuffled across genes (expression features follow)",
@@ -85,7 +85,7 @@ def panel() -> plt.Figure:
             y += 1.35 if "\n" in r["label"] else 1
         spans.append((c, y0 - 0.5, y - 0.5, fl))
         y += 1.4
-    for ax, key, title in zip(axes, ["D", "S"], ["Δα", "count-evidence margin $S_g$"]):
+    for ax, key, title in zip(axes, ["D", "S"], ["Δα", "count evidence $S_g$"]):
         col, mk = cm.STY[key][0], cm.STY[key][1]
         for c, lo, hi, fl in spans:
             ax.add_patch(plt.Rectangle((fl[key][0], lo), fl[key][1] - fl[key][0], hi - lo, color="#E6E6E6",
@@ -101,14 +101,14 @@ def panel() -> plt.Figure:
                             zorder=2)
                 ax.scatter(vals, yy, s=11, marker=mk, color=col, edgecolor="white", lw=0.3, zorder=3)
                 if r.get("note") and not vals:
-                    ax.text(0.0, r["y"], r["note"], va="center", fontsize=5.3, color=cm.MUTED, style="italic")
+                    ax.text(0.0, r["y"], r["note"], va="center", fontsize=5.6, color=cm.MUTED, style="italic")
                 elif r.get("note") and key == "D":
-                    ax.text(min(vals) - 0.04, r["y"], r["note"], va="center", ha="right", fontsize=5.3,
+                    ax.text(min(vals) - 0.04, r["y"], r["note"], va="center", ha="right", fontsize=5.6,
                             color=cm.MUTED, style="italic")
         ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
         ax.set_xlim(-0.4, 1.02)
         ax.set_xticks([-0.25, 0, 0.25, 0.5, 0.75, 1.0])
-        ax.set_xlabel(f"{title} of control run vs normal training\n(Spearman ρ across genes)", fontsize=6.5)
+        ax.set_xlabel(f"{title}: control run vs normal training\n(Spearman ρ across genes)", fontsize=6.5)
     axes[0].set_yticks(yt)
     axes[0].set_yticklabels(yl, fontsize=5.8)
     axes[0].set_ylim(y - 1.0, -1.4)

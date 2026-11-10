@@ -30,9 +30,10 @@ Z3 = cm.RES / "Z3"
 F2 = cm.RES / "F2"
 PREVIEW = F2 / "preview"
 
-FREE = ("#D55E00", "o", "Δα, per-gene gate")
-CAN = ("#666666", "D", "Δα, protein-feature gate")
-SG = ("#0072B2", "s", "count evidence $S_g$")
+# Colors and markers of the house style (figures/style.py): the default gate as in every other figure.
+CAN = (cm.style.READOUT["delta_alpha"].color, cm.style.READOUT["delta_alpha"].marker, "Δα, protein-feature gate")
+FREE = (cm.style.READOUT["delta_alpha_per_gene"].color, cm.style.READOUT["delta_alpha_per_gene"].marker, "Δα, per-gene gate")
+SG = (cm.style.READOUT["count_evidence"].color, cm.style.READOUT["count_evidence"].marker, "count evidence $S_g$")
 FS = 6.0  # tick and row labels
 FL = 6.3  # axis labels
 
@@ -60,14 +61,14 @@ def _style(ax):
 
 
 # ------------------------------------------------------------------------------------------------ a
-ROWS = [("H1", "all", "liver level (H1)\nliver, human + mouse"), ("H1", "multi", "liver, 4 species"),
-        ("H3", "all", "liver pattern (H3)\nliver, human + mouse"), ("H3", "multi", "liver, 4 species"),
-        ("H2", "all", "testis level (H2)\ntestis, human + mouse"), ("H4", "all", "testis pattern (H4)\ntestis, human + mouse")]
+ROWS = [("H1", "all", "liver level (H1)\nLiver Human+Mouse"), ("H1", "multi", "Liver 4 species"),
+        ("H3", "all", "liver pattern (H3)\nLiver Human+Mouse"), ("H3", "multi", "Liver 4 species"),
+        ("H2", "all", "testis level (H2)\nTestis Human+Mouse"), ("H4", "all", "testis pattern (H4)\nTestis Human+Mouse")]
 UNI = {("all", "all"): "all", ("all", "cs"): "count_supported", ("multi", "all"): "multi_4sp_or_3sp",
        ("multi", "cs"): "multi_4sp_count_supported"}
 
 
-STATUS_KEY = "pre-specified status (Table 1): V supported, N null, R reversed; –, estimate outside the test"
+STATUS_KEY = "pre-specified status: V supported, N null, R reversed; –, estimate outside the test"
 PANEL_H, PANEL_BOTTOM, PANEL_TOP = 2.48, 0.74, 0.26  # forest and testis-level panels share one height and axes bottom (one row)
 
 
@@ -117,8 +118,8 @@ def panel_forest() -> plt.Figure:
         ax.set_xticks([-0.2, -0.1, 0, 0.1, 0.2])
         ax.set_xticklabels(["−0.2", "", "0", "", "0.2"])
         ax.set_title(["all genes", "count evidence only"][j], fontsize=FL, pad=2)
-    axes[0].text(1.0 + gaps[0] / 2 / aw[0], -0.62, "pre-specified\ntest\n(default gate)",
-                 transform=axes[0].get_yaxis_transform(), ha="center", va="bottom", fontsize=5.2, color=cm.MUTED,
+    axes[0].text(1.0 + gaps[0] / 2 / aw[0], -0.62, "pre-specified\ntest (protein-\nfeature gate)",
+                 transform=axes[0].get_yaxis_transform(), ha="center", va="bottom", fontsize=5.5, color=cm.MUTED,
                  linespacing=1.0)
     # paired difference
     ax = axes[2]
@@ -134,7 +135,7 @@ def panel_forest() -> plt.Figure:
     ax.set_xlim(-0.06, 0.3)
     ax.set_xticks([0, 0.1, 0.2, 0.3])
     ax.set_xticklabels(["0", "0.1", "0.2", "0.3"])
-    ax.set_title("per-gene minus\nprotein-feature", fontsize=FL, pad=2, linespacing=1.0)
+    ax.set_title("per-gene minus\nprotein-feature gate", fontsize=FL, pad=2, linespacing=1.0)
     for ax in axes:
         _style(ax)
         ax.set_ylim(ys[-1] + 0.6, -0.6)
@@ -148,17 +149,17 @@ def panel_forest() -> plt.Figure:
     axes[1].set_yticks([])
     axes[2].set_yticks([])
     fig.text((left + aw[0] + gaps[0] / 2 + aw[1] / 2 - 0.2) / W, 0.325 / H,
-             "Δα vs independent measure, $\\rho_p$ (95% CI)", fontsize=FL, ha="center", va="bottom")
+             "Δα vs independent data, $\\rho_p$ (95% CI)", fontsize=FL, ha="center", va="bottom")
     x2 = left + aw[0] + gaps[0] + aw[1] + gaps[1] + aw[2] / 2
     fig.text(x2 / W, 0.325 / H, "difference (95% CI)", fontsize=FL, ha="center", va="bottom")
-    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=3.1, label="protein-feature gate (default)"),
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=3.1, label="protein-feature gate"),
          Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.6, label="per-gene gate"),
          Line2D([], [], marker="|", color=cm.INK, ls="none", ms=6, mew=1.0, label="pre-specified, 10 seeds"),
          Line2D([], [], marker="o", color=cm.INK, ls="none", ms=3.3, label="difference: all genes"),
          Line2D([], [], marker="o", color=cm.INK, mfc="white", ls="none", ms=3.3, label="count evidence only")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.13 / H), ncol=5, fontsize=5.2,
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.13 / H), ncol=5, fontsize=5.5,
                handletextpad=0.1, columnspacing=0.45, frameon=False, borderpad=0)
-    fig.text(0.5, 0.03 / H, STATUS_KEY, fontsize=5.2, ha="center", va="bottom", color=cm.MUTED)
+    fig.text(0.5, 0.03 / H, STATUS_KEY, fontsize=5.5, ha="center", va="bottom", color=cm.MUTED)
     return fig
 
 
@@ -219,14 +220,14 @@ def panel_testis_level() -> plt.Figure:
     lim = max(abs(np.array(ax.get_ylim())).max() for ax in axes)
     for ax in axes:
         ax.set_ylim(-lim, lim)
-    axes[0].set_ylabel("Δα, mean rank in bin (centred)", fontsize=FL, labelpad=1)
+    axes[0].set_ylabel("Δα, mean rank in bin (centered)", fontsize=FL, labelpad=1)
     axes[1].set_yticklabels([])
     fig.text((left + aw + gap / 2) / W, 0.325 / H, "EVEE testis expression level, rank\n(right: residual rank given covariates)", fontsize=FL, linespacing=1.05, ha="center",
              va="bottom")
-    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ms=2.2, mew=0, lw=1, label="protein-feature"),
-         Line2D([], [], marker=FREE[1], color=FREE[0], ms=2.6, mew=0, lw=1, label="per-gene"),
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ms=2.2, mew=0, lw=1, label="protein-feature gate"),
+         Line2D([], [], marker=FREE[1], color=FREE[0], ms=2.6, mew=0, lw=1, label="per-gene gate"),
          Line2D([], [], color=SG[0], lw=0.8, ls=(0, (2.5, 1.5)), label="$S_g$")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.55, 0.115 / H), ncol=3, fontsize=5.4, handletextpad=0.3,
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.55, 0.115 / H), ncol=3, fontsize=5.5, handletextpad=0.3,
                columnspacing=0.8, frameon=False, borderpad=0, handlelength=1.6)
     return fig
 
@@ -265,7 +266,7 @@ def panel_gate_vs_s() -> plt.Figure:
             ax.set_ylabel("liver" if coh == "liv_hmouse" else "testis", fontsize=FL, labelpad=1)
         if coh == "liv_hmouse":
             ax.set_xticklabels([])
-            ax.set_title("per-gene gate" if gate == "free5" else "protein-feature", fontsize=FL, pad=2)
+            ax.set_title("per-gene gate" if gate == "free5" else "protein-feature gate", fontsize=FL, pad=2)
         else:
             ax.set_xticklabels(["0", "0.5", "1"])
     fig.text(0.06 / W, (bottom + a + vg / 2) / H, "Δα, rank", rotation=90, fontsize=FL, ha="left", va="center")
@@ -277,8 +278,8 @@ def panel_gate_vs_s() -> plt.Figure:
 # ------------------------------------------------------------------------------------------------ d
 C42_ROWS = [("SC", "all", "spermatocyte peak, 1,103"), ("SC", "count_supported", "with count evidence"),
             ("SC_strict", "all", "strict peak, 166"), ("SC_strict", "count_supported", "with count evidence")]
-C43_ROWS = [("liv_4sp", "prog63_noMT", "programme, 63"), ("liv_4sp", "core15", "core genes, 15"),
-            ("liv_hmouse", "prog63_noMT", "programme, 63"), ("liv_hmouse", "core15", "core genes, 15")]
+C43_ROWS = [("liv_4sp", "prog63_noMT", "program, 63"), ("liv_4sp", "core15", "core genes, 15"),
+            ("liv_hmouse", "prog63_noMT", "program, 63"), ("liv_hmouse", "core15", "core genes, 15")]
 C43_Y = [0.75, 1.75, 3.5, 4.5]  # group headers (cohort) at 0 and 2.75
 
 
@@ -317,7 +318,7 @@ def panel_named() -> plt.Figure:
     ax1.set_xticklabels(["0", "0.5", "1"])
     ax1.set_title("testis, spermatocyte genes", fontsize=FL, pad=2)
     y2 = [0.0, *C43_Y[:2], 2.75, *C43_Y[2:]]
-    labs2 = ["liver, 4 species"] + [lab for _, _, lab in C43_ROWS[:2]] + ["liver, human + mouse"] + [lab for _, _, lab in C43_ROWS[2:]]
+    labs2 = ["Liver 4 species"] + [lab for _, _, lab in C43_ROWS[:2]] + ["Liver Human+Mouse"] + [lab for _, _, lab in C43_ROWS[2:]]
     ax2.set_yticks(y2)
     ax2.set_yticklabels(labs2, fontsize=FS)
     for i, tk in enumerate(ax2.get_yticklabels()):
@@ -333,16 +334,16 @@ def panel_named() -> plt.Figure:
         ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
         _style(ax)
     fig.text(0.5, 0.205 / H, "matched excess, SD units (95% CI)", fontsize=FL, ha="center", va="bottom")
-    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=2.6, label="protein-feature"),
-         Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.0, label="per-gene"),
+    h = [Line2D([], [], marker=CAN[1], color=CAN[0], ls="none", ms=2.6, label="protein-feature gate"),
+         Line2D([], [], marker=FREE[1], color=FREE[0], ls="none", ms=3.0, label="per-gene gate"),
          Line2D([], [], marker=SG[1], color=SG[0], ls="none", ms=3.0, label="$S_g$")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=3, fontsize=5.4, handletextpad=0.15,
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=3, fontsize=5.5, handletextpad=0.15,
                columnspacing=0.7, frameon=False, borderpad=0)
     return fig
 
 
 # ------------------------------------------------------------------------------------------------ e
-X5_COH = [("liv_hmouse", "liver, human + mouse"), ("liv_4sp", "liver, 4 species"), ("test_hmouse", "testis, human + mouse")]
+X5_COH = [("liv_hmouse", "Liver Human+Mouse"), ("liv_4sp", "Liver 4 species"), ("test_hmouse", "Testis Human+Mouse")]
 X5_PANELS = [("dNdS_vs_D", "Δα vs dN/dS"), ("pi_vs_D", "Δα vs protein prior π")]
 
 
@@ -375,7 +376,7 @@ def panel_axes() -> plt.Figure:
     fig.text((left + aw / 2 - 0.15) / W, 0.205 / H, "Spearman ρ across genes", fontsize=FL, ha="center", va="bottom")
     h = [Line2D([], [], marker="o", color=cm.INK, ls="none", ms=3.0, label="all genes"),
          Line2D([], [], marker="o", color=cm.INK, mfc="white", ls="none", ms=3.0, label="count evidence")]
-    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=2, fontsize=5.4, handletextpad=0.1,
+    fig.legend(handles=h, loc="lower center", bbox_to_anchor=(0.5, 0.0), ncol=2, fontsize=5.5, handletextpad=0.1,
                columnspacing=0.6, frameon=False, borderpad=0)
     return fig
 

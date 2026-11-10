@@ -80,7 +80,7 @@ def heat(M: pd.DataFrame, label: str, show_rows: bool) -> plt.Figure:
     for s in ax.spines.values():
         s.set_visible(False)
     cb = fig.colorbar(im, cax=cax, orientation="horizontal")
-    cb.set_label(f"{label}\n(scaled within panel, 1 = best)", fontsize=5.5)
+    cb.set_label(f"{label}\n(scaled within cohort, 1 = best)", fontsize=5.5)
     cb.ax.tick_params(labelsize=5)
     cb.outline.set_linewidth(0.4)
     return fig

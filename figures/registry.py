@@ -7,18 +7,22 @@ the order of their floats; it is written from the manuscript, so a moved float c
 A figure of a paper module whose key is not in ``order.txt`` is *pending*: its float is not in the manuscript yet (a new
 continuation float, for example). It can be composed, the build names it every time, and it is not in ``figures.pdf``.
 It joins the paper when its float exists and the order is written again; ``build --strict`` fails while one is pending.
+
+For a dry run of another order (floats added or moved in a copy of the manuscript) set ``CHIMERA_FIGURES_ORDER=<file>``
+together with ``CHIMERA_FIGURES_OUT``.
 """
 
 from __future__ import annotations
 
 import hashlib
 import importlib
+import os
 import pkgutil
 from pathlib import Path
 
 from figures import compose as C
 
-ORDER = C.ROOT / "order.txt"
+ORDER = Path(os.environ.get("CHIMERA_FIGURES_ORDER", C.ROOT / "order.txt"))
 
 
 def read_order() -> list:

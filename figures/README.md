@@ -77,7 +77,8 @@ PYTHONPATH=$PWD python -m figures.compose main_validation    # compose one figur
 2. **A panel**: run the script that draws it (in `chimera_env`), then `bash figures/build.sh`. Panel scripts live with
    the analysis they belong to (`analysis/tasks/<task>/`) or in `figures/redraw/`; they read cached result tables,
    call `figures.style.apply()` and save with `figures.style.save_panel(fig, "family/name")`. For a dry run set
-   `CHIMERA_FIGURES_OUT=<folder>`: panels and build products go there and the repository is not touched.
+   `CHIMERA_FIGURES_OUT=<folder>`: panels and build products go there and the repository is not touched
+   (`CHIMERA_FIGURES_ORDER=<file>` tries another order of the floats in the same way).
 3. **A new figure**: add an entry to the spec module of its part of the paper. Until its float exists in the manuscript
    the figure is *pending*: it is composed, the build names it, and it is not in `figures.pdf`. Then write the order
    and build. `order.txt` is normally written from the manuscript (`sync_figures.py --write-order`), so a float that moves

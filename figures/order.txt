@@ -14,6 +14,7 @@ main_tissues_4
 main_disease
 main_protein
 main_protein_2
+main_protein_3
 supp_alpha_training
 supp_alpha_robustness
 supp_alpha_decorrelation
@@ -79,6 +80,7 @@ supp_atlas_spatial_autocorrelation
 supp_atlas_archetype_trajectory
 supp_atlas_archetype_enrichment
 supp_residue_audit
+supp_residue_audit_2
 supp_residue_mixed_effects
 supp_residue_cliffs_delta
 supp_residue_attention_by_feature

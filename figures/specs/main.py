@@ -6,13 +6,12 @@ A continuation float has the key of its figure with ``_2``, ``_3`` and the same 
 
 from __future__ import annotations
 
-from figures.compose import Col, COLUMNWIDTH, Figure, LabelledPage, P, Row, SRC, X
+from figures.compose import Col, Figure, NB, P, Row, X
 
-# Page 31 of the first assembled pages with its panel letters removed; the letters of this figure are drawn at the
-# positions the old ones had (center x, bottom of the letter box, in bp from the top left of that page).
-ATLAS_LETTERS = {"d": (73.7, 171.3), "e": (267.9, 171.3), "f": (462.0, 171.3), "g": (653.6, 171.3),
-                 "h": (201.0, 341.7), "i": (496.9, 341.7), "j": (676.0, 341.7),
-                 "k": (90.1, 503.5), "l": (240.7, 503.5), "m": (399.6, 503.5), "n": (622.7, 503.5)}
+# Two panels of the protein figure need the trained gate network and are placed as the notebooks stored them, without
+# their heading line (the first 11 bp of the page).
+STORED_CONTRIBUTIONS = NB("gin_attention_overall/c3_per_gene_esm2_vs_expression_disagreement", "b", region=(0, 11, 306.4, 191.2))
+STORED_ARCHETYPE_MAP = NB("gene_archetypes/a3_archetype_umap", "j", region=(0, 11, 328.0, 270.4))
 
 FIGS = {
     # Drawn by figures/redraw/overview/overview.py at print size; the five panels are placed as whole pages.
@@ -36,9 +35,10 @@ FIGS = {
                "pattern; below means the pattern or the level differs. Genes with too few counts get a value "
                "from genes with similar proteins, shown in gray. Panel (e) lists what the paper does with these "
                "readouts.")),
+    # Drawn by figures/redraw/main_figures.py at print size: three pages with the same axes box.
     "main_alpha_vs_prior": Figure(
-        SRC("assembled/page04", ink=False),
-        width=1.10 * COLUMNWIDTH,
+        Row(X("main_alpha_vs_prior/scatter", "a"), X("main_alpha_vs_prior/shift", "b"),
+            X("main_alpha_vs_prior/distribution", "c"), same_scale=True),
         label="fig:alpha-intro",
         title="The gate value α against the protein prior",
         shows=("Every dot or bar is a gene. The model starts each gene at a value set by how similar its protein "
@@ -57,7 +57,7 @@ FIGS = {
                "cells of different species mix. (b) How well cell types stay apart. (c) A weighted mean of the "
                "two. Methods are grouped by whether they see cell-type labels during training.")),
     "main_delta_alpha_liver": Figure(
-        Row(SRC("assembled/page16", {"a": 194.7, "b": 342.6}, region=(0, 0, 414, 402)),
+        Row(X("main_delta_alpha_liver/category_boxes", "a"), X("main_delta_alpha_liver/category_effect_sizes", "b"),
             P("main_delta_alpha_liver/prior_landscape", "c")),
         label="fig:dalpha-biology",
         title="Δα by gene category and across the protein prior, four-species liver",
@@ -110,33 +110,37 @@ FIGS = {
                "Two named findings, spermatocyte genes above the prior and hepatocyte catabolic genes below it, "
                "hold under both gates. (i) Under both gates Δα stays unrelated to dN/dS and to the protein "
                "prior.")),
+    # 476 bp wide: at the text width the float with its caption is as tall as the page (smallest text 5.1 pt here).
     "main_tissues": Figure(
         Col(P("main_tissues/axis", "a"), P("main_tissues/genes", "b"), gap=3),
+        width=476,
         label="fig:one-reading",
         title="Δα against protein identity and dN/dS, and named genes, in eight tissues",
         shows=("The same reading in eight tissues, one column or block per tissue. (a) Top row: how far genes "
-               "move from the prior. Middle and bottom rows: Δα against protein identity and against dN/dS. The "
-               "orange trend line is flat, so deployment does not follow sequence conservation in any tissue. "
-               "(b) For each tissue, the genes furthest above the prior (orange), the tissue's own lineage genes "
-               "(bold) and the genes furthest below (blue).")),
+               "move from the prior, with the spread and the shares of genes clearly above and below. Middle and "
+               "bottom rows: Δα against protein identity and against dN/dS, with the correlations under each "
+               "cloud. The orange trend line is flat, so deployment does not follow sequence conservation in any "
+               "tissue. Small gray triangles mark genes beyond an axis. (b) For each tissue, the genes furthest "
+               "above the prior (orange), the tissue's own lineage genes (bold) and the genes furthest below "
+               "(blue), every bar at its full length.")),
     "main_tissues_2": Figure(
         P("main_tissues/recurrence", "c"),
-        width=470,
         label="fig:one-reading", part=2,
         title="Gene programs and classes across eight tissues",
         shows=("Rows are gene programs and gene classes, columns the eight tissues. A red cell means the program "
-               "sits above the protein prior in that tissue, a blue cell below; a star marks significance. Most "
-               "programs point the same way in every tissue: receptors, cell contacts and signaling above; "
-               "translation, mitochondria and chromatin below. The columns at the right show that the count "
-               "evidence and direct profile correlation agree with this, and that protein identity and dN/dS do "
-               "not predict it.")),
+               "sits above the protein prior in that tissue, a blue cell below; a star marks significance, a gray "
+               "cell a program with too few genes. The rows stand in four blocks with headings: programs above "
+               "the prior in tissue after tissue (receptors, cell contacts and signaling), programs below it "
+               "(translation, mitochondria and chromatin), programs found in one tissue, and programs with "
+               "opposite signs in different tissues. The columns at the right, explained by the key under the "
+               "panel, show that the count evidence and direct profile correlation agree with this, and that "
+               "protein identity and dN/dS do not predict it.")),
     "main_tissues_3": Figure(
-        Col(Row(P("main_tissues/gene_by_tissue_row1", {"d": 150, "e": 400}, region=(0, 0, 512, 119)), same_scale=True,
-                width=425),
+        Col(Row(P("main_tissues/gene_by_tissue_row1", {"d": 150, "e": 400}, region=(0, 0, 512, 119)), same_scale=True),
             Row(P("main_tissues/gene_by_tissue_row2", {"f": 150, "g": 395}, region=(0, 120, 512, 283)),
-                same_scale=True, width=425),
+                same_scale=True),
             Row(P("main_tissues/gene_by_tissue_row3", {"h": 145, "i": 385}, region=(0, 283, 512, 429)),
-                same_scale=True, width=425),
+                same_scale=True),
             gap=3),
         label="fig:one-reading", part=3,
         title="Gene and tissue components of the readouts",
@@ -173,7 +177,7 @@ FIGS = {
                "transferring programs against its null in kidney, liver and islet. (e) Published lists of shared "
                "and human-specific injury genes.")),
     "main_protein": Figure(
-        Col(SRC("assembled/page23_unlabelled", {"a": 182.7, "b": 463}, region=(0, 0, 571, 156)),
+        Col(Row(X("main_protein/attribution_shares", "a"), STORED_CONTRIBUTIONS),
             P("main_protein/controls", "c")),
         label="fig:gin-esm2",
         title="Inputs of the gate network and control trainings",
@@ -186,13 +190,30 @@ FIGS = {
                "when features are changed and collapses when counts are shuffled. Δα (left) shows how much "
                "follows the features and how much follows the counts.")),
     "main_protein_2": Figure(
-        LabelledPage("src:assembled/page31_unlabelled", at=ATLAS_LETTERS, bottom=505.0),
+        Col(Row(X("main_protein/atlas_alpha", "d"), X("main_protein/atlas_delta_alpha", "e"),
+                X("main_protein/atlas_correction", "f"), same_scale=True),
+            Row(X("main_protein/atlas_categories", "g"),
+                Col(X("main_protein/atlas_categories_key"), X("main_protein/atlas_clusters", "h")))),
         label="fig:gin-esm2", part=2,
-        title="Protein-space atlas and gene archetypes",
+        title="Protein-space atlas",
         shows=("A map of all genes arranged by protein similarity: each dot is a gene, and dots that lie close "
-               "have similar protein-language features. (d to g) The map coloured by α, by Δα, by the size of "
-               "the gate's correction and by gene category. (h) The median Δα of twelve protein neighbourhoods "
-               "in four liver models. (i to k) The gate network sorts genes into three groups (archetypes) that "
-               "lie below, at and above the prior. (l to n) The three groups on the protein map, and checks that "
-               "expression level alone does not explain them.")),
+               "have similar protein-language features. (d) The map colored by the gate value α. (e) Colored by "
+               "Δα: neighboring genes tend to share the sign. (f) Colored by the size of the correction the gate "
+               "network makes to the prior. (g) Twelve gene categories on the map, at most 30 genes each; the key "
+               "is at the right. (h) The genes of each of four liver cohorts sorted into twelve protein "
+               "clusters; each cell is the median Δα of one cluster, sorted from lowest to highest within the "
+               "cohort. The spread is widest in the four-species cohort.")),
+    "main_protein_3": Figure(
+        Col(Row(X("main_protein/archetype_number", "i"), STORED_ARCHETYPE_MAP, X("main_protein/archetype_delta_alpha", "k")),
+            Row(X("main_protein/archetype_protein_map", "l"), X("main_protein/archetype_neighbors", "m"),
+                X("main_protein/archetype_prediction", "n"), same_scale=True)),
+        label="fig:gin-esm2", part=3,
+        title="Gene archetypes of the gate network",
+        shows=("The gate network sorts genes into groups (archetypes) in its hidden layer. (i) How well the groups "
+               "separate and how well they repeat between random starts, for 3 to 12 groups: three is chosen. "
+               "(j) The three archetypes on a map of the hidden layer. (k) Δα of the genes of each archetype: "
+               "A0 below the prior, A1 near it, A2 above it. (l) The archetypes on the protein map of panels d "
+               "to g. (m) Protein neighbors share the archetype more often than chance. (n) The archetype can "
+               "be predicted in part from expression level alone (0.57) and almost fully from all inputs of the "
+               "gate network (0.94), so expression level alone does not explain it.")),
 }

@@ -127,25 +127,38 @@ def machine_path_scan(root: Path | None = None, jobs: int = 4) -> list:
 
 
 def letter_problems(rows: dict, figs: dict) -> dict:
-    """Letters over a figure and its continuation floats: a, b, c ... in reading order. key -> message."""
+    """Letters over a figure and its continuation floats: a, b, c ... in reading order. key -> message.
+
+    Reading order on one float: the next letter is never on a panel that lies wholly above the panel before, and never on
+    one to its left in the same band (two panels are in one band when they overlap in height) unless that panel starts
+    and ends lower, which begins a new row. A tall panel beside a column of two reads tall panel, upper, lower; two
+    columns of unequal panels read row by row. Several letters on one panel run left to right."""
     out, by_label = {}, {}
     for k, f in figs.items():
         if k in rows:
             by_label.setdefault(f.label, []).append(k)
     for label, keys in by_label.items():
-        seq = []
+        seq = []                                    # (key, letter, x, top, bottom) in the order of the letters
         for k in keys:
-            placed = sorted(((p["y"] + p["h"], p["x"], L) for p in rows[k]["panels"] for L in p["letters"]), key=lambda t: (round(t[0] / 12), t[1]))
-            seq += [(k, L) for _, _, L in placed]
-        letters = [L for _, L in seq]
+            on_float = [(L, p["x"] + i * 1e-3, p["y"], p["y"] + p["h"]) for p in rows[k]["panels"] for i, L in enumerate(p["letters"])]
+            seq += [(k, *t) for t in sorted(on_float)]
+        letters = [L for _, L, *_ in seq]
         if not letters:
             continue
         want = [chr(ord("a") + i) for i in range(len(letters))]
-        if sorted(letters) != want:
+        if letters != want:
             out[keys[0]] = f"letters {''.join(letters)}: not a, b, c ... without gap or repeat"
-        elif letters != want:
-            first = next(i for i, (a, b) in enumerate(zip(letters, want)) if a != b)
-            out[seq[first][0]] = f"letters read {''.join(letters)} on the page, not in order"
+            continue
+        tol = 2.0                                   # bp
+        for (k1, a, x1, t1, b1), (k2, b, x2, t2, b2) in zip(seq, seq[1:]):
+            if k1 != k2:
+                continue                            # the next float starts a new page
+            above = b2 <= t1 + tol
+            same_band = t2 < b1 - tol and t1 < b2 - tol
+            new_row = t2 > t1 + tol and b2 > b1 + tol
+            if above or (same_band and x2 < x1 and not new_row):
+                out[k1] = f"letters not in reading order: ({b}) is {'above' if above else 'left of'} ({a})"
+                break
     return out
 
 

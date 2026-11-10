@@ -68,12 +68,7 @@ INK = "#222222"
 MUTED = "#777777"
 RULE = "#BBBBBB"
 
-COHORT = {
-    "liv_hmonkey": "liver, human + monkey", "liv_hmouse": "liver, human + mouse",
-    "liv_hzeb": "liver, human + zebrafish", "liv_4sp": "liver, 4 species",
-    "test_hmac": "testis, human + macaque", "test_hmouse": "testis, human + mouse",
-    "test_3sp": "testis, 3 species",
-}
+COHORT = dict(style.COHORT)  # "Liver Human+Mouse", "Liver 4 species", ...: the names every figure uses
 GOLD = {
     "H1": "liver expression level\n(EVEE, 4 mammals)",
     "H2": "testis expression level\n(EVEE, 4 mammals)",
@@ -81,7 +76,7 @@ GOLD = {
     "H4": "testis cell-type pattern\n(8 held-out species)",
 }
 GOLD_SHORT = {"H1": "liver level", "H2": "testis level", "H3": "liver pattern", "H4": "testis pattern"}
-RHO_P = "partial rank correlation with independent measure, $\\rho_p$"
+RHO_P = "partial rank correlation with independent data, $\\rho_p$"
 
 
 def setup() -> None:

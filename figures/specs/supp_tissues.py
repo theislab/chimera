@@ -6,83 +6,98 @@ A continuation float has the key of its figure with ``_2``, ``_3`` and the same 
 
 from __future__ import annotations
 
-from figures.compose import Col, Figure, P, Panel, Row
+from figures.compose import Col, Figure, P, Panel, Row, X
 
 
 def tissue(family: str) -> Col:
-    """The eleven panels of a tissue figure, a to k, in four rows."""
+    """The eleven panels of a tissue figure, a to k, in four rows; each panel is a page of its exact size."""
     def q(k: str) -> Panel:
-        return P(f"{family}/{k}", k)
+        return X(f"{family}/{k}", k)
 
     return Col(Row(q("a"), q("b"), q("c"), same_scale=True), Row(q("d"), q("e"), same_scale=True),
                Row(q("f"), q("g"), q("h"), same_scale=True), Row(q("i"), q("j"), q("k"), same_scale=True), gap=3)
+
+
+TISSUE_SHOWS = ("The reading of {tissue} ({species}) with the panels the main figures use for liver and testis. (a) to (c) "
+                "compare, for every gene, the value the model gives it (α) with the value its protein conservation alone "
+                "predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by "
+                "prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes "
+                "stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the "
+                "Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show "
+                "which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above "
+                "and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. "
+                "(j) shows that Δα rises with the evidence in the counts. {k} Small gray triangles mark genes that lie "
+                "beyond an axis.")
+K_SUPPORT = "(k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign."
+K_MODELS = "(k) shows the distribution of Δα in every model of this tissue, one row per model, the model of this figure first."
 
 FIGS = {
     "supp_tissue_bone_marrow": Figure(
         tissue("supp_tissue_bone_marrow"),
         label="fig:supp-h1-bone-marrow",
         title="The reading in bone marrow",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="bone marrow", species="human, mouse lemur and mouse", k=K_SUPPORT)),
     "supp_tissue_kidney": Figure(
         tissue("supp_tissue_kidney"),
         label="fig:supp-h1-kidney",
         title="The reading in kidney",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="kidney", species="human and mouse", k=K_SUPPORT)),
     "supp_tissue_islet": Figure(
         tissue("supp_tissue_islet"),
         label="fig:supp-h1-islet",
         title="The reading in pancreatic islet",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="pancreatic islet", species="human and mouse", k=K_SUPPORT)),
     "supp_tissue_eye": Figure(
         tissue("supp_tissue_eye"),
         label="fig:supp-h1-eye",
         title="The reading in the eye",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="the eye", species="human and mouse", k=K_MODELS)),
     "supp_tissue_cortex": Figure(
         tissue("supp_tissue_cortex"),
         label="fig:supp-h1-cortex",
         title="The reading in cerebral cortex",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="cerebral cortex (primary motor cortex)", species="human and mouse", k=K_MODELS)),
     "supp_tissue_lung": Figure(
         tissue("supp_tissue_lung"),
         label="fig:supp-h1-lung",
         title="The reading in lung",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="lung", species="human, mouse lemur and mouse", k=K_SUPPORT)),
     "supp_tissue_muscle": Figure(
         tissue("supp_tissue_muscle"),
         label="fig:supp-h1-muscle",
         title="The reading in skeletal muscle",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="skeletal muscle", species="human and mouse", k=K_SUPPORT)),
     "supp_tissue_tumor_myeloid": Figure(
         tissue("supp_tissue_tumor_myeloid"),
         label="fig:supp-h1-tumour",
         title="The reading in lung-tumor myeloid cells",
-        shows=""),
+        shows=TISSUE_SHOWS.format(tissue="lung-tumor myeloid cells", species="human and mouse", k=K_SUPPORT)),
+    # 448 bp wide (as it printed before): with the heading of its subsection the float fits the page (smallest text 5.1 pt).
     "supp_tissues_recurrence": Figure(
         P("supp_tissues_recurrence/recurrence_all"),
-        width=440,
+        width=448,
         label="fig:supp-h1-recurrence-all",
         title="All gene sets that recur across tissues",
-        shows=("Each row is a set of genes with a common function, for example receptors, ion channels or "
-               "ribosome and translation genes. Each column is a tissue. A red cell means that in this tissue "
-               "the genes of the set sit above their protein prior more than comparable genes do: their use "
-               "across cell types is shared between species more than the conservation of their proteins "
-               "predicts. A blue cell means the opposite. The same sets are red in tissue after tissue "
-               "(receptors, cell-surface, signaling and inflammation sets) and the same sets are blue "
-               "(mitochondrial, translation, chromatin and proteostasis sets). The columns at the right give the "
-               "test of recurrence and show how the same sets behave on the count evidence, on a direct profile "
-               "comparison and on two sequence measures.")),
+        shows=("Each row is a set of genes with a common function, for example receptors, ion channels or ribosome and "
+               "translation genes. Each column is a tissue. A red cell means that in this tissue the genes of the set sit "
+               "above their protein prior more than comparable genes do; a blue cell means the opposite; the number is the "
+               "z value, a star marks significance, and a gray cell is a set with too few genes in that tissue. Colors stop "
+               "at 8, the numbers do not. The rows stand in three blocks, each with a heading: sets above the prior in "
+               "tissue after tissue (receptors, cell-surface, signaling and inflammation sets), sets below it "
+               "(mitochondrial, translation, chromatin and proteostasis sets), and three sets found in one tissue only. The "
+               "columns at the right, explained by the key under the figure, give the test of recurrence and show how the "
+               "same sets behave on the count evidence, on a direct profile comparison and on two sequence measures.")),
     "supp_tissues_lineage": Figure(
         P("supp_tissues_lineage/lineage"),
         label="fig:supp-h1-lineage",
         title="Lineage marker sets across tissues",
-        shows=("Each row is a small set of well-known marker genes of one cell lineage, such as B cells of the "
-               "bone marrow, the proximal tubule of the kidney or inhibitory neurons of the cortex; the tissue "
-               "the lineage belongs to is given in brackets. Each column is a tissue. A red cell means that in "
-               "this tissue the marker genes sit above comparable genes: on the left for Δα, the reading against "
-               "the protein prior, and on the right for the count evidence behind it. The black box marks the "
-               "lineage's own tissue. A dash means that fewer than five of the marker genes have enough counts "
-               "in that tissue to be scored. Most values lie in the boxes, and they are red.")),
+        shows=("Each row is a small set of well-known marker genes of one cell lineage, such as B cells of the bone marrow, "
+               "the proximal tubule of the kidney or inhibitory neurons of the cortex; the tissue the lineage belongs to is "
+               "given in parentheses. Each column is a tissue. A red cell means that in this tissue the marker genes sit "
+               "above comparable genes: on the left for Δα, the reading against the protein prior, and on the right for the "
+               "count evidence behind it. The outline marks the lineage's own tissue. A light gray cell means that fewer "
+               "than five of the marker genes have enough counts in that tissue to be scored. Most values lie in the "
+               "outlined cells, and all of those are red.")),
     "supp_programs_recurrent": Figure(
         Col(P("supp_programs_recurrent/atlas", "a"), Row(P("supp_programs_recurrent/distance", "b"), width=330), gap=3),
         label="fig:supp-e1",

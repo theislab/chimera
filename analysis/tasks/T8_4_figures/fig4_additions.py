@@ -38,7 +38,7 @@ THEMES = {
     "urea cycle / gluconeogenesis": (["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"], "#0072B2"),
     "mitochondrially encoded OXPHOS": (["MT-CO1", "MT-CO2", "MT-CO3", "MT-CYB", "MT-ND1", "MT-ND2", "MT-ND4",
                                         "MT-ATP6"], "#5B3E80"),
-    "liver support": (["SELP", "SELE", "VCAM1", "F3", "CR2", "CD40LG", "COL17A1", "PDGFRB", "KIT", "C1QC"],
+    "supporting tissue": (["SELP", "SELE", "VCAM1", "F3", "CR2", "CD40LG", "COL17A1", "PDGFRB", "KIT", "C1QC"],
                       "#D55E00"),
     "housekeeping": (["DDX4", "RPL3", "EEF1A1", "EEF2", "ACTB", "TUBA1A", "COX4I1", "NDUFA1", "HNF4A"], "#7F7F7F"),
 }
@@ -85,14 +85,15 @@ def panel_landscape() -> plt.Figure:
         handles.append(ax.scatter(s.prior, s.delta_alpha, s=16, color=col, edgecolor="white", linewidth=0.4,
                                   zorder=4, label=theme))
         for r in s.itertuples():
-            texts.append(ax.text(r.prior, r.delta_alpha, r.label, fontsize=5, ha="center", va="center",
+            texts.append(ax.text(r.prior, r.delta_alpha, r.label, fontsize=5.6, ha="center", va="center",
                                  color=cm.INK, zorder=5))
     ax.axhline(0, color="#888888", lw=0.5, ls="--", zorder=2)
-    ax.set_xlabel("protein-identity prior π")
-    ax.set_ylabel("Δα (liver, 4 species)")
+    ax.set_xlabel("protein prior π", fontsize=7)
+    ax.set_ylabel("Δα (liver 4 species)", fontsize=7)
+    ax.tick_params(labelsize=6.5)
     ax.set_xlim(0.15, 1.0)
     handles.append(Line2D([], [], ls="none", label=f"{DAGGER} no margin support: Δα not backed by counts"))
-    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.01), ncol=1, fontsize=5.5, frameon=False,
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.01), ncol=1, fontsize=5.8, frameon=False,
                handletextpad=0.1, labelspacing=0.15, borderpad=0)
     top.hist(g.prior, bins=60, color="#999999", edgecolor="none")
     right.hist(g.delta_alpha, bins=60, color="#999999", edgecolor="none", orientation="horizontal")
@@ -137,16 +138,16 @@ def panel_drivers() -> plt.Figure:
         ax.plot([c.sum()], [y], marker="|", ms=5, color=cm.INK, mew=0.9, zorder=4)
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=0)
     ax.set_yticks(range(len(nm)))
-    ax.set_yticklabels([f"{r.label}  ({r.delta_alpha:+.2f})" for r in nm.itertuples()], fontsize=5.3)
+    ax.set_yticklabels([f"{r.label}  ({r.delta_alpha:+.2f})" for r in nm.itertuples()], fontsize=5.6)
     ax.set_ylim(len(nm) - 0.4, -0.6)
-    ax.set_xlabel("contribution to count-evidence margin $S_g$, by cell type\n(liver, 4 species; tick: total $S_g$)",
+    ax.set_xlabel("contribution to count evidence $S_g$, by cell type\n(liver 4 species; tick: total $S_g$)",
                   fontsize=6.5)
     hs = [Patch(color=col, label=f"{name} (weight {W.reindex(ts).sum():.2f})" if ts else name)
           for name, ts, col in CT_GROUPS]
-    fig.legend(handles=hs, loc="outside lower center", ncol=2, fontsize=5.2, handlelength=1.0,
+    fig.legend(handles=hs, loc="outside lower center", ncol=2, fontsize=5.6, handlelength=1.0,
                columnspacing=0.8)
-    ax.text(0.01, 0.01, f"(Δα in brackets)   {DAGGER} no margin support", transform=ax.transAxes,
-            ha="left", va="bottom", fontsize=5, color=cm.MUTED)
+    ax.text(0.01, 0.01, f"(Δα in parentheses)   {DAGGER} no margin support", transform=ax.transAxes,
+            ha="left", va="bottom", fontsize=5.6, color=cm.MUTED)
     return fig
 
 
@@ -161,9 +162,7 @@ def cohort_rows() -> pd.DataFrame:
     table = pd.read_csv(cm.RES / "H1" / "cohort_table.csv").set_index("cohort")
     labels = table.label
     runs = runs.set_index("cohort").reindex(table.index).reset_index()
-    runs["label"] = [cm.COHORT.get(c, labels[c].replace(" H+", ", human + ").lower().replace("m. mulatta", "M. mulatta").replace("m. fascicularis", "M. fascicularis")
-                                   .replace("marrow 3", "marrow, 3").replace("eye 5", "eye, 5").replace("eye primates", "eye, primates"))
-                     for c in runs.cohort]
+    runs["label"] = [cm.style.cohort_name(c if c in cm.COHORT else labels[c]) for c in runs.cohort]
     runs = runs[runs.tissue.isin(TISSUES)]  # H1 also lists the C1 cohorts (cortex, lung, muscle, tumour); Fig 4e keeps the 16 until its layout is extended
     runs["order"] = [TISSUES.index(t) for t in runs.tissue]
     return runs.sort_values("order", kind="stable").reset_index(drop=True)
@@ -203,11 +202,11 @@ def panel_margin_support() -> plt.Figure:
             source.append(dict(cohort=c, run=r0.run, tail=name[:8], n=len(sub),
                                frac=sub.margin_support.mean() if len(sub) else np.nan))
             if len(sub) == 0:
-                ax.text(0.01, y, "no genes", va="center", fontsize=5, color=cm.MUTED)
+                ax.text(0.01, y, "no genes", va="center", fontsize=5.9, color=cm.MUTED)
                 continue
             f = sub.margin_support.mean()
             ax.barh(y, f, height=0.42, color=col, lw=0, label=name if not ax.containers or len(ax.containers) < 2 else None)
-            ax.text(f + 0.01, y, f"{f:.2f}  (n {len(sub):,})", va="center", fontsize=5, color=cm.INK)
+            ax.text(f + 0.01, y, f"{f:.2f}  (n = {len(sub):,})", va="center", fontsize=5.9, color=cm.INK)
         if c in MS_COHORTS:
             assert abs(h.loc[c, "frac_tail_with_margin_support"] - t.margin_support.mean()) < 1e-9
     pd.DataFrame(source).to_csv(cm.RES / "T8_4" / "fig4_margin_support_source.csv", index=False)
@@ -216,17 +215,17 @@ def panel_margin_support() -> plt.Figure:
     ax.set_ylim(len(rows) - 0.5, -0.5)
     for i in np.where(np.diff(rows.order))[0]:
         ax.axhline(i + 0.5, color=cm.RULE, lw=0.4)
-    ax.set_xlim(0, 1.25)
+    ax.set_xlim(0, 1.5)  # room for the numbers beside the bars
     ax.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_xlabel("fraction of tail genes whose Δα is backed by\ncount evidence of the same sign (margin support)",
                   fontsize=6, labelpad=1)
-    fig.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=5.3, handlelength=1.0, frameon=False,
+    fig.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=5.9, handlelength=1.0, frameon=False,
                borderpad=0, columnspacing=0.8, handletextpad=0.3)
     return fig
 
 
-PAIRS = [("liv_hmonkey", "test_hmac", "H+Monkey vs H+Macaque", "human + monkey (liver) vs human + macaque (testis)"),
-         ("liv_hmouse", "test_hmouse", "H+Mouse vs H+Mouse", "human + mouse, liver vs testis")]
+PAIRS = [("liv_hmonkey", "test_hmac", "H+Monkey vs H+Macaque", "liver Human+Monkey vs testis Human+Macaque"),
+         ("liv_hmouse", "test_hmouse", "H+Mouse vs H+Mouse", "liver Human+Mouse vs testis Human+Mouse")]
 
 
 def _centred(c: str) -> pd.DataFrame:
@@ -256,11 +255,11 @@ def panel_cross_tissue() -> plt.Figure:
         lim = 1.08 * max(np.nanquantile(np.abs(np.r_[x, y]), 0.995), np.abs(np.r_[x[mt], y[mt]]).max())
         ax.set_xlim(-lim, lim)
         ax.set_ylim(-lim, lim)
-        ax.set_xlabel("Δα in liver (raw prior, centred)", fontsize=6.5)
+        ax.set_xlabel("Δα in liver (raw prior, centered)", fontsize=6.5)
         ax.set_title(title, fontsize=6.3)
         cm.fd.annotate_stat(ax, f"Spearman ρ = {rho:+.3f}, n = {len(ix):,}\nsign differs in {r.flip_rate_observed:.0%}"
                                 f" of genes\n(expected if unrelated: {r.flip_rate_expected:.0%})", "lower right")
-    axes[0].set_ylabel("Δα in testis (raw prior, centred)", fontsize=6.5)
+    axes[0].set_ylabel("Δα in testis (raw prior, centered)", fontsize=6.5)
     axes[0].legend(loc="upper left", fontsize=5.5, handletextpad=0.2, borderaxespad=0.1)
     return fig
 

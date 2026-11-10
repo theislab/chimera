@@ -1,5 +1,5 @@
 {
- "figures_pdf_sha256": "4117d633d10e3927105bc46e107c8338f041b53029cb43bbaeddb1f46ce03eda",
+ "figures_pdf_sha256": "d73ba7db8771b2c2727a5637e16f4fdb74c726282adf4a72bd5a652cc047dce3",
  "crop": "pdf-crop-margins -v -p 0 -t 250 -c gr -x 300 -y 300 -a -0.5",
  "figures": [
   {
@@ -111,43 +111,70 @@
    "part": 1,
    "number": "2",
    "title": "The gate value α against the protein prior",
-   "width_bp": 258.4,
-   "height_bp": 75.41,
+   "width_bp": 483.4,
+   "height_bp": 143.85,
    "spec": "specs/main.py",
-   "n_panels": 1,
+   "n_panels": 3,
    "panels": [
     {
-     "letters": [],
-     "file": "figures/sources/assembled/page04.pdf",
+     "letters": [
+      "a"
+     ],
+     "file": "figures/panels/main_alpha_vs_prior/scatter.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.3677,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 257.4,
-     "h": 74.65,
+     "w": 157.33,
+     "h": 137.91,
      "exact": true,
-     "clipped": true
+     "clipped": false
+    },
+    {
+     "letters": [
+      "b"
+     ],
+     "file": "figures/panels/main_alpha_vs_prior/shift.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 137.91,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "c"
+     ],
+     "file": "figures/panels/main_alpha_vs_prior/distribution.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 137.91,
+     "exact": true,
+     "clipped": false
     }
    ],
-   "smallest_text_pt": 2.57,
-   "share_under_5pt": "1.00",
-   "checks": "listed: font_family, scale, text, text_single",
-   "sha256": "d4de3cba92ddc4a43ae138442896be2786831267a6461218b8f24bb9e8eb80de",
+   "smallest_text_pt": 5.8,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "701836014b81a64ed118666794248898c960894980616f9da772a33ae6807997",
    "shows": "Every dot or bar is a gene. The model starts each gene at a value set by how similar its protein is between the species (the protein prior). During training the gene's value α can move away from that start when the counts say so. (a) α against the prior: most genes stay near the diagonal and many leave it. (b) The move itself, Δα = α minus the prior: about half of the genes move up and half move down. (c) The distribution of α beside that of the prior: the same overall shape, shifted by the data.",
-   "signature": "5ee2523a2c7194527b954c37936beab202572d98eb5bca1495b14fbe11c4ad28",
+   "signature": "01950e3d875cf69d219b865ca1ade83731db49226d3a3a4196481c5e746f633e",
    "shrink": 1.0,
    "composed_size": [
-    257.4,
-    74.652
+    486.0,
+    147.407
    ],
    "problems": {},
-   "listed": {
-    "text": "100% of the characters under 5.0 pt, smallest 2.57 pt (2.57 ''; 2.57 ''; 2.57 '') [page assembled by hand, placed as it printed; to be rebuilt from its panels]",
-    "text_single": "32 single characters under 3.5 pt, smallest 2.57 pt [page assembled by hand, placed as it printed; to be rebuilt from its panels]",
-    "font_family": "fonts other than DejaVu in the panels: Helvetica [page assembled by hand, placed as it printed; to be rebuilt from its panels]",
-    "scale": "1 of 1 panels below scale 0.9, smallest 0.368 [page assembled by hand, placed as it printed; to be rebuilt from its panels]"
-   }
+   "listed": {}
   },
   {
    "page": 3,
@@ -228,30 +255,39 @@
    "part": 1,
    "number": "4",
    "title": "Δα by gene category and across the protein prior, four-species liver",
-   "width_bp": 486.76,
-   "height_bp": 281.07,
+   "width_bp": 484.12,
+   "height_bp": 280.58,
    "spec": "specs/main.py",
-   "n_panels": 2,
+   "n_panels": 3,
    "panels": [
     {
      "letters": [
-      "a",
-      "b"
+      "a"
      ],
-     "file": "figures/sources/assembled/page16.pdf",
+     "file": "figures/panels/main_delta_alpha_liver/category_boxes.pdf",
      "page": 1,
-     "region": [
-      0,
-      0,
-      414,
-      402
-     ],
-     "scale": 0.6763,
+     "region": null,
+     "scale": 0.9994,
      "x": 0.0,
      "y": 0.0,
-     "w": 279.12,
-     "h": 271.77,
-     "exact": false,
+     "w": 179.41,
+     "h": 271.28,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "b"
+     ],
+     "file": "figures/panels/main_delta_alpha_liver/category_effect_sizes.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9994,
+     "x": 186.41,
+     "y": 0.0,
+     "w": 93.07,
+     "h": 271.28,
+     "exact": true,
      "clipped": false
     },
     {
@@ -261,32 +297,28 @@
      "file": "figures/panels/main_delta_alpha_liver/prior_landscape.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0018,
-     "x": 286.12,
+     "scale": 1.0,
+     "x": 286.48,
      "y": 0.0,
-     "w": 199.88,
-     "h": 271.77,
+     "w": 199.52,
+     "h": 271.28,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 3.98,
-   "share_under_5pt": "0.27",
-   "checks": "listed: scale, text, text_single",
-   "sha256": "43bce0ffa868ada00243a1be9cfe5de00fb9534b531b40533744a99019d2b354",
+   "smallest_text_pt": 5.6,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "f8e9e350ebc6284443774f0b58f24d590a4926339bf82a376fabe605e295c745",
    "shows": "(a) For twelve large gene categories, the spread of Δα over the genes of the category in the four-species liver model. Categories at the top sit above their protein prior, those at the bottom below it. (b) The same as effect sizes: how far each category is shifted (left column) and whether its genes move more than the average gene (right column). (c) Every gene as a dot, protein prior on the x axis and Δα on the y axis. Named genes: liver enzyme genes (urea cycle, gluconeogenesis) and mitochondrially encoded genes far below the prior, genes of supporting cell types above it. A dagger marks a gene whose position comes from its protein features and not from its own counts.",
-   "signature": "e1e5f873d1cb58bea3a4e30d643ebd5771f2b2b61f535288df1c71b1563ee34f",
+   "signature": "d81a9f4f5170e2cf1282bd51abf06231de22867ff9c72dad006f999526a07801",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    281.265
+    280.78
    ],
    "problems": {},
-   "listed": {
-    "text": "27% of the characters under 5.0 pt, smallest 3.98 pt (3.98 '\\t\\x0c'; 3.98 '\\t\\r'; 3.98 '\\t\\x0c') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "text_single": "13 single characters under 3.5 pt, smallest 3.31 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "scale": "1 of 2 panels below scale 0.9, smallest 0.676 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
-   }
+   "listed": {}
   },
   {
    "page": 5,
@@ -363,7 +395,7 @@
    ],
    "smallest_text_pt": 5.3,
    "share_under_5pt": "0.00",
-   "checks": "FAIL: stale_allow",
+   "checks": "ok",
    "sha256": "f6b29b1cd73d93526c5528d4209dc3da7eae7f02bd8e548af4b78b693c039f92",
    "shows": "(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is backed by count evidence of the same sign. (f) How α and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (g) Δα of the same genes in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs to the tissue.",
    "signature": "7e49ce17b4b0c568d9f884f7bf49151310a639f7a08684a11d546d17cb211b7f",
@@ -372,12 +404,8 @@
     486.0,
     519.325
    ],
-   "problems": {
-    "stale_allow": "specs/_allow.py lists 'spelling' for this figure but the check passes: remove the entry"
-   },
-   "listed": {
-    "letters": "letters read abcedfg on the page, not in order [letters to be put in reading order together with the caption]"
-   }
+   "problems": {},
+   "listed": {}
   },
   {
    "page": 6,
@@ -556,7 +584,7 @@
    ],
    "smallest_text_pt": 5.19,
    "share_under_5pt": "0.00",
-   "checks": "FAIL: stale_allow",
+   "checks": "ok",
    "sha256": "14b4d3a9050a632cfad505dde0911260d91c16d079dd4696776fd999a13a6f55",
    "shows": "The model can read Δα in two ways: through the protein-feature gate (the default) or gene by gene from each gene's own counts (the per-gene gate). (e) The four tests of panel a for both gates: with the per-gene gate Δα agrees with independent pattern data in liver and in testis. Right: the difference between the gates. (f) Testis: Δα against independent expression level; the per-gene readout follows the count evidence. (g) Δα against the count evidence of the same fit: loosely related with the protein-feature gate, almost identical with the per-gene gate. (h) Two named findings, spermatocyte genes above the prior and hepatocyte catabolic genes below it, hold under both gates. (i) Under both gates Δα stays unrelated to dN/dS and to the protein prior.",
    "signature": "0dd184df4c538cb87d96ff38b98764d31f41fc9b34ccc3c6c3e4c3f915d94833",
@@ -565,9 +593,7 @@
     486.0,
     350.004
    ],
-   "problems": {
-    "stale_allow": "specs/_allow.py lists 'spelling' for this figure but the check passes: remove the entry"
-   },
+   "problems": {},
    "listed": {}
   },
   {
@@ -577,8 +603,8 @@
    "part": 1,
    "number": "6",
    "title": "Δα against protein identity and dN/dS, and named genes, in eight tissues",
-   "width_bp": 486.52,
-   "height_bp": 484.48,
+   "width_bp": 476.76,
+   "height_bp": 520.95,
    "spec": "specs/main.py",
    "n_panels": 2,
    "panels": [
@@ -589,11 +615,11 @@
      "file": "figures/panels/main_tissues/axis.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9819,
+     "scale": 0.9885,
      "x": 0.0,
      "y": 0.0,
-     "w": 486.0,
-     "h": 193.79,
+     "w": 476.0,
+     "h": 222.62,
      "exact": false,
      "clipped": false
     },
@@ -604,30 +630,28 @@
      "file": "figures/panels/main_tissues/genes.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.98,
+     "scale": 0.9871,
      "x": 0.0,
-     "y": 206.29,
-     "w": 486.0,
-     "h": 269.62,
+     "y": 235.12,
+     "w": 476.0,
+     "h": 277.01,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 5.1,
+   "smallest_text_pt": 5.14,
    "share_under_5pt": "0.00",
-   "checks": "listed: spelling",
-   "sha256": "59e69c27dc9fc9e6f9e55a0f474a38cf1a665e2d47aa6df64ffe14bb1865cdc8",
-   "shows": "The same reading in eight tissues, one column or block per tissue. (a) Top row: how far genes move from the prior. Middle and bottom rows: Δα against protein identity and against dN/dS. The orange trend line is flat, so deployment does not follow sequence conservation in any tissue. (b) For each tissue, the genes furthest above the prior (orange), the tissue's own lineage genes (bold) and the genes furthest below (blue).",
-   "signature": "1f731df295031240fdd4057c5660f2a557fdb92db397c801b39e62e7abb793a4",
+   "checks": "ok",
+   "sha256": "759a378d7bc78b0383da7a18f1563e8d52c84c3693d38d92a5aa05a06106a89f",
+   "shows": "The same reading in eight tissues, one column or block per tissue. (a) Top row: how far genes move from the prior, with the spread and the shares of genes clearly above and below. Middle and bottom rows: Δα against protein identity and against dN/dS, with the correlations under each cloud. The orange trend line is flat, so deployment does not follow sequence conservation in any tissue. Small gray triangles mark genes beyond an axis. (b) For each tissue, the genes furthest above the prior (orange), the tissue's own lineage genes (bold) and the genes furthest below (blue), every bar at its full length.",
+   "signature": "31f752d77a06b28b8c129ad868e6c743390ffb48a0708268256f36339a103c70",
    "shrink": 1.0,
    "composed_size": [
-    486.0,
-    485.404
+    476.0,
+    521.627
    ],
    "problems": {},
-   "listed": {
-    "spelling": "British spelling: centred [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
    "page": 9,
@@ -636,8 +660,8 @@
    "part": 2,
    "number": "6 (continued)",
    "title": "Gene programs and classes across eight tissues",
-   "width_bp": 470.04,
-   "height_bp": 352.33,
+   "width_bp": 486.76,
+   "height_bp": 400.49,
    "spec": "specs/main.py",
    "n_panels": 1,
    "panels": [
@@ -648,30 +672,28 @@
      "file": "figures/panels/main_tissues/recurrence.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9617,
+     "scale": 1.0078,
      "x": 0.0,
      "y": 0.0,
-     "w": 470.0,
-     "h": 343.75,
+     "w": 486.0,
+     "h": 392.15,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.71,
-   "share_under_5pt": "0.74",
-   "checks": "listed: text",
-   "sha256": "59dd310484b50397c5b84c95478868b34cab48ffc2991b443fd0ee8606426bed",
-   "shows": "Rows are gene programs and gene classes, columns the eight tissues. A red cell means the program sits above the protein prior in that tissue, a blue cell below; a star marks significance. Most programs point the same way in every tissue: receptors, cell contacts and signaling above; translation, mitochondria and chromatin below. The columns at the right show that the count evidence and direct profile correlation agree with this, and that protein identity and dN/dS do not predict it.",
-   "signature": "30f935e0402cab125d4cde1c01b163631c9c0544be1778fb5d62af0b8f5b311d",
+   "smallest_text_pt": 5.54,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "2355f73204b120023caa0bc8a8f3e9e4265c5b052d3700582982be6d42e3e3de",
+   "shows": "Rows are gene programs and gene classes, columns the eight tissues. A red cell means the program sits above the protein prior in that tissue, a blue cell below; a star marks significance, a gray cell a program with too few genes. The rows stand in four blocks with headings: programs above the prior in tissue after tissue (receptors, cell contacts and signaling), programs below it (translation, mitochondria and chromatin), programs found in one tissue, and programs with opposite signs in different tissues. The columns at the right, explained by the key under the panel, show that the count evidence and direct profile correlation agree with this, and that protein identity and dN/dS do not predict it.",
+   "signature": "259a0ae140793337d8b1322e087908c7357c012636448a5f7f08316d3f3f3e8c",
    "shrink": 1.0,
    "composed_size": [
-    470.0,
-    353.249
+    486.0,
+    401.654
    ],
    "problems": {},
-   "listed": {
-    "text": "74% of the characters under 5.0 pt, smallest 4.71 pt (4.71 '<'; 4.71 '.'; 4.71 '0') [text under the floor; panels to be redrawn at print size]"
-   }
+   "listed": {}
   },
   {
    "page": 10,
@@ -680,8 +702,8 @@
    "part": 3,
    "number": "6 (continued)",
    "title": "Gene and tissue components of the readouts",
-   "width_bp": 425.32,
-   "height_bp": 365.61,
+   "width_bp": 486.28,
+   "height_bp": 412.99,
    "spec": "specs/main.py",
    "n_panels": 3,
    "panels": [
@@ -698,11 +720,11 @@
       512,
       119
      ],
-     "scale": 0.8496,
-     "x": 30.5,
+     "scale": 0.9715,
+     "x": 0.0,
      "y": 0.0,
-     "w": 425.0,
-     "h": 91.42,
+     "w": 486.0,
+     "h": 104.54,
      "exact": false,
      "clipped": false
     },
@@ -719,11 +741,11 @@
       512,
       283
      ],
-     "scale": 0.8726,
-     "x": 30.5,
-     "y": 103.92,
-     "w": 425.0,
-     "h": 123.21,
+     "scale": 0.9979,
+     "x": 0.0,
+     "y": 117.04,
+     "w": 486.0,
+     "h": 140.9,
      "exact": false,
      "clipped": false
     },
@@ -740,31 +762,28 @@
       512,
       429
      ],
-     "scale": 0.834,
-     "x": 30.5,
-     "y": 239.63,
-     "w": 425.0,
-     "h": 117.16,
+     "scale": 0.9537,
+     "x": 0.0,
+     "y": 270.44,
+     "w": 486.0,
+     "h": 133.97,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.67,
-   "share_under_5pt": "0.27",
-   "checks": "listed: scale, text, text_single, words",
-   "sha256": "218ab2f39834ab87a315140e599f39100fbe7f38d13f3c00f4d385f32a72fd06",
+   "smallest_text_pt": 5.34,
+   "share_under_5pt": "0.00",
+   "checks": "listed: words",
+   "sha256": "f1136a454f128429f2c9d2dde542acf49153504bc34053a06655a6f9cc5106dd",
    "shows": "(d) How much of each readout belongs to the gene in every tissue, to the gene in one tissue, or to noise. (e) Each tissue's readout against independent data of every tissue: the matching tissue (outlined) agrees best. (f) The advantage of the matching tissue over the others. (g) Within one gene, differences between tissues in the readout follow differences between tissues in the independent data. (h) For genes whose reading flips between tissues, what is low in the low tissue: mostly a gap in expression level. (i) Six example genes.",
-   "signature": "3c43e56b0e4fea0c63dd83ee19305415456579e269d9b3dc0523ad678ca05031",
+   "signature": "bf3bee71e284441f33759baad03ef243496c9c848276f914346a03ae3519aac4",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    366.288
+    413.91
    ],
    "problems": {},
    "listed": {
-    "text": "27% of the characters under 5.0 pt, smallest 4.67 pt (4.67 't'; 4.67 'e'; 4.67 's') [text under the floor; panels to be redrawn at print size]",
-    "text_single": "1 single characters under 3.5 pt, smallest 3.42 pt [single characters under the floor; panels to be redrawn at print size]",
-    "scale": "3 of 3 panels below scale 0.9, smallest 0.834 [panels placed below 0.9 of their drawn size; to be redrawn at print size]",
     "words": "internal names: gold [internal names on the panels; to change when they are redrawn]"
    }
   },
@@ -953,29 +972,43 @@
    "part": 1,
    "number": "8",
    "title": "Inputs of the gate network and control trainings",
-   "width_bp": 487.0,
-   "height_bp": 501.37,
+   "width_bp": 486.28,
+   "height_bp": 532.93,
    "spec": "specs/main.py",
-   "n_panels": 2,
+   "n_panels": 3,
    "panels": [
     {
      "letters": [
-      "a",
+      "a"
+     ],
+     "file": "figures/panels/main_protein/attribution_shares.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9995,
+     "x": 0.0,
+     "y": 0.0,
+     "w": 267.48,
+     "h": 163.85,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
       "b"
      ],
-     "file": "figures/sources/assembled/page23_unlabelled.pdf",
+     "file": "notebooks/figures/gin_attention_overall/c3_per_gene_esm2_vs_expression_disagreement.pdf",
      "page": 1,
      "region": [
       0,
-      0,
-      571,
-      156
+      11,
+      306.4,
+      191.2
      ],
-     "scale": 0.8508,
-     "x": 0.0,
+     "scale": 0.9197,
+     "x": 274.48,
      "y": 0.0,
-     "w": 486.0,
-     "h": 132.05,
+     "w": 211.52,
+     "h": 163.85,
      "exact": false,
      "clipped": false
     },
@@ -988,29 +1021,26 @@
      "region": null,
      "scale": 1.0008,
      "x": 0.0,
-     "y": 147.55,
+     "y": 179.35,
      "w": 486.0,
      "h": 344.76,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.8,
-   "share_under_5pt": "0.03",
-   "checks": "listed: scale, text",
-   "sha256": "3882ef99e8f908dcb6c43713586bdbb2df9db9342cb486c0d18a3e795a9b967d",
+   "smallest_text_pt": 5.06,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "caada2274433ca12de252083b492834d930519cd7551839fea87b19568f4c692",
    "shows": "(a) Four ways of asking which inputs the gate network uses. Protein-language features (ESM-2) lead in three of them; expression features lead when whole groups of inputs are removed. (b) For each gene, the part of the correction that comes from protein features against the part that comes from expression features. The two are nearly unrelated and both are needed. (c) Control trainings: gene features removed, randomized or set to zero; counts shuffled between genes. Each dot compares one control run with normal training. The count evidence S_g (right) stays the same when features are changed and collapses when counts are shuffled. Δα (left) shows how much follows the features and how much follows the counts.",
-   "signature": "a405212130059351e0c252fe40c01fe0e98b159cf64d6bb68ced808698baa799",
+   "signature": "88ec171cc3f0cccd0b094c8288338ad2d600c121976f460025a7553f6144bd94",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    501.814
+    533.61
    ],
    "problems": {},
-   "listed": {
-    "text": "3% of the characters under 5.0 pt, smallest 4.8 pt (4.8 '+\\n\\t\\x0c\\n'; 4.8 '+\\n\\t'; 4.8 '+\\n\\t\\n') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "scale": "1 of 2 panels below scale 0.9, smallest 0.851 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
-   }
+   "listed": {}
   },
   {
    "page": 14,
@@ -1018,60 +1048,241 @@
    "label": "fig:gin-esm2",
    "part": 2,
    "number": "8 (continued)",
-   "title": "Protein-space atlas and gene archetypes",
-   "width_bp": 487.0,
-   "height_bp": 317.51,
+   "title": "Protein-space atlas",
+   "width_bp": 483.88,
+   "height_bp": 272.49,
    "spec": "specs/main.py",
-   "n_panels": 1,
+   "n_panels": 6,
    "panels": [
     {
      "letters": [
-      "d",
-      "e",
-      "f",
-      "g",
-      "h",
-      "i",
-      "j",
-      "k",
-      "l",
-      "m",
-      "n"
+      "d"
      ],
-     "file": "figures/sources/assembled/page31_unlabelled.pdf",
+     "file": "figures/panels/main_protein/atlas_alpha.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.631,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 486.0,
-     "h": 307.69,
-     "exact": false,
+     "w": 157.33,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "e"
+     ],
+     "file": "figures/panels/main_protein/atlas_delta_alpha.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "f"
+     ],
+     "file": "figures/panels/main_protein/atlas_correction.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "g"
+     ],
+     "file": "figures/panels/main_protein/atlas_categories.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 1.0007,
+     "x": 0.0,
+     "y": 140.46,
+     "w": 157.56,
+     "h": 125.13,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [],
+     "file": "figures/panels/main_protein/atlas_categories_key.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9988,
+     "x": 164.56,
+     "y": 140.46,
+     "w": 321.44,
+     "h": 52.02,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "h"
+     ],
+     "file": "figures/panels/main_protein/atlas_clusters.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9988,
+     "x": 164.56,
+     "y": 198.47,
+     "w": 321.44,
+     "h": 67.12,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 1.93,
-   "share_under_5pt": "0.97",
-   "checks": "listed: font_family, scale, text, text_single, unreadable_text_layer",
-   "sha256": "62973e51e84189cd765eb994c44e501bef035542d01c9a9433da7d9c03bc418c",
-   "shows": "A map of all genes arranged by protein similarity: each dot is a gene, and dots that lie close have similar protein-language features. (d to g) The map coloured by α, by Δα, by the size of the gate's correction and by gene category. (h) The median Δα of twelve protein neighbourhoods in four liver models. (i to k) The gate network sorts genes into three groups (archetypes) that lie below, at and above the prior. (l to n) The three groups on the protein map, and checks that expression level alone does not explain them.",
-   "signature": "0b2211e63608cf25e00a2938cfa41dc3208d675ac3834fb194f24125769f60d5",
+   "smallest_text_pt": 5.79,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "25defedfd9ca74725c3f2b4b459fbf07bf7ef19e0ebe7986acc749e15cf1135a",
+   "shows": "A map of all genes arranged by protein similarity: each dot is a gene, and dots that lie close have similar protein-language features. (d) The map colored by the gate value α. (e) Colored by Δα: neighboring genes tend to share the sign. (f) Colored by the size of the correction the gate network makes to the prior. (g) Twelve gene categories on the map, at most 30 genes each; the key is at the right. (h) The genes of each of four liver cohorts sorted into twelve protein clusters; each cell is the median Δα of one cluster, sorted from lowest to highest within the cohort. The spread is widest in the four-species cohort.",
+   "signature": "90b82f308048bf3e62f428576be07a0d02805f1819cafe9197f0a4351ae50fa8",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    318.674
+    275.088
    ],
    "problems": {},
-   "listed": {
-    "text": "97% of the characters under 5.0 pt, smallest 1.93 pt (1.93 '\\r\\n\\t\\t'; 1.93 '\\r\\n\\t\\x0c'; 1.93 '\\r\\t\\t\\n') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "text_single": "416 single characters under 3.5 pt, smallest 2.37 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "font_family": "fonts other than DejaVu in the panels: Monaco [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "scale": "1 of 1 panels below scale 0.9, smallest 0.631 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "unreadable_text_layer": "the text layer cannot be decoded (hand-assembled page): words and spelling are not checked [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
-   }
+   "listed": {}
   },
   {
    "page": 15,
+   "key": "main_protein_3",
+   "label": "fig:gin-esm2",
+   "part": 3,
+   "number": "8 (continued)",
+   "title": "Gene archetypes of the gate network",
+   "width_bp": 483.16,
+   "height_bp": 337.99,
+   "spec": "specs/main.py",
+   "n_panels": 6,
+   "panels": [
+    {
+     "letters": [
+      "i"
+     ],
+     "file": "figures/panels/main_protein/archetype_number.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9991,
+     "x": 0.0,
+     "y": 0.0,
+     "w": 135.96,
+     "h": 188.47,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "j"
+     ],
+     "file": "notebooks/figures/gene_archetypes/a3_archetype_umap.pdf",
+     "page": 1,
+     "region": [
+      0,
+      11,
+      328.0,
+      270.4
+     ],
+     "scale": 0.775,
+     "x": 142.96,
+     "y": 0.0,
+     "w": 251.15,
+     "h": 188.47,
+     "exact": false,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "k"
+     ],
+     "file": "figures/panels/main_protein/archetype_delta_alpha.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9991,
+     "x": 401.11,
+     "y": 0.0,
+     "w": 84.89,
+     "h": 188.47,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "l"
+     ],
+     "file": "figures/panels/main_protein/archetype_protein_map.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 0.0,
+     "y": 203.97,
+     "w": 149.9,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "m"
+     ],
+     "file": "figures/panels/main_protein/archetype_neighbors.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 156.9,
+     "y": 203.97,
+     "w": 128.07,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "n"
+     ],
+     "file": "figures/panels/main_protein/archetype_prediction.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9993,
+     "x": 291.97,
+     "y": 203.97,
+     "w": 194.03,
+     "h": 124.96,
+     "exact": true,
+     "clipped": false
+    }
+   ],
+   "smallest_text_pt": 5.04,
+   "share_under_5pt": "0.00",
+   "checks": "listed: scale",
+   "sha256": "0cdc012147e0a2e802221bfa5f2348a030f06fa71d6337aeb0fe303d005c34a3",
+   "shows": "The gate network sorts genes into groups (archetypes) in its hidden layer. (i) How well the groups separate and how well they repeat between random starts, for 3 to 12 groups: three is chosen. (j) The three archetypes on a map of the hidden layer. (k) Δα of the genes of each archetype: A0 below the prior, A1 near it, A2 above it. (l) The archetypes on the protein map of panels d to g. (m) Protein neighbors share the archetype more often than chance. (n) The archetype can be predicted in part from expression level alone (0.57) and almost fully from all inputs of the gate network (0.94), so expression level alone does not explain it.",
+   "signature": "2c9d8c22211100e29ddede515b8aadfc56b3a4a64c7c7af165de30683347fd53",
+   "shrink": 1.0,
+   "composed_size": [
+    486.0,
+    338.429
+   ],
+   "problems": {},
+   "listed": {
+    "scale": "1 of 6 panels below scale 0.9, smallest 0.775 [panel j is the panel stored by the notebook (it needs the trained gate network); it is drawn for a larger page and placed at 0.775, where its smallest text prints at 5.0 pt]"
+   }
+  },
+  {
+   "page": 16,
    "key": "supp_alpha_training",
    "label": "fig:supp-alpha-training-dynamics",
    "part": 1,
@@ -1173,7 +1384,7 @@
    "listed": {}
   },
   {
-   "page": 16,
+   "page": 17,
    "key": "supp_alpha_robustness",
    "label": "fig:supp-alpha-robustness",
    "part": 1,
@@ -1365,7 +1576,7 @@
    "listed": {}
   },
   {
-   "page": 17,
+   "page": 18,
    "key": "supp_alpha_decorrelation",
    "label": "fig:supp-alpha-decorrelation",
    "part": 1,
@@ -1437,7 +1648,7 @@
    "listed": {}
   },
   {
-   "page": 18,
+   "page": 19,
    "key": "supp_integration_seven_methods",
    "label": "fig:supp-main-integration",
    "part": 1,
@@ -1494,7 +1705,7 @@
    "listed": {}
   },
   {
-   "page": 19,
+   "page": 20,
    "key": "supp_integration_metrics",
    "label": "fig:supp-integration-metrics",
    "part": 1,
@@ -1611,7 +1822,7 @@
    "listed": {}
   },
   {
-   "page": 20,
+   "page": 21,
    "key": "supp_integration_umap_testis",
    "label": "fig:supp-integration-testis-umap",
    "part": 1,
@@ -1651,7 +1862,7 @@
    "listed": {}
   },
   {
-   "page": 21,
+   "page": 22,
    "key": "supp_integration_umap_liver",
    "label": "fig:supp-integration-liver-umap",
    "part": 1,
@@ -1691,7 +1902,7 @@
    "listed": {}
   },
   {
-   "page": 22,
+   "page": 23,
    "key": "supp_integration_ten_methods",
    "label": "fig:supp-integration-purity",
    "part": 1,
@@ -1733,7 +1944,7 @@
    }
   },
   {
-   "page": 23,
+   "page": 24,
    "key": "supp_integration_raw_metrics",
    "label": "fig:supp-integration-raw",
    "part": 1,
@@ -1773,7 +1984,7 @@
    "listed": {}
   },
   {
-   "page": 24,
+   "page": 25,
    "key": "supp_integration_eleven_cohorts",
    "label": "fig:supp-integration-ext",
    "part": 1,
@@ -1848,7 +2059,7 @@
    }
   },
   {
-   "page": 25,
+   "page": 26,
    "key": "supp_sequence_axis",
    "label": "fig:supp-sequence-axis",
    "part": 1,
@@ -1888,7 +2099,7 @@
    "listed": {}
   },
   {
-   "page": 26,
+   "page": 27,
    "key": "supp_known_measures",
    "label": "fig:supp-known-measures",
    "part": 1,
@@ -1930,7 +2141,7 @@
    }
   },
   {
-   "page": 27,
+   "page": 28,
    "key": "supp_relations_heatmap",
    "label": "fig:supp-relations-heatmap",
    "part": 1,
@@ -1972,7 +2183,7 @@
    }
   },
   {
-   "page": 28,
+   "page": 29,
    "key": "supp_relations_density",
    "label": "fig:supp-relations-density",
    "part": 1,
@@ -2016,7 +2227,7 @@
    }
   },
   {
-   "page": 29,
+   "page": 30,
    "key": "supp_worked_genes",
    "label": "fig:supp-worked-genes",
    "part": 1,
@@ -2056,7 +2267,7 @@
    "listed": {}
   },
   {
-   "page": 30,
+   "page": 31,
    "key": "supp_categories_broad",
    "label": "fig:supp-dalpha-broad-categories",
    "part": 1,
@@ -2146,7 +2357,7 @@
    }
   },
   {
-   "page": 31,
+   "page": 32,
    "key": "supp_categories_liver",
    "label": "fig:supp-dalpha-liver-detailed",
    "part": 1,
@@ -2203,7 +2414,7 @@
    "listed": {}
   },
   {
-   "page": 32,
+   "page": 33,
    "key": "supp_categories_testis",
    "label": "fig:supp-dalpha-testis-detailed",
    "part": 1,
@@ -2247,22 +2458,20 @@
    ],
    "smallest_text_pt": 5.01,
    "share_under_5pt": "0.00",
-   "checks": "listed: spelling",
-   "sha256": "d835013ac0d817f9754d060bc5acf4156158c7dccbf98c3715cf8815dced6072",
+   "checks": "ok",
+   "sha256": "7d4b13bcfc484cb2204c74601bf43b8a58895978fef788e260a7c52acdcc1700",
    "shows": "This is the detailed version of the broad-category figure for testis of human and macaque, with 41 gene categories instead of ten. In panel a each row is one category, with its number of genes in brackets; the box shows the spread of Δα across the category's genes, the blue line the median, and the dashed line zero, where a gene's shared use is what its protein conservation predicts. Rows run from the highest median at the top to the lowest at the bottom. The number at the right of each row is the category's average shift from zero, in units of the spread of all genes, with a star where the shift is statistically supported. Panel b shows the same shift as a colored table, next to \"amplitude\", which asks whether the genes of a category lie farther from zero than other genes. One category stands apart: the 11 genes encoded on the mitochondrial genome lie more than four units above the prior. Collagens, actin and microtubule genes follow at about one unit, and the mitochondrial ribosome is the only category clearly below zero. Most testis categories lie above zero because the protein prior is capped in testis, so the order of the rows is the reading to take.",
-   "signature": "49bbb88191cbf77789d5b0aa55d68a871894431b8b5da34fc579b0aae63bab38",
+   "signature": "05af0f0c181a6aa074d1724b953c227540e4818ecfae3c07ed7cc851c43ff519",
    "shrink": 1.0,
    "composed_size": [
     486.0,
     502.708
    ],
    "problems": {},
-   "listed": {
-    "spelling": "British spelling: signalling [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 33,
+   "page": 34,
    "key": "supp_hallmark",
    "label": "fig:supp-dalpha-hallmark",
    "part": 1,
@@ -2336,7 +2545,7 @@
    }
   },
   {
-   "page": 34,
+   "page": 35,
    "key": "supp_celltype_closure",
    "label": "fig:supp-celltype-closure",
    "part": 1,
@@ -2376,7 +2585,7 @@
    "listed": {}
   },
   {
-   "page": 35,
+   "page": 36,
    "key": "supp_celltype_seeds",
    "label": "fig:supp-celltype-seeds",
    "part": 1,
@@ -2418,7 +2627,7 @@
    }
   },
   {
-   "page": 36,
+   "page": 37,
    "key": "supp_functional_layer",
    "label": "fig:supp-functional-layer",
    "part": 1,
@@ -2503,11 +2712,11 @@
    ],
    "problems": {},
    "listed": {
-    "letters": "letters babc: not a, b, c ... without gap or repeat [letters to be put in reading order together with the caption]"
+    "letters": "letters abbc: not a, b, c ... without gap or repeat [letters to be put in reading order together with the caption]"
    }
   },
   {
-   "page": 37,
+   "page": 38,
    "key": "supp_covariate_audit",
    "label": "fig:supp-covariate-audit",
    "part": 1,
@@ -2547,7 +2756,7 @@
    "listed": {}
   },
   {
-   "page": 38,
+   "page": 39,
    "key": "supp_seed_reliability",
    "label": "fig:supp-seed-reliability",
    "part": 1,
@@ -2587,7 +2796,7 @@
    "listed": {}
   },
   {
-   "page": 39,
+   "page": 40,
    "key": "supp_gate_gap",
    "label": "fig:supp-gate-gap",
    "part": 1,
@@ -2679,7 +2888,7 @@
    }
   },
   {
-   "page": 40,
+   "page": 41,
    "key": "supp_gate_gap_classes",
    "label": "fig:supp-gate-gap-cont",
    "part": 1,
@@ -2772,7 +2981,7 @@
    }
   },
   {
-   "page": 41,
+   "page": 42,
    "key": "supp_gate_gap_named",
    "label": "fig:supp-gate-gap-named",
    "part": 1,
@@ -2817,7 +3026,7 @@
    }
   },
   {
-   "page": 42,
+   "page": 43,
    "key": "supp_published_differences",
    "label": "fig:supp-e6",
    "part": 1,
@@ -2878,14 +3087,14 @@
    }
   },
   {
-   "page": 43,
+   "page": 44,
    "key": "supp_ground_truth",
    "label": "fig:supp-b1",
    "part": 1,
    "number": "S31",
    "title": "Ground-truth benchmark: level alterations and protein identity",
-   "width_bp": 483.64,
-   "height_bp": 574.33,
+   "width_bp": 480.04,
+   "height_bp": 564.08,
    "spec": "specs/supp_validation.py",
    "n_panels": 2,
    "panels": [
@@ -2896,11 +3105,11 @@
      "file": "figures/panels/supp_ground_truth/task_level.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 418.09,
+     "h": 414.0,
      "exact": true,
      "clipped": false
     },
@@ -2911,42 +3120,38 @@
      "file": "figures/panels/supp_ground_truth/identity.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
-     "y": 433.59,
+     "y": 429.5,
      "w": 486.0,
-     "h": 132.87,
+     "h": 128.16,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.53,
-   "share_under_5pt": "0.64",
-   "checks": "listed: spelling, text, text_single",
-   "sha256": "02b50e2e92e80f9ce9923e94b62866afff789493226c4b78f0bde05e3b3921fa",
-   "shows": "To test whether a score can find a real change, the counts of chosen genes were altered on purpose in one species, and the model was trained again on the altered data. In this first part the alteration is a change of level: the gene's counts are thinned 2-, 4- or 8-fold in one species. The large table gives, for every score, how well it separates the altered genes from untouched genes of the same kind (0.5 is chance, 1 is perfect), in liver, testis and kidney and in four groups of genes from weakly to strongly expressed. The table beside it gives the share of altered genes that a score finds when 5 % false alarms are allowed. The three line plots show how detection grows with the size of the change. Panel (b) repeats the comparison for genes with low, medium and high protein identity.",
-   "signature": "919454d4d81ae71d4a2f8d823f8ae32d84d7031139e896d642876fc95a88668d",
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "97b3f9a36d4373bc884d19bb1360b8332042cc74d34870820044bdc5d8040100",
+   "shows": "To test whether a score can find a real change, the counts of chosen genes were altered on purpose in one species, and the model was trained again on the altered data. In panel a the alteration is a change of level: the gene's counts are thinned 2-, 4- or 8-fold in one species. The large table gives, for every score (rows, grouped into Chimera's readouts, direct calculations, other tools, sequence measures and two controls), how well it separates the altered genes from untouched genes of the same kind at 8-fold thinning (0.5 is chance, 1 is perfect), in liver, testis and kidney and in four groups of genes from weakly (1) to strongly (4) expressed. The table beside it gives the share of altered genes that a score finds when 5 % false alarms are allowed. Light gray cells were not run. The three line plots show how detection grows with the size of the change. Panel b repeats the comparison for genes with low, medium and high protein identity, for the three kinds of alteration.",
+   "signature": "fa1b6cb76199f63e99f8c802829064807f697c648dd57037de43c056cbdc336e",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    575.966
+    567.16
    ],
    "problems": {},
-   "listed": {
-    "text": "64% of the characters under 5.0 pt, smallest 4.53 pt (4.53 '0'; 4.53 '.'; 4.53 '5') [text under the floor; panels to be redrawn at print size]",
-    "text_single": "1 single characters under 3.5 pt, smallest 3.3 pt [single characters under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: labelled [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 44,
+   "page": 45,
    "key": "supp_ground_truth_2",
    "label": "fig:supp-b1",
    "part": 2,
    "number": "S31 (continued)",
-   "title": "Ground-truth benchmark: pattern alterations and share of the move",
-   "width_bp": 483.4,
-   "height_bp": 594.7,
+   "title": "Ground-truth benchmark: pattern alterations and share of altered genes",
+   "width_bp": 480.52,
+   "height_bp": 585.92,
    "spec": "specs/supp_validation.py",
    "n_panels": 2,
    "panels": [
@@ -2957,11 +3162,11 @@
      "file": "figures/panels/supp_ground_truth/task_pattern.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 418.09,
+     "h": 414.0,
      "exact": true,
      "clipped": false
     },
@@ -2972,42 +3177,38 @@
      "file": "figures/panels/supp_ground_truth/share.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
-     "y": 433.59,
+     "y": 429.5,
      "w": 486.0,
-     "h": 153.25,
+     "h": 150.0,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.53,
-   "share_under_5pt": "0.67",
-   "checks": "listed: spelling, text, text_single",
-   "sha256": "348297d0b1eec49d127cf0369bc717a44f24c4e7830c0bdd3c6fcfe68b945982",
-   "shows": "Here the planted change is one of pattern: a share of a gene's counts is moved from the cell type where it is most used to the one where it is least used, in one species, so the total stays the same and only where the gene is used changes. Panel (c) shows, as before, how well each score separates the altered genes from untouched ones and how detection grows as more counts are moved. Panel (d) asks whether it matters how many genes are altered at once (2, 5 or 10 % of all genes): the lines are nearly flat, so the scores do not depend on the number of altered genes.",
-   "signature": "9c32c8c57933cd4c9ac4d8122e0c845cdbff07dedff7c9b590e5da0a6c45ae4a",
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "3bd93f4b26c02e4dd3e4e87c0392370d399e4927e2a3f4709f00d18cb2575c34",
+   "shows": "Here the planted change is one of pattern: a share of a gene's counts is moved from the cell type where it is most used to the one where it is least used, in one species, so the total stays the same and only where the gene is used changes. Panel c shows, as panel a does, how well each score separates the altered genes from untouched ones and how detection grows as more counts are moved. Panel d asks whether it matters how many genes are altered at once (2, 5 or 10 % of all genes), for the strongest level change (solid lines) and the strongest pattern change (dotted lines) and four scores.",
+   "signature": "59518bcc345212b4e97cff0b44202a28ee3353d94e3c3cdf4eac72cd279c0727",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    596.339
+    589.0
    ],
    "problems": {},
-   "listed": {
-    "text": "67% of the characters under 5.0 pt, smallest 4.53 pt (4.53 '0'; 4.53 '.'; 4.53 '5') [text under the floor; panels to be redrawn at print size]",
-    "text_single": "3 single characters under 3.5 pt, smallest 3.17 pt [single characters under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: labelled [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 45,
+   "page": 46,
    "key": "supp_ground_truth_3",
    "label": "fig:supp-b1",
    "part": 3,
    "number": "S31 (continued)",
    "title": "Ground-truth benchmark: loss alterations and practical cost",
-   "width_bp": 484.6,
-   "height_bp": 601.73,
+   "width_bp": 480.76,
+   "height_bp": 585.92,
    "spec": "specs/supp_validation.py",
    "n_panels": 2,
    "panels": [
@@ -3018,11 +3219,11 @@
      "file": "figures/panels/supp_ground_truth/task_loss.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 418.09,
+     "h": 414.0,
      "exact": true,
      "clipped": false
     },
@@ -3033,42 +3234,38 @@
      "file": "figures/panels/supp_ground_truth/practical_cost.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
-     "y": 433.59,
+     "y": 429.5,
      "w": 486.0,
-     "h": 160.04,
+     "h": 150.0,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.53,
-   "share_under_5pt": "0.63",
-   "checks": "listed: spelling, text, text_single",
-   "sha256": "6cc2fe8b2d3eed2493d5b76e71a04681d46572c26d0a17d1cd48462df643f3af",
-   "shows": "In panel (e) the planted change is a loss: a gene's counts are removed, in part or completely, from the one cell type where the gene is most used, in one species. The tables and lines read as in the earlier panels. Panel (f) shows what a run costs: the time one run takes on 16 processor cores and the memory it needs, for Chimera, for the direct calculations and for two other tools, on the liver, testis and kidney data, and how the time grows with the number of cells.",
-   "signature": "31b3d1894302df2aa87a250ac802ca698928a2c4690d4f2f77616f7d2f7313cd",
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "bd9a94749eee19ec6fd2a87850d859d07a848456bc386066a85fee9c5a9857d5",
+   "shows": "In panel e the planted change is a loss: a gene's counts are removed, in part or completely, from the one cell type where the gene is most used, in one species. The tables and lines read as in panel a. Panel f shows what a run costs: the time one run takes on 16 processor cores and the memory it needs, for Chimera, for the direct calculations and for two other tools, on the liver, testis and kidney data of human and mouse. Under a line, Chimera alone on a data set of three species and one of four species, where the other methods were not run. The plot on the right shows how the time grows with the number of cells.",
+   "signature": "2d002059de1d802ecd46f15041c30cce50c28db65584850b181c73eaa36ddaaf",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    603.129
+    589.0
    ],
    "problems": {},
-   "listed": {
-    "text": "63% of the characters under 5.0 pt, smallest 4.53 pt (4.53 '0'; 4.53 '.'; 4.53 '5') [text under the floor; panels to be redrawn at print size]",
-    "text_single": "1 single characters under 3.5 pt, smallest 3.3 pt [single characters under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: labelled [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 46,
+   "page": 47,
    "key": "supp_ground_truth_4",
    "label": "fig:supp-b1",
    "part": 4,
    "number": "S31 (continued)",
-   "title": "Ground-truth benchmark: expression bands and false-positive rate",
-   "width_bp": 484.12,
-   "height_bp": 499.63,
+   "title": "Ground-truth benchmark: expression quartiles and false-positive rate",
+   "width_bp": 480.76,
+   "height_bp": 517.04,
    "spec": "specs/supp_validation.py",
    "n_panels": 2,
    "panels": [
@@ -3079,11 +3276,11 @@
      "file": "figures/panels/supp_ground_truth/low_expression.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 255.11,
+     "h": 244.08,
      "exact": true,
      "clipped": false
     },
@@ -3094,42 +3291,38 @@
      "file": "figures/panels/supp_ground_truth/type1_error.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
-     "y": 270.61,
+     "y": 259.58,
      "w": 486.0,
-     "h": 221.16,
+     "h": 252.0,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.72,
-   "share_under_5pt": "0.13",
-   "checks": "listed: spelling, text, text_single",
-   "sha256": "bfcadc19bc5889995f86ed01cd153b95dd0b3b8db3901584ef24c1d1797455cd",
-   "shows": "Panel (g) asks how detection depends on how strongly a gene is expressed. The top row gives the share of altered genes found, for genes in four groups from weakly to strongly expressed; the bottom row shows why Chimera's count evidence finds none of the weakly expressed ones: for those genes the model has too few counts and sets the count evidence to zero. Panel (h) tests for false alarms with three kinds of data in which no gene was changed in the way the test looks for: random gene sets, a reshuffling of counts that keeps the cell-type pattern, and a thinning applied to both species alike. A score that stays near the dashed line raises no false alarms; on the first test every score does.",
-   "signature": "09af62b8b18feae15e8249519cb961a0cf2993dac89a7e0584788a0e03aaacc6",
+   "smallest_text_pt": 6.0,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "481bd26c2b325b4bf52875efa2d83c9b1017201cbc08bb6d39252efa3876a09b",
+   "shows": "Panel g asks how detection depends on how strongly a gene is expressed. The top row gives the share of altered genes found, for genes in four groups from weakly (1) to strongly (4) expressed; the bottom row shows why Chimera's count evidence finds none of the weakly expressed ones: for those genes the model has too few counts and sets the count evidence to zero. Panel h tests for false alarms with three kinds of data in which no gene was changed in the way the test looks for: random gene sets, a reshuffling of counts that keeps the cell-type pattern, and a thinning applied to both species alike. Each row is a score, with one marker each for liver, testis and kidney, set side by side. A score that stays near the dashed line raises no false alarms; on the first test the scores stay at or near it.",
+   "signature": "a1f99b0769f36425096dc7b0244190a5bb24edffd668f30ae0568e7b8d63c663",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    501.266
+    521.08
    ],
    "problems": {},
-   "listed": {
-    "text": "13% of the characters under 5.0 pt, smallest 4.72 pt (4.72 '('; 4.72 'C'; 4.72 'h') [text under the floor; panels to be redrawn at print size]",
-    "text_single": "2 single characters under 3.5 pt, smallest 3.3 pt [single characters under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: labelled [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 47,
+   "page": 48,
    "key": "supp_ground_truth_5",
    "label": "fig:supp-b1",
    "part": 5,
    "number": "S31 (continued)",
    "title": "Ground-truth benchmark: alterations in raw counts",
-   "width_bp": 484.6,
-   "height_bp": 344.7,
+   "width_bp": 481.48,
+   "height_bp": 357.06,
    "spec": "specs/supp_validation.py",
    "n_panels": 1,
    "panels": [
@@ -3140,38 +3333,38 @@
      "file": "figures/panels/supp_ground_truth/raw_counts.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9432,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 336.6,
+     "h": 352.08,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 5.19,
+   "smallest_text_pt": 6.0,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "c9ea29c71a2c99235bbc0ce599494b14dbf82d0701cd4d6ad191ab1f0e5aa43c",
-   "shows": "Three example genes show what the planted changes look like in the raw data of the kidney. Each bar pair is one cell type: gray is the average count per cell before the change, blue after. For GOT2 all counts in mouse are thinned, so every blue bar is much lower (a level change). For RAB12 the counts are removed in one mouse cell type only, the fibroblasts (a loss). For ORC4 counts are moved in human from the cell type that uses the gene most to the one that uses it least, so one bar falls and another rises (a pattern change). The plots on the right show the same genes in the other species, where nothing was changed.",
-   "signature": "5582b42decdbb7b8334139614ae72436b160104b9fb0c0e9e914fa0365b929cc",
+   "sha256": "15d602119b7943fd97e821a73beef5f7fa2e5b21ec2f8fb175aedeeda0f164cd",
+   "shows": "Three example genes show what the planted changes look like in the raw data of the kidney. Each bar pair is one cell type: gray is the average count per cell before the change, blue after. For GOT2 all counts in mouse are thinned, so every blue bar is much lower (a level change). For RAB12 the counts are removed in one mouse cell type only, the fibroblasts (a loss). For ORC4 counts are moved in human from the cell type that uses the gene most to the one that uses it least, so one bar falls and another rises (a pattern change). A small triangle marks the cell types on which a change acts. The plots on the right show the same genes in the other species, where nothing was changed.",
+   "signature": "a19ead4f3e335406fcb287ffa8a65df682eabe06d4dcb4f177e7daea157935b6",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    346.101
+    361.58
    ],
    "problems": {},
    "listed": {}
   },
   {
-   "page": 48,
+   "page": 49,
    "key": "supp_benchmark_overview",
    "label": "fig:supp-b2-overview",
    "part": 1,
    "number": "S32",
    "title": "Gene-level benchmark: overview",
-   "width_bp": 640.84,
-   "height_bp": 325.62,
+   "width_bp": 643.24,
+   "height_bp": 371.32,
    "spec": "specs/supp_validation.py",
    "n_panels": 1,
    "panels": [
@@ -3180,87 +3373,78 @@
      "file": "figures/panels/supp_benchmark_overview/overview.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.6818,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 648.0,
-     "h": 330.38,
+     "h": 378.72,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 2.59,
-   "share_under_5pt": "1.00",
-   "checks": "listed: scale, spelling, text, words",
-   "sha256": "c64e10748e489b162a27bd91b9af3f226f7c6c77800c0b593e999a556cea2df3",
-   "shows": "",
-   "signature": "9245286ee765d345d24d5dd2e99b35b867663b6cf3cc156b7bf21fd3a4f3c766",
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "75a0ed46abf8229feab23ff5963943b6e365522922d3a85556bd5353a8644037",
+   "shows": "Each row is a way of scoring a gene across species, in four groups: four readouts of Chimera, seven direct calculations that need no model (for example the correlation of a gene's cell-type profile between species), five other cross-species tools, and three measures from the protein or DNA sequence. Inside a group the rows run from the best to the worst overall rank. Each column is a family of tests, with the number of tests printed above it. Track A changes the counts of chosen genes on purpose and asks whether a method finds them, and adds three kinds of data in which nothing should be found. Track B damages the data (wrong or coarse labels, a different cell-type mix, fewer cells or reads, an extra batch) and asks two things each time: does the score still agree with independent data, and does it agree with the method's own score on the undamaged data. Track C compares the scores with independent data from other studies and species. Track D measures run time and memory. A large dark circle means the method ranked near the top in that family, a small pale one near the bottom; a hatched circle means the test does not apply to the method or the method was not run there. Red numbers give how many training runs finished out of those tried, where some failed. The bar and the number on the right give the overall rank, where 0 is best.",
+   "signature": "9fc04f5151d3ffb27e6cdb9ad71e52490775623557025bb0831d5f295c5a9912",
    "shrink": 1.0,
    "composed_size": [
     648.0,
-    330.382
+    378.72
    ],
    "problems": {},
-   "listed": {
-    "text": "100% of the characters under 5.0 pt, smallest 2.59 pt (2.59 '5'; 2.59 '/'; 2.59 '1') [text under the floor; panels to be redrawn at print size]",
-    "scale": "1 of 1 panels below scale 0.9, smallest 0.682 [panels placed below 0.9 of their drawn size; to be redrawn at print size]",
-    "words": "internal names: B1b, B1c, B1z, B2b, B3a, Lfc, Sdir, free gate [internal names on the panels; to change when they are redrawn]",
-    "spelling": "British spelling: colour [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 49,
+   "page": 50,
    "key": "supp_benchmark_tasks",
    "label": "fig:supp-b2-tasks",
    "part": 1,
    "number": "S33",
    "title": "Gene-level benchmark: every task",
-   "width_bp": 640.6,
-   "height_bp": 223.27,
+   "width_bp": 637.0,
+   "height_bp": 335.56,
    "spec": "specs/supp_validation.py",
    "n_panels": 1,
    "panels": [
     {
      "letters": [],
-     "file": "figures/panels/supp_benchmark_overview/overview.pdf",
-     "page": 2,
+     "file": "figures/panels/supp_benchmark_overview/tasks.pdf",
+     "page": 1,
      "region": null,
-     "scale": 0.6388,
+     "scale": 1.0,
      "x": 0.0,
      "y": 0.0,
      "w": 648.0,
-     "h": 229.95,
+     "h": 342.96,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 3.83,
-   "share_under_5pt": "1.00",
-   "checks": "listed: scale, text, words",
-   "sha256": "249e6d0425957c1bd30a610d3bff137b5dea5c51f24c2a2751e56bc159777dfa",
-   "shows": "Each row is a way of scoring a gene across species: four readouts of Chimera, seven direct calculations that need no model (for example the correlation of a gene's cell-type profile between species), three measures from the protein or DNA sequence, and five other cross-species tools. Each column is a family of tests. Track A changes the counts of chosen genes on purpose and asks whether a method finds them. Track B damages the data (fewer cells, wrong labels, different cell-type mix) and asks whether the scores stay the same. Track C compares the scores with independent data from other studies and species. Track D measures run time and memory. A large dark circle means the method ranked near the top in that family; a hatched circle means the test does not apply to the method. The bar on the right is the overall rank.",
-   "signature": "cd62c4af8b64509a8cddd7782287e6c6d60bfc8fe365d6fd80a8046a4816420a",
+   "smallest_text_pt": 5.5,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "65a86643886c7a8353cb41adea114a2fefb17acf7780d1445974be5e82637629",
+   "shows": "This figure opens up the summary of the previous one. Every thin column is one single test, 616 in all, in the same four tracks (named under the columns) and the same families (named above the brackets). Every row is a method, in the same groups and order as before. Dark blue means the method ranked near the top in that test, pale blue near the bottom; a light gray cell means the test does not apply to the method, the method was not run there, or its training runs failed.",
+   "signature": "b3649c4d39ccfc42c9171b6426a1905cd2aa1d13fc93321d25a48917cfe804eb",
    "shrink": 1.0,
    "composed_size": [
     648.0,
-    229.95
+    342.96
    ],
    "problems": {},
-   "listed": {
-    "text": "100% of the characters under 5.0 pt, smallest 3.83 pt (3.83 'S'; 3.83 'A'; 3.83 'M') [text under the floor; panels to be redrawn at print size]",
-    "scale": "1 of 1 panels below scale 0.9, smallest 0.639 [panels placed below 0.9 of their drawn size; to be redrawn at print size]",
-    "words": "internal names: B1b, B1c, B1z, B2b, B3a, Lfc, Sdir, free gate [internal names on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 50,
+   "page": 51,
    "key": "supp_tissues_recurrence",
    "label": "fig:supp-h1-recurrence-all",
    "part": 1,
    "number": "S34",
    "title": "All gene sets that recur across tissues",
-   "width_bp": 440.28,
-   "height_bp": 459.94,
+   "width_bp": 448.76,
+   "height_bp": 490.4,
    "spec": "specs/supp_tissues.py",
    "n_panels": 1,
    "panels": [
@@ -3269,33 +3453,31 @@
      "file": "figures/panels/supp_tissues_recurrence/recurrence_all.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9003,
+     "scale": 0.929,
      "x": 0.0,
      "y": 0.0,
-     "w": 440.0,
-     "h": 459.66,
+     "w": 448.0,
+     "h": 490.36,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.41,
-   "share_under_5pt": "0.99",
-   "checks": "listed: text",
-   "sha256": "a1297387fee4fff5e95c401734f8451390f6049a1cc9174b02f77d0628fbb8f3",
-   "shows": "Each row is a set of genes with a common function, for example receptors, ion channels or ribosome and translation genes. Each column is a tissue. A red cell means that in this tissue the genes of the set sit above their protein prior more than comparable genes do: their use across cell types is shared between species more than the conservation of their proteins predicts. A blue cell means the opposite. The same sets are red in tissue after tissue (receptors, cell-surface, signaling and inflammation sets) and the same sets are blue (mitochondrial, translation, chromatin and proteostasis sets). The columns at the right give the test of recurrence and show how the same sets behave on the count evidence, on a direct profile comparison and on two sequence measures.",
-   "signature": "a8d60cd8a48b6375d933d81a9e7307d0dc1d35112b983978d798858e07bfcb18",
+   "smallest_text_pt": 5.11,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "316f8fa5389fadb0a19032882b49f6e07dbbb1929adbd83c091d39926b0f6a8c",
+   "shows": "Each row is a set of genes with a common function, for example receptors, ion channels or ribosome and translation genes. Each column is a tissue. A red cell means that in this tissue the genes of the set sit above their protein prior more than comparable genes do; a blue cell means the opposite; the number is the z value, a star marks significance, and a gray cell is a set with too few genes in that tissue. Colors stop at 8, the numbers do not. The rows stand in three blocks, each with a heading: sets above the prior in tissue after tissue (receptors, cell-surface, signaling and inflammation sets), sets below it (mitochondrial, translation, chromatin and proteostasis sets), and three sets found in one tissue only. The columns at the right, explained by the key under the figure, give the test of recurrence and show how the same sets behave on the count evidence, on a direct profile comparison and on two sequence measures.",
+   "signature": "5490ffe5abbd7788e2ec6f2609a3866f0609f950239963bc2b5392b43e6ec0c4",
    "shrink": 1.0,
    "composed_size": [
-    440.0,
-    459.663
+    448.0,
+    490.362
    ],
    "problems": {},
-   "listed": {
-    "text": "99% of the characters under 5.0 pt, smallest 4.41 pt (4.41 '<'; 4.41 '.'; 4.41 '0') [text under the floor; panels to be redrawn at print size]"
-   }
+   "listed": {}
   },
   {
-   "page": 51,
+   "page": 52,
    "key": "supp_programs_recurrent",
    "label": "fig:supp-e1",
    "part": 1,
@@ -3356,7 +3538,7 @@
    }
   },
   {
-   "page": 52,
+   "page": 53,
    "key": "supp_programs_by_tissue",
    "label": "fig:supp-e1-cont",
    "part": 1,
@@ -3402,7 +3584,7 @@
    }
   },
   {
-   "page": 53,
+   "page": 54,
    "key": "supp_programs_named_genes",
    "label": "fig:supp-e1-genes",
    "part": 1,
@@ -3447,14 +3629,14 @@
    }
   },
   {
-   "page": 54,
+   "page": 55,
    "key": "supp_tissue_bone_marrow",
    "label": "fig:supp-h1-bone-marrow",
    "part": 1,
    "number": "S38",
    "title": "The reading in bone marrow",
-   "width_bp": 486.28,
-   "height_bp": 479.87,
+   "width_bp": 482.68,
+   "height_bp": 526.49,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -3465,12 +3647,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3480,12 +3662,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3495,12 +3677,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3510,12 +3692,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3525,12 +3707,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3540,12 +3722,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.71,
-     "w": 141.63,
-     "h": 118.69,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3555,12 +3737,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 148.63,
-     "y": 259.66,
-     "w": 174.34,
-     "h": 126.75,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3570,12 +3752,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 329.97,
-     "y": 267.71,
-     "w": 156.03,
-     "h": 118.69,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3585,12 +3767,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0248,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 399.4,
-     "w": 157.5,
-     "h": 71.66,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3600,12 +3782,12 @@
      "file": "figures/panels/supp_tissue_bone_marrow/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0248,
-     "x": 164.5,
-     "y": 398.9,
-     "w": 156.76,
-     "h": 72.15,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3615,41 +3797,38 @@
      "file": "figures/panels/supp_tissue_bone_marrow/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0248,
-     "x": 328.26,
-     "y": 399.4,
-     "w": 157.74,
-     "h": 71.66,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.15",
-   "checks": "listed: spelling, text",
-   "sha256": "cdb89c40a75fe140519831943aea88ea4f92a315918546c8e2d73750edee088c",
-   "shows": "",
-   "signature": "1dbe625fdaa654b0eb8edafe2e1c2da3b1194b4ec49fe58212aa82483c3707bc",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "054c335efc7b879e0748d22320705d094013718ddb2c576029d2e1507b2489f2",
+   "shows": "The reading of bone marrow (human, mouse lemur and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "b949d90fd356854dc97af743f52a9961845ea73058115e20537c38b71213be84",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.553
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "15% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 'e') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 55,
+   "page": 56,
    "key": "supp_tissue_kidney",
    "label": "fig:supp-h1-kidney",
    "part": 1,
    "number": "S39",
    "title": "The reading in kidney",
-   "width_bp": 486.28,
-   "height_bp": 479.26,
+   "width_bp": 483.88,
+   "height_bp": 526.49,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -3660,12 +3839,12 @@
      "file": "figures/panels/supp_tissue_kidney/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3675,12 +3854,12 @@
      "file": "figures/panels/supp_tissue_kidney/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3690,12 +3869,12 @@
      "file": "figures/panels/supp_tissue_kidney/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3705,12 +3884,12 @@
      "file": "figures/panels/supp_tissue_kidney/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3720,12 +3899,12 @@
      "file": "figures/panels/supp_tissue_kidney/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3735,12 +3914,12 @@
      "file": "figures/panels/supp_tissue_kidney/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.22,
-     "w": 141.63,
-     "h": 118.69,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3750,12 +3929,12 @@
      "file": "figures/panels/supp_tissue_kidney/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 148.63,
-     "y": 259.66,
-     "w": 174.58,
-     "h": 126.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3765,12 +3944,12 @@
      "file": "figures/panels/supp_tissue_kidney/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 330.21,
-     "y": 267.22,
-     "w": 155.79,
-     "h": 118.69,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3780,12 +3959,12 @@
      "file": "figures/panels/supp_tissue_kidney/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 398.91,
-     "w": 157.74,
-     "h": 71.77,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3795,12 +3974,12 @@
      "file": "figures/panels/supp_tissue_kidney/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 164.74,
-     "y": 398.42,
-     "w": 157.0,
-     "h": 72.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3810,41 +3989,38 @@
      "file": "figures/panels/supp_tissue_kidney/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 328.75,
-     "y": 398.91,
-     "w": 157.25,
-     "h": 71.77,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.19",
-   "checks": "listed: spelling, text",
-   "sha256": "94a647190eb3623789ca772f44eaa6f126c0d85270245529c95da6702be6411c",
-   "shows": "",
-   "signature": "59f3b42e35a06dc4c20b5d013a67462e0670615bde211121edf43ddb855a03b3",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "201fe6729d92935cb2eea5c7d3d995230c45215267748c9ead80ac00a36642c5",
+   "shows": "The reading of kidney (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "0ea1c883f6aa84cc9bef6900b9e4130db8c993666af6fb3df40b526aa4ffb9dc",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.178
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "19% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 'p') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 56,
+   "page": 57,
    "key": "supp_tissue_islet",
    "label": "fig:supp-h1-islet",
    "part": 1,
    "number": "S40",
    "title": "The reading in pancreatic islet",
-   "width_bp": 486.28,
-   "height_bp": 479.41,
+   "width_bp": 482.68,
+   "height_bp": 526.01,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -3855,12 +4031,12 @@
      "file": "figures/panels/supp_tissue_islet/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3870,12 +4046,12 @@
      "file": "figures/panels/supp_tissue_islet/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3885,12 +4061,12 @@
      "file": "figures/panels/supp_tissue_islet/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.48,
-     "w": 157.5,
-     "h": 81.88,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3900,12 +4076,12 @@
      "file": "figures/panels/supp_tissue_islet/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3915,12 +4091,12 @@
      "file": "figures/panels/supp_tissue_islet/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3930,12 +4106,12 @@
      "file": "figures/panels/supp_tissue_islet/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0174,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.23,
-     "w": 141.71,
-     "h": 118.75,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3945,12 +4121,12 @@
      "file": "figures/panels/supp_tissue_islet/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0174,
-     "x": 148.71,
-     "y": 259.66,
-     "w": 174.18,
-     "h": 126.32,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3960,12 +4136,12 @@
      "file": "figures/panels/supp_tissue_islet/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0174,
-     "x": 329.89,
-     "y": 267.23,
-     "w": 156.11,
-     "h": 118.75,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3975,12 +4151,12 @@
      "file": "figures/panels/supp_tissue_islet/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0243,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 398.97,
-     "w": 157.42,
-     "h": 71.62,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -3990,12 +4166,12 @@
      "file": "figures/panels/supp_tissue_islet/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0243,
-     "x": 164.42,
-     "y": 398.48,
-     "w": 156.68,
-     "h": 72.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4005,41 +4181,38 @@
      "file": "figures/panels/supp_tissue_islet/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0243,
-     "x": 328.09,
-     "y": 398.97,
-     "w": 157.91,
-     "h": 71.62,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.14",
-   "checks": "listed: spelling, text",
-   "sha256": "d964852601f176a43905abcb1d9d3e793b33358c6c808e67a670984c57834e5d",
-   "shows": "",
-   "signature": "d6f662a72dd41b8d37c461887f832b286d00c7d0d2505ccc117d7883aa851b38",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "59c80a0648f473f59951c59e08239ca2e68c59ad74c8f23d7e8af6406f9dcce1",
+   "shows": "The reading of pancreatic islet (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "5e1329afce13e201f102dba7021cb793d285d3bfd1d4a2e4d0c663278dfde8d5",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.093
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "14% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 's') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 57,
+   "page": 58,
    "key": "supp_tissue_eye",
    "label": "fig:supp-h1-eye",
    "part": 1,
    "number": "S41",
    "title": "The reading in the eye",
-   "width_bp": 486.28,
-   "height_bp": 479.82,
+   "width_bp": 482.68,
+   "height_bp": 546.87,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -4050,12 +4223,12 @@
      "file": "figures/panels/supp_tissue_eye/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4065,12 +4238,12 @@
      "file": "figures/panels/supp_tissue_eye/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4080,12 +4253,12 @@
      "file": "figures/panels/supp_tissue_eye/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4095,12 +4268,12 @@
      "file": "figures/panels/supp_tissue_eye/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4110,12 +4283,12 @@
      "file": "figures/panels/supp_tissue_eye/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4125,12 +4298,12 @@
      "file": "figures/panels/supp_tissue_eye/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.24,
-     "w": 141.51,
-     "h": 119.0,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4140,12 +4313,12 @@
      "file": "figures/panels/supp_tissue_eye/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
-     "x": 148.51,
-     "y": 259.66,
-     "w": 174.05,
-     "h": 126.58,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4155,12 +4328,12 @@
      "file": "figures/panels/supp_tissue_eye/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
-     "x": 329.56,
-     "y": 267.24,
-     "w": 156.44,
-     "h": 119.0,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4170,12 +4343,12 @@
      "file": "figures/panels/supp_tissue_eye/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 399.24,
-     "w": 157.74,
-     "h": 71.77,
-     "exact": false,
+     "y": 449.56,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4185,12 +4358,12 @@
      "file": "figures/panels/supp_tissue_eye/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 164.74,
-     "y": 398.74,
-     "w": 157.0,
-     "h": 72.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 449.56,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4200,41 +4373,38 @@
      "file": "figures/panels/supp_tissue_eye/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 328.75,
-     "y": 400.47,
-     "w": 157.25,
-     "h": 70.54,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 110.09,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.64,
-   "share_under_5pt": "0.24",
-   "checks": "listed: spelling, text",
-   "sha256": "4d4dbd1ee56b9b76020d3210e00aafe6238f59a9e5a719b2e5202a06af6a4164",
-   "shows": "",
-   "signature": "72ec3d00370c0d870b6c5e875b9d6a20d933c6ed5837e201aeb922812d950bae",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "5b7eb6815a49fd0a4dd99327380143de853857724fab4024a17112cda5e7bbaf",
+   "shows": "The reading of the eye (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) shows the distribution of Δα in every model of this tissue, one row per model, the model of this figure first. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "325339d81579dd6842b45a0469981b302f614406c3049a841dc237b3e83eab61",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.505
+    548.994
    ],
    "problems": {},
-   "listed": {
-    "text": "24% of the characters under 5.0 pt, smallest 4.64 pt (4.64 '1'; 4.64 '0'; 4.69 'm') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 58,
+   "page": 59,
    "key": "supp_tissue_cortex",
    "label": "fig:supp-h1-cortex",
    "part": 1,
    "number": "S42",
    "title": "The reading in cerebral cortex",
-   "width_bp": 486.28,
-   "height_bp": 479.26,
+   "width_bp": 482.68,
+   "height_bp": 546.87,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -4245,12 +4415,12 @@
      "file": "figures/panels/supp_tissue_cortex/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4260,12 +4430,12 @@
      "file": "figures/panels/supp_tissue_cortex/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4275,12 +4445,12 @@
      "file": "figures/panels/supp_tissue_cortex/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4290,12 +4460,12 @@
      "file": "figures/panels/supp_tissue_cortex/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4305,12 +4475,12 @@
      "file": "figures/panels/supp_tissue_cortex/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4320,12 +4490,12 @@
      "file": "figures/panels/supp_tissue_cortex/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.22,
-     "w": 141.63,
-     "h": 118.69,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4335,12 +4505,12 @@
      "file": "figures/panels/supp_tissue_cortex/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 148.63,
-     "y": 259.66,
-     "w": 174.58,
-     "h": 126.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4350,12 +4520,12 @@
      "file": "figures/panels/supp_tissue_cortex/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 330.21,
-     "y": 267.22,
-     "w": 155.79,
-     "h": 118.69,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4365,12 +4535,12 @@
      "file": "figures/panels/supp_tissue_cortex/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 398.91,
-     "w": 157.74,
-     "h": 71.77,
-     "exact": false,
+     "y": 449.56,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4380,12 +4550,12 @@
      "file": "figures/panels/supp_tissue_cortex/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 164.74,
-     "y": 398.42,
-     "w": 157.0,
-     "h": 72.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 449.56,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4395,41 +4565,38 @@
      "file": "figures/panels/supp_tissue_cortex/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 328.75,
-     "y": 400.14,
-     "w": 157.25,
-     "h": 70.54,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 110.09,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.20",
-   "checks": "listed: spelling, text",
-   "sha256": "a46b2aa3429e88e4f67c0c039cb6237c9f212951d4ac2f81c6567661f8c8983b",
-   "shows": "",
-   "signature": "c77b39f023b1b31cbf24c0a72e6d7e7ccece27f01f31fefd63beefce71ed1421",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "6041dc585691c28f37f6a6bc1928d18f118ef02c946b4a0ac4cce6ada227c9fa",
+   "shows": "The reading of cerebral cortex (primary motor cortex) (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) shows the distribution of Δα in every model of this tissue, one row per model, the model of this figure first. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "97557274dfd25524f922467f972b177637265eaa105de5727350e46a2671f8b7",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.178
+    548.994
    ],
    "problems": {},
-   "listed": {
-    "text": "20% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 'O') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 59,
+   "page": 60,
    "key": "supp_tissue_lung",
    "label": "fig:supp-h1-lung",
    "part": 1,
    "number": "S43",
    "title": "The reading in lung",
-   "width_bp": 486.28,
-   "height_bp": 479.26,
+   "width_bp": 482.92,
+   "height_bp": 526.49,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -4440,12 +4607,12 @@
      "file": "figures/panels/supp_tissue_lung/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4455,12 +4622,12 @@
      "file": "figures/panels/supp_tissue_lung/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4470,12 +4637,12 @@
      "file": "figures/panels/supp_tissue_lung/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4485,12 +4652,12 @@
      "file": "figures/panels/supp_tissue_lung/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4500,12 +4667,12 @@
      "file": "figures/panels/supp_tissue_lung/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4515,12 +4682,12 @@
      "file": "figures/panels/supp_tissue_lung/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.22,
-     "w": 141.63,
-     "h": 118.69,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4530,12 +4697,12 @@
      "file": "figures/panels/supp_tissue_lung/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 148.63,
-     "y": 259.66,
-     "w": 174.09,
-     "h": 126.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4545,12 +4712,12 @@
      "file": "figures/panels/supp_tissue_lung/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0169,
-     "x": 329.72,
-     "y": 267.22,
-     "w": 156.28,
-     "h": 118.69,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4560,12 +4727,12 @@
      "file": "figures/panels/supp_tissue_lung/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 398.91,
-     "w": 157.74,
-     "h": 71.77,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4575,12 +4742,12 @@
      "file": "figures/panels/supp_tissue_lung/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 164.74,
-     "y": 398.42,
-     "w": 157.0,
-     "h": 72.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4590,41 +4757,38 @@
      "file": "figures/panels/supp_tissue_lung/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 328.75,
-     "y": 398.91,
-     "w": 157.25,
-     "h": 71.77,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.19",
-   "checks": "listed: spelling, text",
-   "sha256": "aa87b0dba22b2007e6e4fc78a8a1a9e87867d46cf745d3a8cef89ccbd567898e",
-   "shows": "",
-   "signature": "5cc7cf53409eb05062b1670c5589f57edd5eefc82cf823833631c9fd65496412",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "1a8cfd0ec6483b562d7fa9ae2581d074e99c5167e3d0d798b8dc2b32a31e7f31",
+   "shows": "The reading of lung (human, mouse lemur and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "da5b3cdd84e5c53cdd5f0f36e12da3be949e918c381245e1bf2bf6e2b4bc9cfa",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.178
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "19% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 'A') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 60,
+   "page": 61,
    "key": "supp_tissue_muscle",
    "label": "fig:supp-h1-muscle",
    "part": 1,
    "number": "S44",
    "title": "The reading in skeletal muscle",
-   "width_bp": 486.28,
-   "height_bp": 479.51,
+   "width_bp": 482.68,
+   "height_bp": 526.49,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -4635,12 +4799,12 @@
      "file": "figures/panels/supp_tissue_muscle/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4650,12 +4814,12 @@
      "file": "figures/panels/supp_tissue_muscle/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4665,12 +4829,12 @@
      "file": "figures/panels/supp_tissue_muscle/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4680,12 +4844,12 @@
      "file": "figures/panels/supp_tissue_muscle/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4695,12 +4859,12 @@
      "file": "figures/panels/supp_tissue_muscle/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4710,12 +4874,12 @@
      "file": "figures/panels/supp_tissue_muscle/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.24,
-     "w": 142.0,
-     "h": 119.0,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4725,12 +4889,12 @@
      "file": "figures/panels/supp_tissue_muscle/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
-     "x": 149.0,
-     "y": 259.66,
-     "w": 173.81,
-     "h": 126.58,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4740,12 +4904,12 @@
      "file": "figures/panels/supp_tissue_muscle/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0195,
-     "x": 329.81,
-     "y": 267.24,
-     "w": 156.19,
-     "h": 119.0,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4755,12 +4919,12 @@
      "file": "figures/panels/supp_tissue_muscle/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0254,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 399.24,
-     "w": 157.58,
-     "h": 71.69,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4770,12 +4934,12 @@
      "file": "figures/panels/supp_tissue_muscle/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0254,
-     "x": 164.58,
-     "y": 398.74,
-     "w": 156.84,
-     "h": 72.19,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4785,41 +4949,38 @@
      "file": "figures/panels/supp_tissue_muscle/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0254,
-     "x": 328.42,
-     "y": 399.24,
-     "w": 157.58,
-     "h": 71.69,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.64,
-   "share_under_5pt": "0.11",
-   "checks": "listed: spelling, text",
-   "sha256": "7bf55878a53c5f68e948730388b1ce94d6742857d85f269e5b60a339aa9ee29d",
-   "shows": "",
-   "signature": "b3a3865899ec0c35a3c3cc4f11c0d6db64628bfe683bc59dcfb9894929ec8564",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "b30ca6b90388b337e62f3ab3eb8aa432e773951ff299f4a3672ff55d189d4634",
+   "shows": "The reading of skeletal muscle (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "39d2692541b451df59c6c8507bb2954a320f243f24dd88481d45d5ad0c00c430",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.43
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "11% of the characters under 5.0 pt, smallest 4.64 pt (4.64 '1'; 4.64 '0'; 4.69 'F') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, fibre, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 61,
+   "page": 62,
    "key": "supp_tissue_tumor_myeloid",
    "label": "fig:supp-h1-tumour",
    "part": 1,
    "number": "S45",
    "title": "The reading in lung-tumor myeloid cells",
-   "width_bp": 486.28,
-   "height_bp": 479.63,
+   "width_bp": 482.68,
+   "height_bp": 526.49,
    "spec": "specs/supp_tissues.py",
    "n_panels": 11,
    "panels": [
@@ -4830,12 +4991,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/a.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
+     "scale": 0.9993,
      "x": 0.0,
      "y": 0.0,
-     "w": 156.76,
-     "h": 83.36,
-     "exact": false,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4845,12 +5006,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/b.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 163.76,
-     "y": 0.25,
-     "w": 157.75,
-     "h": 83.11,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4860,12 +5021,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/c.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0297,
-     "x": 328.5,
-     "y": 1.24,
-     "w": 157.5,
-     "h": 82.13,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 0.0,
+     "w": 157.33,
+     "h": 83.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4875,12 +5036,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/d.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 100.29,
-     "w": 294.75,
-     "h": 146.87,
-     "exact": false,
+     "y": 96.44,
+     "w": 291.91,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4890,12 +5051,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/e.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.1539,
-     "x": 301.75,
-     "y": 95.86,
-     "w": 184.25,
-     "h": 151.3,
-     "exact": false,
+     "scale": 0.9994,
+     "x": 298.91,
+     "y": 96.44,
+     "w": 187.09,
+     "h": 153.99,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4905,12 +5066,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/f.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0179,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 267.23,
-     "w": 141.05,
-     "h": 118.81,
-     "exact": false,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4920,12 +5081,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/g.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0179,
-     "x": 148.05,
-     "y": 259.66,
-     "w": 174.52,
-     "h": 126.39,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 166.97,
+     "y": 262.93,
+     "w": 152.06,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4935,12 +5096,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/h.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0179,
-     "x": 329.56,
-     "y": 267.23,
-     "w": 156.44,
-     "h": 118.81,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 326.03,
+     "y": 262.93,
+     "w": 159.97,
+     "h": 153.98,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4950,12 +5111,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/i.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
+     "scale": 0.9993,
      "x": 0.0,
-     "y": 399.04,
-     "w": 157.74,
-     "h": 71.77,
-     "exact": false,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4965,12 +5126,12 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/j.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 164.74,
-     "y": 398.55,
-     "w": 157.0,
-     "h": 72.26,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 164.33,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     },
     {
@@ -4980,41 +5141,38 @@
      "file": "figures/panels/supp_tissue_tumor_myeloid/k.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0264,
-     "x": 328.75,
-     "y": 399.04,
-     "w": 157.25,
-     "h": 71.77,
-     "exact": false,
+     "scale": 0.9993,
+     "x": 328.67,
+     "y": 429.41,
+     "w": 157.33,
+     "h": 89.94,
+     "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.63,
-   "share_under_5pt": "0.13",
-   "checks": "listed: spelling, text",
-   "sha256": "ae8126f4480edcd1b2a32d1870a6790c0f2bc7b07571ea93e6a21b2339c8fe6c",
-   "shows": "",
-   "signature": "769b050f66ef74c1865de6be7c7ca311c6bcfd95679cc739605948fe77383b50",
+   "smallest_text_pt": 5.2,
+   "share_under_5pt": "0.00",
+   "checks": "ok",
+   "sha256": "bf44effef4d60d9d62578b4012ec46d709efaf4fa2c83b3be83a07de1eba9839",
+   "shows": "The reading of lung-tumor myeloid cells (human and mouse) with the panels the main figures use for liver and testis. (a) to (c) compare, for every gene, the value the model gives it (α) with the value its protein conservation alone predicts (the protein prior), and show how far genes move from the prior (Δα). (d) places every gene by prior and Δα and marks textbook marker genes of the tissue's cell lineages; the names of crowded genes stand in a row along the top. (e) and (f) ask the same for groups of genes: ten broad categories, and the Hallmark gene sets, where triangles are sets whose q value is below the plotted range. (g) and (h) show which cell types supply the evidence in the counts, for the marker genes and for the genes farthest above and below the prior. (i) compares Δα between the groups of genes found inside the model's protein network. (j) shows that Δα rises with the evidence in the counts. (k) gives the share of genes far above and far below the prior that are backed by count evidence of the same sign. Small gray triangles mark genes that lie beyond an axis.",
+   "signature": "8570bd8cca2e517eff850aaafbcddfaa37136a3673be5d47624f2c6f6438b52d",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    480.309
+    528.848
    ],
    "problems": {},
-   "listed": {
-    "text": "13% of the characters under 5.0 pt, smallest 4.63 pt (4.63 '1'; 4.63 '0'; 4.68 'N') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 62,
+   "page": 63,
    "key": "supp_tissues_lineage",
    "label": "fig:supp-h1-lineage",
    "part": 1,
    "number": "S46",
    "title": "Lineage marker sets across tissues",
    "width_bp": 486.28,
-   "height_bp": 310.98,
+   "height_bp": 286.98,
    "spec": "specs/supp_tissues.py",
    "n_panels": 1,
    "panels": [
@@ -5023,33 +5181,31 @@
      "file": "figures/panels/supp_tissues_lineage/lineage.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0033,
+     "scale": 1.019,
      "x": 0.0,
      "y": 0.0,
      "w": 486.0,
-     "h": 310.94,
+     "h": 286.94,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 5.02,
+   "smallest_text_pt": 5.6,
    "share_under_5pt": "0.00",
-   "checks": "listed: spelling",
-   "sha256": "34bb457858b9df711adeb429cc94780d7194a77ea6480f26546449da577f3ee2",
-   "shows": "Each row is a small set of well-known marker genes of one cell lineage, such as B cells of the bone marrow, the proximal tubule of the kidney or inhibitory neurons of the cortex; the tissue the lineage belongs to is given in brackets. Each column is a tissue. A red cell means that in this tissue the marker genes sit above comparable genes: on the left for Δα, the reading against the protein prior, and on the right for the count evidence behind it. The black box marks the lineage's own tissue. A dash means that fewer than five of the marker genes have enough counts in that tissue to be scored. Most values lie in the boxes, and they are red.",
-   "signature": "44d94b6b3e3c4f67ed56789745ff76f66b1cf4ba3216444c4385dce3ad6ea669",
+   "checks": "ok",
+   "sha256": "e5b348a21cf840a0830ad3bdcbf0c1c0cb95b321bc0038c6a45ddc53d8847863",
+   "shows": "Each row is a small set of well-known marker genes of one cell lineage, such as B cells of the bone marrow, the proximal tubule of the kidney or inhibitory neurons of the cortex; the tissue the lineage belongs to is given in parentheses. Each column is a tissue. A red cell means that in this tissue the marker genes sit above comparable genes: on the left for Δα, the reading against the protein prior, and on the right for the count evidence behind it. The outline marks the lineage's own tissue. A light gray cell means that fewer than five of the marker genes have enough counts in that tissue to be scored. Most values lie in the outlined cells, and all of those are red.",
+   "signature": "a83d744376774317cea6adad6ccbf8f3ed7add3d6b0b3dc82122c16bdb928e4a",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    310.944
+    286.937
    ],
    "problems": {},
-   "listed": {
-    "spelling": "British spelling: programme [British spelling on the panels; to change when they are redrawn]"
-   }
+   "listed": {}
   },
   {
-   "page": 63,
+   "page": 64,
    "key": "supp_bone_marrow_reference",
    "label": "fig:supp-bone-marrow",
    "part": 1,
@@ -5166,7 +5322,7 @@
    "listed": {}
   },
   {
-   "page": 64,
+   "page": 65,
    "key": "supp_cell_compartments",
    "label": "fig:supp-e3-compartments",
    "part": 1,
@@ -5225,7 +5381,7 @@
    }
   },
   {
-   "page": 65,
+   "page": 66,
    "key": "supp_cell_lineages",
    "label": "fig:supp-e3-lineages",
    "part": 1,
@@ -5284,7 +5440,7 @@
    }
   },
   {
-   "page": 66,
+   "page": 67,
    "key": "supp_primate_branches",
    "label": "fig:supp-e3-primates",
    "part": 1,
@@ -5360,7 +5516,7 @@
    }
   },
   {
-   "page": 67,
+   "page": 68,
    "key": "supp_protein_architecture",
    "label": "fig:supp-e2",
    "part": 1,
@@ -5436,7 +5592,7 @@
    }
   },
   {
-   "page": 68,
+   "page": 69,
    "key": "supp_regulatory_architecture",
    "label": "fig:supp-e5",
    "part": 1,
@@ -5510,7 +5666,7 @@
    }
   },
   {
-   "page": 69,
+   "page": 70,
    "key": "supp_disease_genes",
    "label": "fig:supp-e4",
    "part": 1,
@@ -5587,7 +5743,7 @@
    }
   },
   {
-   "page": 70,
+   "page": 71,
    "key": "supp_drug_targets",
    "label": "fig:supp-e4-targets",
    "part": 1,
@@ -5631,7 +5787,7 @@
    }
   },
   {
-   "page": 71,
+   "page": 72,
    "key": "supp_gin_linear_baseline",
    "label": "fig:supp-gin-esm2-linear-baseline",
    "part": 1,
@@ -5688,7 +5844,7 @@
    "listed": {}
   },
   {
-   "page": 72,
+   "page": 73,
    "key": "supp_gin_attribution_suite",
    "label": "fig:supp-gin-esm2-attribution-suite",
    "part": 1,
@@ -5835,7 +5991,7 @@
    "listed": {}
   },
   {
-   "page": 73,
+   "page": 74,
    "key": "supp_gin_method_consensus",
    "label": "fig:supp-gin-esm2-method-consensus",
    "part": 1,
@@ -5892,7 +6048,7 @@
    "listed": {}
   },
   {
-   "page": 74,
+   "page": 75,
    "key": "supp_gin_orthogonality",
    "label": "fig:supp-gin-esm2-orthogonality",
    "part": 1,
@@ -5949,7 +6105,7 @@
    "listed": {}
   },
   {
-   "page": 75,
+   "page": 76,
    "key": "supp_gin_per_pc",
    "label": "fig:supp-gin-esm2-per-pc",
    "part": 1,
@@ -6051,7 +6207,7 @@
    "listed": {}
   },
   {
-   "page": 76,
+   "page": 77,
    "key": "supp_atlas_spatial_autocorrelation",
    "label": "fig:supp-esm2-umap-spatial-autocorr",
    "part": 1,
@@ -6181,7 +6337,7 @@
    "listed": {}
   },
   {
-   "page": 77,
+   "page": 78,
    "key": "supp_atlas_archetype_trajectory",
    "label": "fig:supp-esm2-umap-archetype-trajectory",
    "part": 1,
@@ -6221,7 +6377,7 @@
    "listed": {}
   },
   {
-   "page": 78,
+   "page": 79,
    "key": "supp_atlas_archetype_enrichment",
    "label": "fig:supp-esm2-umap-archetype-enrichment",
    "part": 1,
@@ -6278,16 +6434,16 @@
    "listed": {}
   },
   {
-   "page": 79,
+   "page": 80,
    "key": "supp_residue_audit",
    "label": "fig:supp-main-gin-protein",
    "part": 1,
    "number": "S65",
    "title": "Residue-level attribution audit",
-   "width_bp": 486.76,
-   "height_bp": 584.83,
+   "width_bp": 487.0,
+   "height_bp": 466.75,
    "spec": "specs/supp_protein.py",
-   "n_panels": 8,
+   "n_panels": 4,
    "panels": [
     {
      "letters": [
@@ -6301,11 +6457,11 @@
       375,
       384
      ],
-     "scale": 0.6018,
-     "x": 24.0,
+     "scale": 0.6688,
+     "x": 0.0,
      "y": 0.0,
-     "w": 222.96,
-     "h": 226.72,
+     "w": 247.79,
+     "h": 251.97,
      "exact": false,
      "clipped": false
     },
@@ -6321,11 +6477,11 @@
       724,
       384
      ],
-     "scale": 0.6018,
-     "x": 253.96,
+     "scale": 0.6688,
+     "x": 254.79,
      "y": 0.0,
-     "w": 208.04,
-     "h": 226.72,
+     "w": 231.21,
+     "h": 251.97,
      "exact": false,
      "clipped": false
     },
@@ -6341,11 +6497,11 @@
       958,
       188
      ],
-     "scale": 0.6207,
-     "x": 23.0,
-     "y": 296.08,
-     "w": 144.89,
-     "h": 104.02,
+     "scale": 1.1335,
+     "x": 0.0,
+     "y": 267.47,
+     "w": 264.61,
+     "h": 189.98,
      "exact": false,
      "clipped": false
     },
@@ -6361,14 +6517,46 @@
       958,
       384
      ],
-     "scale": 0.5978,
-     "x": 174.89,
-     "y": 294.02,
-     "w": 119.71,
-     "h": 106.08,
+     "scale": 1.0707,
+     "x": 271.61,
+     "y": 267.47,
+     "w": 214.39,
+     "h": 189.98,
      "exact": false,
      "clipped": false
-    },
+    }
+   ],
+   "smallest_text_pt": 3.56,
+   "share_under_5pt": "0.75",
+   "checks": "listed: scale, text, text_single, unreadable_text_layer",
+   "sha256": "ac3b676688b353a4f9b517a6e37d0f2809a24d97f090d49ff3172378e4399637",
+   "shows": "The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means the first kind receives more attribution. (b) The same comparisons made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence.",
+   "signature": "179a15ddbea15d8ca3687899144a4bc2d35bcb5707a4fa96f89e173d509a084c",
+   "shrink": 1.0,
+   "composed_size": [
+    486.0,
+    466.946
+   ],
+   "problems": {},
+   "listed": {
+    "text": "75% of the characters under 5.0 pt, smallest 3.56 pt (3.56 '+\\t'; 3.56 '+\\x0c'; 3.56 '+\\x0c\\t\\x0c') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
+    "text_single": "22 single characters under 3.5 pt, smallest 2.53 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
+    "scale": "2 of 4 panels below scale 0.9, smallest 0.669 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
+    "unreadable_text_layer": "the text layer cannot be decoded (hand-assembled page): words and spelling are not checked [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
+   }
+  },
+  {
+   "page": 81,
+   "key": "supp_residue_audit_2",
+   "label": "fig:supp-main-gin-protein",
+   "part": 2,
+   "number": "S65 (continued)",
+   "title": "Residue-level attribution audit, continued",
+   "width_bp": 486.28,
+   "height_bp": 507.68,
+   "spec": "specs/supp_protein.py",
+   "n_panels": 4,
+   "panels": [
     {
      "letters": [
       "e"
@@ -6376,11 +6564,11 @@
      "file": "notebooks/figures/ortholog_qc/i3c_cross_tissue_disagreement_portrait_grayscale.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.6361,
-     "x": 301.59,
-     "y": 240.22,
-     "w": 161.41,
-     "h": 159.88,
+     "scale": 0.9851,
+     "x": 0.0,
+     "y": 0.0,
+     "w": 249.97,
+     "h": 247.61,
      "exact": false,
      "clipped": false
     },
@@ -6396,11 +6584,11 @@
       520,
       511
      ],
-     "scale": 0.6941,
-     "x": 0.0,
-     "y": 413.6,
-     "w": 144.49,
-     "h": 79.35,
+     "scale": 1.1003,
+     "x": 256.97,
+     "y": 0.0,
+     "w": 229.03,
+     "h": 125.78,
      "exact": false,
      "clipped": false
     },
@@ -6416,11 +6604,11 @@
       520,
       650
      ],
-     "scale": 0.5689,
-     "x": 0.0,
-     "y": 508.45,
-     "w": 144.49,
-     "h": 67.08,
+     "scale": 0.9017,
+     "x": 256.97,
+     "y": 141.28,
+     "w": 229.03,
+     "h": 106.33,
      "exact": false,
      "clipped": false
     },
@@ -6436,35 +6624,33 @@
       958,
       650
      ],
-     "scale": 0.7963,
-     "x": 151.49,
-     "y": 413.6,
-     "w": 334.51,
-     "h": 161.93,
+     "scale": 1.1569,
+     "x": 0.0,
+     "y": 263.11,
+     "w": 486.0,
+     "h": 235.27,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 2.17,
-   "share_under_5pt": "0.98",
-   "checks": "listed: scale, text, text_single",
-   "sha256": "d0d1181b344e742b5c72072b0eb15ecb25c91d7954ef5934829059be7593527f",
-   "shows": "The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means the first kind receives more attribution. (b) The same comparisons made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence. (e) The genes shared by liver and testis: mean Δα in liver against mean Δα in testis, shaded by the quadrant a gene falls in. (f, g) Three hand-curated groups of proteins: their overall attribution does not differ, and the contrast of hydrophobic against polar residues is clearest in the first group. (h) Six properties that are often assumed to drive such maps (disorder, glycine, proline, conservation and others) look strong when residues are pooled and disappear within proteins, except for contact density.",
-   "signature": "81682de0871e61b33ad8d8df9bd32aa686999554b846eda1551699e3685a3eaf",
+   "smallest_text_pt": 3.44,
+   "share_under_5pt": "0.10",
+   "checks": "listed: text",
+   "sha256": "4be94a15a176efd7f4938a773817bfaa1ddf71f1df1498a765264d22b3e8809b",
+   "shows": "(e) The genes shared by liver and testis: mean Δα in liver against mean Δα in testis, shaded by the quadrant a gene falls in. (f, g) Three hand-curated groups of proteins: their overall attribution does not differ, and the contrast of hydrophobic against polar residues is clearest in the first group. (h) Six properties that are often assumed to drive such maps (disorder, glycine, proline, conservation and others) look strong when residues are pooled and disappear within proteins, except for contact density.",
+   "signature": "79b8fdbfac659fa3140b17153469f2da349eeefd968478d71eaa72b7ccdd21c8",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    585.033
+    507.879
    ],
    "problems": {},
    "listed": {
-    "text": "98% of the characters under 5.0 pt, smallest 2.17 pt (2.17 ''; 2.17 ''; 2.17 '') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "text_single": "572 single characters under 3.5 pt, smallest 2.28 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "scale": "8 of 8 panels below scale 0.9, smallest 0.569 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
+    "text": "10% of the characters under 5.0 pt, smallest 3.44 pt (3.44 ''; 3.44 ''; 3.44 '') [holds regions of a page assembled by hand; its panels are to be redrawn at print size]"
    }
   },
   {
-   "page": 80,
+   "page": 82,
    "key": "supp_residue_mixed_effects",
    "label": "fig:supp-gin-protein-residue-beta",
    "part": 1,
@@ -6504,7 +6690,7 @@
    "listed": {}
   },
   {
-   "page": 81,
+   "page": 83,
    "key": "supp_residue_cliffs_delta",
    "label": "fig:supp-gin-protein-cliffs-delta",
    "part": 1,
@@ -6544,7 +6730,7 @@
    "listed": {}
   },
   {
-   "page": 82,
+   "page": 84,
    "key": "supp_residue_attention_by_feature",
    "label": "fig:supp-gin-protein-attention-by-feature",
    "part": 1,
@@ -6589,7 +6775,7 @@
    "listed": {}
   },
   {
-   "page": 83,
+   "page": 85,
    "key": "supp_residue_card_etv1",
    "label": "fig:supp-gin-protein-etv1",
    "part": 1,
@@ -6629,7 +6815,7 @@
    "listed": {}
   },
   {
-   "page": 84,
+   "page": 86,
    "key": "supp_residue_card_hprt1",
    "label": "fig:supp-gin-protein-hprt1",
    "part": 1,
@@ -6669,7 +6855,7 @@
    "listed": {}
   },
   {
-   "page": 85,
+   "page": 87,
    "key": "supp_residue_card_runx1",
    "label": "fig:supp-gin-protein-runx1",
    "part": 1,

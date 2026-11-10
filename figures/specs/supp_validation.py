@@ -88,65 +88,81 @@ FIGS = {
         width=LANDSCAPE,
         label="fig:supp-b2-overview",
         title="Gene-level benchmark: overview",
-        shows=""),
+        shows=("Each row is a way of scoring a gene across species, in four groups: four readouts of Chimera, "
+               "seven direct calculations that need no model (for example the correlation of a gene's cell-type "
+               "profile between species), five other cross-species tools, and three measures from the protein "
+               "or DNA sequence. Inside a group the rows run from the best to the worst overall rank. Each "
+               "column is a family of tests, with the number of tests printed above it. Track A changes the "
+               "counts of chosen genes on purpose and asks whether a method finds them, and adds three kinds of "
+               "data in which nothing should be found. Track B damages the data (wrong or coarse labels, a "
+               "different cell-type mix, fewer cells or reads, an extra batch) and asks two things each time: "
+               "does the score still agree with independent data, and does it agree with the method's own score "
+               "on the undamaged data. Track C compares the scores with independent data from other studies and "
+               "species. Track D measures run time and memory. A large dark circle means the method ranked near "
+               "the top in that family, a small pale one near the bottom; a hatched circle means the test does "
+               "not apply to the method or the method was not run there. Red numbers give how many training "
+               "runs finished out of those tried, where some failed. The bar and the number on the right give "
+               "the overall rank, where 0 is best.")),
     "supp_benchmark_tasks": Figure(
-        X("supp_benchmark_overview/overview", page=2),
+        X("supp_benchmark_overview/tasks"),
         width=LANDSCAPE,
         label="fig:supp-b2-tasks",
         title="Gene-level benchmark: every task",
-        shows=("Each row is a way of scoring a gene across species: four readouts of Chimera, seven direct "
-               "calculations that need no model (for example the correlation of a gene's cell-type profile "
-               "between species), three measures from the protein or DNA sequence, and five other cross-species "
-               "tools. Each column is a family of tests. Track A changes the counts of chosen genes on purpose "
-               "and asks whether a method finds them. Track B damages the data (fewer cells, wrong labels, "
-               "different cell-type mix) and asks whether the scores stay the same. Track C compares the scores "
-               "with independent data from other studies and species. Track D measures run time and memory. A "
-               "large dark circle means the method ranked near the top in that family; a hatched circle means "
-               "the test does not apply to the method. The bar on the right is the overall rank.")),
+        shows=("This figure opens up the summary of the previous one. Every thin column is one single test, 616 "
+               "in all, in the same four tracks (named under the columns) and the same families (named above the "
+               "brackets). Every row is a method, in the same groups and order as before. Dark blue means the "
+               "method ranked near the top in that test, pale blue near the bottom; a light gray cell means the "
+               "test does not apply to the method, the method was not run there, or its training runs failed.")),
     "supp_ground_truth": Figure(
         Col(X("supp_ground_truth/task_level", "a"), X("supp_ground_truth/identity", "b")),
         label="fig:supp-b1",
         title="Ground-truth benchmark: level alterations and protein identity",
         shows=("To test whether a score can find a real change, the counts of chosen genes were altered on "
-               "purpose in one species, and the model was trained again on the altered data. In this first part "
-               "the alteration is a change of level: the gene's counts are thinned 2-, 4- or 8-fold in one "
-               "species. The large table gives, for every score, how well it separates the altered genes from "
-               "untouched genes of the same kind (0.5 is chance, 1 is perfect), in liver, testis and kidney and "
-               "in four groups of genes from weakly to strongly expressed. The table beside it gives the share "
-               "of altered genes that a score finds when 5 % false alarms are allowed. The three line plots show "
-               "how detection grows with the size of the change. Panel (b) repeats the comparison for genes with "
-               "low, medium and high protein identity.")),
+               "purpose in one species, and the model was trained again on the altered data. In panel a the "
+               "alteration is a change of level: the gene's counts are thinned 2-, 4- or 8-fold in one species. "
+               "The large table gives, for every score (rows, grouped into Chimera's readouts, direct "
+               "calculations, other tools, sequence measures and two controls), how well it separates the "
+               "altered genes from untouched genes of the same kind at 8-fold thinning (0.5 is chance, 1 is "
+               "perfect), in liver, testis and kidney and in four groups of genes from weakly (1) to strongly "
+               "(4) expressed. The table beside it gives the share of altered genes that a score finds when "
+               "5 % false alarms are allowed. Light gray cells were not run. The three line plots show how "
+               "detection grows with the size of the change. Panel b repeats the comparison for genes with low, "
+               "medium and high protein identity, for the three kinds of alteration.")),
     "supp_ground_truth_2": Figure(
         Col(X("supp_ground_truth/task_pattern", "c"), X("supp_ground_truth/share", "d")),
         label="fig:supp-b1", part=2,
-        title="Ground-truth benchmark: pattern alterations and share of the move",
+        title="Ground-truth benchmark: pattern alterations and share of altered genes",
         shows=("Here the planted change is one of pattern: a share of a gene's counts is moved from the cell "
                "type where it is most used to the one where it is least used, in one species, so the total stays "
-               "the same and only where the gene is used changes. Panel (c) shows, as before, how well each "
+               "the same and only where the gene is used changes. Panel c shows, as panel a does, how well each "
                "score separates the altered genes from untouched ones and how detection grows as more counts are "
-               "moved. Panel (d) asks whether it matters how many genes are altered at once (2, 5 or 10 % of all "
-               "genes): the lines are nearly flat, so the scores do not depend on the number of altered genes.")),
+               "moved. Panel d asks whether it matters how many genes are altered at once (2, 5 or 10 % of all "
+               "genes), for the strongest level change (solid lines) and the strongest pattern change (dotted "
+               "lines) and four scores.")),
     "supp_ground_truth_3": Figure(
         Col(X("supp_ground_truth/task_loss", "e"), X("supp_ground_truth/practical_cost", "f")),
         label="fig:supp-b1", part=3,
         title="Ground-truth benchmark: loss alterations and practical cost",
-        shows=("In panel (e) the planted change is a loss: a gene's counts are removed, in part or completely, "
+        shows=("In panel e the planted change is a loss: a gene's counts are removed, in part or completely, "
                "from the one cell type where the gene is most used, in one species. The tables and lines read as "
-               "in the earlier panels. Panel (f) shows what a run costs: the time one run takes on 16 processor "
-               "cores and the memory it needs, for Chimera, for the direct calculations and for two other tools, "
-               "on the liver, testis and kidney data, and how the time grows with the number of cells.")),
+               "in panel a. Panel f shows what a run costs: the time one run takes on 16 processor cores and the "
+               "memory it needs, for Chimera, for the direct calculations and for two other tools, on the liver, "
+               "testis and kidney data of human and mouse. Under a line, Chimera alone on a data set of three "
+               "species and one of four species, where the other methods were not run. The plot on the right "
+               "shows how the time grows with the number of cells.")),
     "supp_ground_truth_4": Figure(
         Col(X("supp_ground_truth/low_expression", "g"), X("supp_ground_truth/type1_error", "h")),
         label="fig:supp-b1", part=4,
-        title="Ground-truth benchmark: expression bands and false-positive rate",
-        shows=("Panel (g) asks how detection depends on how strongly a gene is expressed. The top row gives the "
-               "share of altered genes found, for genes in four groups from weakly to strongly expressed; the "
-               "bottom row shows why Chimera's count evidence finds none of the weakly expressed ones: for those "
-               "genes the model has too few counts and sets the count evidence to zero. Panel (h) tests for "
-               "false alarms with three kinds of data in which no gene was changed in the way the test looks "
-               "for: random gene sets, a reshuffling of counts that keeps the cell-type pattern, and a thinning "
-               "applied to both species alike. A score that stays near the dashed line raises no false alarms; "
-               "on the first test every score does.")),
+        title="Ground-truth benchmark: expression quartiles and false-positive rate",
+        shows=("Panel g asks how detection depends on how strongly a gene is expressed. The top row gives the "
+               "share of altered genes found, for genes in four groups from weakly (1) to strongly (4) "
+               "expressed; the bottom row shows why Chimera's count evidence finds none of the weakly expressed "
+               "ones: for those genes the model has too few counts and sets the count evidence to zero. Panel h "
+               "tests for false alarms with three kinds of data in which no gene was changed in the way the test "
+               "looks for: random gene sets, a reshuffling of counts that keeps the cell-type pattern, and a "
+               "thinning applied to both species alike. Each row is a score, with one marker each for liver, "
+               "testis and kidney, set side by side. A score that stays near the dashed line raises no false "
+               "alarms; on the first test the scores stay at or near it.")),
     "supp_ground_truth_5": Figure(
         Col(X("supp_ground_truth/raw_counts", "i")),
         label="fig:supp-b1", part=5,
@@ -156,6 +172,7 @@ FIGS = {
                "GOT2 all counts in mouse are thinned, so every blue bar is much lower (a level change). For "
                "RAB12 the counts are removed in one mouse cell type only, the fibroblasts (a loss). For ORC4 "
                "counts are moved in human from the cell type that uses the gene most to the one that uses it "
-               "least, so one bar falls and another rises (a pattern change). The plots on the right show the "
-               "same genes in the other species, where nothing was changed.")),
+               "least, so one bar falls and another rises (a pattern change). A small triangle marks the cell "
+               "types on which a change acts. The plots on the right show the same genes in the other species, "
+               "where nothing was changed.")),
 }

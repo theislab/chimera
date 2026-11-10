@@ -10,5 +10,5 @@ $R $D/gsea.py --jobs 5
 $R $D/archetypes.py --jobs 5
 $R $D/drivers.py
 $R $D/figures.py
-$R -m analysis.tasks.F1_figures.compose --spec $D/specs_h1.py --all
+bash figures/build.sh    # composes the figures whose panels changed (figures/specs/supp_tissues.py, main.py)
 $R $D/tex.py

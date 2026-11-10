@@ -50,16 +50,16 @@ CATEGORY_DISPLAY = {
     "cytokines_chemokines": "Cytokines and chemokines", "cytoskeleton_actin": "Actin cytoskeleton",
     "cytoskeleton_intermediate": "Intermediate filaments", "cytoskeleton_microtubule": "Microtubules",
     "dna_replication_repair": "DNA replication and repair", "ecm_collagen": "ECM: collagens", "ecm_other": "ECM: other",
-    "glutathione_redox": "Glutathione and redox", "hedgehog_signaling": "Hedgehog signalling", "histone": "Histones",
+    "glutathione_redox": "Glutathione and redox", "hedgehog_signaling": "Hedgehog signaling", "histone": "Histones",
     "housekeeping": "Housekeeping", "immediate_early": "Immediate early genes", "interferon_response": "Interferon response",
-    "kinases_signaling": "Signalling kinases", "metabolism_glycolysis": "Glycolysis", "metabolism_lipid": "Lipid metabolism",
-    "mitochondrial_dna_encoded": "Mitochondrially encoded", "notch_signaling": "Notch signalling",
+    "kinases_signaling": "Signaling kinases", "metabolism_glycolysis": "Glycolysis", "metabolism_lipid": "Lipid metabolism",
+    "mitochondrial_dna_encoded": "Mitochondrially encoded", "notch_signaling": "Notch signaling",
     "nuclear_receptors": "Nuclear receptors", "oxphos_nuclear_encoded": "OXPHOS, nuclear-encoded", "proteasome": "Proteasome",
     "ribosomal_mt": "Mitochondrial ribosome", "ribosomal_structural": "Cytosolic ribosome", "ribosome_biogenesis": "Ribosome biogenesis",
     "splicing_factors": "Splicing factors", "tf_forkhead_etc": "Forkhead and other TFs", "tf_homeobox": "Homeobox TFs",
-    "tf_zinc_finger": "Zinc-finger TFs", "tgfb_bmp_signaling": "TGF-β/BMP signalling",
+    "tf_zinc_finger": "Zinc-finger TFs", "tgfb_bmp_signaling": "TGF-β/BMP signaling",
     "translation_elongation": "Translation elongation", "translation_initiation": "Translation initiation",
-    "wnt_signaling": "Wnt signalling", "mhc_class_I": "MHC class I", "mhc_class_II": "MHC class II",
+    "wnt_signaling": "Wnt signaling", "mhc_class_I": "MHC class I", "mhc_class_II": "MHC class II",
 }
 
 
