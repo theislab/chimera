@@ -1,0 +1,13 @@
+"""D1 figure for F1_figures/compose.py. Panels live in results/analysis/D1/panels/; the composed PDF goes where compose.py writes (CHIMERA_MANUSCRIPT may point elsewhere).
+
+    PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.F1_figures.compose --spec analysis/tasks/D1_sparse_genes/specs_d1.py supp_d1_sparse
+"""
+from __future__ import annotations
+
+from analysis.tasks.D1_sparse_genes import rules as RU
+from analysis.tasks.F1_figures.compose import Col, Figure, Panel, Row
+
+D = RU.RES / "panels"
+P = lambda name, label=None, **kw: Panel(D / f"{name}.pdf", label=label, **kw)  # noqa: E731
+
+FIGS = {"supp_d1_sparse": Figure(Col(Row(P("d1_masked", "a"), P("d1_heldout", "b")), P("d1_depth", "c")))}

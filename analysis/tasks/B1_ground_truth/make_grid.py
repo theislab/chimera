@@ -1,0 +1,60 @@
+"""Write the grid manifests. A row whose gene set would equal that of a smaller share (the band has too few eligible genes for the
+larger share) is listed with duplicate_of and not trained: it adds no information. n_pairs and share_achieved are recorded for all."""
+
+from __future__ import annotations
+
+import pandas as pd
+
+from analysis.tasks.B1_ground_truth import alter as A
+from analysis.tasks.B1_ground_truth import rules as RU
+
+
+def main():
+    rows = pd.DataFrame(RU.grid())
+    rows["duplicate_of"] = ""
+    rows["n_pairs"] = 0
+    rows["share_achieved"] = 0.0
+    rows["recipe"] = rows["cohort"].map(lambda c: RU.COHORTS[c]["recipe"])
+    rows["duplicate_of"] = ""
+    for c in RU.COHORTS:
+        a = A.read_base(c)
+        g, _ = A.gene_table(a, c)
+        for (alt, band, seed), sub in rows[(rows.cohort == c) & (rows.alt != "none")].groupby(["alt", "band", "seed"]):
+            np_ = len(A.select_pairs(g, alt, band, seed))
+            for i, r in sub.iterrows():
+                n = min(int(round(r["share"] * len(g))), np_)
+                rows.loc[i, "n_pairs"] = n
+                rows.loc[i, "share_achieved"] = n / len(g)
+            for e, s2 in sub.groupby("effect"):
+                seen = {}
+                for i, r in s2.sort_values("share").iterrows():
+                    n = rows.loc[i, "n_pairs"]
+                    if n in seen:
+                        rows.loc[i, "duplicate_of"] = seen[n]
+                    else:
+                        seen[n] = r["run"]
+    rows.to_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", index=False)
+    for c in RU.COHORTS:
+        d = rows[(rows.cohort == c) & (rows.reuse == "") & (rows.duplicate_of == "")].sort_values(["tier", "alt", "effect", "band", "share", "seed"])
+        d.to_csv(RU.TASK_DIR / f"grid_{c}.tsv", sep="\t", index=False)
+        n = rows[(rows.cohort == c) & (rows.reuse != "")]
+        n.to_csv(RU.TASK_DIR / f"grid_{c}_none.tsv", sep="\t", index=False)
+        print(c, "train rows", len(d), "none", len(n), d.groupby("tier").size().to_dict(), flush=True)
+
+
+def arms():
+    d = pd.DataFrame(RU.arm_grid())
+    d["duplicate_of"] = ""
+    a = pd.read_csv(RU.TASK_DIR / "grid_all.tsv", sep="\t", keep_default_na=False)
+    key = ["cohort", "alt", "effect", "band", "share", "seed"]
+    a = a[a.alt != "none"].astype({"effect": float, "share": float, "seed": int})
+    d = d.merge(a[key + ["n_pairs", "share_achieved"]], on=key, how="left")
+    d = d.sort_values(["tier", "alt", "cohort", "arm", "seed"], key=lambda x: x.map({"none": "0"}).fillna(x) if x.name == "alt" else x)
+    d.to_csv(RU.TASK_DIR / "grid_arms.tsv", sep="\t", index=False)
+    print(d.groupby(["tier", "arm"]).size())
+
+
+if __name__ == "__main__":
+    import sys
+
+    arms() if "arms" in sys.argv else main()

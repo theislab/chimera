@@ -1,4 +1,0 @@
-run_name	args
-o2-test_hmouse-s42	--config A --max-epochs 200 --adata data/revision/O1/repair_testis/human_mouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-o2-test_hmouse-s43	--config A --max-epochs 200 --adata data/revision/O1/repair_testis/human_mouse.h5ad --seed 43 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-o2-test_hmouse-s44	--config A --max-epochs 200 --adata data/revision/O1/repair_testis/human_mouse.h5ad --seed 44 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

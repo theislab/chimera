@@ -1,0 +1,26 @@
+job	method	cohort	object	n_species	h5ad	recipe
+chimera-liv_hmouse-full-r1	chimera	liv_hmouse	full	2	data/processed/camex_human_mouse.h5ad	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+chimera-liv_hmouse-full-r2	chimera	liv_hmouse	full	2	data/processed/camex_human_mouse.h5ad	--config A --max-epochs 150 --adv-weight 200 --free-bits 1.0
+direct-liv_hmouse-full-r1	direct	liv_hmouse	full	2	data/processed/camex_human_mouse.h5ad	
+saturn-liv_hmouse-full-r1	saturn	liv_hmouse	full	2	data/processed/camex_human_mouse.h5ad	
+camex-liv_hmouse-full-r1	camex	liv_hmouse	full	2	data/processed/camex_human_mouse.h5ad	
+chimera-test_hmouse-full-r1	chimera	test_hmouse	full	2	data/processed/camex_testis_human_mouse.h5ad	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+chimera-test_hmouse-full-r2	chimera	test_hmouse	full	2	data/processed/camex_testis_human_mouse.h5ad	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+direct-test_hmouse-full-r1	direct	test_hmouse	full	2	data/processed/camex_testis_human_mouse.h5ad	
+saturn-test_hmouse-full-r1	saturn	test_hmouse	full	2	data/processed/camex_testis_human_mouse.h5ad	
+camex-test_hmouse-full-r1	camex	test_hmouse	full	2	data/processed/camex_testis_human_mouse.h5ad	
+chimera-kidney-full-r1	chimera	kidney	full	2	data/analysis/disease_kidney/kidney_healthy_train.h5ad	--config A --max-epochs 200 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+chimera-kidney-full-r2	chimera	kidney	full	2	data/analysis/disease_kidney/kidney_healthy_train.h5ad	--config A --max-epochs 200 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+direct-kidney-full-r1	direct	kidney	full	2	data/analysis/disease_kidney/kidney_healthy_train.h5ad	
+saturn-kidney-full-r1	saturn	kidney	full	2	data/analysis/disease_kidney/kidney_healthy_train.h5ad	
+camex-kidney-full-r1	camex	kidney	full	2	data/analysis/disease_kidney/kidney_healthy_train.h5ad	
+chimera-test_hmouse-f25-r1	chimera	test_hmouse	f25	2	data/analysis/B1/trackD/test_hmouse_f25.h5ad	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+direct-test_hmouse-f25-r1	direct	test_hmouse	f25	2	data/analysis/B1/trackD/test_hmouse_f25.h5ad	
+saturn-test_hmouse-f25-r1	saturn	test_hmouse	f25	2	data/analysis/B1/trackD/test_hmouse_f25.h5ad	
+camex-test_hmouse-f25-r1	camex	test_hmouse	f25	2	data/analysis/B1/trackD/test_hmouse_f25.h5ad	
+chimera-test_hmouse-f50-r1	chimera	test_hmouse	f50	2	data/analysis/B1/trackD/test_hmouse_f50.h5ad	--config A --max-epochs 200 --adv-weight 200 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+direct-test_hmouse-f50-r1	direct	test_hmouse	f50	2	data/analysis/B1/trackD/test_hmouse_f50.h5ad	
+saturn-test_hmouse-f50-r1	saturn	test_hmouse	f50	2	data/analysis/B1/trackD/test_hmouse_f50.h5ad	
+camex-test_hmouse-f50-r1	camex	test_hmouse	f50	2	data/analysis/B1/trackD/test_hmouse_f50.h5ad	
+chimera-test_3sp-full-r1	chimera	test_3sp	full	3	data/processed/camex_testis_unified.h5ad	--config A --max-epochs 100 --adv-weight 100 --lambda-anchor 0.001 --free-bits 1.0 --lambda-mmd 50 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
+chimera-liv_4sp-full-r1	chimera	liv_4sp	full	4	data/processed/camex_pancreas_unified.h5ad	--config A --max-epochs 200 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0

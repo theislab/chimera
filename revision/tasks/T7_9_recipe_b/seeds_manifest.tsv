@@ -1,5 +1,0 @@
-run_name	args
-rev-isl-s43	--config A --max-epochs 200 --adata data/revision/disease_islet/islet_healthy_train.h5ad --seed 43 --batch-key batch --adv-weight 200 --lambda-anchor 0.006 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-isl-s44	--config A --max-epochs 200 --adata data/revision/disease_islet/islet_healthy_train.h5ad --seed 44 --batch-key batch --adv-weight 200 --lambda-anchor 0.006 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-isl-s45	--config A --max-epochs 200 --adata data/revision/disease_islet/islet_healthy_train.h5ad --seed 45 --batch-key batch --adv-weight 200 --lambda-anchor 0.006 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-isl-s46	--config A --max-epochs 200 --adata data/revision/disease_islet/islet_healthy_train.h5ad --seed 46 --batch-key batch --adv-weight 200 --lambda-anchor 0.006 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

@@ -1,0 +1,37 @@
+name	args
+full:PCA	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method pca --seed 42
+full:Harmony	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method harmony --batch-key batch --seed 42
+full:scVI-sp	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method scvi --batch-key species --seed 42
+full:scVI-donor	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method scvi --batch-key batch --seed 42
+full:scANVI	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+full:sysVI	--adata data/analysis/van_zyl/van_zyl_unified.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+hmouse:PCA	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method pca --seed 42
+hmouse:Harmony	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method harmony --batch-key batch --seed 42
+hmouse:scVI-sp	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method scvi --batch-key species --seed 42
+hmouse:scVI-donor	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method scvi --batch-key batch --seed 42
+hmouse:scANVI	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+hmouse:sysVI	--adata data/analysis/van_zyl/van_zyl_hmouse.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+hmmul:PCA	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method pca --seed 42
+hmmul:Harmony	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method harmony --batch-key batch --seed 42
+hmmul:scVI-sp	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method scvi --batch-key species --seed 42
+hmmul:scVI-donor	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method scvi --batch-key batch --seed 42
+hmmul:scANVI	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+hmmul:sysVI	--adata data/analysis/van_zyl/van_zyl_hmmul.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+primates:PCA	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method pca --seed 42
+primates:Harmony	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method harmony --batch-key batch --seed 42
+primates:scVI-sp	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method scvi --batch-key species --seed 42
+primates:scVI-donor	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method scvi --batch-key batch --seed 42
+primates:scANVI	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+primates:sysVI	--adata data/analysis/van_zyl/van_zyl_primates.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+hpig:PCA	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method pca --seed 42
+hpig:Harmony	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method harmony --batch-key batch --seed 42
+hpig:scVI-sp	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method scvi --batch-key species --seed 42
+hpig:scVI-donor	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method scvi --batch-key batch --seed 42
+hpig:scANVI	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+hpig:sysVI	--adata data/analysis/van_zyl/van_zyl_hpig.h5ad --method sysvi --batch-key batch --species-key species --seed 42
+hmfas:PCA	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method pca --seed 42
+hmfas:Harmony	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method harmony --batch-key batch --seed 42
+hmfas:scVI-sp	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method scvi --batch-key species --seed 42
+hmfas:scVI-donor	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method scvi --batch-key batch --seed 42
+hmfas:scANVI	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method scanvi --batch-key batch --labels-key cell_type_harmonised --seed 42
+hmfas:sysVI	--adata data/analysis/van_zyl/van_zyl_hmfas.h5ad --method sysvi --batch-key batch --species-key species --seed 42

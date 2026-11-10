@@ -1,0 +1,70 @@
+# T7.9 Islet healthy-model recipe, grid B: fixed grid, selection rule unchanged
+
+Second grid, declared after the first grid (`analysis/tasks/T7_9_recipe/`, rows 1-8) failed G-D2 in
+every row. It was decided from training-health results only (saturation, NaN, active dims, mixing);
+no Δα beyond the gate, no S_g, no DE, disease or biology readout was read. The grid and this README
+are committed before any grid-B run, and the selection rule and its thresholds are those of the first
+grid, unchanged (`select_recipe.py` differs from `T7_9_recipe/select_recipe.py` only in paths).
+
+Cohort: `data/analysis/disease_islet/islet_healthy_train.h5ad`, rebuilt with no mitochondrial cut
+(`analysis/tasks/T7_9_islet/build.py`), K = 2.
+
+## Why the first grid saturated (health results only)
+
+| Run | frac(α > 0.95) | kNN mixing entropy |
+|---|---|---|
+| canonical testis H+Mouse (iter111) | 0.002 | 0.40 |
+| canonical testis 3-sp | 0.013 | |
+| canonical liver H+Mouse iter90 s42 / s43 | 0.017 / 0.049 | 0.25 / 0.50 |
+| islet grid 1 (base) / 4 (mmd 100) | 0.082 / 0.096 | 0.32 / 0.52 |
+| islet grid 2, 5, 6 (adv 100, anc 0.0015, fb 1.5) | 0.12-0.23 | 0.05-0.12 |
+| islet grid 7, 8 (unclamped) | 0.42-0.44 | 0.02 |
+| islet grid 3 (adv 300, mmd 50) | NaN at epoch 167 | |
+
+1. **Unclamped rows saturate by construction.** α starts at π because the correction is
+   zero-initialised, and 33.8% of genes sit at the stored cap of 0.95. Any positive correction on
+   them gives α > 0.95. Grid B has no unclamped row.
+2. **Clamped rows saturate when species mix poorly.** On a clamped prior (0.85), α > 0.95 needs a
+   correction of about +1.2 logit units. Large positive corrections appear where the shared decoder
+   does not explain a species' expression, which is where species stay apart. The poorly mixed rows
+   saturate most, and the best-mixed rows (1, 4) least.
+3. **The islet object makes mixing harder than the testis.** The mouse training cells are
+   β-dominated (27,845 of 34,655 before caps). Mouse ductal (66) and stellate (153) are thin in the
+   conditional MMD, and two technical batches per species are used where the canonical cohorts have
+   one or two.
+
+So grid B stays on the coupled pair (conditional MMD on `cell_ontology_class`, clamp 0.85), as the
+canonical testis recipes do. It raises alignment pressure around the best-mixed row 4 (λ_mmd 100 →
+150, 200; adversary 200 or 300), and on half the rows doubles λ_anc, which holds α nearer π. Gate
+thresholds are not changed. The R5 notes (saturation counts capped-prior genes; the tail test is taken
+against the clamped prior) are recorded in the plan's amendment log for any later grid; they are not
+applied here.
+
+## Grid (`grid.tsv`, 8 configurations, seed 42, names `rev-isl-grid<k>-s42`, k = 9-16)
+
+| k | adv | anc | mmd | fb | clamp / cond. MMD | epochs | role |
+|---|---|---|---|---|---|---|---|
+| 9 | 200 | 0.003 | 100 | 1.0 | 0.85 / cell_ontology_class | 200 | first-grid row 4 on the rebuilt object |
+| 10 | 200 | 0.003 | 150 | 1.0 | same | 200 | stronger MMD |
+| 11 | 200 | 0.003 | 200 | 1.0 | same | 200 | stronger MMD |
+| 12 | 300 | 0.003 | 150 | 1.0 | same | 200 | stronger adversary and MMD |
+| 13 | 300 | 0.003 | 200 | 1.0 | same | 200 | stronger adversary and MMD |
+| 14 | 200 | 0.006 | 100 | 1.0 | same | 200 | anchor doubled |
+| 15 | 200 | 0.006 | 150 | 1.0 | same | 200 | anchor doubled, stronger MMD |
+| 16 | 200 | 0.006 | 200 | 1.0 | same | 200 | anchor doubled, stronger MMD |
+
+All: `--config A --accelerator cpu --batch-key batch --celltype-key cell_ontology_class`,
+`cpu_p` / `cpu_normal`, 16 CPUs, 64G, 23:50, array of 8 over `manifest.tsv`.
+
+## Selection (`select_recipe.py`, rule unchanged from the first grid)
+
+1. G-D2 per finished run: no NaN (and no E2.1 failure); each α tail (α > 0.95, α < 0.05) ≤ 5%;
+   10/10 active z dims (Var(z_mean) ≥ 0.01); α − π > 0.05 and < −0.05 each in ≥ 2% of genes.
+2. Among passing runs, the highest composite of `compute_integration_metrics` (k = 15, seed 42,
+   labels `cell_ontology_class`), min-max over passing runs, 0.4 mixing + 0.6 biology; ties go to
+   the lower id.
+3. The selected configuration is trained at seeds 43-46 (`rev-isl-s<seed>`); its grid run is s42.
+   If no row passes, islet training stops and H-D1 is not testable; H-D4 stands.
+4. `run_report.py` reports, for every run, the α − π sign profile against the clamped and the raw
+   prior, mixing entropy, species purity and adversarial accuracy. A seed below 0.75 × the selected
+   run's mixing entropy is flagged and reported separately.

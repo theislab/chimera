@@ -99,7 +99,7 @@ pytest -q
 
 Versions of the core dependencies are pinned in [`pyproject.toml`](pyproject.toml) to those
 the checkpoints were trained with. On Linux x86-64,
-`bash revision/envs/build_env_from_lock.sh chimera_env` builds the CPU environment with every
+`bash analysis/envs/build_env_from_lock.sh chimera_env` builds the CPU environment with every
 package at the version of the lock file used for the revision analyses. Training defaults to `--accelerator mps`; on Linux pass
 `--accelerator cpu` or `--accelerator gpu`.
 
@@ -125,7 +125,7 @@ The `panc_*` and `pancreas_*` names in code and file names refer to the **liver*
 [`REPRODUCE.md`](REPRODUCE.md) describes how to regenerate every analysis from the archived
 artefacts. The canonical training recipes are listed in
 [`configs/canonical_recipes.tsv`](configs/canonical_recipes.tsv), and
-[`revision/reproduce_smoke.sh`](revision/reproduce_smoke.sh) checks a checkout against the
+[`analysis/reproduce_smoke.sh`](analysis/reproduce_smoke.sh) checks a checkout against the
 archived runs.
 
 ### Training on a new cohort

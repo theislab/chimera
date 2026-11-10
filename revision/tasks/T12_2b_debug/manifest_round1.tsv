@@ -1,4 +1,0 @@
-run_name	args
-rev-bm-dbg-prop25k-g1	--config A --max-epochs 40 --adata data/revision/bone_marrow/debug/bm_dbg_prop25k.h5ad --seed 42 --adv-weight 150 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --batch-key species
-rev-bm-dbg-prop25k-g2	--config A --max-epochs 40 --adata data/revision/bone_marrow/debug/bm_dbg_prop25k.h5ad --seed 42 --adv-weight 100 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85 --batch-key species
-rev-bm-dbg-prop25k-g8	--config A --max-epochs 40 --adata data/revision/bone_marrow/debug/bm_dbg_prop25k.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1 --batch-key species

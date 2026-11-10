@@ -2,7 +2,7 @@
 
 ``ortho_N`` numbers are table-local: the liver, testis and van Zyl ortholog tables
 number their rows independently. These tests pin the cohort-aware lookups in
-``revision/common/gene_ids.py`` and ``notebooks/_paper_utils.py`` and the
+``analysis/common/gene_ids.py`` and ``notebooks/_paper_utils.py`` and the
 ``hsapiens_gene_id`` join used for every cross-tissue comparison.
 
 Data-dependent tests skip when ``data/processed/`` is absent (it is not tracked).
@@ -24,7 +24,7 @@ for p in (REPO, REPO / "notebooks"):
         sys.path.insert(0, str(p))
 
 import _paper_utils as pu  # noqa: E402
-from revision.common import gene_ids  # noqa: E402
+from analysis.common import gene_ids  # noqa: E402
 
 PROCESSED = gene_ids.DATA_PROCESSED
 COHORTS = list(gene_ids.H5ADS)

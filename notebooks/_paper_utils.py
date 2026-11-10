@@ -99,14 +99,14 @@ def load_adata_for_run(run: dict[str, Any]):
 # tables number their rows independently, so the same ``ortho_N`` names
 # different genes in different tables. Every lookup therefore states its
 # cohort, and genes from different tables are joined on ``hsapiens_gene_id``.
-# All lookups delegate to ``revision/common/gene_ids.py``.
+# All lookups delegate to ``analysis/common/gene_ids.py``.
 # ---------------------------------------------------------------------------
 
 def _gene_ids():
     import sys
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
-    from revision.common import gene_ids
+    from analysis.common import gene_ids
     return gene_ids
 
 

@@ -1,0 +1,4 @@
+dataset	h5ad	seed_map	label	beside
+hpig	data/analysis/van_zyl/van_zyl_hpig.h5ad	analysis/tasks/T11_5_vz_genes/seed_map_hpig.tsv	human + pig	False
+hmfas	data/analysis/van_zyl/van_zyl_hmfas.h5ad	analysis/tasks/T11_5_vz_genes/seed_map_hmfas.tsv	human + M. fascicularis	False
+full_g1	data/analysis/van_zyl/van_zyl_unified.h5ad	analysis/tasks/T11_3_vz_seeds/seed_map.tsv	5 species, grid 1	True

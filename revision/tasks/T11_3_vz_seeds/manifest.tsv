@@ -1,5 +1,0 @@
-run_name	args
-rev-vz-s43	--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 43 --batch-key source_batch --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.5 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-vz-s44	--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 44 --batch-key source_batch --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.5 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-vz-s45	--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 45 --batch-key source_batch --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.5 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-vz-s46	--config A --max-epochs 200 --adata data/revision/van_zyl/van_zyl_unified.h5ad --seed 46 --batch-key source_batch --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.5 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

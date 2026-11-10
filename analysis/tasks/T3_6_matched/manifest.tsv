@@ -1,0 +1,4 @@
+run_name	args
+rev-ctl-liv_4sp-matchA-s42	--config A --max-epochs 200 --adata data/analysis/controls/liv_4sp_matchA.h5ad --seed 42 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-ctl-liv_4sp-matchA-s43	--config A --max-epochs 200 --adata data/analysis/controls/liv_4sp_matchA.h5ad --seed 43 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0
+rev-ctl-liv_4sp-matchA-s44	--config A --max-epochs 200 --adata data/analysis/controls/liv_4sp_matchA.h5ad --seed 44 --adv-weight 200 --lambda-anchor 0.001 --lambda-mmd 100 --free-bits 1.0

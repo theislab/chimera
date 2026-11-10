@@ -1,3 +1,0 @@
-run_name	args
-rev-vz-primates-s43	--config A --max-epochs 100 --adata data/revision/van_zyl/van_zyl_primates.h5ad --seed 43 --batch-key source_batch --celltype-key cell_ontology_class --adv-weight 100 --lambda-anchor 0.001 --lambda-mmd 50 --free-bits 1 --celltype-conditional-mmd --prior-clamp-max 0.85
-rev-vz-primates-s44	--config A --max-epochs 100 --adata data/revision/van_zyl/van_zyl_primates.h5ad --seed 44 --batch-key source_batch --celltype-key cell_ontology_class --adv-weight 100 --lambda-anchor 0.001 --lambda-mmd 50 --free-bits 1 --celltype-conditional-mmd --prior-clamp-max 0.85

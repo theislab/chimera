@@ -1,0 +1,35 @@
+kind	key	value	note
+input	consensus	results/analysis/T3_3/{cohort}__consensus.csv	T3.3 consensus D (column D); cohorts liv_hmouse, test_hmouse, liv_4sp, test_3sp
+input	consensus_done	results/analysis/T3_3/DONE	the official run starts only when this exists
+input	seed_pooling	results/analysis/T3_3/seed_pooling.json	seeds used in D (per-seed D re-read from training/runs/<run>/final_state.npz)
+input	baselines	results/analysis/T4_2/baselines__{cohort}.csv	B1b, B1c, B1z, B2b, B3a (T4.2)
+input	baseline_summary	results/analysis/T4_2/summary__{cohort}.json	shared types per cohort
+input	margin	results/analysis/T2_5/{cohort}__genes.parquet	T2.5 margin-support flag (canonical run)
+input	contributions	results/analysis/T2_5/liv_hmouse__C_gk.parquet	T2.5 per-type contributions (cell-type drivers)
+input	cds	results/analysis/T2_4/cds_features.csv	log human CDS length
+input	h5ad	data/processed/{h5ad}.h5ad	training cohorts: covariates, tau, 72 GIN features (64 ESM PCs)
+input	evee	data/analysis/gold/G1/evolutionary_statistics.zip	H1, H2
+input	evee_map	results/analysis/T4_1/evee_symbol_to_ensg.tsv	T4.1 symbol map
+input	ts_liver	data/analysis/gold/G2/ts_liver.h5ad	H3
+input	tms_liver	data/analysis/gold/G3/tms_liver_10x.h5ad	H3
+input	h3_label_map	../chimera-private/reviews/cell_system_review_1/response/tools/h3_label_map.tsv	committed at T0.2
+input	murat	data/raw/camex/2testis/dataset/raw-testis-{species}-Murat.h5ad	H4, 8 held-out species
+input	h4_map	results/analysis/T4_1/h4_ortholog_map_one2one_union.tsv.gz	H4 1:1 map, union of both Compara files (h4_map_union.py)
+input	loeuf	data/analysis/gold/G7/gnomad.v4.1.constraint_metrics.tsv	H8
+input	dnds	results/analysis/T4_1/dnds99_hmouse_union.tsv	H8, Compara 99 human-mouse, both files
+input	hk	results/analysis/T4_1/hk_symbol_to_ensg.tsv	C1
+input	hgnc	data/analysis/gold/G10/hgnc_complete_set.txt	C2, symbol mapping
+input	hgnc_family	data/analysis/gold/G10/hgnc_family.csv	C2
+input	hgnc_hierarchy	data/analysis/gold/G10/hgnc_hierarchy.csv	C2
+input	hgnc_gene_family	data/analysis/gold/G10/hgnc_gene_has_family.csv	C2
+input	hallmark	~/.cache/gseapy/Enrichr.MSigDB_Hallmark_2020.gmt	V1, V2
+input	goa	data/analysis/gold/G10/goa_human.gaf.gz	V3
+input	go_obo	data/analysis/gold/G10/go-basic.obo	V3
+input	gtf	data/analysis/ensembl110/Homo_sapiens.GRCh38.110.gtf.gz	symbol mapping, chromosomes
+step	golds	python -m analysis.tasks.T4_3_scoreboard.golds	gold tables and split halves -> results/analysis/T4_3/golds/
+step	baseline_splits	python -m analysis.tasks.T4_3_scoreboard.baseline_splits --cohorts liv_hmouse,test_hmouse	cell-half baselines -> results/analysis/T4_3/baseline_splits/
+step	b3b_consensus	python analysis/tasks/T4_2_gene_baselines/run.py --cohorts liv_hmouse,test_hmouse,liv_4sp,test_3sp --delta-alpha results/analysis/T3_3/{cohort}__consensus.csv --delta-column D --force --outdir results/analysis/T4_3/baselines_consensusD	B3b on the consensus D (T4.2 code; run.py checks its in-process B3b against it)
+step	scoreboard	python -m analysis.tasks.T4_3_scoreboard.run --mode real	all tests, decide.py (row.json), figures.py; DONE last
+step	verify_primary	python -m analysis.tasks.T4_3_scoreboard.verify_primary	post-run check: H1-H4 recomputed without stats.py or controls.py; covariate decomposition (exploratory)
+step	calibration_dominant	python -m analysis.tasks.T4_3_scoreboard.calibration_dominant	post-run check: set test on random sets from cell-type-dominated gene pools
+step	dominance_exploratory	python -m analysis.tasks.T4_3_scoreboard.dominance_exploratory	exploratory, post hoc: Family 2 and H1-H4 with dominance added; enters no status, row or modifier

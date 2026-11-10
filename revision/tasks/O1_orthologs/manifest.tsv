@@ -1,3 +1,0 @@
-run_name	args
-o1-liv_hmouse-s42	--config A --max-epochs 150 --adata data/revision/O1/rebuild_t3/liver_hmouse.h5ad --seed 42 --adv-weight 200 --free-bits 1.0
-o1-liv_hmouse-s43	--config A --max-epochs 150 --adata data/revision/O1/rebuild_t3/liver_hmouse.h5ad --seed 43 --adv-weight 200 --free-bits 1.0

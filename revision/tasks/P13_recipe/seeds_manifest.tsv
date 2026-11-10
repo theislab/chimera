@@ -1,5 +1,0 @@
-run_name	args
-rev-kid-s43	--config A --max-epochs 200 --adata data/revision/disease_kidney/kidney_healthy_train.h5ad --seed 43 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-kid-s44	--config A --max-epochs 200 --adata data/revision/disease_kidney/kidney_healthy_train.h5ad --seed 44 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-kid-s45	--config A --max-epochs 200 --adata data/revision/disease_kidney/kidney_healthy_train.h5ad --seed 45 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-kid-s46	--config A --max-epochs 200 --adata data/revision/disease_kidney/kidney_healthy_train.h5ad --seed 46 --batch-key batch --adv-weight 300 --lambda-anchor 0.003 --lambda-mmd 50 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

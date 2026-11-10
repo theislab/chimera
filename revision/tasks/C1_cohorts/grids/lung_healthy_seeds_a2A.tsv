@@ -1,3 +1,0 @@
-run_name	args
-rev-c1-lung-healthy-a2A-s43	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/lung_healthy.h5ad --seed 43 --batch-key batch --adv-weight 133 --lambda-anchor 0.00328 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85
-rev-c1-lung-healthy-a2A-s44	--config A --max-epochs 200 --adata data/revision/new_usecases/c1_build/objects/lung_healthy.h5ad --seed 44 --batch-key batch --adv-weight 133 --lambda-anchor 0.00328 --lambda-mmd 100 --free-bits 1.0 --celltype-conditional-mmd --celltype-key cell_ontology_class --prior-clamp-max 0.85

@@ -1,8 +1,0 @@
-tool	stem	labels	seed	work	dest
-saturn	camex_human_monkey	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_human_monkey-s42	training/runs/baselines_saturn_leiden/camex_human_monkey-s42
-saturn	camex_human_mouse	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_human_mouse-s42	training/runs/baselines_saturn_leiden/camex_human_mouse-s42
-saturn	camex_human_zebrafish	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_human_zebrafish-s42	training/runs/baselines_saturn_leiden/camex_human_zebrafish-s42
-saturn	camex_pancreas_unified	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_pancreas_unified-s42	training/runs/baselines_saturn_leiden/camex_pancreas_unified-s42
-saturn	camex_testis_human_macaque	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_testis_human_macaque-s42	training/runs/baselines_saturn_leiden/camex_testis_human_macaque-s42
-saturn	camex_testis_human_mouse	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_testis_human_mouse-s42	training/runs/baselines_saturn_leiden/camex_testis_human_mouse-s42
-saturn	camex_testis_unified	leiden_within	42	results/revision/T5_3/saturn_leiden/camex_testis_unified-s42	training/runs/baselines_saturn_leiden/camex_testis_unified-s42

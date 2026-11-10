@@ -1,0 +1,5 @@
+run_name	args
+rev-ctl-liv_hmouse-priorswap-s45	--config A --max-epochs 150 --adata data/analysis/controls/liv_hmouse_priorswap.h5ad --seed 45 --adv-weight 200 --free-bits 1.0 --batch-key batch
+rev-ctl-liv_hmouse-priorswap-s46	--config A --max-epochs 150 --adata data/analysis/controls/liv_hmouse_priorswap.h5ad --seed 46 --adv-weight 200 --free-bits 1.0 --batch-key batch
+rev-ctl-liv_hmouse-priorswap-s47	--config A --max-epochs 150 --adata data/analysis/controls/liv_hmouse_priorswap.h5ad --seed 47 --adv-weight 200 --free-bits 1.0 --batch-key batch
+rev-ctl-liv_hmouse-priorswap-s48	--config A --max-epochs 150 --adata data/analysis/controls/liv_hmouse_priorswap.h5ad --seed 48 --adv-weight 200 --free-bits 1.0 --batch-key batch

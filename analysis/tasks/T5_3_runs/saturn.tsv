@@ -1,0 +1,8 @@
+tool	stem	labels	seed	work	dest
+saturn	camex_human_monkey	cell_type	42	results/analysis/T5_3/saturn/camex_human_monkey-s42	training/runs/baselines_saturn/camex_human_monkey-s42
+saturn	camex_human_mouse	cell_type	42	results/analysis/T5_3/saturn/camex_human_mouse-s42	training/runs/baselines_saturn/camex_human_mouse-s42
+saturn	camex_human_zebrafish	cell_type	42	results/analysis/T5_3/saturn/camex_human_zebrafish-s42	training/runs/baselines_saturn/camex_human_zebrafish-s42
+saturn	camex_pancreas_unified	cell_type	42	results/analysis/T5_3/saturn/camex_pancreas_unified-s42	training/runs/baselines_saturn/camex_pancreas_unified-s42
+saturn	camex_testis_human_macaque	cell_type	42	results/analysis/T5_3/saturn/camex_testis_human_macaque-s42	training/runs/baselines_saturn/camex_testis_human_macaque-s42
+saturn	camex_testis_human_mouse	cell_type	42	results/analysis/T5_3/saturn/camex_testis_human_mouse-s42	training/runs/baselines_saturn/camex_testis_human_mouse-s42
+saturn	camex_testis_unified	cell_type	42	results/analysis/T5_3/saturn/camex_testis_unified-s42	training/runs/baselines_saturn/camex_testis_unified-s42
