@@ -38,7 +38,7 @@ def extract(run_dir: Path, sidecar: bool = False) -> dict:
         print(f"  use_per_gene_bias=False — skipping (correction = MLP only).")
         return {}
 
-    adata_path = Path("/Users/kemalinecik/git_nosync/master_chimera/chimera") / cfg["adata_path"]
+    adata_path = Path(__file__).resolve().parents[1] / cfg["adata_path"]  # adata_path is relative to the repository root
     adata = ad.read_h5ad(adata_path)
     # Re-apply the prior clamp the same way train_and_diagnose did, so the
     # buffer matches the training-time conservation_prior.

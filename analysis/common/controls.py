@@ -1,6 +1,6 @@
-"""Shared pieces of the control analyses (T3.4-T3.6): seed consensus, covariate residuals, floor, calls.
+"""Shared pieces of the control analyses (tasks T3_4, T3_5, T3_6): seed consensus, covariate residuals, floor, calls.
 
-Definitions follow the pre-specified analysis plan (sections 2, 3 and 9):
+Definitions follow the pre-specified analysis plan:
 
 * D for a run is ``alpha - prior`` from ``final_state.npz`` (prior as the run anchored on it,
   i.e. clamped on testis recipes). The consensus is the mean over seeds; the cohort median
@@ -23,8 +23,8 @@ from scipy.stats import spearmanr
 from analysis.common import cohorts as C
 from analysis.common import gene_ids
 
-# Seeds that make up D per cohort (canonical s42, MPS seeds where they exist, T3.2 CPU seeds).
-# The T3.1 seed-pooling rule may drop a seed; pass ``drop`` to the functions below.
+# Seeds that make up D per cohort (canonical s42, MPS seeds where they exist, the CPU seeds of T3_2_seeds).
+# The seed-pooling rule (T3_3_consensus) may drop a seed; pass ``drop`` to the functions below.
 SEED_SETS = {
     "liv_hmouse": {42: "xds-hmouse-iter90-150ep-s42", 43: "xds-hmouse-iter90-150ep-s43",
                    44: "xds-hmouse-iter90-150ep-s44", 45: "rev-liv_hmouse-s45", 46: "rev-liv_hmouse-s46"},

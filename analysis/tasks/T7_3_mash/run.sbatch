@@ -11,9 +11,11 @@
 # Stages: fits (sensitivity, permuted, bulk, batch control), analysis (H-D1, H-D1b, H-D4), t78.
 # guilliams.py runs first.
 set -uo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
 export PYTHONUNBUFFERED=1 MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
-cd "${CHIMERA_ROOT:-/home/icb/kemal.inecik/lustre_workspace/master_chimera/chimera}" || exit 2
+cd "${CHIMERA_ROOT:-${SLURM_SUBMIT_DIR:-$PWD}}" || exit 2
+[[ -d analysis/tasks ]] || { echo "submit from the repository root or set CHIMERA_ROOT" >&2; exit 2; }
 export PYTHONPATH=$PWD
 py() { mamba run --no-capture-output -n revision_de_env python "$@"; }
 case "$1" in

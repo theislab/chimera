@@ -1,4 +1,4 @@
-"""Canonical cohorts, run state and per-gene covariates shared by the T2 analyses.
+"""Canonical cohorts, run state and per-gene covariates shared by the analyses.
 
 Read-only on ``training/runs`` and ``data/processed``. Gene identity goes through
 ``gene_ids`` only; cross-tissue joins use ``hsapiens_gene_id``.
@@ -104,7 +104,7 @@ def gene_covariates(adata) -> pd.DataFrame:
     ``tau`` uses species-balanced cell-type means of CP10K (types with >= 20 cells,
     species-type groups with >= 10 cells). ``ppass`` is the probability that a gene
     passes the >= 20 expressing-cell mask in a 256-cell batch under sqrt-species sampling.
-    Species-balanced (05 section 3): mean over species of species mean log1p CP10K, and of
+    Species-balanced (pre-specified analysis plan): mean over species of species mean log1p CP10K, and of
     species detection fractions.
     """
     import scipy.sparse as sp

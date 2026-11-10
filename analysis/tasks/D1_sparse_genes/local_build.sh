@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Inside an existing allocation: remaining forward margins, then gene tables, four cohorts at a time.
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH PYTHONPATH=$PWD OMP_NUM_THREADS=3 MKL_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 SLURM_CPUS_PER_TASK=3
+# Run from the repository root with mamba on PATH.
+export PYTHONPATH=$PWD OMP_NUM_THREADS=3 MKL_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 SLURM_CPUS_PER_TASK=3
 PY="mamba run --no-capture-output -n chimera_env python"
 for c in islet bone_marrow; do [ -f results/analysis/D1/fwd/$c.parquet ] || $PY -m analysis.tasks.D1_sparse_genes.fwd --cohort $c > results/analysis/D1/logs/fwd_$c.log 2>&1 & done
 wait

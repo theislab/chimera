@@ -5,7 +5,7 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=$PW
 R="mamba run -n chimera_env python -m analysis.tasks.E4_translational"
 bash analysis/tasks/E4_translational/fetch.sh
 $R.annot
-$R.analysis tables q1 q23
+$R.q1_q3_stats tables q1 q23
 $R.names
 $R.summarize
 $R.q1_followup

@@ -289,7 +289,7 @@ def build_cohort(args) -> dict:
         ck["max_abs_diff_D_task_table"] = float(np.abs(g["D"] - tt["D"].reindex(vn)).max())
     ck["n_saturated_flag"] = int(g.saturated_flag.sum())
     tidy = RES / "T11" / "genes" / f"genes_{c[3:]}.tsv"
-    if c.startswith("vz_") and tidy.exists():  # the tidy table of the eye agent: same genes, same flag
+    if c.startswith("vz_") and tidy.exists():  # the tidy table of the eye cohort (T11_7_vz_figure): same genes, same flag
         ty = pd.read_csv(tidy, sep="\t").set_index("var_name").reindex(vn)
         ck["n_saturated_flag_differs_T11"] = int((ty["saturated_flag"].astype(bool).to_numpy() != g.saturated_flag.to_numpy()).sum())
         ck["max_abs_diff_D_tidy"] = float(np.abs(g["D"] - ty["delta_alpha_centred"]).max())

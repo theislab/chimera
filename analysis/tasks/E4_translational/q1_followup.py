@@ -10,7 +10,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from analysis.tasks.E4_translational import analysis as A
+from analysis.tasks.E4_translational import q1_q3_stats as A
 from analysis.tasks.E4_translational import rules as RU
 
 

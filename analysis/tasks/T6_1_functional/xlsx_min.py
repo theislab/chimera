@@ -1,6 +1,6 @@
 """Read one worksheet of an .xlsx file with the standard library only.
 
-The revision environments carry no Excel reader. Cells are placed by their column
+The analysis environments carry no Excel reader. Cells are placed by their column
 reference, so empty cells keep their position.
 """
 

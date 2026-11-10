@@ -32,7 +32,7 @@ PAT = re.compile(r"human_symbol=([^&\"]*)&probeset_id=([^&\"]*)&mouse_symbol=([^
 
 def query(symbol: str) -> dict:
     data = urllib.parse.urlencode({"sTermHuman": symbol, "submit_term_human": "Search"}).encode()
-    req = urllib.request.Request(URL, data=data, headers={"User-Agent": "chimera-revision-crosscheck"})
+    req = urllib.request.Request(URL, data=data, headers={"User-Agent": "chimera-crosscheck"})
     with urllib.request.urlopen(req, timeout=60) as r:
         html = r.read().decode("utf8", errors="replace")
     m = PAT.search(html)

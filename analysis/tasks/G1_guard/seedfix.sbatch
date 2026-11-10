@@ -10,7 +10,9 @@
 # G1, seed fix in training/train_and_diagnose.py set_seed(). usage: sbatch seedfix.sbatch <base tree> <fixed tree>. One node, one thread.
 #   base, split pinned to the seed by the harness  vs  fixed, nothing pinned (twice): identical means the fix only seeds the split, and new fits repeat.
 set -uo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH PYTHONUNBUFFERED=1 MPLBACKEND=Agg OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
 base=$1; fixed=$2; here=$PWD/analysis/tasks/G1_guard; data=$PWD/data/processed
 hostname
 fit() { local tree=$1 name=$2 pin=$3; shift 3

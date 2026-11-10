@@ -38,15 +38,11 @@ RCLONE_BIN="${RCLONE_BIN:-}"
 if [[ -z "$RCLONE_BIN" ]]; then
   if command -v rclone >/dev/null 2>&1; then
     RCLONE_BIN="$(command -v rclone)"
-  elif [[ -x "$HOME/tools/apps/mamba/envs/tardis_env/bin/rclone" ]]; then
-    RCLONE_BIN="$HOME/tools/apps/mamba/envs/tardis_env/bin/rclone"
-  elif [[ -x "/Users/kemalinecik/tools/apps/mamba/envs/tardis_env/bin/rclone" ]]; then
-    RCLONE_BIN="/Users/kemalinecik/tools/apps/mamba/envs/tardis_env/bin/rclone"
   fi
 fi
 
 if [[ -z "$RCLONE_BIN" ]]; then
-  echo "Error: rclone not found in PATH or tardis_env." >&2
+  echo "Error: rclone not found in PATH; install it or set RCLONE_BIN." >&2
   exit 1
 fi
 

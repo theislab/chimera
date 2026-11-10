@@ -3,7 +3,7 @@
 Writes results/analysis/E4/{tables/cohorts.parquet, q1_concordance.csv, q1_per_cohort.csv, q1_not.csv, q23_sets.csv,
 q23_contrast.csv, q23_partial.csv, q23_callshare.csv}.
 
-    PYTHONPATH=$PWD mamba run -n chimera_env python -m analysis.tasks.E4_translational.analysis [--quick]
+    PYTHONPATH=$PWD mamba run -n chimera_env python -m analysis.tasks.E4_translational.q1_q3_stats [--quick]
 """
 
 from __future__ import annotations

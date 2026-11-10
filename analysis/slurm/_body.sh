@@ -1,9 +1,12 @@
-# Shared job body, sourced by cpu.sbatch and array.sbatch.
+# Shared job body, sourced by cpu.sbatch and array.sbatch (see analysis/README.md, "Running a task").
+# The repository root is $CHIMERA_ROOT if set, else found from the location of this file.
+# mamba is taken from PATH (or from the folder of $MAMBA_EXE / $CONDA_EXE of an initialized shell).
 set -uo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1} MKL_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export PYTHONUNBUFFERED=1 MPLBACKEND=Agg
-cd "${CHIMERA_ROOT:-/home/icb/kemal.inecik/lustre_workspace/master_chimera/chimera}" || exit 2
+cd "${CHIMERA_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}" || exit 2
 export PYTHONPATH=$PWD
 
 # Write training/runs/$1/_provenance.json next to the run: SHA, argv, lock hash, job, host.
@@ -26,8 +29,13 @@ PY
 
 # train_run <run_name> <args to run_experiment.py after --run-name>
 # Exit 1 from run_experiment.py means expectations failed, not that the run failed.
+# PRINT_ONLY=1 prints the training command and returns without touching training/runs.
 train_run() {
   local name="$1"; shift
+  if [[ ${PRINT_ONLY:-0} == 1 ]]; then
+    echo "mamba run --no-capture-output -n chimera_env python training/run_experiment.py --run-name $name --accelerator cpu $*"
+    return 0
+  fi
   if [[ -e "training/runs/$name" ]]; then
     if [[ -f "training/runs/$name/summary.json" ]]; then echo "finished: $name"; return 0; fi
     mkdir -p training/runs/_failed

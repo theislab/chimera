@@ -6,12 +6,13 @@
 #   RUN_CHECKPOINT=1 bash analysis/reproduce_smoke.sh   # also load one checkpoint on CPU
 #   RUN_FIGURE=1 bash analysis/reproduce_smoke.sh       # also execute 03_alpha_master
 #
-# Expects the deposited bundles unpacked in place (see REPRODUCE.md): data/processed/ and
-# training/runs/ always; the gene-table check runs when results/gene_tables/ is present and
-# then also needs the revision seed runs; the check of the harmonised per-gene tables of both
-# gates (analysis/check_gene_tables.py) runs when results/analysis/H1 and Z4 are present and
-# needs the free-gate runs too. Writes nothing outside a temporary folder,
-# except the figures that notebook 03 writes when RUN_FIGURE=1.
+# Expects the deposited bundles unpacked in place (REPRODUCE.md, section 3): data_liver_testis and
+# models_canonical always. The check of the consensus tables runs when results/gene_tables/ is
+# present (bundle gene_tables) and then also needs models_seeds_controls_cohorts. The check of the
+# per-gene tables of all 26 cohorts for both gates (analysis/check_gene_tables.py) runs when
+# results/analysis/H1 and Z4 are present (bundle analysis_results) and also needs
+# models_per_gene_gate. Writes nothing outside a temporary folder, except the figures that
+# notebook 03 writes when RUN_FIGURE=1.
 # Exit code 0 means every check passed.
 set -euo pipefail
 
@@ -92,7 +93,7 @@ def run_dir(cohort, seed):
     r = recipe[cohort]
     if str(seed) in r["seeds"].split(","):
         return "training/runs/" + r["run_name"].replace("{seed}", str(seed))
-    return f"training/runs/rev-{cohort}-s{seed}"   # revision seed runs (checkpoints_revision bundle)
+    return f"training/runs/rev-{cohort}-s{seed}"   # further seeds (bundle models_seeds_controls_cohorts)
 
 for cohort in recipe:
     seeds = pooling[cohort]["used"]
@@ -117,8 +118,8 @@ PY
 fi
 
 if [[ -f results/analysis/H1/runs.tsv && -f results/analysis/Z4/h1/kept_used.json ]]; then
-  step "harmonised per-gene tables (both gates) against the deposited runs"
-  # needs revision_results, checkpoints_canonical, checkpoints_revision and checkpoints_free_gate
+  step "per-gene tables of the 26 cohorts (both gates) against the deposited runs"
+  # needs analysis_results, models_canonical, models_seeds_controls_cohorts and models_per_gene_gate
   "$PY" analysis/check_gene_tables.py
 fi
 

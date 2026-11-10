@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=chimera_rev_arr
+#SBATCH --job-name=chimera_arr
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=48G
 #SBATCH --time=23:50:00
-# Usage: sbatch --array=0-N --output=results/analysis/<task>/logs/%x_%A_%a.out \
+# One training run per array task. Submit from the repository root (or set CHIMERA_ROOT):
+#   sbatch --array=0-N --output=results/analysis/<task>/logs/%x_%A_%a.out \
 #          analysis/slurm/array.sbatch <manifest.tsv>
 # Manifest: header line, then "<run_name><TAB><run_experiment args>".
+# Without a cluster: SLURM_ARRAY_TASK_ID=<row> bash analysis/slurm/array.sbatch <manifest.tsv>
+# (PRINT_ONLY=1 prints the training command only). Partition and QOS above are those of the
+# authors' cluster; change them for yours.
 source analysis/slurm/_body.sh
 manifest="$1"
 row=$(sed -n "$((SLURM_ARRAY_TASK_ID + 2))p" "$manifest")

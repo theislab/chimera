@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Metrics for every scored altered fit not yet done, on one node. Usage: bash metrics_all.sh <n_parallel>
+# Metrics for every scored altered fit not yet done, on one node.
+# Usage, from the repository root, inside chimera_env (or with PYTHON=<python of chimera_env>):
+#   bash analysis/tasks/B1_ground_truth/metrics_all.sh <n_parallel>
 export PYTHONPATH=$PWD OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONUNBUFFERED=1 MPLBACKEND=Agg
-PY=/home/icb/kemal.inecik/tools/apps/mamba/envs/chimera_env/bin/python
+PY="${PYTHON:-python}"
 cd results/analysis/B1/scores
 ls | grep '^b1-' | sed 's/.parquet$//' > /dev/null
 cd - > /dev/null

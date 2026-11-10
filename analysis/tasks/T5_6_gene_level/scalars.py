@@ -22,7 +22,7 @@ Secondary scalars are exploratory. The seed value of a scalar is the mean over t
 needs a value in all three, matching D_3 (mean of alpha - prior over seeds 42-44).
 
 Writes results/analysis/T5_6/<cohort>__<arm>.csv (one row per gene the arm covers) and, for T5.6
-analysis.py, results/analysis/T5_6/modules/<cohort>__<arm>__s<seed>.npz.
+scalar_analysis.py, results/analysis/T5_6/modules/<cohort>__<arm>__s<seed>.npz.
 """
 from __future__ import annotations
 

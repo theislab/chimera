@@ -9,7 +9,8 @@
 #SBATCH --output=results/analysis/G1/logs/%x_%j.out
 # G1 step 2. usage: sbatch bitproof.sbatch <before tree> <after tree>. All fits in this one job, so on one node.
 set -uo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
 export PYTHONUNBUFFERED=1 MPLBACKEND=Agg
 before=$1; after=$2
 here=$PWD/analysis/tasks/G1_guard

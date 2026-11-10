@@ -1,9 +1,12 @@
-"""Gene identity for every Chimera cohort. The only gene-identity helper in revision code.
+"""Gene identity for every Chimera cohort. The only gene-identity helper of the analysis code.
 
-``ortho_N`` numbers are table-local: the liver, testis, Van Zyl, bone-marrow and kidney ortholog
-tables assign them independently, so the same ID names different genes in different tables.
+``ortho_N`` numbers are table-local: every ortholog table (liver, testis, eye, bone marrow, kidney,
+cortex, ...) assigns them independently, so the same ID names different genes in different tables.
 Every lookup must therefore state its cohort, and joins across tissues must use
 ``hsapiens_gene_id``.
+
+``REPO_ROOT`` is the repository root (``CHIMERA_ROOT`` if set, else found from this file); the
+analysis code takes its paths from it.
 """
 
 from __future__ import annotations
@@ -17,14 +20,15 @@ DATA_PROCESSED = REPO_ROOT / "data" / "processed"
 
 _LIVER = "ortholog_table.csv"
 _TESTIS = "ortholog_table_testis.csv"
-# Tables built during the revision live outside data/processed/; an absolute path here is
-# kept as is by ``DATA_PROCESSED / name``.
+# Tables of the cohorts beyond liver and testis live outside data/processed/; an absolute path
+# here is kept as is by ``DATA_PROCESSED / name``.
 _VAN_ZYL = str(REPO_ROOT / "data" / "analysis" / "van_zyl" / "ortholog_table_van_zyl.csv")
 _BONE_MARROW = str(REPO_ROOT / "data" / "analysis" / "bone_marrow" / "ortholog_table_bone_marrow.csv")
-# Kidney AKI case (plan section 8c): human-mouse 1:1, P13_kidney/build_orthologs.py.
+# Kidney: human-mouse 1:1, written by tasks/P13_kidney/build_orthologs.py.
 _KIDNEY = str(REPO_ROOT / "data" / "analysis" / "disease_kidney" / "ortholog_table_kidney.csv")
 
-# C1 new use cases (plan section 13): tables and objects in new_usecases/c1_build/objects.
+# Cortex, lung, skeletal muscle and tumor myeloid cells (tasks/C1_cohorts): tables and objects in
+# new_usecases/c1_build/objects.
 _C1 = REPO_ROOT / "data" / "analysis" / "new_usecases" / "c1_build" / "objects"
 _C1_COHORTS = {"brain_dlpfc": "brain_dlpfc", "brain_dlpfc_hchimp": "brain_dlpfc", "brain_dlpfc_hmac": "brain_dlpfc", "brain_dlpfc_hmarm": "brain_dlpfc", "brain_dlpfc_hmac_own": "brain_dlpfc_hmac_own",
                "brain_m1": "brain_m1", "brain_m1_hmouse": "brain_m1_hmouse", "lung_healthy": "lung_healthy", "tumour_zilionis": "tumour_zilionis",
@@ -56,11 +60,11 @@ H5ADS = {
     "test_3sp": "camex_testis_unified",
 }
 
-# Cohorts rebuilt during the revision live outside data/processed/; full paths, so code
-# that iterates H5ADS under DATA_PROCESSED never reads the superseded processed object.
-REVISION_H5ADS = {
+# Objects of the cohorts beyond liver and testis live under data/analysis/; full paths, so code
+# that iterates H5ADS under DATA_PROCESSED never reads the earlier eye object kept there.
+OTHER_H5ADS = {
     "van_zyl": REPO_ROOT / "data" / "analysis" / "van_zyl" / "van_zyl_unified.h5ad",
-    # build 2 (T12.2b: no mt filter, per-type cap at the testis 3-species size); build 1 in the parent folder
+    # second build (no mitochondrial filter, per-type cap at the size of three-species testis); the first build is in the parent folder
     "bone_marrow": REPO_ROOT / "data" / "analysis" / "bone_marrow" / "v2" / "bone_marrow_unified.h5ad",
     "kidney": REPO_ROOT / "data" / "analysis" / "disease_kidney" / "kidney_healthy_train.h5ad",
     **{k: _C1 / f"{k}.h5ad" for k in _C1_COHORTS},
@@ -68,9 +72,9 @@ REVISION_H5ADS = {
 
 
 def h5ad_path(cohort: str) -> Path:
-    """Training h5ad for ``cohort``: the rebuilt object for revision cohorts, else data/processed/."""
-    if cohort in REVISION_H5ADS:
-        return REVISION_H5ADS[cohort]
+    """Training h5ad for ``cohort``: under data/analysis/ for the cohorts beyond liver and testis, else data/processed/."""
+    if cohort in OTHER_H5ADS:
+        return OTHER_H5ADS[cohort]
     return DATA_PROCESSED / f"{H5ADS[cohort]}.h5ad"
 
 

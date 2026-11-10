@@ -254,7 +254,7 @@ def main():
     adata = ad.read_h5ad(adata_path)
 
     # Lazy import to avoid pulling heavy dependencies at module level
-    from chimera.model import ChimeraModel
+    from chimera import ChimeraModel
 
     logger.info("Loading ChimeraModel from %s", model_dir)
     model = ChimeraModel.load(str(model_dir), adata=adata)

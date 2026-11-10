@@ -6,7 +6,7 @@
 
 **Data.** snRNA-seq / Drop-seq of cortical interneurons in ferret, mouse, marmoset, macaque and human. This is not our M1 data, so `circular = no`.
 
-**Files.** All files are in `data/analysis/E6/krienen2020/`; see `MANIFEST.tsv`. This folder was new and was not shared with another agent at the time.
+**Files.** All files are in `data/analysis/E6/krienen2020/`; see `MANIFEST.tsv`.
 - `41586_2020_2781_MOESM1_ESM.pdf` is the reporting summary.
 - `MOESM2_ESM.xlsx` is **ST1**: per-species expression of the four major classes (PVALB, SST, ID2/LAMP5, VIP and OTHER.CGE). It is converted in `converted/`.
 - `MOESM6_ESM.xlsx` is **ST5**: scaled expression of the Liger-integrated marmoset and mouse clusters. It is converted in `converted/`.

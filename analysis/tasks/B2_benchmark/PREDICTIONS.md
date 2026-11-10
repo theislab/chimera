@@ -38,7 +38,7 @@ What I knew when writing these: X4 (S = pattern gain minus level cost), X6 (labe
 ## Overview
 - **PO.** On the fixed aggregate, a direct baseline (B1, B1c or B2b) ranks first overall. S_g is in the top half and first on label-damage tasks on liver. D ranks in the lower half on gold tasks; static scores last on agreement by rule (not ranked) and low on gold.
 
-## Track I (integration on the new cohorts, added by coordinator's instruction; integration is the substrate, not Chimera's aim)
+## Track I (integration on the cohorts beyond liver and testis, added later; integration is the substrate, not Chimera's aim)
 - **PI1.** scANVI, which uses labels, first or near first on composite in the new cohorts, as on the original seven and T11.4; Chimera in the upper half of the panel, highest or near highest on species mixing and below scANVI and scVI on cell-type conservation.
 - **PI2.** No old value moves: scaling is per cohort.
 - **PI3.** SATURN and CAMEX through 1:1 orthologs score lower than their native rows on comparable cohorts would suggest (fewer genes).

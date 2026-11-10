@@ -65,7 +65,7 @@ dependencies = [
     "umap-learn==0.5.12",
     "igraph==1.0.0",
 
-    # Imported by notebook builders (statsmodels) and revision outputs (pyarrow).
+    # Imported by notebook builders (statsmodels) and by the analysis outputs (pyarrow, parquet tables).
     "statsmodels>=0.14.0",
     "pyarrow>=15.0.0",
 ]

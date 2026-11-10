@@ -206,7 +206,7 @@ def main():
 
     # --- load model ---
     # Import here to avoid hard dep at module level
-    from chimera.model import ChimeraModel
+    from chimera import ChimeraModel
 
     logger.info("Loading model from %s", args.model_dir)
     model = ChimeraModel.load(args.model_dir, adata=adata)

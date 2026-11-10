@@ -385,7 +385,7 @@ def main():
 
     logger.info("Loading model from %s", args.model_dir)
     # Import Chimera model loader
-    from chimera.model import ChimeraModel
+    from chimera import ChimeraModel
 
     model = ChimeraModel.load(args.model_dir)
 

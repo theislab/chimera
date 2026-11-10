@@ -1,4 +1,4 @@
-"""T5.6 analysis (chimera_env), after scalars.py. Fixed before any result was read.
+"""T5.6 analysis of the tool scalars (chimera_env), after scalars.py. Fixed before any result was read.
 
 D_3 = mean of alpha - prior over seeds 42-44, centred on the cohort median (signs within a cohort
 only). Covariates C3 = spline of rank pi_raw, rank log mean, rank detection (the M4 rule, 05 section 5);

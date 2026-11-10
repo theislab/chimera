@@ -10,7 +10,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-PY=/Users/kemalinecik/tools/apps/mamba/bin/python
+PY="${PYTHON:-python}"   # run inside chimera_env, or set PYTHON
 COMMON_ARGS="--max-epochs 100 --adv-lr 1e-4 --seed 42 --config D --adv-weight 100 --lambda-fit 0.1 --lambda-anchor 0.001 --lambda-res 0.01 --warmup-adversarial-epochs 5 --warmup-fqr-epochs 20 --warmup-kl-epochs 20 --n-latent 10 --n-hidden 128 --accelerator mps"
 
 echo "=== [1/4] gin-abl-baseline (no patch) ==="

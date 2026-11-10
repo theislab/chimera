@@ -1,5 +1,12 @@
-# Data directory (large files, downloaded at runtime)
-data/
+# Chimera storage: filled from the deposit or by running code, never tracked (see REPRODUCE.md, section 3)
+/data/
+/results/
+/training/runs
+/notebooks/cache
+# a data folder inside the package folder is not part of the package
+/chimera/data/
+# request cache that pybiomart writes into the folder it is called from
+.pybiomart.sqlite
 
 # macOS
 .DS_Store
@@ -183,9 +190,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-
-.pybiomart.sqlite
-/training/runs
-/results/
-/data backup
-/notebooks/cache

@@ -1,5 +1,5 @@
 """G1: stop a guard-arm fit once its training loss is NaN at an epoch end (it does not recover), after the probe has written the first non-finite batch; then write its health record.
-Only tasks of G1 arrays (job name g1_arm). Run in a loop by the session.    python3 analysis/tasks/G1_guard/nan_watch.py
+Only tasks of G1 arrays (job name g1_arm). Run repeatedly while the array runs, from the repository root with mamba on PATH:    python3 analysis/tasks/G1_guard/nan_watch.py
 """
 import re
 import subprocess
@@ -19,5 +19,5 @@ for jid in q:
         subprocess.run(["scancel", jid])
         with open(LOG / "nan_watch.log", "a") as f:
             f.write(f"{jid} loss NaN at epoch {m.group(1)}, cancelled\n")
-        subprocess.run(["bash", "-c", f"export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH; mamba run -n chimera_env python -m analysis.tasks.G1_guard.step3_health --index {task} >> {LOG}/nan_watch.log 2>&1"])
+        subprocess.run(["bash", "-c", f"mamba run -n chimera_env python -m analysis.tasks.G1_guard.step3_health --index {task} >> {LOG}/nan_watch.log 2>&1"])
         print(f"NaN {jid} epoch {m.group(1)}", flush=True)

@@ -17,7 +17,7 @@ set -uo pipefail
 # that doesn't). Each run's summary.json is authoritative.
 
 cd "$(dirname "$0")/.."
-PY=/Users/kemalinecik/tools/apps/mamba/envs/tardis_env/bin/python
+PY="${PYTHON:-python}"   # run inside chimera_env, or set PYTHON
 
 CONFIG_FLAGS=(
   --config D --max-epochs 100
