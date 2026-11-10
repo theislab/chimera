@@ -22,7 +22,7 @@ Atlas of gene programs across tissues: set statistics per cohort and readout for
 
 **Reads** (as named in the code)
 
-- results of `F1_figures`, `H1_harmonise`, `Z4_free_gate_all`
+- results of `H1_harmonise`, `Z4_free_gate_all`
 - `data/analysis/E1/`
 - code of `F1_figures`, `H1_harmonise`
 

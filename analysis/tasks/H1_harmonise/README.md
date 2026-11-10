@@ -25,7 +25,6 @@ One reading for all 26 cohorts in ten tissues: per-gene tables in one schema wit
 - `data/analysis/disease_islet/`
 - `data/processed/`
 - `training/runs/`
-- code of `F1_figures`
 
 **Notes.** README.md lists the steps. results/analysis/H1/genes/<cohort>.parquet are the per-gene tables of the protein-feature gate, checked by analysis/check_gene_tables.py; rules.py defines every column and the cohort registry. Labeled exploratory in the paper. recurrence.py reads the Hallmark library from the gseapy cache in the home folder (~/.cache/gseapy/), which T6_1_functional/fetch_enrichr_cache.py fills.
 <!-- glance:end -->
@@ -43,9 +42,9 @@ Run from `chimera/`, in `chimera_env`:
 | Hallmark GSEA, the call of `notebooks/_pathway_builder.py` | `gsea.py` | `gsea/<cohort>.csv` |
 | Gene archetypes, the method of `notebooks/_gene_archetypes_builder.py` | `archetypes.py` | `archetypes/` |
 | Cell-type contributions from existing forward passes | `drivers.py` | `drivers/` |
-| Panels, one PDF each | `figures.py` | `panels/` |
+| Panels, one PDF each | `figures.py` | `figures/panels/<family>/` (in the repository, not under `results/`) |
 | Composed figures | `bash figures/build.sh` (see `figures/README.md`) | `figures/composed/`, `figures/figures.pdf` |
-| Cohort tables of the Supplement (LaTeX) | `tex.py` | written into the manuscript repository |
+| Cohort tables of the Supplement (LaTeX) | `tex.py` | `cohort_tables_generated.tex` (`--out` for another place) |
 
 ## Cohorts and flags
 

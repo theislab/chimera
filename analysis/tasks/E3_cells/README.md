@@ -30,6 +30,5 @@ Cell types and lineages: genes grouped by their home compartment, their excess o
 **Reads** (as named in the code)
 
 - results of `H1_harmonise`, `Z4_free_gate_all`
-- code of `F1_figures`
 
 **Notes.** Labeled exploratory in the paper. Definitions in rules.py.

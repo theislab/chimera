@@ -73,7 +73,7 @@ belongs to, the digits its place in that family.
 | `E1` to `E6` | Analyses across all cohorts: gene programs, protein architecture, cell types, drug targets and disease genes, regulatory input, published species differences. |
 | `B1`, `B2` | The gene-level benchmark: ground truth (`B1`); robustness, independent data and overview (`B2`). |
 | `D1`, `G1`, `O1` | Genes with few counts (`D1`), the latent guard (`G1`), the ortholog audit and the identifier-joined objects (`O1`). |
-| `F1`, `F2`, `S1` | Figure helpers. |
+| `F1`, `F2` | Figure helpers. |
 
 A result folder usually has the name of its task without the description
 (`tasks/T4_3_scoreboard` writes `results/analysis/T4_3/`). The exceptions: `T12_3_tests` writes
@@ -271,9 +271,8 @@ Which scripts draw panels or measure table values from cached results?
 
 | Task folder | What it does | Run (first step) | Writes | Paper | Status |
 |---|---|---|---|---|---|
-| [`T8_4_figures`](tasks/T8_4_figures/README.md) | Panel scripts of main and supplementary figures that draw from cached result tables (integration, cell-type sources and tissue comparison, validation, control trainings, seed reliability), and generated supplementary tables. | `python -m analysis.tasks.T8_4_figures.make_all (single figures: fig3_integration, fig3_integration_ext, fig4_additions, fig5_controls, fig7_validation, supp_figures; tables: tables)` | `figures/panels/`<br>`results/analysis/T8_4/` | Figure 3; Figure 4; Figure 5; Figure 8; Supplementary Figure S26; Supplementary Figure S11 | in the paper |
-| [`F1_figures`](tasks/F1_figures/README.md) | Redraws, at print size and from the same data, panels that were first made by the notebooks 04 and 06 and by task scripts. | `python -m analysis.tasks.F1_figures.notebook_panels` (+1 more steps) | `figures/panels/`<br>`results/analysis/F1/` | Figure 4; Supplementary Figure S21 | infrastructure |
-| [`S1_figures`](tasks/S1_figures/README.md) | Helper that removes the panel letters from one page of an assembled figure page, so that the layout tool can draw them. | `python -m analysis.tasks.S1_figures.strip_page_labels` | `results/analysis/S1/` | not in the paper | infrastructure |
+| [`T8_4_figures`](tasks/T8_4_figures/README.md) | Panel scripts of main and supplementary figures that draw from cached result tables (integration, cell-type sources and tissue comparison, validation, control trainings, seed reliability). | `python -m analysis.tasks.T8_4_figures.make_all (single figures: fig3_integration, fig3_integration_ext, fig4_additions, fig5_controls, fig7_validation, supp_figures)` | `figures/panels/`<br>`results/analysis/T8_4/` | Figure 3; Figure 4; Figure 5; Figure 8; Supplementary Figure S26; Supplementary Figure S11 | in the paper |
+| [`F1_figures`](tasks/F1_figures/README.md) | Redraws, at print size and from the same data, panels that notebooks and task scripts first drew: the gene-category panels of testis Human+Macaque and the Hallmark panels (notebooks 04 and 06), the closure panel of the cell-type decomposition and the ten-method integration view. | `python -m analysis.tasks.F1_figures.notebook_panels` (+1 more steps) | `figures/panels/supp_categories_testis/`<br>`figures/panels/supp_hallmark/`<br>`figures/panels/supp_celltype_closure/`<br>`notebooks/figures/baselines_master_ext/` | Supplementary Figure S20a, b; Supplementary Figure S21a, b, c; Supplementary Figure S22; Supplementary Figure S9 | infrastructure |
 | [`T2_7_consistency`](tasks/T2_7_consistency/README.md) | Measures, from the archived runs, the values that the recipe and assumption tables of the Supplement print (gene counts, shared cell types, training outcomes per cohort). | `python -m analysis.tasks.T2_7_consistency.run` | `results/analysis/T2_7/` | Supplementary Table S15; Supplementary Table S3 | in the paper |
 
 ### Infrastructure

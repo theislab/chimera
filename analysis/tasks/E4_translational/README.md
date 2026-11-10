@@ -22,9 +22,8 @@ Drug targets and disease genes: where they sit relative to the protein prior in 
 
 **Reads** (as named in the code)
 
-- results of `F1_figures`
 - `data/analysis/E4/`
 - `data/analysis/Y2/`
-- code of `E1_atlas`, `F1_figures`, `H1_harmonise`
+- code of `E1_atlas`, `H1_harmonise`
 
 **Notes.** Labeled exploratory in the paper. Definitions and predictions in rules.py; q1_followup.py is post hoc and labeled so.

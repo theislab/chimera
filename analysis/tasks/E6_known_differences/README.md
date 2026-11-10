@@ -34,6 +34,5 @@ Tests whether the readouts recover species differences in cell-type gene express
 - `data/analysis/new_usecases/`
 - `data/analysis/van_zyl/`
 - `data/processed/`
-- code of `F1_figures`, `H1_harmonise`
 
 **Notes.** Labeled exploratory in the paper. lists/ holds the gene lists derived from the supplementary tables of each publication, derive/ the script and note per publication; assign.tsv maps lists to cohorts. Definitions in rules.py.

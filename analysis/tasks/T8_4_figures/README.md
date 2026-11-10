@@ -1,7 +1,7 @@
 <!-- Generated from analysis/tasks/INDEX.tsv by analysis/make_index.py. Edit the table, not this file. -->
 # T8_4_figures
 
-Panel scripts of main and supplementary figures that draw from cached result tables (integration, cell-type sources and tissue comparison, validation, control trainings, seed reliability), and generated supplementary tables.
+Panel scripts of main and supplementary figures that draw from cached result tables (integration, cell-type sources and tissue comparison, validation, control trainings, seed reliability).
 
 | | |
 |---|---|
@@ -13,7 +13,7 @@ Panel scripts of main and supplementary figures that draw from cached result tab
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    python -m analysis.tasks.T8_4_figures.make_all (single figures: fig3_integration, fig3_integration_ext, fig4_additions, fig5_controls, fig7_validation, supp_figures; tables: tables)
+    python -m analysis.tasks.T8_4_figures.make_all (single figures: fig3_integration, fig3_integration_ext, fig4_additions, fig5_controls, fig7_validation, supp_figures)
 
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
 

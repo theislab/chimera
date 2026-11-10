@@ -28,6 +28,6 @@ Where the two gates place a gene differently (the gate gap): its reproducibility
 **Reads** (as named in the code)
 
 - results of `H1_harmonise`, `Z4_free_gate_all`
-- code of `F1_figures`, `H1_harmonise`
+- code of `H1_harmonise`
 
 **Notes.** Definitions in rules.py.
