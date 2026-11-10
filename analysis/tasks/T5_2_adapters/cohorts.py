@@ -9,17 +9,20 @@ import hashlib
 import json
 import os
 import resource
+import runpy
 import subprocess
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-WORKSPACE = REPO.parent
-TOOLS = WORKSPACE / "external_tools"
-SATURN_DIR = TOOLS / "SATURN"
-CAMEX_DIR = TOOLS / "CAMEX"
-SATURN_COMMIT = "6906abf23728aa8ebf400cedf4ce38e4821a0a49"
-CAMEX_COMMIT = "17053c956de528aec88878d4493d94838a668d6e"
+# Where the clones of the tools are and which commits are pinned: analysis/external_tools
+# (standard library only, so it is run by path and loads in every tool env).
+EXTERNAL_TOOLS = runpy.run_path(str(REPO / "analysis" / "external_tools" / "location.py"))
+TOOLS = EXTERNAL_TOOLS["tools_dir"]()
+SATURN_DIR = EXTERNAL_TOOLS["tool_dir"]("SATURN")
+CAMEX_DIR = EXTERNAL_TOOLS["tool_dir"]("CAMEX")
+SATURN_COMMIT = EXTERNAL_TOOLS["pinned_commit"]("SATURN")
+CAMEX_COMMIT = EXTERNAL_TOOLS["pinned_commit"]("CAMEX")
 
 PROCESSED = REPO / "data" / "processed"
 RAW_CAMEX = REPO / "data" / "raw" / "camex"

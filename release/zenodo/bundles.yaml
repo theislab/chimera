@@ -1,0 +1,479 @@
+# What goes into the Zenodo deposit of Chimera.
+#
+# This file is the single place that says which files of the working tree are deposited, in
+# which bundle, and what is left out and why. `stage.py` reads it and builds one folder per
+# bundle (one Zenodo record each). All paths are relative to the repository root.
+#
+# To deposit a new folder, add one line to the `members` of a bundle (or a new bundle) and run
+#   python release/zenodo/stage.py --dry-run --bundles <bundle>     # what would be packed
+#   python release/zenodo/stage.py --bundles <bundle>               # pack it
+# To leave a folder out on purpose, add it to `not_included` of the bundle it belongs to (or to
+# `not_deposited` at the end of this file) with the reason. `stage.py --check` reports every
+# folder of the storage that is neither packed nor listed.
+#
+# Member selectors (each list item under `members` is one of these):
+#   from: <folder>            files of a folder
+#     take: [<pattern>, ...]    which ones, relative to the folder (default ["**"] = everything);
+#                               `*` matches inside one folder level, `**` matches any depth;
+#                               a name without a wildcard must exist
+#     skip: [<pattern>, ...]    patterns removed from the selection
+#     into: <folder>            folder the files get inside the tarball (default: the same)
+#     others: <reason>          lists every other entry of the folder in skipped.tsv with this reason
+#   file: <path>              one file;  as: <path> gives it another path inside the tarball
+#   runs: {...}               training runs under training/runs, taken with a `view` (see run_views);
+#                             the runs are the union of the three sources below
+#     recipes: <tsv>            the runs of the recipe table (columns run_name, seeds)
+#     names: [<pattern>, ...]   run folder names
+#     listed_in: <json>         every string value of this JSON file is a run name
+#     except_listed_in: <json>  then the runs named in this JSON file are removed
+#   tasks_in: <folder>        task folders of a results folder (see task_folders)
+#     only: [...] | except: [...]   which task folders
+#     complete: [...]               task folders packed with their binary intermediates
+#   obs_table_of: <h5ad>      the cell annotation table (obs) of an AnnData file as csv.gz, without
+#     as: <path>                the expression matrix
+#
+# In `not_included` and `not_deposited`, a path may use `*` and `{a,b}` alternatives.
+
+format: 1
+
+deposit:
+  name: Chimera
+  code_repository: https://github.com/theislab/chimera
+  license: bsd-3-clause                  # Zenodo license identifier written into every record
+  citation_file: CITATION.cff            # creators and keywords of the records
+  licenses_file: release/zenodo/LICENSES.md   # third-party sources and their licenses; copied into every record
+  docs_naming_every_bundle: [REPRODUCE.md]    # `--check` fails when one of these files does not name a bundle
+  record_limit_gb: 50                    # Zenodo limit per record; a tarball above 95 % of it is split
+  split_part_gb: 45
+
+# Files that are never packed, wherever a selector finds them.
+never_packed:
+  names: [.DS_Store]
+  suffixes: [.tmp, .bak]
+  name_contains: [.bak_]
+
+# Columns removed from every deposited table (csv, tsv, parquet, also gzipped csv/tsv).
+# The altered members are listed in scrubbed.tsv.
+dropped_columns:
+  label: EVEE
+  columns: [G_H1, G_H2, evee_mean_liver, evee_mean_testis]
+  reason: >-
+    Per-gene EVEE values (Chen et al. 2019) carry no stated license and are not redistributed.
+    Summary statistics and correlations stay; the per-gene values are rebuilt from the archived
+    EVEE download listed in data/analysis/gold/G1/MANIFEST.tsv.
+
+# Text members up to this size are read and checked against the text rules: the public ones
+# below and, when given, those of a private rules file (--private-rules). A `replace` rule
+# rewrites matches (listed in scrubbed.tsv), a `review` rule lists matches in review_hits.tsv
+# without altering them, a `blocked` rule stops the build when a match is left.
+text_rules:
+  suffixes: [.json, .md, .txt, .csv, .tsv, .log, .out, .yaml, .yml, .tex, .err]
+  max_mb: 5
+  replace: []
+  review: []
+  blocked: []
+
+# How a training run folder (training/runs/<run>/) is taken.
+run_views:
+  complete:
+    description: the whole run folder
+    requires: [final_state.npz]
+    if_unfinished: error
+    everything: true
+  standard:
+    description: final state, configuration, summaries, the model and the training metrics
+    requires: [final_state.npz, model/model.pt]
+    if_unfinished: skip
+    top_level: &run_top_level
+      names: [config.json, summary.json, run_summary.json, final_state.npz, report.md,
+              pretrain_checks.json, _provenance.json, conservation_prior_raw.npy]
+      small_files: {suffixes: [.json, .csv, .md], below_bytes: 1048576}
+    subtrees: [model]
+    files: [lightning/metrics.csv]
+  summary:
+    description: final state, configuration and summaries, without the model
+    requires: [final_state.npz]
+    if_unfinished: skip
+    top_level: *run_top_level
+
+# Rules for `tasks_in` selectors (results/analysis/<task>/).
+task_folders:
+  not_results:                 # top-level entries that are never results
+    names: [_prerun]
+    name_contains: [scratch]
+    reason: pre-run and scratch outputs, not results
+  listed_skips:                # files left out and listed one by one in skipped.tsv
+    - path_part_contains: scratch
+      reason: scratch
+    - name_regex: '^centroids_s\d+\.pkl$|_pretrain\.h5ad$'
+      reason: SATURN intermediate (macrogene centroid initialization or pre-training snapshot), regenerated by SATURN
+  counted_skips:               # files left out and counted per task folder in skipped.tsv
+    - path_regex: '/de/(perm|loo)/'
+      label: "**/de/perm,loo"
+      reason: permutation and leave-one-out differential-expression draw tables (intermediates of the deposited summaries; rerun by the task)
+  compact:                     # applies to every task folder not listed under `complete`
+    drop_suffixes: [.npz, .npy, .pt, .pth, .ckpt, .h5ad, .h5, .pkl, .joblib, .bw, .zarr]
+    drop_folders: [cache, health_cache, shim, ms_stage, preview, attempts, _tmp, tmp]
+    reason: binary intermediates or cache files (forward passes, latents, arrays, AnnData, caches); tables, text and figures deposited
+
+bundles:
+
+  data_liver_testis:
+    title: processed data of the liver and testis cohorts
+    unpacks_to: "`data/processed/`"
+    description: >-
+      The seven processed AnnData objects of the canonical cohorts (liver from the CAMEX bundle of
+      Guilliams et al. 2022 and Wang et al. 2023; testis from Murat et al. 2023), with their
+      build configurations, the Ensembl release 110 one-to-one ortholog tables for liver and
+      testis, and the GIN feature scalers. camex_pancreas_unified.h5ad is the liver 4-species
+      cohort (historical file name).
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - from: data/processed
+        take:
+          - camex_human_monkey.h5ad
+          - camex_human_mouse.h5ad
+          - camex_human_zebrafish.h5ad
+          - camex_pancreas_unified.h5ad
+          - camex_testis_human_macaque.h5ad
+          - camex_testis_human_mouse.h5ad
+          - camex_testis_unified.h5ad
+          - "camex_*_config.json"
+          - ortholog_table.csv
+          - ortholog_table_testis.csv
+          - gin_scaler.pkl
+          - gin_scaler_testis.pkl
+        others: backup copies and an earlier eye-cohort object; the eye cohort is in data_other_cohorts
+
+  data_other_cohorts:
+    title: processed data of the other cohorts, disease data and controls
+    unpacks_to: "`data/analysis/`"
+    description: >-
+      Processed objects built from public data: the eye cohort (Van Zyl aqueous-humor outflow
+      tissues, GEO) with its five species subsets and the class-filter sensitivity build; bone
+      marrow human, mouse lemur and mouse (Tabula Sapiens, Tabula Microcebus, Tabula Muris Senis
+      via CELLxGENE); kidney (KPMP, CELLxGENE) and islet (CELLxGENE) healthy training objects and
+      disease pseudobulks; cortex M1 and DLPFC, lung, skeletal muscle and tumor myeloid training
+      objects (CELLxGENE, GEO) with their ortholog tables and feature scalers; liver MASH
+      pseudobulks (GEO GSE202379, GSE192742) and cell annotations; the count and feature control
+      objects; and the download manifests (URL, date, sha256) of every third-party input that is
+      linked rather than redistributed.
+    members:
+      # Eye cohort: objects, configurations, ortholog table, scaler and build reports (top-level files)
+      - from: data/analysis/van_zyl
+        take: ["*"]
+      # Eye cohort, class-filter sensitivity build (at least 50 cells per class in each species)
+      - from: data/analysis/van_zyl_f50
+        take: ["*"]
+      # Bone marrow: the cohort is v2/
+      - from: data/analysis/bone_marrow
+        take:
+          - "v2/**"
+          - ortholog_table_bone_marrow.csv
+          - ortholog_table_bone_marrow.report.json
+          - build_report.json
+          - counts_type_by_species.tsv
+          - counts_type_by_species_tissue.tsv
+          - shay_coe.tsv
+          - shay_coe_report.json
+      - from: data/analysis/disease_kidney
+        take:
+          - kidney_healthy_train.h5ad
+          - kidney_healthy_train_full_vocab.h5ad
+          - kidney_healthy_train_gin_scaler.pkl
+          - kidney_pseudobulk_human.h5ad
+          - kidney_pseudobulk_mouse.h5ad
+          - ortholog_table_kidney.csv
+          - ortholog_table_kidney.report.json
+      - from: data/analysis/disease_islet
+        take:
+          - islet_healthy_train.h5ad
+          - islet_healthy_train_full_vocab.h5ad
+          - islet_healthy_train_gin_scaler.pkl
+          - islet_pseudobulk_human.h5ad
+          - islet_pseudobulk_mouse.h5ad
+      # Liver MASH: pseudobulks and the authors' metadata table
+      - from: data/analysis/disease
+        take: [disease_pseudobulk_human.h5ad, disease_pseudobulk_mouse.h5ad, "meta/**"]
+      # Annotated disease objects: the cell annotations only (the matrices are public counts)
+      - obs_table_of: data/analysis/disease/annotated_human.h5ad
+        as: data/analysis/disease/annotated_human.obs.csv.gz
+      - obs_table_of: data/analysis/disease/annotated_mouse.h5ad
+        as: data/analysis/disease/annotated_mouse.obs.csv.gz
+      - obs_table_of: data/analysis/disease_islet/annotated_human.h5ad
+        as: data/analysis/disease_islet/annotated_human.obs.csv.gz
+      - obs_table_of: data/analysis/disease_islet/annotated_mouse.h5ad
+        as: data/analysis/disease_islet/annotated_mouse.obs.csv.gz
+      # Cortex M1 and DLPFC, lung, skeletal muscle, tumor myeloid cells: training objects,
+      # configurations, ortholog tables, scalers; and the download tables of the folder
+      - from: data/analysis/new_usecases
+        take: ["c1_build/objects/**", "*.tsv"]
+      # Count and feature control objects
+      - from: data/analysis/controls
+      # Download manifests (URL, date, sha256) of every third-party input
+      - from: data/analysis
+        take: ["**/MANIFEST*.tsv"]
+        skip: ["**/_failed/**"]
+    not_included:
+      - path: data/analysis/van_zyl/inputs
+        reason: raw GEO matrices and the SATURN ESM-2 subset; linked, see LICENSES.md
+      - path: data/analysis/bone_marrow/bone_marrow_unified.h5ad
+        reason: earlier build of the bone-marrow object; the cohort is v2/ (rebuildable from CELLxGENE)
+      - path: data/analysis/bone_marrow/{raw,geo,debug,ensembl110,inputs,shay}
+        reason: third-party downloads or diagnostic draws; linked, see MANIFEST.tsv and LICENSES.md
+      - path: data/analysis/disease/disease_liver_pooled{,_full_vocab}.h5ad
+        reason: pooled object marked NOT_FOR_TRAINING; no analysis reads it
+      - path: data/analysis/{disease,disease_islet}/annotated_{human,mouse}.h5ad
+        reason: annotated full matrix (public GEO / CELLxGENE counts); the cell annotations are deposited as csv.gz and the matrix is rebuilt by the disease builders (analysis/tasks/T7_2_*, T7_9_*)
+      - path: data/analysis/new_usecases/{esm,c1_build/inputs,c1_build/species}
+        reason: ESM-2 embeddings and per-species build inputs (raw counts, ESM subsets); not redistributed, see LICENSES.md
+      - path: data/analysis/new_usecases/{ad_5xfad,ad_seaad,brain_dlpfc,brain_m1,brain_mtg,ensembl110,ensembl_old,lung_fibrosis,lung_healthy,muscle_ageing,regen_hoang,tumour_zilionis}
+        reason: third-party downloads (CELLxGENE, GEO, Ensembl); linked, MANIFEST.tsv and MANIFEST_C1.tsv deposited
+      - path: data/analysis/{gold,functional,glaucoma,ensembl110,x3_annotations,y5_annotations,Y1,Y2,Y6,E1,E2,E4,E5,E6}
+        reason: third-party downloads; linked, MANIFEST.tsv deposited
+      - path: data/analysis/T5_inputs
+        reason: input files of the SATURN and CAMEX adapters, rebuilt by analysis/tasks/T5_2_adapters
+      - path: data/analysis/{disease,disease_islet,disease_kidney}/raw
+        reason: third-party downloads; linked, MANIFEST.tsv deposited
+      - path: data/analysis/{D1,G1}
+        reason: thinned and held-out objects, rebuilt from the deposited objects by analysis/tasks/D1_sparse_genes and G1_guard
+      - path: data/analysis/{B1,B2}
+        reason: altered and perturbed objects of the gene-level benchmark (about 95 GB), rebuilt deterministically by the task code from the deposited cohort objects
+      - path: data/analysis/O1
+        reason: identifier-joined objects are in data_identifier_joined; Ensembl Compara extracts are linked
+
+  data_identifier_joined:
+    title: liver and testis objects with counts joined on the Ensembl gene ID, recommended for reuse
+    unpacks_to: "`data/analysis/O1/repair_*/`, `training/runs/o2-*/`"
+    description: >-
+      Liver (Human+Mouse, Human+Monkey, 4-species) and testis (Human+Mouse) objects in which
+      every count column is taken from the raw row that carries the Ensembl gene ID of the
+      ortholog table (repair_log.csv per tissue lists each column that differs from the
+      symbol-joined object; build reports and ortholog tables are beside the objects), and the
+      Chimera models trained on them with the canonical recipes (seeds 42-44; liver Human+Monkey
+      seeds 42-51 with a matched control on the symbol-joined object). These are the recommended
+      objects for new work on these cohorts. Liver macaque is identifier-joined only where its
+      matrix carries Ensembl IDs; zebrafish carries none and is unchanged.
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - from: data/analysis/O1/repair_liver
+      - from: data/analysis/O1/repair_testis
+      - runs: {names: ["o2-*"]}
+        view: standard
+    not_included:
+      - path: data/analysis/O1/{control_liver,control_testis,rebuild_canonical,rebuild_t3}
+        reason: build checks that reproduce the canonical objects, rebuilt by analysis/tasks/O1_orthologs/repair.py --mode control
+      - path: data/analysis/O1/{compara105_human_rows.parquet,compara110_human_rows.parquet,gtf110_genes.parquet,compara110_ncrna}
+        reason: Ensembl Compara and GTF extracts (releases 105, 110); linked, rebuilt by the O1 builders
+      - path: training/runs/o1-*
+        reason: fits on the build-check objects (data/analysis/O1/rebuild_t3), rebuilt by analysis/tasks/O1_orthologs
+
+  models_canonical:
+    title: trained models of the seven canonical cohorts
+    unpacks_to: "`training/runs/<run>/` (the runs of `configs/canonical_recipes.tsv`)"
+    description: >-
+      The 11 canonical Chimera runs (liver Human+Monkey seeds 42-44, Human+Mouse seeds 42-44,
+      Human+Zebrafish, 4-species; testis Human+Macaque, Human+Mouse, 3-species), complete run
+      folders: model/model.pt, final_state.npz (alpha, prior, correction, S_g, latent means),
+      config.json, summary.json, per-epoch alpha snapshots, training metrics, tables and figure
+      caches. Trained on Apple MPS; the recipe of each run is in configs/canonical_recipes.tsv of
+      the code release.
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - runs: {recipes: configs/canonical_recipes.tsv}
+        view: complete
+
+  models_seeds_controls_cohorts:
+    title: trained models of the further seeds, controls and cohorts
+    unpacks_to: "`training/runs/rev-*/`, `training/runs/g1-*/`"
+    description: >-
+      Protein-feature-gate runs beyond the 11 canonical ones: further seeds of the canonical
+      recipes (liver 4-species seeds 43-46, liver Human+Mouse seeds 45-51, testis 3-species seeds
+      43-46, testis Human+Mouse seeds 43-51), CPU platform and same-seed repeat runs, the control
+      runs (feature destruction, count permutation, matched cell types, prior swap, testis without
+      labels), the recipe grids and seeds of every further cohort (bone marrow, eye and its
+      species subsets, islet, kidney, cortex M1 and DLPFC, lung, skeletal muscle, tumor myeloid
+      cells), and the runs with the latent guard --clamp-z-logvar (rev-g1-*). Per run: model/,
+      final_state.npz, config.json, summary.json, run_summary.json, report.md, provenance and
+      the training metrics. For the latent-guard runs on thinned objects (g1-*): configuration,
+      summaries and final state. CPU-trained.
+    members:
+      - runs: {names: ["rev-*"], except_listed_in: results/analysis/Z4/kept.json}
+        view: standard
+      # Latent-guard runs on the thinned objects of the depth analyses: no model
+      - runs: {names: ["g1-*"]}
+        view: summary
+    not_included:
+      - path: training/runs/rev-*/alpha_snapshots
+        reason: per-epoch alpha snapshots are deposited for the canonical runs only
+      - path: training/runs/g1-*/model
+        reason: fits on thinned objects; configurations, summaries and final states are deposited, models are not (objects rebuilt by analysis/tasks/G1_guard/step3_prepare.py)
+
+  models_per_gene_gate:
+    title: trained models with the per-gene gate
+    unpacks_to: "`training/runs/z3-*/`, `z4-*/`, `rev-ctl-liv_hmouse-m-*/`"
+    description: >-
+      Fits with a per-gene gate (--config M: the canonical model with one free correction per
+      gene in place of the protein-feature network, recipe otherwise unchanged): every fit of
+      liver Human+Mouse, liver 4-species and testis Human+Mouse, and the seeds kept by the health
+      rule on each of the 26 harmonized cohorts (results/analysis/Z4/kept.json). Per run: model/,
+      final_state.npz, config.json, summary.json, run_summary.json, report.md, provenance and the
+      training metrics. CPU-trained.
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - runs: {names: ["z3-*"], listed_in: results/analysis/Z4/kept.json}
+        view: standard
+    not_included:
+      - path: training/runs/z4-*
+        reason: z4 fits that are not named in results/analysis/Z4/kept.json were not kept by the health rule (results/analysis/Z4/health.csv) or are spare seeds
+
+  gene_tables:
+    title: per-gene tables
+    unpacks_to: "`results/gene_tables/`"
+    description: >-
+      One CSV per canonical cohort with the human Ensembl ID, symbol, prior, raw prior, alpha,
+      correction, delta-alpha, the seed-consensus readout D, S_g and sign consistency, pooled
+      over seeds; seed reliability and seed-pair agreement. Per-gene tables of the 26 harmonized
+      cohorts in one schema, for the protein-feature gate and for the per-gene gate, with
+      count-support, strict-support and naming flags. README.md inside describes every column.
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - from: results/analysis/T3_3
+        take: ["*__consensus.csv", reliability.csv, seed_pooling.json, seed_pairs.csv]
+        into: results/gene_tables
+      - from: results/analysis/H1/genes
+        take: ["*.tsv.gz"]
+        into: results/gene_tables/harmonised/canonical
+      - from: results/analysis/Z4/h1/genes
+        take: ["*.tsv.gz"]
+        into: results/gene_tables/harmonised/free_gate
+      - file: results/analysis/H1/runs.tsv
+        as: results/gene_tables/harmonised/runs_canonical.tsv
+      - file: results/analysis/Z4/h1/kept_used.json
+        as: results/gene_tables/harmonised/seeds_free_gate.json
+      - file: results/analysis/H1/cohort_table.csv
+        as: results/gene_tables/harmonised/cohort_table.csv
+      - file: release/zenodo/texts/gene_tables_README.md
+        as: results/gene_tables/README.md
+
+  notebook_caches:
+    title: notebook caches and integration baseline runs
+    unpacks_to: "`notebooks/cache/`, `training/runs/baselines_*`"
+    description: >-
+      Caches read by the figure notebooks (including frozen responses of live services: Enrichr
+      libraries, Ensembl REST sequences, AlphaFold DB structures, GIN attributions) and the
+      integration baseline runs (scVI, scANVI, sysVI, Harmony, PCA, SATURN, CAMEX).
+    members:
+      - from: notebooks/cache
+      - from: training/runs
+        take: ["baselines_*/**"]
+        skip: ["baselines_*/mock_*/**"]
+    not_included:
+      - path: training/runs/baselines_*/mock_*
+        reason: output of a unit test on mock data, not a result
+
+  analysis_results:
+    title: analysis outputs
+    unpacks_to: "`results/analysis/<task>/`"
+    description: >-
+      Outputs of the analyses of the paper, one folder per task (results/analysis/<task>/):
+      reliability and consensus, controls, gold standards and baselines, scoreboard, functional
+      layer, disease cases, further cohorts, residue checks, the harmonized per-gene tables of 26
+      cohorts for both gates (H1, Z4) and the gate comparisons (Z3, Z4), the identifier-joined
+      count comparison (O1), the latent-guard checks (G1), the gate gap (X8), integration with
+      the per-gene gate (I1), the exploratory analyses (program atlas, protein and gene
+      architecture, cell types and lineages, translational, regulatory architecture, literature
+      species differences: E1-E6) and the figure sources. Most task folders are deposited as
+      tables, text and figures without binary intermediates; permutation and leave-one-out
+      differential-expression draws are not included. Per-gene EVEE values (license unstated)
+      are not included; they are rebuilt from the archived EVEE download.
+    members:
+      - tasks_in: results/analysis
+        except: [B1, B2, T5_1, T5_2, T5_3, T5_6, T2_2, _release]
+        complete: [P13, T11_1, T11_2, T11_2b, T12_1, T12_2, T12_2b, T1_3, T2_3, T2_4, T2_5, T2_6,
+                   T2_7, T3_1, T3_1b, T3_2, T3_2b, T3_3, T3_4, T3_5, T3_6, T4_1, T4_2, T4_3,
+                   T5_4b, T5_5, T6_1, T6_3, T6_4, T6_6, T6_8, T6_8b, T6_8b_repeat.csv, T6_9,
+                   T7_1, T7_2, T7_3, T7_8, T7_9, T8_1, T8_4, X1, X2, X3, X4, X5, X6, X7]
+    not_included:
+      - path: results/analysis/T2_2
+        reason: working record of a notebook rerun (logs and earlier outputs), not a result
+
+  tool_runs_saturn_camex:
+    title: SATURN and CAMEX runs
+    unpacks_to: "`results/analysis/T5_*/`"
+    description: >-
+      SATURN and CAMEX runs (environment smoke test, pilot, cell-level runs on the seven
+      canonical cohorts, gene-level runs with three seeds): outputs, embeddings, gene-level
+      scalars and logs. SATURN macrogene-centroid initializations and pre-training snapshots are
+      not included.
+    members:
+      - tasks_in: results/analysis
+        only: [T5_1, T5_2, T5_3, T5_6]
+        complete: [T5_1, T5_2, T5_3, T5_6]
+
+  gene_level_benchmark:
+    title: gene-level benchmark
+    unpacks_to: "`results/analysis/B1/`, `B2/`, `training/runs/b1*-*/`, `b2-*/`"
+    description: >-
+      The gene-level benchmark: Track A (ground-truth spike-in of pattern, level and loss changes,
+      and null alterations, on liver, testis and kidney Human+Mouse), Track B (robustness to
+      perturbed cells, labels and depth), Track C (independent data across tissues), Track D (run
+      time and memory) and the overview, for Chimera (both gates) and the compared tools: scored
+      tables, truth sets, health records, logs, overview tables and figures, and configuration,
+      summary and final state of every scored Chimera fit. Altered objects and the models of the
+      altered fits are rebuilt by the task code.
+    derived_from: ["10.6084/m9.figshare.31131808.v1"]
+    members:
+      - tasks_in: results/analysis
+        only: [B1, B2]
+      - runs: {names: ["b1-*", "b1free-*", "b1hybrid-*", "b1trackd-*", "b2-*"]}
+        view: summary
+    not_included:
+      - path: training/runs/{b1,b1free,b1hybrid,b1trackd,b2}-*/model
+        reason: fits on altered objects; configuration, summary and final state are deposited, models and altered objects are rebuilt by analysis/tasks/B1_ground_truth and B2_benchmark
+
+  analysis_plan:
+    title: pre-specified analysis plan
+    record_type: publication
+    unpacks_to: "`results/analysis/_release/`"
+    description: >-
+      The pre-specified analysis plan of the study as frozen before any association between a
+      Chimera readout and an independent gold standard was computed, with the sections added
+      afterwards and the dated amendment log.
+    members:
+      # The released copy of the plan is written into results/analysis/_release/ by the authors'
+      # export of the plan; like every result it is storage, not a tracked file.
+      - file: results/analysis/_release/analysis_plan_prespecified.md
+    loose_files: [results/analysis/_release/analysis_plan_prespecified.md]
+
+# Storage folders whose every entry must be either packed by a bundle or named with a reason
+# (under `not_included` of a bundle, or under `not_deposited` below). `stage.py --check` lists
+# the entries that are neither, so that a new folder cannot stay out of the deposit unnoticed.
+coverage_roots:
+  - data
+  - data/processed
+  - data/analysis
+  - data/analysis/new_usecases
+  - results
+  - results/analysis
+  - notebooks/cache
+  - training/runs
+
+# Entries of the coverage roots that belong to no bundle.
+not_deposited:
+  - path: data/raw
+    reason: raw third-party downloads (CAMEX bundle, SATURN ESM-2 embeddings, GEO); served by their sources, see LICENSES.md
+  - path: results/chimera_v24_config_D
+    reason: output of an early development run; no analysis reads it
+  - path: results/gene_tables
+    reason: the unpacked gene_tables bundle; present only in a checkout with the deposit unpacked
+  - path: training/runs/d1-*
+    reason: fits on the thinned and held-out objects of the sparse-gene analysis; their tables are in analysis_results (results/analysis/D1) and the objects are rebuilt by analysis/tasks/D1_sparse_genes
+  - path: training/runs/z2-*
+    reason: ablation fits of the embedding analysis; their tables are in analysis_results (results/analysis/Z2)
+  - path: training/runs/_failed
+    reason: interrupted attempts that analysis/slurm/_body.sh moved aside before the run was started again; the finished runs are packed
+  - path: "training/runs/{*.log,*.md}"
+    reason: console logs and notes of development runs
+  - path: "training/runs/{iter*,xds*,xds2*,testis*,4sp*,abl*,ablation*,final*,full*,gin*,masked*,nb20*,quick*,smoke*,verify*,retrain-*,clean-*}"
+    reason: development runs and local retrains that no analysis of the paper reads (the canonical runs among them are packed by models_canonical)

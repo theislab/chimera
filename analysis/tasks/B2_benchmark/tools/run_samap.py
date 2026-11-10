@@ -45,7 +45,7 @@ import scipy.sparse as sp  # noqa: E402
 from samap import SAMAP  # noqa: E402
 
 BLAST_DIR = C.REPO / "data" / "analysis" / "B2" / "tools" / "samap"
-TOOL_DIR = C.TOOLS / "SAMap"
+TOOL_DIR = C.tool_dir("SAMap")
 PREFIX = {"Human": "hs", "Mouse": "mm"}
 PARAMS = dict(n_iterations=3, cross_species_k=20, neighborhood_sizes=3, hom_edge_thr=0, hom_edge_mode="pearson",
               scale_edges_by_corr=True, pairwise=True, neigh_from_keys=False, keys="leiden_clusters", leiden_resolution=3.0,

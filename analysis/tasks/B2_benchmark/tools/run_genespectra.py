@@ -38,7 +38,7 @@ C.set_threads(1)
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-TOOL_DIR = C.TOOLS / "GeneSpectra"
+TOOL_DIR = C.tool_dir("GeneSpectra")
 sys.path.insert(0, str(TOOL_DIR))
 
 import anndata as ad  # noqa: E402

@@ -1,10 +1,12 @@
 # Shared body for SATURN / CAMEX jobs. Sourced by the sbatch files in T5_2_adapters and T5_3_runs.
 set -uo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
 N=${SLURM_CPUS_PER_TASK:-4}
 export OMP_NUM_THREADS=$N MKL_NUM_THREADS=$N OPENBLAS_NUM_THREADS=$N NUMEXPR_NUM_THREADS=$N
 export VECLIB_MAXIMUM_THREADS=$N NUMBA_NUM_THREADS=$N PYTHONUNBUFFERED=1 MPLBACKEND=Agg DGLBACKEND=pytorch
-cd "${CHIMERA_ROOT:-/home/icb/kemal.inecik/lustre_workspace/master_chimera/chimera}" || exit 2
+# The repository root is $CHIMERA_ROOT if set, else found from the location of this file.
+cd "${CHIMERA_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}" || exit 2
 A=analysis/tasks/T5_2_adapters
 echo "host=$(hostname) job=${SLURM_JOB_ID:-} task=${SLURM_ARRAY_TASK_ID:-} cpus=$N sha=$(git rev-parse HEAD) start=$(date -Is)"
 

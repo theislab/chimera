@@ -42,7 +42,7 @@ python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-
 python-dotenv==1.2.4
 pytz @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_pytz_h5ded981_1793296577/work
 PyYAML==6.0.3
-sc-samap @ file:///ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/external_tools/SAMap
+sc-samap @ git+https://github.com/atarashansky/SAMap@8ffeaec17d738477d4a6302045098943a2726be7
 scanpy==1.12.5
 scikit-learn==1.9.1
 scipy==1.18.1

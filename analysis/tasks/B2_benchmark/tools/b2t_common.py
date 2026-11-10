@@ -11,6 +11,7 @@ import importlib.util
 import json
 import os
 import resource
+import runpy
 import subprocess
 import sys
 from pathlib import Path
@@ -22,7 +23,10 @@ import scipy.sparse as sp
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
-TOOLS = REPO.parent / "external_tools"
+# Where the clones of the tools are: analysis/external_tools (run by path, standard library only).
+EXTERNAL_TOOLS = runpy.run_path(str(REPO / "analysis" / "external_tools" / "location.py"))
+TOOLS = EXTERNAL_TOOLS["tools_dir"]()
+tool_dir = EXTERNAL_TOOLS["tool_dir"]
 SPECIES = ("Human", "Mouse")
 TABLE_ID = {"Human": "hsapiens_gene_id", "Mouse": "mmusculus_gene_id"}
 TABLE_SYMBOL = {"Human": "hsapiens_gene_name", "Mouse": "mmusculus_gene_name"}

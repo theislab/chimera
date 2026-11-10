@@ -9,10 +9,11 @@
 # then the gene-level homology graph that every SAMap run reuses. Once per species pair.
 # Usage, from chimera/: sbatch --output=results/analysis/B2/tools_pilot/_logs/%x_%j.out analysis/tasks/B2_benchmark/tools/blast_samap.sbatch
 set -euo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH before submitting" >&2; exit 2; }
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-4}
 REPO=${SLURM_SUBMIT_DIR:-$(pwd)}
-TOOL=$REPO/../external_tools/SAMap
+TOOL="$(python3 "$REPO/analysis/external_tools/location.py" SAMap)"
 D=$REPO/data/analysis/B2/tools/samap
 cd "$D"
 t0=$SECONDS

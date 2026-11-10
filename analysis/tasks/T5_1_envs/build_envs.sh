@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
-# Build the two competitor envs (CPU) and clone the tools at pinned commits.
-# Clones live in master_chimera/external_tools/, outside every repo.
-# Run from chimera/. Env solves on the slow filesystem take tens of minutes.
+# Build the environments of SATURN and CAMEX (CPU), saturn_env and camex_env.
+# The tools themselves are cloned at their pinned commits by analysis/external_tools/fetch.py,
+# called below; where the clones live and which commits are pinned is defined there.
+# Run from the repository root. Solving an environment on a slow file system takes tens of minutes.
 set -euo pipefail
-export PATH=/home/icb/kemal.inecik/tools/apps/mamba/bin:$PATH
-ROOT=$(cd .. && pwd)
-TOOLS=$ROOT/external_tools
-mkdir -p "$TOOLS" && chmod 700 "$TOOLS"
+command -v mamba >/dev/null 2>&1 || PATH="$(dirname "${MAMBA_EXE:-${CONDA_EXE:-/nonexistent/mamba}}"):$PATH"
+command -v mamba >/dev/null 2>&1 || { echo "mamba not found: put its bin folder on PATH" >&2; exit 2; }
 
-[[ -d $TOOLS/SATURN ]] || git clone https://github.com/snap-stanford/SATURN "$TOOLS/SATURN"
-git -C "$TOOLS/SATURN" checkout 6906abf
-[[ -d $TOOLS/CAMEX ]] || git clone https://github.com/zhanglabtools/CAMEX "$TOOLS/CAMEX"
-git -C "$TOOLS/CAMEX" checkout 17053c9
+python3 analysis/external_tools/fetch.py SATURN CAMEX
 
 mamba env list | grep -q '^saturn_env ' || mamba env create -y -f analysis/envs/saturn_env.yml
 mamba env list | grep -q '^camex_env ' || mamba env create -y -f analysis/envs/camex_env.yml

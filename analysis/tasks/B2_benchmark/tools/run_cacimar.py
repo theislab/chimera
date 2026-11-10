@@ -44,7 +44,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
-TOOL_DIR = C.TOOLS / "CACIMAR"
+TOOL_DIR = C.tool_dir("CACIMAR")
 PREFIX = {"Human": "hs", "Mouse": "mm"}
 MIN_CELLS = 3
 PARAMS = dict(normalization="Seurat NormalizeData default", PowerCutoff=0.35, DifferenceCutoff=0.1, PvalueCutoff=0.05,

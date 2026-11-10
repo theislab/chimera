@@ -1,6 +1,6 @@
 """C1: ESM-2 gene embeddings for species outside the SATURN export, the SATURN recipe.
 
-SATURN (``external_tools/SATURN/protein_embeddings``): Ensembl ``pep.all``, proteins with a stop codon
+SATURN (``protein_embeddings/`` of its clone, see ``analysis/external_tools``): Ensembl ``pep.all``, proteins with a stop codon
 dropped; ``esm2_t48_15B_UR50D``, sequences truncated at 1022 residues, mean of the last layer (48) over
 residues; a gene's embedding is the mean over its proteins. The existing ``ESM2/*.torch`` files are
 this recipe keyed by symbol. Here the output is keyed by Ensembl gene ID, which
@@ -28,7 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path("/ictstr01/groups/ml01/workspace/kemal.inecik/master_chimera/chimera")
+ROOT = Path(__file__).resolve().parents[3]  # the repository root
 OUT = ROOT / "data" / "analysis" / "new_usecases" / "esm"
 WEIGHTS = OUT / "hub" / "checkpoints" / "esm2_t48_15B_UR50D.pt"
 NEW = ROOT / "data" / "analysis" / "new_usecases" / "ensembl110"
