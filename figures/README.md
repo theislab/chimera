@@ -78,8 +78,9 @@ PYTHONPATH=$PWD python -m figures.compose main_validation    # compose one figur
    the analysis they belong to (`analysis/tasks/<task>/`) or in `figures/redraw/`; they read cached result tables,
    call `figures.style.apply()` and save with `figures.style.save_panel(fig, "family/name")`. For a dry run set
    `CHIMERA_FIGURES_OUT=<folder>`: panels and build products go there and the repository is not touched.
-3. **A new figure**: add an entry to the spec module of its part of the paper, add its key to `order.txt` at its place,
-   build. `order.txt` is normally written from the manuscript (`sync_figures.py --write-order`), so a float that moves
+3. **A new figure**: add an entry to the spec module of its part of the paper. Until its float exists in the manuscript
+   the figure is *pending*: it is composed, the build names it, and it is not in `figures.pdf`. Then write the order
+   and build. `order.txt` is normally written from the manuscript (`sync_figures.py --write-order`), so a float that moves
    in the paper changes one generated file and no spec.
 
 ## House style and checks

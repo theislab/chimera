@@ -9,16 +9,16 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 1 | Figure 1 | `main_overview` | Overview: what the model takes, does and returns | 486 x 350 | `specs/main.py` |
 | 2 | Figure 2 | `main_alpha_vs_prior` | The gate value α against the protein prior | 258 x 75 | `specs/main.py` |
 | 3 | Figure 3 | `main_integration` | Integration benchmark on the seven liver and testis cohorts | 483 x 285 | `specs/main.py` |
-| 4 | Figure 4 | `main_delta_alpha_liver` | Δα by gene category and across the protein prior, four-species liver | 487 x 280 | `specs/main.py` |
-| 5 | Figure 4 (continued) | `main_delta_alpha_liver_2` | Cell-type sources of the count evidence, margin support, tissue comparison and sequence measures | 486 x 527 | `specs/main.py` |
-| 6 | Figure 5 | `main_validation` | Pre-specified tests against independent data and comparison with direct baselines | 486 x 544 | `specs/main.py` |
-| 7 | Figure 5 (continued) | `main_validation_2` | The tests and two named findings under the protein-feature gate and the per-gene gate | 478 x 347 | `specs/main.py` |
+| 4 | Figure 4 | `main_delta_alpha_liver` | Δα by gene category and across the protein prior, four-species liver | 487 x 281 | `specs/main.py` |
+| 5 | Figure 4 (continued) | `main_delta_alpha_liver_2` | Cell-type sources of the count evidence, margin support, tissue comparison and sequence measures | 487 x 519 | `specs/main.py` |
+| 6 | Figure 5 | `main_validation` | Pre-specified tests against independent data and comparison with direct baselines | 486 x 545 | `specs/main.py` |
+| 7 | Figure 5 (continued) | `main_validation_2` | The tests and two named findings under the protein-feature gate and the per-gene gate | 478 x 348 | `specs/main.py` |
 | 8 | Figure 6 | `main_tissues` | Δα against protein identity and dN/dS, and named genes, in eight tissues | 487 x 484 | `specs/main.py` |
 | 9 | Figure 6 (continued) | `main_tissues_2` | Gene programs and classes across eight tissues | 470 x 352 | `specs/main.py` |
 | 10 | Figure 6 (continued) | `main_tissues_3` | Gene and tissue components of the readouts | 425 x 366 | `specs/main.py` |
 | 11 | Figure 6 (continued) | `main_tissues_4` | Home compartments, protein domains and regulatory features | 486 x 394 | `specs/main.py` |
 | 12 | Figure 7 | `main_disease` | Transfer of disease programs between human and mouse | 486 x 400 | `specs/main.py` |
-| 13 | Figure 8 | `main_protein` | Inputs of the gate network and control trainings | 487 x 491 | `specs/main.py` |
+| 13 | Figure 8 | `main_protein` | Inputs of the gate network and control trainings | 487 x 501 | `specs/main.py` |
 | 14 | Figure 8 (continued) | `main_protein_2` | Protein-space atlas and gene archetypes | 487 x 318 | `specs/main.py` |
 | 15 | Supplementary Figure S2 | `supp_alpha_training` | Training dynamics of α | 476 x 318 | `specs/supp_model.py` |
 | 16 | Supplementary Figure S3 | `supp_alpha_robustness` | Program-level Δα across seeds, species sets and tissues | 481 x 603 | `specs/supp_model.py` |
@@ -77,7 +77,7 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 69 | Supplementary Figure S53 | `supp_disease_genes` | Disease genes and drug targets by organ system | 438 x 436 | `specs/supp_tissues.py` |
 | 70 | Supplementary Figure S54 | `supp_drug_targets` | Approved drug targets against the protein prior | 486 x 163 | `specs/supp_tissues.py` |
 | 71 | Supplementary Figure S56 | `supp_gin_linear_baseline` | Linear surrogate and scalar-correlation controls of the gate correction | 480 x 122 | `specs/supp_protein.py` |
-| 72 | Supplementary Figure S57 | `supp_gin_attribution_suite` | Attribution of the gate correction to input groups, all methods | 484 x 522 | `specs/supp_protein.py` |
+| 72 | Supplementary Figure S57 | `supp_gin_attribution_suite` | Attribution of the gate correction to input groups, all methods | 481 x 515 | `specs/supp_protein.py` |
 | 73 | Supplementary Figure S58 | `supp_gin_method_consensus` | Consensus of the attribution methods | 404 x 269 | `specs/supp_protein.py` |
 | 74 | Supplementary Figure S59 | `supp_gin_orthogonality` | ESM-2 and expression inputs: orthogonality and ablation | 480 x 157 | `specs/supp_protein.py` |
 | 75 | Supplementary Figure S60 | `supp_gin_per_pc` | Contribution of single ESM-2 principal components | 482 x 272 | `specs/supp_protein.py` |
@@ -138,7 +138,7 @@ Figure 4, key `main_delta_alpha_liver`, label `fig:dalpha-biology`.
 
 Panels:
 
-- (a, b) `figures/sources/assembled/page16.pdf`, region (0, 0, 414, 402), scale 0.67
+- (a, b) `figures/sources/assembled/page16.pdf`, region (0, 0, 414, 402), scale 0.68
 - (c) `figures/panels/main_delta_alpha_liver/prior_landscape.pdf`, scale 1.00
 
 Not yet in the house style: scale; text; text_single (see `specs/_allow.py`).
@@ -147,16 +147,16 @@ Not yet in the house style: scale; text; text_single (see `specs/_allow.py`).
 
 Figure 4 (continued), key `main_delta_alpha_liver_2`, label `fig:dalpha-biology`.
 
-(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is backed by count evidence of the same sign. (f) Δα of the same genes in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs to the tissue. (g) How α and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither.
+(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is backed by count evidence of the same sign. (f) How α and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (g) Δα of the same genes in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs to the tissue.
 
 Panels:
 
-- (d) `figures/panels/main_delta_alpha_liver/celltype_drivers.pdf`, scale 1.03
-- (e) `figures/panels/main_delta_alpha_liver/margin_support.pdf`, scale 0.94
-- (g) `figures/panels/main_delta_alpha_liver/sequence_axis.pdf`, scale 0.96
-- (f) `figures/panels/main_delta_alpha_liver/cross_tissue.pdf`, scale 1.01
+- (d) `figures/panels/main_delta_alpha_liver/celltype_drivers.pdf`, scale 1.01
+- (e) `figures/panels/main_delta_alpha_liver/margin_support.pdf`, scale 0.93
+- (f) `figures/panels/main_delta_alpha_liver/sequence_axis.pdf`, scale 0.93
+- (g) `figures/panels/main_delta_alpha_liver/cross_tissue.pdf`, scale 1.01
 
-Not yet in the house style: letters; spelling; text (see `specs/_allow.py`).
+Not yet in the house style: letters (see `specs/_allow.py`).
 
 ## Page 6: Pre-specified tests against independent data and comparison with direct baselines
 
@@ -184,8 +184,6 @@ Panels:
 - (g) `figures/panels/main_validation/gates_vs_count_evidence.pdf`, scale 0.96
 - (h) `figures/panels/main_validation/gates_named_findings.pdf`, scale 0.96
 - (i) `figures/panels/main_validation/gates_sequence_measures.pdf`, scale 0.96
-
-Not yet in the house style: spelling; text (see `specs/_allow.py`).
 
 ## Page 8: Δα against protein identity and dN/dS, and named genes, in eight tissues
 
@@ -263,7 +261,7 @@ Figure 8, key `main_protein`, label `fig:gin-esm2`.
 Panels:
 
 - (a, b) `figures/sources/assembled/page23_unlabelled.pdf`, region (0, 0, 571, 156), scale 0.85
-- (c) `figures/panels/main_protein/controls.pdf`, scale 0.97
+- (c) `figures/panels/main_protein/controls.pdf`, scale 1.00
 
 Not yet in the house style: scale; text (see `specs/_allow.py`).
 
@@ -1033,10 +1031,10 @@ Panels:
 - (b) `figures/panels/supp_gin_attribution_suite/gradient_input_by_group.pdf`, scale 1.00
 - (c) `figures/panels/supp_gin_attribution_suite/gradient_input_signed_single.pdf`, scale 1.00
 - (d) `figures/panels/supp_gin_attribution_suite/ablation_correlation_by_group.pdf`, scale 1.00
-- (e) `figures/panels/supp_gin_attribution_suite/weight_path_by_group.pdf`, scale 0.97
-- (g) `notebooks/figures/gin_attention_overall/b3_integrated_gradients_completeness.pdf`, region (0, 11, 274.41, 191.28), scale 1.03
-- (f) `figures/panels/supp_gin_attribution_suite/weight_path_top20.pdf`, scale 1.03
-- (h) `figures/panels/supp_gin_attribution_suite/ig_by_group.pdf`, scale 1.03
+- (e) `figures/panels/supp_gin_attribution_suite/weight_path_by_group.pdf`, scale 1.00
+- (g) `figures/panels/supp_gin_attribution_suite/ig_completeness.pdf`, scale 1.00
+- (f) `figures/panels/supp_gin_attribution_suite/weight_path_top20.pdf`, scale 1.00
+- (h) `figures/panels/supp_gin_attribution_suite/ig_by_group.pdf`, scale 1.00
 
 ## Page 73: Consensus of the attribution methods
 
@@ -1114,6 +1112,8 @@ Panels:
 ## Page 79: Residue-level attribution audit
 
 Supplementary Figure S65, key `supp_residue_audit`, label `fig:supp-main-gin-protein`.
+
+The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means the first kind receives more attribution. (b) The same comparisons made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence. (e) The genes shared by liver and testis: mean Δα in liver against mean Δα in testis, shaded by the quadrant a gene falls in. (f, g) Three hand-curated groups of proteins: their overall attribution does not differ, and the contrast of hydrophobic against polar residues is clearest in the first group. (h) Six properties that are often assumed to drive such maps (disorder, glycine, proline, conservation and others) look strong when residues are pooled and disappear within proteins, except for contact density.
 
 Panels:
 

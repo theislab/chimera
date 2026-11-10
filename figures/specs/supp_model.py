@@ -99,7 +99,8 @@ FIGS = {
                 "sysVI). The same map is drawn three times: colored by donor, by species and by cell type, with one "
                 "legend and the cell counts under each column. In a well-integrated map the colors of the first two "
                 "columns are mixed and the colors of the third stay apart."),
-        note=("panel: figures/redraw/integration_umap.py (stored UMAP coordinates, nothing is recomputed)")),
+        note=("panel: figures/redraw/integration_umap.py (stored UMAP coordinates, nothing is recomputed); donors and "
+              "species are drawn in one fixed random order of the cells, cell types from the largest to the smallest")),
     "supp_integration_umap_liver": Figure(
         X("supp_integration_umap_liver/grid"),
         label="fig:supp-integration-liver-umap",
@@ -109,7 +110,8 @@ FIGS = {
                 "batches, sysVI). The same map is drawn three times: colored by donor, by species and by cell type, "
                 "with one legend and the cell counts under each column. In a well-integrated map the colors of the "
                 "first two columns are mixed and the colors of the third stay apart."),
-        note=("panel: figures/redraw/integration_umap.py (stored UMAP coordinates, nothing is recomputed)")),
+        note=("panel: figures/redraw/integration_umap.py (stored UMAP coordinates, nothing is recomputed); donors and "
+              "species are drawn in one fixed random order of the cells, cell types from the largest to the smallest")),
     "supp_integration_ten_methods": Figure(
         NB("baselines_master_ext/composite_mixing_bio_10models"),
         label="fig:supp-integration-purity",

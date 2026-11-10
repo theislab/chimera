@@ -132,24 +132,49 @@ def protein_space(cohort: str) -> dict:
                 delta_alpha=(final["alpha"] - final["prior"]).astype(np.float32))
 
 
+# Ties among genes with identical ESM-2 components make the neighbor search depend on how it is split over threads,
+# so the split is fixed here (20 threads, the one behind the values of the paper) and not taken from the machine.
 NEIGHBOR_THREADS = 20
+NEIGHBOR_CHECKSUM = {"liver_hmonkey": 2789576388, "liver_hmouse": 2225125037, "liver_hzeb": 3587800562,
+                     "liver_4sp": 1140565463}   # CRC-32 of the neighbor table of each cohort with this split
 
 
 def neighbors(features: np.ndarray) -> np.ndarray:
     """Indices of the K_NEIGHBORS nearest genes of every gene (Euclidean): the first of the K_NEIGHBORS + 1 found is dropped.
 
     In the four-species cohort 91 genes have the same 64 components as another gene, so which of the genes at distance
-    zero count among the neighbors is an arbitrary choice, and that choice follows from how the search is split over
-    threads. The values of the paper are those of a search on 20 threads, which this call repeats (they are reproduced
-    to five decimals). With 1 to 8 threads, or on a machine with fewer than 20 cores, the four-species values differ
-    from them by at most 0.0008; the other three cohorts have no such ties and do not change.
+    zero count among the neighbors is an arbitrary choice that follows from the split of the search over threads. The
+    search always runs on NEIGHBOR_THREADS threads, whatever the machine and its environment offer, which repeats the
+    values of the paper to five decimals. (Another split moves the four-species values by at most 0.0008 and those of
+    the other three cohorts in the fifth decimal.)
     """
+    import os
+
     from sklearn.neighbors import NearestNeighbors
     from threadpoolctl import threadpool_limits
 
-    with threadpool_limits(limits=NEIGHBOR_THREADS):
-        _, index = NearestNeighbors(n_neighbors=K_NEIGHBORS + 1, algorithm="auto").fit(features).kneighbors(features)
+    before = os.environ.get("OMP_NUM_THREADS")
+    os.environ["OMP_NUM_THREADS"] = str(NEIGHBOR_THREADS)   # scikit-learn then takes the limit set below, also with fewer cores
+    try:
+        with threadpool_limits(limits=NEIGHBOR_THREADS):
+            _, index = NearestNeighbors(n_neighbors=K_NEIGHBORS + 1, algorithm="auto").fit(features).kneighbors(features)
+    finally:
+        if before is None:
+            del os.environ["OMP_NUM_THREADS"]
+        else:
+            os.environ["OMP_NUM_THREADS"] = before
     return index[:, 1:]
+
+
+def check_neighbors(cohort: str, graph: np.ndarray) -> None:
+    """Say so when the neighbor table of a cohort with ties is not the one behind the values of the paper."""
+    import zlib
+
+    want = NEIGHBOR_CHECKSUM.get(cohort)
+    got = zlib.crc32(np.ascontiguousarray(graph, dtype=np.int64).tobytes())
+    if want is not None and got != want:
+        print(f"note: the neighbor table of {cohort} differs from the reference (checksum {got}, expected {want}; another "
+              "scikit-learn version?): its values can differ from the paper in the fourth decimal")
 
 
 def coherence(values: np.ndarray, graph: np.ndarray) -> float:
@@ -188,6 +213,7 @@ def autocorrelation_table() -> pd.DataFrame:
     for cohort in LIVER:
         d = protein_space(cohort)
         graph = neighbors(d["esm"])
+        check_neighbors(cohort, graph)
         for statistic, measure in (("coherence", coherence), ("moran", moran)):
             rng = np.random.default_rng(RNG_SEED)
             for quantity in QUANTITY:

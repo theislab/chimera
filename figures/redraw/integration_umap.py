@@ -7,10 +7,12 @@ Inputs per cohort: ``notebooks/cache/chimera_umap/<cohort key>__<method>__umap.n
 stored for Chimera, PCA, scANVI, scVI with donor batch and sysVI) and the cell annotations (species, cell type, donor)
 of the cohort's data object. No UMAP is computed: the script stops when a coordinate file is missing.
 
-Every cell is drawn, in the order of the notebook panels: one color after the other, donors and cell types from the
-largest group to the smallest, species as Human, Macaque or Monkey, Mouse; a later group lies over an earlier one. Colors
-are those of the notebook panels. Each column has one legend with the cell counts. The point clouds are images at
-600 dpi; everything else is vector.
+Every cell is drawn, with the colors of the notebook panels. In the donor and species columns the cells are drawn in
+one fixed random order, so that no donor or species is hidden under one drawn later (these columns show how donors and
+species mix). In the cell-type column the types are drawn one after the other from the largest to the smallest, as in
+the notebook panels, so that rare types lie on top. Legends list donors and cell types from the largest group to the
+smallest and species as Human, Macaque or Monkey, Mouse; each column has one legend with the cell counts. The point
+clouds are images at 600 dpi; everything else is vector.
 
     PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m figures.redraw.integration_umap [testis|liver]
 """
@@ -42,6 +44,11 @@ HEAD_H, MARK_H, LEGEND_LINE = 12.0, 12.0, 7.7    # column headings; band of the 
 # The notebook drew every cell with s = 2.5 on axes of about 215 x 244 bp; same share of the map here.
 POINT = dict(s=2.5 * TILE_W * TILE_H / (215.0 * 244.0), alpha=0.85, linewidths=0, rasterized=True)
 RASTER_DPI = 600
+# Drawing order of the cells per column (by donor, by species, by cell type). True: all cells in one fixed random order.
+# False: one group after the other in the order of the legend, as the notebook panels were drawn; a later group then lies
+# over an earlier one and can hide it (in the liver cohort the largest donor lay almost wholly under another).
+MIXED_ORDER = (True, True, False)
+ORDER_SEED = 0
 
 
 def annotations(cohort: str) -> pd.DataFrame:
@@ -94,14 +101,19 @@ def grid(cohort: str) -> list:
     left = [NAME_W + j * (TILE_W + GAP_X) for j in range(3)]
     top = [HEAD_H + i * (TILE_H + GAP_Y) for i in range(len(METHODS))]
 
+    order = np.random.default_rng(ORDER_SEED).permutation(len(obs))   # the same order of the cells in every map
     for i, (method, path) in enumerate(files.items()):
         xy = np.load(path)
         if xy.shape != (len(obs), 2):
             raise SystemExit(f"{path.name}: {xy.shape[0]} points for {len(obs)} cells")
         for j, (labels, groups, color) in enumerate(columns):
             ax = fig.add_axes([left[j] / WIDTH, 1 - (top[i] + TILE_H) / height, TILE_W / WIDTH, TILE_H / height])
-            for g in groups:
-                ax.scatter(xy[labels == g, 0], xy[labels == g, 1], color=color[g], **POINT)
+            if MIXED_ORDER[j]:
+                cells = order[np.isin(labels[order], groups)]
+                ax.scatter(xy[cells, 0], xy[cells, 1], c=[color[g] for g in labels[cells]], **POINT)
+            else:
+                for g in groups:
+                    ax.scatter(xy[labels == g, 0], xy[labels == g, 1], color=color[g], **POINT)
             ax.axis("off")
         page.text(NAME_W / 2 - 0.5, top[i] + TILE_H / 2, C.METHOD[method], rotation=90, ha="center", va="center",
                   fontsize=C.SIZE["title"], fontweight="bold" if method == "Chimera" else "normal")

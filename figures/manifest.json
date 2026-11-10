@@ -1,5 +1,5 @@
 {
- "figures_pdf_sha256": "2b93bd94f9254dc0f46d7f061667687629f3583afea72a7ae304edcfef40b8cb",
+ "figures_pdf_sha256": "4117d633d10e3927105bc46e107c8338f041b53029cb43bbaeddb1f46ce03eda",
  "crop": "pdf-crop-margins -v -p 0 -t 250 -c gr -x 300 -y 300 -a -0.5",
  "figures": [
   {
@@ -210,9 +210,9 @@
    "smallest_text_pt": 5.1,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "801aa7272d753eedc91c7a29876c372d0ddb72b10091a6c233f02e050ecde2e1",
+   "sha256": "ece955996e7d838e9f2f174ab6b2f0fb379a801c561069b0a34e1ebd64aed80c",
    "shows": "Rows are methods that align cells across species; columns are the seven liver and testis cohorts. Each cell is a score from 0 (lowest method on that cohort) to 1 (highest). (a) How well cells of different species mix. (b) How well cell types stay apart. (c) A weighted mean of the two. Methods are grouped by whether they see cell-type labels during training.",
-   "signature": "8aeaafbcc2a1ad3e8192a9587c5f9f6cb090d9f9c126c28b0887b52099c4c8e2",
+   "signature": "a403aa97451c34baae0c7602c5585f7643d7c18739def4f428f634a4a5fcd640",
    "shrink": 1.0,
    "composed_size": [
     486.0,
@@ -229,7 +229,7 @@
    "number": "4",
    "title": "Δα by gene category and across the protein prior, four-species liver",
    "width_bp": 486.76,
-   "height_bp": 279.84,
+   "height_bp": 281.07,
    "spec": "specs/main.py",
    "n_panels": 2,
    "panels": [
@@ -246,11 +246,11 @@
       414,
       402
      ],
-     "scale": 0.6733,
+     "scale": 0.6763,
      "x": 0.0,
      "y": 0.0,
-     "w": 277.87,
-     "h": 270.54,
+     "w": 279.12,
+     "h": 271.77,
      "exact": false,
      "clipped": false
     },
@@ -261,31 +261,31 @@
      "file": "figures/panels/main_delta_alpha_liver/prior_landscape.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9973,
-     "x": 284.87,
+     "scale": 1.0018,
+     "x": 286.12,
      "y": 0.0,
-     "w": 201.13,
-     "h": 270.54,
+     "w": 199.88,
+     "h": 271.77,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 3.96,
-   "share_under_5pt": "0.48",
+   "smallest_text_pt": 3.98,
+   "share_under_5pt": "0.27",
    "checks": "listed: scale, text, text_single",
-   "sha256": "e8980ccc128b49535ec6802cceee31e0c6ac6008088d43199ad9701007b0ff2e",
+   "sha256": "43bce0ffa868ada00243a1be9cfe5de00fb9534b531b40533744a99019d2b354",
    "shows": "(a) For twelve large gene categories, the spread of Δα over the genes of the category in the four-species liver model. Categories at the top sit above their protein prior, those at the bottom below it. (b) The same as effect sizes: how far each category is shifted (left column) and whether its genes move more than the average gene (right column). (c) Every gene as a dot, protein prior on the x axis and Δα on the y axis. Named genes: liver enzyme genes (urea cycle, gluconeogenesis) and mitochondrially encoded genes far below the prior, genes of supporting cell types above it. A dagger marks a gene whose position comes from its protein features and not from its own counts.",
-   "signature": "30e7e0842eb664d1463131ae5af97a80db50cf638f86fa34b87466a1cd8a1c19",
+   "signature": "e1e5f873d1cb58bea3a4e30d643ebd5771f2b2b61f535288df1c71b1563ee34f",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    280.043
+    281.265
    ],
    "problems": {},
    "listed": {
-    "text": "48% of the characters under 5.0 pt, smallest 3.96 pt (3.96 '\\t\\x0c'; 3.96 '\\t\\r'; 3.96 '\\t\\x0c') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "text_single": "13 single characters under 3.5 pt, smallest 3.3 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
-    "scale": "1 of 2 panels below scale 0.9, smallest 0.673 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
+    "text": "27% of the characters under 5.0 pt, smallest 3.98 pt (3.98 '\\t\\x0c'; 3.98 '\\t\\r'; 3.98 '\\t\\x0c') [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
+    "text_single": "13 single characters under 3.5 pt, smallest 3.31 pt [holds a region of a page assembled by hand; its panels are to be redrawn at print size]",
+    "scale": "1 of 2 panels below scale 0.9, smallest 0.676 [holds a region of a page assembled by hand; its panels are to be redrawn at print size]"
    }
   },
   {
@@ -295,8 +295,8 @@
    "part": 2,
    "number": "4 (continued)",
    "title": "Cell-type sources of the count evidence, margin support, tissue comparison and sequence measures",
-   "width_bp": 486.28,
-   "height_bp": 527.38,
+   "width_bp": 486.52,
+   "height_bp": 518.89,
    "spec": "specs/main.py",
    "n_panels": 4,
    "panels": [
@@ -307,11 +307,11 @@
      "file": "figures/panels/main_delta_alpha_liver/celltype_drivers.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0262,
+     "scale": 1.0051,
      "x": 0.0,
      "y": 0.0,
-     "w": 235.03,
-     "h": 366.06,
+     "w": 243.46,
+     "h": 357.8,
      "exact": false,
      "clipped": false
     },
@@ -322,26 +322,11 @@
      "file": "figures/panels/main_delta_alpha_liver/margin_support.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.943,
-     "x": 242.03,
+     "scale": 0.9276,
+     "x": 250.46,
      "y": 0.0,
-     "w": 243.97,
-     "h": 223.37,
-     "exact": true,
-     "clipped": false
-    },
-    {
-     "letters": [
-      "g"
-     ],
-     "file": "figures/panels/main_delta_alpha_liver/sequence_axis.pdf",
-     "page": 1,
-     "region": null,
-     "scale": 0.9635,
-     "x": 242.03,
-     "y": 238.87,
-     "w": 243.97,
-     "h": 127.19,
+     "w": 235.54,
+     "h": 219.51,
      "exact": true,
      "clipped": false
     },
@@ -349,34 +334,49 @@
      "letters": [
       "f"
      ],
+     "file": "figures/panels/main_delta_alpha_liver/sequence_axis.pdf",
+     "page": 1,
+     "region": null,
+     "scale": 0.9302,
+     "x": 250.46,
+     "y": 235.01,
+     "w": 235.54,
+     "h": 122.79,
+     "exact": true,
+     "clipped": false
+    },
+    {
+     "letters": [
+      "g"
+     ],
      "file": "figures/panels/main_delta_alpha_liver/cross_tissue.pdf",
      "page": 1,
      "region": null,
      "scale": 1.0098,
      "x": 0.0,
-     "y": 381.56,
+     "y": 373.3,
      "w": 486.0,
      "h": 136.53,
      "exact": false,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.71,
-   "share_under_5pt": "0.18",
-   "checks": "listed: letters, spelling, text",
-   "sha256": "40bf5d9c082d23469526b8a67e23e70d25175a9220427b6289941276c36d7ae8",
-   "shows": "(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is backed by count evidence of the same sign. (f) Δα of the same genes in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs to the tissue. (g) How α and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither.",
-   "signature": "ad5f594ed3bf9ccfa1c12a86ad7186c2bd0827b9c7d46f65e83273d9cb2e1dd0",
+   "smallest_text_pt": 5.3,
+   "share_under_5pt": "0.00",
+   "checks": "FAIL: stale_allow",
+   "sha256": "f6b29b1cd73d93526c5528d4209dc3da7eae7f02bd8e548af4b78b693c039f92",
+   "shows": "(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is backed by count evidence of the same sign. (f) How α and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (g) Δα of the same genes in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs to the tissue.",
+   "signature": "7e49ce17b4b0c568d9f884f7bf49151310a639f7a08684a11d546d17cb211b7f",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    527.582
+    519.325
    ],
-   "problems": {},
+   "problems": {
+    "stale_allow": "specs/_allow.py lists 'spelling' for this figure but the check passes: remove the entry"
+   },
    "listed": {
-    "text": "18% of the characters under 5.0 pt, smallest 4.71 pt (4.71 '0'; 4.71 '.'; 4.71 '4') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, in brackets [British spelling on the panels; to change when they are redrawn]",
-    "letters": "letters read abcedgf on the page, not in order [letters to be put in reading order together with the caption]"
+    "letters": "letters read abcedfg on the page, not in order [letters to be put in reading order together with the caption]"
    }
   },
   {
@@ -386,8 +386,8 @@
    "part": 1,
    "number": "5",
    "title": "Pre-specified tests against independent data and comparison with direct baselines",
-   "width_bp": 486.04,
-   "height_bp": 543.58,
+   "width_bp": 485.8,
+   "height_bp": 545.39,
    "spec": "specs/main.py",
    "n_panels": 4,
    "panels": [
@@ -398,11 +398,11 @@
      "file": "figures/panels/main_validation/prespecified_tests.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0026,
+     "scale": 1.0006,
      "x": 0.0,
      "y": 0.0,
-     "w": 214.48,
-     "h": 160.58,
+     "w": 215.01,
+     "h": 171.54,
      "exact": false,
      "clipped": false
     },
@@ -413,11 +413,11 @@
      "file": "figures/panels/main_validation/gene_sets.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.0026,
-     "x": 221.48,
-     "y": 0.96,
-     "w": 264.52,
-     "h": 159.61,
+     "scale": 1.0006,
+     "x": 222.01,
+     "y": 12.25,
+     "w": 263.99,
+     "h": 159.29,
      "exact": false,
      "clipped": false
     },
@@ -430,9 +430,9 @@
      "region": null,
      "scale": 1.0613,
      "x": 0.0,
-     "y": 176.08,
+     "y": 187.04,
      "w": 486.0,
-     "h": 177.79,
+     "h": 168.88,
      "exact": true,
      "clipped": false
     },
@@ -445,23 +445,23 @@
      "region": null,
      "scale": 1.0552,
      "x": 0.0,
-     "y": 369.37,
+     "y": 371.42,
      "w": 486.0,
      "h": 165.63,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 5.51,
+   "smallest_text_pt": 5.5,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "a56e16ee2bc61010d8c89f38bb019867ba79cfbd42132695d1deb29a90b633d8",
+   "sha256": "86c74b7734f18e63dd4031d369144b28c59ca214b9232ac6af5b47f879506408",
    "shows": "(a) Four tests fixed before the analysis: does Δα agree with independent data on expression level and on cell-type pattern, in liver and in testis? Points right of zero mean agreement; the dotted line is the bar set in advance. Liver pattern passes. (b) Sets of genes with a known expectation, tested against matched background genes. (c) Δα against simpler direct scores and against the gene scores of SATURN and CAMEX: right of zero, Δα is closer to the independent data. (d) What each score adds when all the others are known: the count evidence S_g adds on pattern.",
-   "signature": "a052ee6efe9810d63d4ef898370f21a993acafbb751b4614297e28f6ffc4b087",
+   "signature": "131169ca831547a12363c293e0688399ad3fdbc55b2b887e190308a7cb167874",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    544.498
+    546.548
    ],
    "problems": {},
    "listed": {}
@@ -474,7 +474,7 @@
    "number": "5 (continued)",
    "title": "The tests and two named findings under the protein-feature gate and the per-gene gate",
    "width_bp": 478.12,
-   "height_bp": 346.92,
+   "height_bp": 348.12,
    "spec": "specs/main.py",
    "n_panels": 5,
    "panels": [
@@ -554,22 +554,21 @@
      "clipped": false
     }
    ],
-   "smallest_text_pt": 4.9,
-   "share_under_5pt": "0.16",
-   "checks": "listed: spelling, text",
-   "sha256": "9ca766306a95a3d63ca85028e4eafc8ea2845bb3af82ad202b6a6af4a2c79360",
+   "smallest_text_pt": 5.19,
+   "share_under_5pt": "0.00",
+   "checks": "FAIL: stale_allow",
+   "sha256": "14b4d3a9050a632cfad505dde0911260d91c16d079dd4696776fd999a13a6f55",
    "shows": "The model can read Δα in two ways: through the protein-feature gate (the default) or gene by gene from each gene's own counts (the per-gene gate). (e) The four tests of panel a for both gates: with the per-gene gate Δα agrees with independent pattern data in liver and in testis. Right: the difference between the gates. (f) Testis: Δα against independent expression level; the per-gene readout follows the count evidence. (g) Δα against the count evidence of the same fit: loosely related with the protein-feature gate, almost identical with the per-gene gate. (h) Two named findings, spermatocyte genes above the prior and hepatocyte catabolic genes below it, hold under both gates. (i) Under both gates Δα stays unrelated to dN/dS and to the protein prior.",
-   "signature": "557fef9c60e9cb6896a3adbf661d9c07872f50c09e7c162f7af3f40ac0cfb99b",
+   "signature": "0dd184df4c538cb87d96ff38b98764d31f41fc9b34ccc3c6c3e4c3f915d94833",
    "shrink": 1.0,
    "composed_size": [
     486.0,
     350.004
    ],
-   "problems": {},
-   "listed": {
-    "text": "16% of the characters under 5.0 pt, smallest 4.9 pt (4.9 'p'; 4.9 'r'; 4.9 'e') [text under the floor; panels to be redrawn at print size]",
-    "spelling": "British spelling: centred, programme [British spelling on the panels; to change when they are redrawn]"
-   }
+   "problems": {
+    "stale_allow": "specs/_allow.py lists 'spelling' for this figure but the check passes: remove the entry"
+   },
+   "listed": {}
   },
   {
    "page": 8,
@@ -955,7 +954,7 @@
    "number": "8",
    "title": "Inputs of the gate network and control trainings",
    "width_bp": 487.0,
-   "height_bp": 490.88,
+   "height_bp": 501.37,
    "spec": "specs/main.py",
    "n_panels": 2,
    "panels": [
@@ -987,11 +986,11 @@
      "file": "figures/panels/main_protein/controls.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9697,
+     "scale": 1.0008,
      "x": 0.0,
      "y": 147.55,
      "w": 486.0,
-     "h": 334.03,
+     "h": 344.76,
      "exact": false,
      "clipped": false
     }
@@ -999,13 +998,13 @@
    "smallest_text_pt": 4.8,
    "share_under_5pt": "0.03",
    "checks": "listed: scale, text",
-   "sha256": "d19083b7435b99c0ebdf16a0a6bde7e317862402eb4c91804f1779da16c46d01",
+   "sha256": "3882ef99e8f908dcb6c43713586bdbb2df9db9342cb486c0d18a3e795a9b967d",
    "shows": "(a) Four ways of asking which inputs the gate network uses. Protein-language features (ESM-2) lead in three of them; expression features lead when whole groups of inputs are removed. (b) For each gene, the part of the correction that comes from protein features against the part that comes from expression features. The two are nearly unrelated and both are needed. (c) Control trainings: gene features removed, randomized or set to zero; counts shuffled between genes. Each dot compares one control run with normal training. The count evidence S_g (right) stays the same when features are changed and collapses when counts are shuffled. Δα (left) shows how much follows the features and how much follows the counts.",
-   "signature": "374e4eb31caa6accc25e66dac6eca2860ba138c7aa8cd32129ac0d6e878cb6ba",
+   "signature": "a405212130059351e0c252fe40c01fe0e98b159cf64d6bb68ced808698baa799",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    491.083
+    501.814
    ],
    "problems": {},
    "listed": {
@@ -1640,9 +1639,9 @@
    "smallest_text_pt": 5.5,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "fa72f868b6b3e984ee88ee3797179a2302ca3d35593ddfd87c6e4e297474ee36",
+   "sha256": "13c978bb7459e917dada17a86a679368c618fc61cefd427b06af8395df6b251e",
    "shows": "Each map shows all cells of the three-species testis cohort as dots; cells with similar profiles lie close together. Each row is one method (Chimera, PCA, scANVI, scVI with donors as batches, sysVI). The same map is drawn three times: colored by donor, by species and by cell type, with one legend and the cell counts under each column. In a well-integrated map the colors of the first two columns are mixed and the colors of the third stay apart.",
-   "signature": "be82ac114c2d5c4a63f9d425b605f0b86fb64fcc111a2bced0235a9895e9575d",
+   "signature": "dc0e2ca916a97bfe81fdc5d491de6402ca6c2ea101f1451336c0c7b681458d05",
    "shrink": 1.0,
    "composed_size": [
     486.0,
@@ -1680,9 +1679,9 @@
    "smallest_text_pt": 5.5,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "ec464c23602a580d3fffa9f377255928e6e8243c275ba54f21c136cc6a3d0af9",
+   "sha256": "c6dd4e3792cc05e96dbc61f2413910cc82ec1dd161cc36dd32cca09af45518f6",
    "shows": "Each map shows all cells of the liver cohort of human and monkey as dots; cells with similar profiles lie close together. Each row is one method (Chimera, PCA, scANVI, scVI with donors as batches, sysVI). The same map is drawn three times: colored by donor, by species and by cell type, with one legend and the cell counts under each column. In a well-integrated map the colors of the first two columns are mixed and the colors of the third stay apart.",
-   "signature": "de6518ddc33484d442e13bf48f23e2a487dd24d847d6bc0ab5f188a631fdc8eb",
+   "signature": "7c97c636ba76aadf110b401421c53924888f1bd634e87605cb0f33be1adef755",
    "shrink": 1.0,
    "composed_size": [
     486.0,
@@ -5695,8 +5694,8 @@
    "part": 1,
    "number": "S57",
    "title": "Attribution of the gate correction to input groups, all methods",
-   "width_bp": 483.64,
-   "height_bp": 521.65,
+   "width_bp": 481.24,
+   "height_bp": 514.65,
    "spec": "specs/supp_protein.py",
    "n_panels": 8,
    "panels": [
@@ -5767,11 +5766,11 @@
      "file": "figures/panels/supp_gin_attribution_suite/weight_path_by_group.pdf",
      "page": 1,
      "region": null,
-     "scale": 0.9744,
+     "scale": 0.9994,
      "x": 0.0,
      "y": 231.28,
-     "w": 240.88,
-     "h": 89.33,
+     "w": 247.06,
+     "h": 91.63,
      "exact": true,
      "clipped": false
     },
@@ -5779,20 +5778,15 @@
      "letters": [
       "g"
      ],
-     "file": "notebooks/figures/gin_attention_overall/b3_integrated_gradients_completeness.pdf",
+     "file": "figures/panels/supp_gin_attribution_suite/ig_completeness.pdf",
      "page": 1,
-     "region": [
-      0,
-      11,
-      274.41,
-      191.28
-     ],
-     "scale": 1.0343,
+     "region": null,
+     "scale": 0.9994,
      "x": 0.0,
-     "y": 336.12,
-     "w": 240.88,
-     "h": 180.55,
-     "exact": false,
+     "y": 338.41,
+     "w": 247.06,
+     "h": 171.26,
+     "exact": true,
      "clipped": false
     },
     {
@@ -5802,11 +5796,11 @@
      "file": "figures/panels/supp_gin_attribution_suite/weight_path_top20.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.026,
-     "x": 247.88,
+     "scale": 0.9994,
+     "x": 254.06,
      "y": 231.28,
-     "w": 238.12,
-     "h": 173.11,
+     "w": 231.94,
+     "h": 168.62,
      "exact": true,
      "clipped": false
     },
@@ -5817,25 +5811,25 @@
      "file": "figures/panels/supp_gin_attribution_suite/ig_by_group.pdf",
      "page": 1,
      "region": null,
-     "scale": 1.026,
-     "x": 247.88,
-     "y": 419.9,
-     "w": 238.12,
-     "h": 96.78,
+     "scale": 0.9994,
+     "x": 254.06,
+     "y": 415.4,
+     "w": 231.94,
+     "h": 94.26,
      "exact": true,
      "clipped": false
     }
    ],
-   "smallest_text_pt": 5.65,
+   "smallest_text_pt": 5.8,
    "share_under_5pt": "0.00",
    "checks": "ok",
-   "sha256": "a6306bd4a26b772ea0a76bb8d9e36cbb6a2cd56c56e0a169d43deda7ebb197bb",
+   "sha256": "1614eb419fcc78ff76a43922a3b79e065cd38e4ff09288e8ddb5d2c3ccc29398",
    "shows": "Four standard tests of which inputs the trained gate network uses, on the four-species liver model. The 72 inputs are put in five groups: the protein-language numbers, their difference between species, the mean sequence identity (the quantity the prior is made of), the expression numbers, and the spread of identity. (a) and (d): switch a group off and see how much the output changes and how well it still follows the full output. (b) and (c): how strongly the output reacts to a small change of an input, per group and with sign for the eight single numbers. (e) and (f): how much weight the connections of the network give to each group and to the 20 heaviest single inputs. (g): a check that integrated gradients add up to the change of the output. (h): integrated gradients per group.",
-   "signature": "e4a1f2ed0b7a2ae5e3772f470a4b3abc74270d9b603a9f57ec30b2c6b9177c69",
+   "signature": "58f5f7b458c4491b0912153faaad45079e223080146d75e659684cbd969527db",
    "shrink": 1.0,
    "composed_size": [
     486.0,
-    526.172
+    519.169
    ],
    "problems": {},
    "listed": {}
@@ -6455,7 +6449,7 @@
    "share_under_5pt": "0.98",
    "checks": "listed: scale, text, text_single",
    "sha256": "d0d1181b344e742b5c72072b0eb15ecb25c91d7954ef5934829059be7593527f",
-   "shows": "",
+   "shows": "The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means the first kind receives more attribution. (b) The same comparisons made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence. (e) The genes shared by liver and testis: mean Δα in liver against mean Δα in testis, shaded by the quadrant a gene falls in. (f, g) Three hand-curated groups of proteins: their overall attribution does not differ, and the contrast of hydrophobic against polar residues is clearest in the first group. (h) Six properties that are often assumed to drive such maps (disorder, glycine, proline, conservation and others) look strong when residues are pooled and disappear within proteins, except for contact density.",
    "signature": "81682de0871e61b33ad8d8df9bd32aa686999554b846eda1551699e3685a3eaf",
    "shrink": 1.0,
    "composed_size": [

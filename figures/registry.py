@@ -3,6 +3,10 @@
 Every spec module defines ``FIGS = {key: Figure(...)}``. A module with ``IN_PAPER = False`` holds figures that can be
 composed but are not part of the paper and not of ``figures.pdf``. ``order.txt`` lists the keys of the paper's figures in
 the order of their floats; it is written from the manuscript, so a moved float changes one generated file and no spec.
+
+A figure of a paper module whose key is not in ``order.txt`` is *pending*: its float is not in the manuscript yet (a new
+continuation float, for example). It can be composed, the build names it every time, and it is not in ``figures.pdf``.
+It joins the paper when its float exists and the order is written again; ``build --strict`` fails while one is pending.
 """
 
 from __future__ import annotations
@@ -38,8 +42,10 @@ def load(in_paper_only: bool = True) -> dict:
             target[key] = fig
     order = read_order()
     problems = [f"{k}: in order.txt but in no spec" for k in order if k not in paper]
-    problems += [f"{k}: in specs/{paper[k].module}.py but not in order.txt" for k in paper if k not in order]
     problems += [f"{k}: listed twice in order.txt" for k in set(order) if order.count(k) > 1]
+    for k in [k for k in paper if k not in order]:  # pending: specified, not yet a float of the paper
+        paper[k].pending = True
+        other[k] = paper.pop(k)
     # parts of one label: 1, 2, 3, ... in order, keys <key>, <key>_2, <key>_3
     seen = {}
     for k in order:
@@ -58,6 +64,11 @@ def load(in_paper_only: bool = True) -> dict:
     if not in_paper_only:
         figs.update(other)
     return figs
+
+
+def pending() -> dict:
+    """Figures of the paper's spec modules that are not in ``order.txt`` yet."""
+    return {k: f for k, f in load(in_paper_only=False).items() if getattr(f, "pending", False)}
 
 
 def signature(fig: C.Figure) -> dict:

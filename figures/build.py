@@ -184,6 +184,20 @@ def run_checks(figs: dict, rows: dict) -> tuple:
     return problems, allowed
 
 
+def missing_panel(fig: C.Figure) -> str:
+    """The first panel file of a figure that does not exist, or ''."""
+    for p in fig.tree.leaves():
+        try:
+            p.path()
+        except FileNotFoundError as e:
+            return str(e)
+    return ""
+
+
+def signature_or_none(fig: C.Figure) -> str | None:
+    return None if missing_panel(fig) else registry.signature_hash(fig)
+
+
 def current(figs: dict) -> list:
     """What is not up to date, without writing anything."""
     out = []
@@ -199,7 +213,9 @@ def current(figs: dict) -> list:
             out.append(f"{k}: composed/{k}.pdf is missing")
         elif sha(pdf) != by[k]["sha256"]:
             out.append(f"{k}: composed/{k}.pdf differs from the manifest")
-        elif registry.signature_hash(f) != by[k]["signature"]:
+        elif signature_or_none(f) is None:
+            out.append(f"{k}: a panel file of its spec is missing ({missing_panel(f)})")
+        elif signature_or_none(f) != by[k]["signature"]:
             out.append(f"{k}: the spec or a panel file changed since it was composed")
     if not SINGLE.exists():
         out.append("figures.pdf is missing")
@@ -219,19 +235,32 @@ def main() -> int:
 
     figs = registry.load(in_paper_only=True)
     extra = {k: f for k, f in registry.load(in_paper_only=False).items() if k not in figs}
+    pending = [k for k, f in extra.items() if getattr(f, "pending", False)]
     if a.check:
         stale = current(figs)
         print("\n".join(stale) if stale else f"current: {len(figs)} figures, figures.pdf, manifest")
+        if pending:
+            print("pending (specified, not yet a float of the paper): " + ", ".join(pending))
         return 1 if stale else 0
 
     unknown = [k for k in a.keys if k not in figs and k not in extra]
     if unknown:
         print("unknown keys:", ", ".join(unknown))
         return 2
-    todo = a.keys or [k for k in figs if load_row(k) is None or not (C.COMPOSED / f"{k}.pdf").exists()
-                      or load_row(k)["signature"] != registry.signature_hash(figs[k])]
-    if not a.keys and len(todo) < len(figs):
-        print(f"{len(figs) - len(todo)} figures are current and are not composed again")
+    both = dict(figs, **{k: extra[k] for k in pending})  # pending figures are composed too, so that their owners see them
+    # A figure with a missing panel file (its panels are being redrawn) keeps its last composed version and is named.
+    broken = {k: missing_panel(f) for k, f in dict(both, **extra).items() if (not a.keys or k in a.keys) and missing_panel(f)}
+    todo = [k for k in (a.keys or both) if k not in broken and (
+        bool(a.keys) or load_row(k) is None or not (C.COMPOSED / f"{k}.pdf").exists()
+        or load_row(k)["signature"] != registry.signature_hash(both[k]))]
+    if not a.keys and len(todo) < len(both):
+        print(f"{len(both) - len(todo) - len(broken)} figures are current and are not composed again")
+    for k, m in broken.items():
+        print(f"MISSING PANEL  {k}: {m}" + ("; its last composed version is kept" if (C.COMPOSED / f"{k}.pdf").exists() else ""))
+    unusable = [k for k in broken if k in figs and (load_row(k) is None or not (C.COMPOSED / f"{k}.pdf").exists())]
+    if unusable and not a.no_single:
+        print("cannot build figures.pdf: no composed version of " + ", ".join(unusable))
+        return 1
     with ThreadPoolExecutor(a.jobs) as ex:
         futs = {k: ex.submit(compose_one, k, (figs.get(k) or extra[k])) for k in todo}
         failed = []
@@ -271,11 +300,13 @@ def main() -> int:
                 print(f"  {k:<38} {name:<12} {msg[:170]}")
     for m in bad:
         print("CROP:", m)
+    if pending:
+        print("\nPending (specified, not yet a float of the paper; composed, not in figures.pdf): " + ", ".join(pending))
     for f, hits in leaks:
         print(f"MACHINE PATH: {f}: {', '.join(hits)}")
     print(f"no trace of a working machine in the panels, composed figures, assets and figures.pdf" if not leaks
           else f"{len(leaks)} files carry traces of a working machine: the build fails")
-    return 1 if (problems or bad or leaks or (a.strict and allowed)) else 0
+    return 1 if (problems or bad or leaks or broken or (a.strict and (allowed or pending))) else 0
 
 
 if __name__ == "__main__":

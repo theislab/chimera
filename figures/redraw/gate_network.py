@@ -13,10 +13,9 @@ as in sections A, B, C.1, C.2 and F of ``notebooks/_gin_attention_overall_builde
     supp_gin_orthogonality/        r2_components_from_expression, delta_alpha_inputs_zeroed
     supp_gin_per_pc/               ig_by_component, spearman_by_component, component_rank1, component_rank2, component_rank3
 
-``ig_completeness`` prints the largest completeness error of integrated gradients. It is a rounding-level quantity of
-single-precision arithmetic (about 3e-06) and its last digits depend on the machine, so the figure keeps the panel of
-the notebook there (``notebooks/figures/gin_attention_overall/b3_integrated_gradients_completeness.pdf``) and this
-script draws its own version only on request (``attribution_suite_with_completeness``).
+``ig_completeness`` states a bound on the largest completeness error of integrated gradients (below 1e-5). The error
+itself is a rounding-level quantity of single-precision arithmetic (about 3e-06) whose last digits depend on the
+machine, so the panel prints the bound, which the script checks, and not the digits.
 
 Inputs (four-species liver run): ``model/model.pt`` (weights of the gate network), ``final_state.npz`` (correction,
 prior, alpha), and the 72 standardized inputs per gene in ``varm["gene_features"]`` of the data object.
@@ -306,12 +305,15 @@ def linear_baseline() -> list:
 # Four attribution methods
 # ---------------------------------------------------------------------------------------------------------------------
 # Heights in bp. Rows (a, b) and (c, d); then (e) over (g) at the left and (f) over (h) at the right, both columns equally
-# high. "completeness" is the height of the first-version panel (g) at the width of the left column.
+# high. "completeness" is the height of panel (g), the completeness check, at the width of the left column.
 ROW = dict(groups=5 * 11.0 + BOTTOM + HEAD, single=8 * 9.0 + BOTTOM + HEAD, top20=20 * 6.6 + BOTTOM + HEAD, completeness=171.3)
 ROW["last"] = ROW["groups"] + ROW["completeness"] - ROW["top20"]
 
 
-def attribution_suite(completeness: bool = False) -> list:
+COMPLETENESS_BOUND = 1e-5   # printed on the completeness panel; the measured error is about 3e-06
+
+
+def attribution_suite() -> list:
     fd = _style()
     family = "supp_gin_attribution_suite"
     g, a = gate(), attributions()
@@ -366,18 +368,19 @@ def attribution_suite(completeness: bool = False) -> list:
     ax.set_title("weight path")
     out.append(_save(fig, family, "weight_path_top20"))
 
-    if completeness:
-        # completeness of integrated gradients: the attributions of a gene add up to the change of the output
-        fig, ax = _page(COL_L, ROW["completeness"], 34, top=HEAD, bottom=29.5)   # room for the sum sign
-        fd.density_scatter(ax, a.ig_sum, a.change, s=1.5)
-        lim = (min(a.ig_sum.min(), a.change.min()), max(a.ig_sum.max(), a.change.max()))
-        fd.add_identity_line(ax, lim=lim)
-        ax.set_xlabel("$\\sum_i \\mathrm{IG}_i(\\mathbf{x})$, sum over the 72 inputs")
-        ax.set_ylabel("$f(\\mathbf{x}) - f(\\mathbf{0})$, change of the correction")
-        fd.annotate_stat(ax, f"max |error| = {a.completeness_error:.2e}", "lower right")
-        ax.texts[-1].set_fontsize(C.SIZE["text"])
-        ax.set_title("integrated gradients")
-        out.append(_save(fig, family, "ig_completeness"))
+    # completeness of integrated gradients: the attributions of a gene add up to the change of the output
+    fig, ax = _page(COL_L, ROW["completeness"], 34, top=HEAD, bottom=29.5)   # room for the sum sign
+    fd.density_scatter(ax, a.ig_sum, a.change, s=1.5)
+    lim = (min(a.ig_sum.min(), a.change.min()), max(a.ig_sum.max(), a.change.max()))
+    fd.add_identity_line(ax, lim=lim)
+    ax.set_xlabel("$\\sum_i \\mathrm{IG}_i(\\mathbf{x})$, sum over the 72 inputs")
+    ax.set_ylabel("$f(\\mathbf{x}) - f(\\mathbf{0})$, change of the correction")
+    if not a.completeness_error < COMPLETENESS_BOUND:
+        raise SystemExit(f"integrated gradients: max |error| = {a.completeness_error:.2e} is not below {COMPLETENESS_BOUND:g}")
+    fd.annotate_stat(ax, "max |error| < 1e-5", "lower right")
+    ax.texts[-1].set_fontsize(C.SIZE["text"])
+    ax.set_title("integrated gradients")
+    out.append(_save(fig, family, "ig_completeness"))
     for m in METHOD:
         print(f"{m:>22}:", "  ".join(f"{C.GATE_GROUP[k]} {v:.1f}%" for k, v in a.percent[m].items()))
     print("Pearson r after ablation:", {k: round(v, 3) for k, v in a.ablation_r.items()})
@@ -541,9 +544,7 @@ def per_component() -> list:
 PANELS = {"linear_baseline": linear_baseline, "attribution_suite": attribution_suite, "method_consensus": method_consensus,
           "orthogonality": orthogonality, "per_component": per_component}
 
-OPTIONAL = {"attribution_suite_with_completeness": functools.partial(attribution_suite, completeness=True)}
-
 if __name__ == "__main__":
     for name in sys.argv[1:] or list(PANELS):
-        for p in {**PANELS, **OPTIONAL}[name]():
+        for p in PANELS[name]():
             print("wrote", p)

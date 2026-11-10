@@ -147,7 +147,33 @@ SIGNIFICANT = "*"  # the one mark for q < 0.05
 
 # ----------------------------------------------------------------------------------------------- no machine paths
 _PTEX_NAME = re.compile(rb"/PTEX\.FileName\s*\(((?:[^()\\]|\\.)*)\)")
-MACHINE_PATH = re.compile(rb"ictstr\d*|/lustre/|/home/icb|kemal|/Users/")  # nothing of a working machine in a tracked file
+_MACHINE_PATTERN = None
+
+
+def machine_pattern() -> "re.Pattern":
+    """What counts as a trace of the machine a file was made on, built from the machine itself: the folder of this
+    repository and every folder above it (as given and with links resolved), the home folder, the user name, and the
+    usual roots of personal folders (``/Users/``, ``/home/``, ``/lustre/``). More patterns, as one regular expression,
+    can be given in the environment variable ``CHIMERA_PRIVATE_PATTERNS``."""
+    global _MACHINE_PATTERN
+    if _MACHINE_PATTERN is None:
+        import getpass
+
+        parts = {"/Users/", "/home/", "/lustre/"}
+        folders = set()
+        for start in (ROOT.parent, ROOT.parent.resolve(), Path.home(), Path.home().resolve()):
+            folders.update(str(p) for p in (start, *start.parents) if str(p) != p.anchor)
+        parts.update(f + "/" for f in folders)
+        try:
+            parts.add(getpass.getuser())
+        except Exception:  # noqa: BLE001  (no user database entry: the folders above still cover the user)
+            pass
+        alternatives = [re.escape(p).encode() for p in sorted(parts, key=len, reverse=True) if len(p) >= 3]
+        extra = os.environ.get("CHIMERA_PRIVATE_PATTERNS", "").strip()
+        if extra:
+            alternatives.append(b"(?:" + extra.encode() + b")")
+        _MACHINE_PATTERN = re.compile(b"|".join(alternatives))
+    return _MACHINE_PATTERN
 
 
 def blank_file_names(pdf: Path) -> int:
@@ -162,14 +188,15 @@ def blank_file_names(pdf: Path) -> int:
 
 
 def machine_paths(path: Path, deep: bool = True) -> list:
-    """Traces of a working machine in a file (``MACHINE_PATH``): in its bytes and, for a PDF with ``deep``, also in its
-    uncompressed form (object streams and stream data opened with qpdf, when qpdf is on PATH). There must be none."""
+    """Traces of a working machine in a file (``machine_pattern``): in its bytes and, for a PDF with ``deep``, also in
+    its uncompressed form (object streams and stream data opened with qpdf, when qpdf is on PATH). There must be none."""
     import shutil
     import subprocess
     import tempfile
 
     path = Path(path)
-    hits = {m.group(0).decode("latin-1") for m in MACHINE_PATH.finditer(path.read_bytes())}
+    pattern = machine_pattern()
+    hits = {m.group(0).decode("latin-1") for m in pattern.finditer(path.read_bytes())}
     qpdf = shutil.which("qpdf")
     if deep and qpdf and path.suffix.lower() == ".pdf":
         with tempfile.TemporaryDirectory() as td:
@@ -177,7 +204,7 @@ def machine_paths(path: Path, deep: bool = True) -> list:
             subprocess.run([qpdf, "--stream-data=uncompress", "--object-streams=disable", "--decode-level=generalized", str(path), str(tmp)],
                            capture_output=True)
             if tmp.exists():
-                hits |= {m.group(0).decode("latin-1") for m in MACHINE_PATH.finditer(tmp.read_bytes())}
+                hits |= {m.group(0).decode("latin-1") for m in pattern.finditer(tmp.read_bytes())}
     return sorted(hits)
 
 

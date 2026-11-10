@@ -71,16 +71,16 @@ FIGS = {
                "from its own counts.")),
     "main_delta_alpha_liver_2": Figure(
         Col(Row(P("main_delta_alpha_liver/celltype_drivers", "d"),
-                Col(X("main_delta_alpha_liver/margin_support", "e"), X("main_delta_alpha_liver/sequence_axis", "g"))),
-            P("main_delta_alpha_liver/cross_tissue", "f")),
+                Col(X("main_delta_alpha_liver/margin_support", "e"), X("main_delta_alpha_liver/sequence_axis", "f"))),
+            P("main_delta_alpha_liver/cross_tissue", "g")),
         label="fig:dalpha-biology", part=2,
         title="Cell-type sources of the count evidence, margin support, tissue comparison and sequence measures",
         shows=("(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of "
                "it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is "
-               "backed by count evidence of the same sign. (f) Δα of the same genes in liver against testis for "
-               "two species pairs: no agreement beyond chance, so the reading belongs to the tissue. (g) How α "
-               "and Δα correlate with protein identity and dN/dS in 16 cohorts: identity and dN/dS go together, "
-               "Δα follows neither.")),
+               "backed by count evidence of the same sign. (f) How α and Δα correlate with protein identity and "
+               "dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (g) Δα of the same genes "
+               "in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs "
+               "to the tissue.")),
     "main_validation": Figure(
         Col(Row(P("main_validation/prespecified_tests", "a"), P("main_validation/gene_sets", "b"), same_scale=True),
             X("main_validation/head_to_head", "c"), X("main_validation/incremental", "d")),
