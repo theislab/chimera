@@ -21,6 +21,10 @@ Usage::
 
     python analysis/tasks/T2_5_celltype_margin/run.py [--runs all] [--threads 4] [--n-boot 200]
         [--outdir DIR] [--reuse-forward]
+
+The closure panel of the paper, figures/panels/supp_celltype_closure/closure.pdf, is drawn from the cached gene tables alone by
+
+    python -c "from analysis.tasks.T2_5_celltype_margin import run; run.draw_panels()"
 """
 
 from __future__ import annotations
@@ -37,6 +41,7 @@ import pandas as pd
 from analysis.common import cohorts as C
 from analysis.common import gene_ids
 from analysis.common.outputs import TaskOutput, add_common_args
+from figures import style
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import margin as MG  # noqa: E402
@@ -322,29 +327,63 @@ def fig_main(C_long: pd.DataFrame, genes: pd.DataFrame, title_run: str):
 
 
 def fig_closure(gene_tables: dict):
-    plt = _design()
+    """One plot per cohort at its size on the page, four per row at the text width: S_g rebuilt from one pass over all
+    cells (x) against S_g at the end of training (y), every gene drawn. Each plot has its own range, the same on both
+    axes; the two axes are named once for the figure, and the free place after the last plot holds the key."""
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+
+    style.apply()
+    mark, ref_line = style.READOUT["count_evidence"], "#888888"  # the genes in the color of the count evidence; the diagonal
     labs = [k for k in gene_tables if k in C.CANONICAL]
-    # Four panels per row at the text width (F1): a single row of seven is too small to read.
-    nrow = int(np.ceil(len(labs) / 4))
-    fig, axes = plt.subplots(nrow, 4, figsize=(6.75, 1.72 * nrow), squeeze=False)
-    for ax in axes.ravel()[len(labs):]:
-        ax.set_visible(False)
-    for ax, lab in zip(axes.ravel(), labs):
+    ncol = 4
+    nrow = int(np.ceil(len(labs) / ncol))
+    # geometry, bp
+    W = style.TEXTWIDTH
+    left, right, top, bottom, side, ticks_w, title_h, ticks_h, gap_y = 12.0, 3.0, 1.0, 12.0, 92.0, 19.0, 10.0, 11.0, 4.0
+    gap_x = (W - left - right - ncol * (ticks_w + side)) / (ncol - 1)
+    row_h = title_h + side + ticks_h
+    H = top + nrow * row_h + (nrow - 1) * gap_y + bottom
+
+    def place(k):  # lower left corner of plot k
+        i, j = divmod(k, ncol)
+        return left + j * (ticks_w + side + gap_x) + ticks_w, H - top - i * (row_h + gap_y) - title_h - side
+
+    fig = plt.figure(figsize=(style.inch(W), style.inch(H)))
+    for k, lab in enumerate(labs):
         t = gene_tables[lab]
         x, y = t["ppass_S_samp"].to_numpy(), t["S_g_ema"].to_numpy()
-        ax.scatter(x, y, s=1, color="#555555", linewidths=0, rasterized=True)
-        lo, hi = np.percentile(np.r_[x, y], [0.5, 99.5])
-        ax.plot([lo, hi], [lo, hi], color="#999999", linewidth=0.5, linestyle="--")
+        x0, y0 = place(k)
+        ax = fig.add_axes([x0 / W, y0 / H, side / W, side / H])
+        ax.scatter(x, y, s=1.4, color=mark.color, alpha=0.5, linewidths=0, rasterized=True)
+        lo, hi = min(x.min(), y.min()), max(x.max(), y.max())  # every gene inside the axes
+        lo, hi = lo - 0.04 * (hi - lo), hi + 0.04 * (hi - lo)
+        ax.plot([lo, hi], [lo, hi], color=ref_line, linewidth=style.LW_REF, linestyle="--", zorder=0)
         ax.set_xlim(lo, hi)
         ax.set_ylim(lo, hi)
-        ax.set_title(C.LABELS[lab], fontsize=6.5)
-        ax.text(0.03, 0.97, f"r = {np.corrcoef(x, y)[0, 1]:.3f}", transform=ax.transAxes, fontsize=6, va="top")
-        ax.tick_params(labelsize=5.5, length=2)
-        ax.set_xlabel("pass rate × forward-pass S_g", fontsize=6)
-    for row in axes:
-        row[0].set_ylabel("trained S_g (EMA)", fontsize=6)
-    fig.tight_layout(pad=0.2, h_pad=0.6, w_pad=0.5)
+        ax.locator_params(axis="both", nbins=4)
+        ax.set_title(style.cohort_name(lab), pad=2.5)
+        ax.text(0.04, 0.96, f"r = {np.corrcoef(x, y)[0, 1]:.3f}", transform=ax.transAxes, fontsize=style.SIZE_TICK, va="top")
+        ax.tick_params(length=2, pad=1.5)
+    fig.text(5.0 / W, (H - top + bottom) / 2 / H, "$S_g$ at the end of training", rotation=90, ha="center", va="center", fontsize=style.SIZE_LABEL)
+    fig.text((left + ticks_w + W - right) / 2 / W, 1.5 / H, "$S_g$ rebuilt from one pass over all cells", ha="center", va="bottom",
+             fontsize=style.SIZE_LABEL)
+    if len(labs) < nrow * ncol:  # the key, in the first free place
+        x0, y0 = place(len(labs))
+        fig.legend([Line2D([], [], marker="o", color=mark.color, ls="", ms=2.2, mew=0), Line2D([], [], color=ref_line, lw=style.LW_REF, ls="--"),
+                    Line2D([], [], ls="")], ["one gene", "equal values", "r, Pearson correlation\nover all genes"], loc="center left",
+                   bbox_to_anchor=(x0 / W, (y0 + side / 2) / H), handlelength=1.6, labelspacing=0.6, borderaxespad=0)
     return fig
+
+
+def draw_panels() -> None:
+    """The closure panel of the paper from the cached gene tables (<cohort>__genes.parquet); nothing is computed."""
+    import matplotlib.pyplot as plt
+
+    res = gene_ids.REPO_ROOT / "results" / "analysis" / "T2_5"
+    fig = fig_closure({c: pd.read_parquet(res / f"{c}__genes.parquet") for c in C.CANONICAL})
+    with plt.rc_context({"savefig.dpi": 360}):  # rasterized gene clouds: above 300 ppi on the page
+        style.save_panel(fig, "supp_celltype_closure/closure", exact=True)
 
 
 def fig_seed(seed_df: pd.DataFrame):

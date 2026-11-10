@@ -1,6 +1,11 @@
-"""Y1 compact figure. Static, for the ledger and a possible supplementary panel. Palette: dataviz reference slots (validator not run, no node here).
+"""Gene by tissue: six panels (variance split, tissue contrast as heat maps and as differences, within-gene tissue
+differences, flip genes, worked genes), drawn from the result tables of this task.
 
-    python -I launch.py analysis.tasks.Y1_gene_tissue.figure
+The panels are saved as three pages of one size, figures/panels/main_tissues/gene_by_tissue_row{1,2,3}.pdf, each with one
+row of panels drawn. The figure spec cuts the six panels out of these pages at fixed positions, so the page and the
+place of every axes on it are fixed here (PAGE_W, PAGE_H, GRID) and do not depend on any label.
+
+    python -I analysis/tasks/Y1_gene_tissue/launch.py analysis.tasks.Y1_gene_tissue.figure
 """
 
 from __future__ import annotations
@@ -20,38 +25,46 @@ from analysis.tasks.Y1_gene_tissue import rules as RU
 sys.path.insert(0, str(Y.ROOT / "notebooks"))
 import _figure_design as fd  # noqa: E402
 
+from figures import style  # noqa: E402
+
 OUT = RU.OUT
-INK, MUTED, GRID = "#0b0b0b", "#52514e", "#d8d7d2"
-CS, CB, CD, CDIR = "#2a78d6", "#eb6834", "#1baf7a", "#6250d6"  # S, B1, D, direct margin; each with its own marker
-MK = {"S": "o", "B1": "s", "D": "^", "Sdir": "D"}
-COL = {"S": CS, "B1": CB, "D": CD, "Sdir": CDIR}
+
+# ---------------------------------------------------------------- house style (figures/style.py) and the names of this figure
+INK, MUTED, RULE = style.INK, style.MUTED, style.RULE
+READOUT = {"S": style.READOUT["count_evidence"], "B1": style.READOUT["profile_correlation"], "D": style.READOUT["delta_alpha"],
+           "Sdir": style.READOUT["direct_margin"]}  # one color and one marker per readout
+MK = {k: m.marker for k, m in READOUT.items()}
+COL = {k: m.color for k, m in READOUT.items()}
 NAME = {"S": r"$S_g$", "B1": "profile correlation", "D": r"$\Delta\alpha$", "Sdir": "direct margin"}  # reader names
+BLUE, BLUE_LIGHT, ORANGE, PURPLE, PALE = "#0072B2", "#8CC0DC", "#E69F00", "#8A7FD8", "#D9D9D9"  # shares of a bar (panels a and e)
+REFERENCE = "independent reference"  # the independent data a readout is compared with
 TIS = ["liver", "testis", "kidney", "islet", "bone_marrow", "eye"]
-TL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "islet": "islet", "bone_marrow": "marrow", "eye": "eye"}
-# Display name of each gold: the "pancreas" gold is the islet reference (keys stay as in the result files).
+TL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "islet": "islet", "bone_marrow": "bone marrow", "eye": "eye"}
+# Display name of each reference: the "pancreas" reference is the islet reference (keys stay as in the result files).
 GL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "pancreas": "islet"}
 
-
-def lettered(ax, s):
-    return ax.text(-0.02, 1.05, s, transform=ax.transAxes, fontweight="bold", fontsize=9, ha="right", va="bottom", color=INK)
+# Geometry in bp. A row page is PAGE_W x PAGE_H; GRID gives the outer edges of the grid of axes on it, from the lower
+# left corner of the page.
+PAGE_W, PAGE_H = 511.914, 429.135
+GRID = dict(left=51.690, right=510.474, bottom=24.940, top=413.308)
 
 
 def panel_a(ax):
     v = pd.read_csv(OUT / "variance_split.csv")
     v = v[v.design == "ED"].set_index("score").loc[["S", "D", "B1"]]
-    tones = {"gene": "#2a78d6", "gxt": "#9ec5f0", "noise": "#d8d7d2"}
+    tones = {"gene": BLUE, "gxt": BLUE_LIGHT, "noise": PALE}
     for i, (sc, r) in enumerate(v.iterrows()):
         left = 0
         for k, c, w in (("gene_share", tones["gene"], r.gene_share), ("gxt_share", tones["gxt"], r.gxt_share), ("noise_share", tones["noise"], r.noise_share)):
             ax.barh(i, w - 0.004, left=left, color=c, height=0.62)
             left += w
         ax.text(r.gene_share + 0.012, i, f"{r.gene_share:.2f}", va="center", ha="left", fontsize=6.5, color=INK)
-    ax.set_yticks(range(3), [NAME[s].replace(" ", "\n") if s == "B1" else NAME[s] for s in v.index])  # two lines: page box unchanged
+    ax.set_yticks(range(3), [NAME[s].replace(" ", "\n") if s == "B1" else NAME[s] for s in v.index])  # two lines: the label stays on the page
     ax.invert_yaxis()
     ax.set_xlim(0, 1)
     ax.set_xlabel("share of variance of z, given expression and detection per tissue")
     h = [plt.Rectangle((0, 0), 1, 1, color=tones[k]) for k in tones]
-    ax.legend(h, ["gene (shared across tissues)", "gene x tissue", "technical noise"], frameon=False, fontsize=6, loc="upper center", bbox_to_anchor=(0.5, 1.28), ncol=3, handlelength=1, columnspacing=0.8)
+    ax.legend(h, ["gene (shared across tissues)", "gene by tissue", "technical noise"], frameon=False, fontsize=6, loc="upper center", bbox_to_anchor=(0.5, 1.28), ncol=3, handlelength=1, columnspacing=0.8)
 
 
 def panel_b(axs):
@@ -70,10 +83,12 @@ def panel_b(axs):
         for i, t in enumerate(TIS):
             for j, g in enumerate(golds):
                 v = M.iloc[i, j]
-                ax.text(j, i, f"{v:.2f}".replace("0.", "."), ha="center", va="center", fontsize=5.8, color="white" if abs(v) > 0.15 else INK)
+                ax.text(j, i, f"{v:.2f}".replace("0.", ".").replace("-", "−"), ha="center", va="center", fontsize=5.8, color="white" if abs(v) > 0.15 else INK)
                 if match[g] == t:
                     ax.add_patch(plt.Rectangle((j - .5, i - .5), 1, 1, fill=False, ec=INK, lw=1.1))
-        ax.set_xlabel(f"gold; readout {NAME[sc]}", fontsize=7, loc="center" if sc == "S" else "right")  # long name: into the gap, page box unchanged
+        ax.set_title(NAME[sc], fontsize=7, pad=3)  # the readout of this heat map
+        ax.set_xlabel(REFERENCE, fontsize=7, loc="center" if sc == "S" else "right")  # right: the label ends with the heat map, on the page
+    axs[0].yaxis.tick_right()  # the tissue names stand between the two heat maps and name the rows of both
     axs[0].set_ylabel("tissue of the readout")
 
 
@@ -85,7 +100,7 @@ def forest(ax, rows, labels, scores, xlabel, ref=0):
         y = np.arange(len(labels)) + off[j]
         ax.hlines(y, d.lo, d.hi, color=COL[sc], lw=1.2)
         ax.plot(d.est, y, MK[sc], color=COL[sc], ms=4, mec="white", mew=0.5, label=NAME[sc], ls="")
-    ax.axvline(ref, color=GRID, lw=0.8, zorder=0)
+    ax.axvline(ref, color=RULE, lw=0.8, zorder=0)
     ax.set_yticks(range(len(labels)), labels)
     ax.invert_yaxis()
     ax.set_xlabel(xlabel)
@@ -94,7 +109,7 @@ def forest(ax, rows, labels, scores, xlabel, ref=0):
 def panel_c(ax):
     d = pd.read_csv(OUT / "contrast_delta.csv")
     d = d[d.score.isin(["S", "B1", "D"])].assign(key=lambda x: x.gold)
-    forest(ax, d, ["liver", "testis", "kidney", "pancreas"], ["S", "B1", "D"], "$\\Delta_T$: same tissue minus other tissues, $\\rho_p$")
+    forest(ax, d, ["liver", "testis", "kidney", "pancreas"], ["S", "B1", "D"], "same tissue minus other tissues, $\\rho_p$")
     ax.set_yticks(range(4), [GL[g] for g in ["liver", "testis", "kidney", "pancreas"]])
     ax.legend(frameon=False, fontsize=6, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3, handletextpad=0.1, columnspacing=1.0)
 
@@ -112,21 +127,21 @@ def panel_d(ax):
         ax.plot(d.est, y, MK[sc], color=COL[sc], ms=4, mec="white", mew=0.5, ls="")
         e = w[w.score == sc].set_index("key").reindex(ls)
         ax.plot(e.est, y, MK[sc], mfc="white", mec=COL[sc], ms=3.5, mew=0.7, ls="")
-    ax.axvline(0, color=GRID, lw=0.8, zorder=0)
+    ax.axvline(0, color=RULE, lw=0.8, zorder=0)
     ax.set_yticks(range(6), ls)
     ax.invert_yaxis()
-    ax.set_xlabel("tissue difference in readout vs in gold, within gene, $\\rho$")
-    # readouts by colour and marker, the two adjustments by fill (column-wise: readouts left, fill right)
+    ax.set_xlabel(f"tissue difference in readout vs in {REFERENCE}, within gene, $\\rho$", loc="right")  # right: it ends with the axis, on the page
+    # readouts by color and marker, the two adjustments by fill (column-wise: readouts left, fill right)
     h = [plt.Line2D([], [], marker=MK[sc], color=COL[sc], ls="", ms=4, mec="white", mew=0.5) for sc in ("S", "B1")]
     h += [plt.Line2D([], [], marker="o", color=INK, ls="", ms=3.5), plt.Line2D([], [], marker="o", mfc="white", mec=INK, ls="", ms=3.5, mew=0.7)]
-    ax.legend(h, [NAME["S"], NAME["B1"], "filled, matched variability", "open, $C$ only"], frameon=False, fontsize=5.6, loc="lower center",
+    ax.legend(h, [NAME["S"], NAME["B1"], "filled, matched variability", "open, covariates only"], frameon=False, fontsize=5.6, loc="lower center",
               bbox_to_anchor=(0.5, 0.98), ncol=2, handletextpad=0.1, columnspacing=0.8, labelspacing=0.15)
 
 
 def panel_e(ax):
     d = pd.read_parquet(OUT / "posthoc" / "D_flip_cells.parquet")
     cats = ["level only", "both", "pattern only", "neither"]
-    cols = {"level only": "#2a78d6", "both": "#8a7fd8", "pattern only": "#eb6834", "neither": "#d8d7d2"}
+    cols = {"level only": BLUE, "both": PURPLE, "pattern only": ORANGE, "neither": PALE}
     tb = pd.crosstab(d.t_lo, d.cat)[cats].reindex(TIS)
     sh = tb.div(tb.sum(axis=1), axis=0)
     for i, t in enumerate(TIS):
@@ -134,7 +149,8 @@ def panel_e(ax):
         for c in cats:
             ax.barh(i, sh.at[t, c] - 0.006, left=left, color=cols[c], height=0.66)
             left += sh.at[t, c]
-    ax.set_yticks(range(6), [f"{TL[t]} ({int(tb.loc[t].sum())})" for t in TIS])
+    # a name of two words on two lines: the longest label ends where the page begins
+    ax.set_yticks(range(6), [f"{TL[t]} ({int(tb.loc[t].sum())})".replace(" ", "\n", TL[t].count(" ")) for t in TIS])
     ax.invert_yaxis()
     ax.set_xlim(0, 1)
     ax.set_xlabel("flip genes by what is low in their low tissue")
@@ -147,13 +163,13 @@ def panel_f(ax):
     genes = ["RUNX1", "GCK", "SLC2A2", "PLEKHG1", "MERTK", "B2M"]
     r = r[r.gene.isin(genes)]
     y = {g: i for i, g in enumerate(genes)}
-    ax.axvline(0, color=GRID, lw=0.8, zorder=0)
+    ax.axvline(0, color=RULE, lw=0.8, zorder=0)
     for g in genes:
         d = r[(r.gene == g) & r.support]
-        ax.hlines(y[g], d.z_S.min(), d.z_S.max(), color=GRID, lw=2, zorder=1)
+        ax.hlines(y[g], d.z_S.min(), d.z_S.max(), color=RULE, lw=2, zorder=1)
         for _, a in d.iterrows():
-            ax.plot(a.z_S, y[g], "o", color=CS, ms=4.5, mec="white", mew=0.5, zorder=3)
-            ax.plot(a.z_B1, y[g] + 0.24, "s", color=CB, ms=3, mec="white", mew=0.3, zorder=2)
+            ax.plot(a.z_S, y[g], MK["S"], color=COL["S"], ms=4.2, mec="white", mew=0.5, zorder=3)
+            ax.plot(a.z_B1, y[g] + 0.24, MK["B1"], color=COL["B1"], ms=3.4, mec="white", mew=0.3, zorder=2)
     # label the extreme tissues only
     for g in genes:
         d = r[(r.gene == g) & r.support]
@@ -163,17 +179,19 @@ def panel_f(ax):
     ax.set_yticks(range(len(genes)), genes)
     ax.set_ylim(len(genes) - 0.15, -0.6)
     ax.set_xlabel("z within tissue, count-supported tissues")
-    h = [plt.Line2D([], [], marker="o", color=CS, ls="", ms=4), plt.Line2D([], [], marker="s", color=CB, ls="", ms=3)]
+    h = [plt.Line2D([], [], marker=MK["S"], color=COL["S"], ls="", ms=4), plt.Line2D([], [], marker=MK["B1"], color=COL["B1"], ls="", ms=3.4)]
     ax.legend(h, [NAME["S"], NAME["B1"]], frameon=False, fontsize=6, loc="lower left", handletextpad=0.1, ncol=2, bbox_to_anchor=(0, 1.0), columnspacing=0.8)
 
 
-def main(slot: bool = False):
-    """slot=True: also write fig_y1_gene_tissue_slot.pdf, the same page without the panel letters (for a composed
-    figure that draws its own), saved with the lettered page's tight box so every panel keeps its position."""
+def draw_panels() -> None:
+    """The six panels from the cached tables, as three pages of one size, each with one row of panels drawn (the other
+    rows are not drawn on it, so a figure that takes a row from its page carries no hidden text of the others). The
+    pages carry no panel letters."""
     fd.apply_design()
     plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42, "font.size": 7, "axes.labelsize": 7, "xtick.labelsize": 6.5, "ytick.labelsize": 6.5})
-    fig = plt.figure(figsize=(7.2, 6.2))
-    gs = fig.add_gridspec(3, 4, height_ratios=[0.62, 1, 1], hspace=0.72, wspace=0.65, left=0.1, right=0.985, top=0.945, bottom=0.075)
+    fig = plt.figure(figsize=(style.inch(PAGE_W), style.inch(PAGE_H)))
+    gs = fig.add_gridspec(3, 4, height_ratios=[0.62, 1, 1], hspace=0.72, wspace=0.65, left=GRID["left"] / PAGE_W, right=GRID["right"] / PAGE_W,
+                          top=GRID["top"] / PAGE_H, bottom=GRID["bottom"] / PAGE_H)
     a = fig.add_subplot(gs[0, :2])
     b1, b2 = fig.add_subplot(gs[0:1, 2]), fig.add_subplot(gs[0:1, 3])
     c = fig.add_subplot(gs[1, :2])
@@ -186,30 +204,17 @@ def main(slot: bool = False):
     panel_d(d)
     panel_e(e)
     panel_f(f)
-    letters = [lettered(ax, s) for ax, s in zip((a, b1, c, d, e, f), "abcdef")]
-    d_ = OUT / "figures"
-    d_.mkdir(exist_ok=True)
-    fig.savefig(d_ / "fig_y1_gene_tissue.pdf")
-    fig.savefig(d_ / "fig_y1_gene_tissue.png", dpi=220)
-    if slot:
-        from matplotlib.transforms import Bbox
-        fig.canvas.draw()
-        bb = fig.get_tightbbox(fig.canvas.get_renderer())
-        pad = plt.rcParams["savefig.pad_inches"]
-        bb = Bbox.from_extents(bb.x0 - pad, bb.y0 - pad, bb.x1 + pad, bb.y1 + pad)
-        for t in letters:
-            t.remove()
-        fig.savefig(d_ / "fig_y1_gene_tissue_slot.pdf", bbox_inches=bb)
-        # One page per row, same box, other rows not drawn: a composed figure that crops a row from this page then
-        # carries no hidden text of the other rows.
-        rows = [[a, b1, b2], [c, d], [e, f]]
-        for k, keep in enumerate(rows, 1):
-            for ax in fig.axes:
-                ax.set_visible(ax in keep)
-            fig.savefig(d_ / f"fig_y1_gene_tissue_slot_row{k}.pdf", bbox_inches=bb)
+    rows = [[a, b1, b2], [c, d], [e, f]]
+    for k, keep in enumerate(rows, 1):
         for ax in fig.axes:
-            ax.set_visible(True)
+            ax.set_visible(ax in keep)
+        style.save_panel(fig, f"main_tissues/gene_by_tissue_row{k}", exact=True, close=False)
+    plt.close(fig)
+
+
+def main():
+    draw_panels()
 
 
 if __name__ == "__main__":
-    main(slot="--slot" in sys.argv)
+    main()

@@ -1,16 +1,14 @@
-"""C1 figure: new use cases. Panels in the T8.4 style (`T8_4_figures/common.py`, `notebooks/_figure_design.py`), composed with F1's compose.py.
-Reads result tables only. Output kept out of the manuscript (CHIMERA_MANUSCRIPT points to results/analysis/C1/fig_ms) for the coordinator to place.
+"""C1 figure: further use cases on the added cohorts (not in the paper). Five panels in the style of
+`T8_4_figures/common.py`, saved to figures/panels/extra_new_use_cases/ and composed by figures/compose.py from
+figures/specs/not_in_paper.py (key extra_new_use_cases). Reads result tables of results/analysis/C1/ only.
 
-    CHIMERA_MANUSCRIPT=$PWD/results/analysis/C1/fig_ms python analysis/tasks/C1_cohorts/figure.py
+    PYTHONPATH=<chimera repo> python -m analysis.tasks.C1_cohorts.figure
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-os.environ.setdefault("CHIMERA_MANUSCRIPT", str(ROOT / "results/analysis/C1/fig_ms"))
-(Path(os.environ["CHIMERA_MANUSCRIPT"]) / "figures" / "revision").mkdir(parents=True, exist_ok=True)
 
 import matplotlib  # noqa: E402
 

@@ -120,10 +120,10 @@ def tables() -> str:
         "Count-supported, genes with a count-evidence margin, mean over runs. $\\Delta\\alpha$ SD and tails, consensus over runs, centered within cohort, share of genes beyond $\\pm0.05$, "
         "against the prior the model anchors on and against the unclamped prior. "
         "$\\rho$, Spearman of $\\Delta\\alpha$ with $S_g$ on count-supported genes per run, mean over runs (partial on expression). Mixing, kNN species entropy on the latent ($k=15$; "
-        "in brackets its value under random mixing at the cohort's species proportions); label transfer, accuracy across species on the cell-type classes. "
+        "in parentheses its value under random mixing at the cohort's species proportions); label transfer, accuracy across species on the cell-type classes. "
         "$\\dagger$, the model used in \\cref{fig:one-reading}. $\\ddagger$, a kept run above $5\\%$ of genes at $\\alpha>0.95$ (the bar is $10\\%$): such genes are flagged in the per-gene tables"
         + sat_note + ". "
-        "The DLPFC pair models are subsets of the four-primate object, except the last, which is built on its own human--macaque ortholog table with the prior from human--macaque identity. "
+        "The DLPFC pair models are subsets of the four-primate object, except DLPFC Human+Macaque, own ortholog table, which is built on its own human--macaque ortholog table with the prior from human--macaque identity. "
         "scVI, scVI(species) on the same object with the same $k$ and labels, for cortex, lung, skeletal muscle and tumor myeloid cells; "
         "Chimera's label transfer sits below it in the DLPFC models and in lung, above it elsewhere. "
         f"$\\star$, count evidence for {pct(tc.loc['tumour_zilionis', 'count_support_share'])} of genes at inDrop depth, the lowest of all cohorts: per-gene claims on tumor stay few. "
@@ -191,7 +191,7 @@ def tables() -> str:
     lines.append("\\begingroup\n\\scriptsize\n\\setlength{\\tabcolsep}{3pt}\n\\renewcommand{\\arraystretch}{1.1}\n"
                  "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.6cm} *{4}{>{\\raggedright\\arraybackslash}p{3.3cm}}@{}}")
     lines.append("\\caption[Supplementary table]{The same data-rule sheet for cortex, lung, skeletal muscle and tumor myeloid cells, as Supplementary~\\cref{tab:harmonised-rules}. "
-                 "These cohorts were built by one pipeline with the rules of the analysis plan (section 13), and their build records are in the deposit. "
+                 "These cohorts were built by one pipeline with the rules of the pre-specified analysis plan (its section 13; \\cref{sssec:rev-plan,sssec:rev-dataprep}), and their build records are in the deposit. "
                  "DLPFC models: the lower tail of $\\Delta\\alpha$ is marked as reference artifacts and not read as biology (the genes at its bottom are single-species annotation gaps checked on raw counts).}")
     lines.append("\\label{tab:harmonised-rules-c1}\\\\\n\\toprule\n" + head + "\n\\midrule\n\\endfirsthead\n\\toprule\n" + head + "\n\\midrule\n\\endhead\n\\bottomrule\n\\endlastfoot")
     lines.extend(" & ".join(r) + " \\\\" for r in rows2)

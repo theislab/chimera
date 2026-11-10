@@ -10,6 +10,4 @@ $R python -m analysis.tasks.E1_atlas.summarize
 $R python -m analysis.tasks.E1_atlas.distance
 $R python -m analysis.tasks.E1_atlas.genes
 $R python -m analysis.tasks.E1_atlas.figures
-SC=${E1_SCRATCH_MS:-$(mktemp -d)}; mkdir -p "$SC/figures/revision"
-CHIMERA_MANUSCRIPT=$SC $R python -m analysis.tasks.F1_figures.compose --spec analysis/tasks/E1_atlas/specs_e1.py --all
-mkdir -p results/analysis/E1/figures && cp "$SC"/figures/revision/fig_e1*_composed.pdf results/analysis/E1/figures/ && cp results/analysis/F1/fig_e1*_composed.png results/analysis/E1/figures/
+bash figures/build.sh    # composes the figures whose panels changed (figures/specs/supp_tissues.py)

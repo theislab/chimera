@@ -113,25 +113,34 @@ FIGS = {
         note=("panel: figures/redraw/integration_umap.py (stored UMAP coordinates, nothing is recomputed); donors and "
               "species are drawn in one fixed random order of the cells, cell types from the largest to the smallest")),
     "supp_integration_ten_methods": Figure(
-        NB("baselines_master_ext/composite_mixing_bio_10models"),
+        Col(Row(X("supp_integration_ten_methods/purity", "a"), X("supp_integration_ten_methods/mixing", "b"), same_scale=True, gap=5.85),
+            Row(X("supp_integration_ten_methods/conservation", "c"), X("supp_integration_ten_methods/composite", "d"), same_scale=True, gap=5.85)),
+        width=351.35,
         label="fig:supp-integration-purity",
         title="Integration: mixing and conservation, ten-method panel",
-        shows=("The four blocks score the same ten integration methods on the seven liver and testis datasets. "
-               "The first block is a raw measure, before any scaling: among the nearest neighbors of a cell, "
+        shows=("The four panels score the same ten integration methods (rows) on the seven liver and testis datasets "
+               "(columns). Panel (a) is a raw measure, before any scaling: among the nearest neighbors of a cell, "
                "what fraction comes from the cell's own species (1.0 means species stay apart, lower means they "
-               "mix). The second and third blocks are the scaled scores for species mixing and for keeping cell "
-               "types apart, and the fourth is their weighted sum. Methods are grouped by whether they are given "
-               "cell-type labels in training.")),
+               "mix). Panels (b) and (c) are the scaled scores for species mixing and for keeping cell types apart, "
+               "and panel (d) is their weighted sum. Methods are grouped by whether they are given cell-type labels "
+               "in training; Chimera is given none on liver and uses them on testis, where its cells have a dashed "
+               "outline. In every panel a darker cell is a better value, and the best method of each dataset is "
+               "in bold.")),
     "supp_integration_raw_metrics": Figure(
-        NB("baselines_master_ext/raw_metrics_10models"),
+        Col(Row(X("supp_integration_raw_metrics/knn_species_purity", "a"), X("supp_integration_raw_metrics/knn_mixing_entropy", "b"),
+                X("supp_integration_raw_metrics/silhouette_species", "c"), same_scale=True, gap=5.85),
+            Row(X("supp_integration_raw_metrics/knn_celltype_purity", "d"), X("supp_integration_raw_metrics/silhouette_celltype", "e"),
+                X("supp_integration_raw_metrics/label_transfer_accuracy", "f"), same_scale=True, gap=5.85)),
         label="fig:supp-integration-raw",
         title="Raw integration metrics, ten-method panel",
         shows=("Six measures of how well a method combines cells of different species, each before any scaling, "
-               "for ten methods on the seven liver and testis datasets. The top row measures species mixing: how "
-               "often a cell's nearest neighbors are of its own species, how evenly species are spread among "
-               "neighbors, and how separate the species are as groups. The bottom row measures whether cell "
-               "types are kept: how often neighbors share the cell type, how separate cell types are as groups, "
-               "and how accurately a cell-type label can be carried from one species to another.")),
+               "for ten methods (rows) on the seven liver and testis datasets (columns). The top row measures "
+               "species mixing: (a) how often a cell's nearest neighbors are of its own species, (b) how evenly "
+               "species are spread among neighbors, and (c) how separate the species are as groups. The bottom row "
+               "measures whether cell types are kept: (d) how often neighbors share the cell type, (e) how separate "
+               "cell types are as groups, and (f) how accurately a cell-type label can be carried from one species "
+               "to another. The value is printed in every cell. The arrow after the name of a measure says whether "
+               "lower or higher is better, and each panel is colored over its own range with the better end dark.")),
     "supp_integration_eleven_cohorts": Figure(
         Col(Row(X("supp_integration_eleven_cohorts/mixing", "a"),
                 X("supp_integration_eleven_cohorts/conservation", "b"), same_scale=True, gap=4),

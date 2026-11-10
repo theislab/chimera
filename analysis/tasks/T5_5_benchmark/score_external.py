@@ -15,7 +15,9 @@ latent is scored for the Supplement only. CAMEX seed 42 enters the table; seeds 
 
 Outputs: notebooks/cache/baselines_master_ext/{<ds>__<model>.json, master_table_ext.csv,
 mean_scores.csv, liver_only_ranking.csv, supplement_saturn_raw_latent.csv, supplement_camex_seeds.csv,
-checks.json}; notebooks/figures/baselines_master_ext/*.pdf. ``master_table.csv`` is not touched.
+checks.json}; notebooks/figures/baselines_master_ext/*.pdf (working views; the two figures of the paper on the ten
+methods are drawn from ``master_table_ext.csv`` by ``figures/redraw/integration_ten_methods.py``). ``master_table.csv``
+is not touched.
 
     PYTHONPATH=. mamba run --no-capture-output -n chimera_env python analysis/tasks/T5_5_benchmark/score_external.py
 """

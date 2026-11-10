@@ -9,6 +9,6 @@ $R $D/recurrence.py --jobs 16
 $R $D/gsea.py --jobs 5
 $R $D/archetypes.py --jobs 5
 $R $D/drivers.py
-$R $D/figures.py
+$R -m analysis.tasks.H1_harmonise.figures    # as a module: the script imports the package figures/ of the repository
 bash figures/build.sh    # composes the figures whose panels changed (figures/specs/supp_tissues.py, main.py)
-$R $D/tex.py
+$R -m analysis.tasks.H1_harmonise.tex

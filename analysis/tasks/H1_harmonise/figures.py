@@ -4,16 +4,13 @@ liver and testis (same axes, palette and order), the recurrence heat map and the
 Panels reuse the forms of notebooks/_alpha_master_builder.py (A1.1-A1.3), _alpha_biology_simpler_builder.py (category boxes with d and q), _pathway_builder.py (Hallmark volcano),
 analysis/tasks/T8_4_figures/fig4_additions.py (landscape, cell-type drivers), X5_sequence_axis/run.py (axis scatter). House style: figures/style.py. Every panel is drawn at its size on the page.
 
-    PYTHONPATH=<chimera repo> python -m analysis.tasks.H1_harmonise.figures --no-y1 [--reference]     # every panel, from the cached tables (draw_panels)
+    PYTHONPATH=<chimera repo> python -m analysis.tasks.H1_harmonise.figures [--reference]     # every panel, from the cached tables (draw_panels)
     CHIMERA_FIGURES_OUT=<folder> ... the same command                                                # dry run: panels under <folder>/panels
 """
 from __future__ import annotations
 
 import argparse
 import re
-import shutil
-import subprocess
-import tempfile
 from pathlib import Path
 
 import matplotlib
@@ -115,9 +112,6 @@ def named(g: pd.DataFrame) -> pd.DataFrame:
 def gene_label(r) -> str:
     """^ alpha above 0.95 in a seed; section sign, pair flagged by the ortholog audit (kept, read with care)."""
     return f"{r.symbol}{'^' if r.saturated_flag else ''}{'§' if bool(r.o1_T2) else ''}"
-
-
-PANELS = OUT / "panels"  # the pages of y1_masked()
 
 
 def psave(fig: plt.Figure, name: str, exact: bool = False) -> None:
@@ -1063,36 +1057,6 @@ def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
     return fig
 
 
-def y1_masked() -> None:
-    """Y1's page without its own letters, so that compose labels its six panels in sequence. Y1 writes the page twice
-    (``figure.py --slot``): with letters (the page box everyone reads) and without them, saved with a box that
-    differs only by a margin on the left and bottom. That
-    margin is trimmed here so every panel keeps the position the regions in figures/specs/main.py were read on. No letter is
-    covered or hidden: the letters are not drawn."""
-    y1 = cm.RES / "Y1" / "figures"
-    ref, slot = y1 / "fig_y1_gene_tissue.pdf", y1 / "fig_y1_gene_tissue_slot.pdf"
-
-    def size(p):
-        o = subprocess.run([str(cm.POPPLER / "pdfinfo"), str(p)], capture_output=True, text=True).stdout
-        w, h = re.search(r"Page size:\s+([\d.]+) x ([\d.]+)", o).groups()
-        return float(w), float(h)
-
-    (W, H), (Ws, Hs) = size(ref), size(slot)
-    trim = f"{Ws - W:.4f}bp {Hs - H:.4f}bp 0bp 0bp"
-    PANELS.mkdir(parents=True, exist_ok=True)
-    # the whole page, and one page per row (the other rows not drawn), all on the same box: the composed figure
-    # crops each row from its own page, so no row carries hidden text of another
-    pages = [(slot, "y1_masked")] + [(y1 / f"fig_y1_gene_tissue_slot_row{k}.pdf", f"y1_masked_row{k}") for k in (1, 2, 3)]
-    for src, dst in pages:
-        assert size(src) == (Ws, Hs), (src, size(src), (Ws, Hs))
-        tex = ("\\documentclass{article}\\usepackage[paperwidth=%sbp,paperheight=%sbp,margin=0pt]{geometry}\\usepackage{graphicx}\\pagestyle{empty}\\setlength{\\parindent}{0pt}"
-               "\\begin{document}\\noindent\\includegraphics[trim=%s,clip]{%s}\\end{document}" % (W, H, trim, src))
-        with tempfile.TemporaryDirectory() as td:
-            (Path(td) / "m.tex").write_text(tex)
-            subprocess.run(["pdflatex", "-interaction=nonstopmode", "m.tex"], cwd=td, capture_output=True, check=True)
-            shutil.copyfile(Path(td) / "m.pdf", PANELS / f"{dst}.pdf")
-
-
 # the panels that are not part of a tissue figure: name in figures/panels -> the function that draws it
 SINGLE = {"main_tissues/axis": lambda: main_axis(), "main_tissues/genes": lambda: main_genes(), "main_tissues/recurrence": lambda: main_recurrence(),
           "supp_tissues_recurrence/recurrence_all": lambda: main_recurrence("all"), "supp_tissues_lineage/lineage": lambda: main_lineage()}
@@ -1116,11 +1080,8 @@ def draw_panels(tissues=None, single=None, reference: bool = False) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--reference", action="store_true", help="also render the standard panels for liver and testis, to compare with the originals")
-    ap.add_argument("--no-y1", action="store_true", help="draw the panels only; leave the pages of the gene-by-tissue panels as they are")
     a = ap.parse_args()
     draw_panels(reference=a.reference)
-    if not a.no_y1:
-        y1_masked()
     return 0
 
 

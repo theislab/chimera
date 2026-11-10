@@ -17,12 +17,15 @@ Outputs ``covariate_table.csv``, ``cv_r2.csv``, ``projection.csv``, ``masking.cs
 Usage::
 
     python analysis/tasks/T2_4_covariates/run.py [--ensembl-dir DIR] [--n-perm 1000] [--outdir DIR] [--prerun]
+
+The panel of the paper, figures/panels/supp_covariate_audit/covariate_audit.pdf, is drawn from the cached tables alone by
+
+    python -c "from analysis.tasks.T2_4_covariates import run; run.draw_panels()"
 """
 
 from __future__ import annotations
 
 import argparse
-import sys
 
 import numpy as np
 import pandas as pd
@@ -34,6 +37,7 @@ from analysis.common import cds as CDS
 from analysis.common import cohorts as C
 from analysis.common import gene_ids
 from analysis.common.outputs import TaskOutput, add_common_args
+from figures import style
 
 MASK_EPS = 1e-6
 TAIL = 0.05
@@ -46,10 +50,18 @@ FEATURE_GROUPS = {
 }
 COVARIATES = ["log_mean", "detection", "log_var", "tau", "prior", "prior_raw", "S_g_ema",
               "log_cds_length", "gc", "gc3", "log_cp10k_spmean", "detection_spmean"]
-COV_LABEL = {"log_mean": "log mean", "detection": "detection", "log_var": "log variance",
-             "tau": "cell-type specificity τ", "prior": "prior π", "prior_raw": "raw prior π",
-             "S_g_ema": "fit-quality margin S", "log_cds_length": "CDS length", "gc": "CDS GC",
-             "partial_S_given_expr": "partial ρ(Δα, S | expression)"}
+# Names of the rows of the figure (house style: figures/style.py).
+COUNT_EVIDENCE = style.READOUT["count_evidence"].name
+COV_LABEL = {"log_mean": "expression, log mean", "detection": "expression, detection rate", "log_var": "expression, log variance",
+             "tau": "cell-type specificity τ", "prior": "protein prior π", "prior_raw": "raw protein prior π",
+             "S_g_ema": COUNT_EVIDENCE, "log_cds_length": "coding length", "gc": "coding GC content",
+             "partial_S_given_expr": COUNT_EVIDENCE + " given expression"}
+R2_LABEL = {"expr3": "cross-validated R², 3 expression features", "all72": "cross-validated R², all 72 gate inputs"}
+
+
+def signed(v: float) -> str:
+    """A correlation with its sign and a true minus sign; a value that rounds to zero carries no sign."""
+    return "0.00" if abs(v) < 0.005 else f"{v:+.2f}".replace("-", "−")
 
 # Reference values of an independent computation of the same table, for comparison,
 # two decimals, cohorts in COHORT_ORDER. Its per-cohort CSVs can be passed with
@@ -285,57 +297,61 @@ def full_reference(ref_dir, cov, cv, proj, mask) -> pd.DataFrame:
 
 
 def figure(cov: pd.DataFrame, cv: pd.DataFrame):
-    """One panel: Spearman of delta-alpha with each covariate, plus CV R^2 rows, 7 cohorts."""
-    sys.path.insert(0, str(gene_ids.REPO_ROOT / "notebooks"))
-    try:
-        import _figure_design as fd
-        fd.apply_design()
-    except Exception as exc:  # noqa: BLE001 - fall back to plain matplotlib
-        print("figure design module unavailable, plain matplotlib:", exc)
-    import matplotlib as mpl
+    """One panel at its size on the page: a map of the Spearman correlation of delta-alpha with each covariate (last row: the
+    partial correlation with S_g given expression) and, under it, a gray map of two cross-validated R^2 rows; 7 cohorts."""
     import matplotlib.pyplot as plt
+    from matplotlib.ticker import FuncFormatter
 
-    mpl.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42})
+    style.apply()
     da = cov[cov.target == "delta_alpha"]
     keys = ["log_mean", "detection", "log_var", "tau", "prior", "S_g_ema", "log_cds_length", "gc",
             "partial_S_given_expr"]
     M = np.array([[da[(da.cohort == c) & (da.covariate == k)].rho.iloc[0] for c in C.COHORT_ORDER]
                   for k in keys])
     R2 = np.array([[cv[(cv.cohort == c) & (cv.target == "delta_alpha") & (cv.features == f)].cv_r2.iloc[0]
-                    for c in C.COHORT_ORDER] for f in ("expr3", "all72")])
-    labels = [COV_LABEL[k] for k in keys] + ["CV R² on expression (3)", "CV R² on all 72 inputs"]
-    fig, ax = plt.subplots(figsize=(4.6, 4.2))
-    n1 = len(keys)
-    im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto",
-                   extent=(-0.5, M.shape[1] - 0.5, n1 - 0.5, -0.5))
-    ax.imshow(R2, cmap="Greys", vmin=0, vmax=1.6, aspect="auto",
-              extent=(-0.5, M.shape[1] - 0.5, n1 + 1.5, n1 - 0.5))
+                    for c in C.COHORT_ORDER] for f in R2_LABEL])
+    n1, n2, n_cols = len(keys), len(R2_LABEL), M.shape[1]
+    # geometry, bp
+    left, right, top, bottom, cell_w, cell_h, gap = 131.0, 51.0, 3.0, 54.0, 24.0, 16.0, 3.0  # row names; color bar; -; cohort names
+    W, H = left + n_cols * cell_w + right, top + (n1 + n2) * cell_h + gap + bottom
+    fig = plt.figure(figsize=(style.inch(W), style.inch(H)))
+    ax = fig.add_axes([left / W, (bottom + n2 * cell_h + gap) / H, n_cols * cell_w / W, n1 * cell_h / H])
+    ax2 = fig.add_axes([left / W, bottom / H, n_cols * cell_w / W, n2 * cell_h / H])
+    xe = np.arange(n_cols + 1) - 0.5
+    im = ax.pcolormesh(xe, np.arange(n1 + 1) - 0.5, M, cmap=style.DIVERGING, vmin=-1, vmax=1, edgecolors="white", linewidth=0.3)
+    ax2.pcolormesh(xe, np.arange(n2 + 1) - 0.5, R2, cmap="Greys", vmin=0, vmax=1.6, edgecolors="white", linewidth=0.3)
     for i in range(n1):
-        for j in range(M.shape[1]):
-            v = M[i, j]
-            ax.text(j, i, f"{v:+.2f}", ha="center", va="center", fontsize=6,
-                    color="white" if abs(v) > 0.55 else "#222222")
-    for i in range(2):
-        for j in range(R2.shape[1]):
-            ax.text(j, n1 + i, f"{R2[i, j]:.2f}", ha="center", va="center", fontsize=6,
-                    color="white" if R2[i, j] > 0.9 else "#222222")
-    ax.axhline(n1 - 0.5, color="white", linewidth=2)
-    ax.set_xlim(-0.5, M.shape[1] - 0.5)
-    ax.set_ylim(n1 + 1.5, -0.5)
-    ax.set_xticks(range(M.shape[1]))
-    ax.set_xticklabels([C.LABELS[c] for c in C.COHORT_ORDER], fontsize=6, rotation=40, ha="right",
-                       rotation_mode="anchor")
-    ax.set_yticks(range(n1 + 2))
-    ax.set_yticklabels(labels, fontsize=6)
-    ax.tick_params(length=0)
-    for s in ax.spines.values():
-        s.set_visible(False)
-    cb = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02, ticks=[-1, -0.5, 0, 0.5, 1])
-    cb.set_label("Spearman ρ with Δα", fontsize=6)
-    cb.ax.tick_params(labelsize=6, length=2)
+        for j in range(n_cols):
+            ax.text(j, i, signed(M[i, j]), ha="center", va="center", fontsize=style.SIZE_TEXT, color="white" if abs(M[i, j]) > 0.55 else style.INK)
+    for i in range(n2):
+        for j in range(n_cols):
+            ax2.text(j, i, f"{R2[i, j]:.2f}", ha="center", va="center", fontsize=style.SIZE_TEXT, color="white" if R2[i, j] > 0.9 else style.INK)
+    for a, n, names in ((ax, n1, [COV_LABEL[k] for k in keys]), (ax2, n2, list(R2_LABEL.values()))):
+        a.set_xlim(-0.5, n_cols - 0.5)
+        a.set_ylim(n - 0.5, -0.5)
+        a.set_yticks(range(n), names)
+        a.set_xticks([])
+        a.tick_params(length=0)
+        for s in a.spines.values():
+            s.set_visible(False)
+    ax2.set_xticks(range(n_cols), [style.cohort_name(c) for c in C.COHORT_ORDER], rotation=40, ha="right", rotation_mode="anchor")
+    cax = fig.add_axes([(left + n_cols * cell_w + 8.0) / W, (bottom + n2 * cell_h + gap + (n1 * cell_h - 110.0) / 2) / H, 7.0 / W, 110.0 / H])
+    cb = fig.colorbar(im, cax=cax, ticks=[-1, -0.5, 0, 0.5, 1])
+    cb.ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: "0.0" if v == 0 else f"{v:+.1f}".replace("-", "−")))
+    cb.set_label("Spearman ρ with Δα", fontsize=style.SIZE_LABEL)
+    cb.ax.tick_params(length=1.5)
     cb.outline.set_visible(False)
-    fig.tight_layout()
     return fig
+
+
+def draw_panels() -> None:
+    """The panel of the figure from the cached tables covariate_table.csv and cv_r2.csv; nothing is computed."""
+    import matplotlib.pyplot as plt
+
+    res = gene_ids.REPO_ROOT / "results" / "analysis" / "T2_4"
+    fig = figure(pd.read_csv(res / "covariate_table.csv"), pd.read_csv(res / "cv_r2.csv"))
+    with plt.rc_context({"savefig.dpi": 360}):  # the color bar is the one raster part: above 300 ppi on the page
+        style.save_panel(fig, "supp_covariate_audit/covariate_audit", exact=True)
 
 
 def main():

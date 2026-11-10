@@ -109,10 +109,8 @@ FIGS = {
                 "color scale."),
         note=("panels: figures/redraw/atlas.py; two pages of 196 bp and one 7 bp gap, placed at scale 1")),
     "supp_residue_audit": Figure(
-        Col(Row(SRC("assembled/page37", "a", region=(0, 0, 375, 384)),
-                SRC("assembled/page37", "b", region=(375, 0, 724, 384))),
-            Row(SRC("assembled/page37", "c", region=(724, 0, 958, 188)),
-                SRC("assembled/page37", "d", region=(724, 200, 958, 384))),
+        Col(Row(X("supp_residue_audit/pooled", "a"), X("supp_residue_audit/per_gene", "b"), same_scale=True, gap=7),
+            Row(X("supp_residue_audit/variance", "c"), X("supp_residue_audit/diagnostic", "d"), same_scale=True, gap=7),
             gap=6),
         label="fig:supp-main-gin-protein",
         title="Residue-level attribution audit",
@@ -120,13 +118,15 @@ FIGS = {
                "from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those "
                "features draw on most when the model sets a gene's correction, and whether that pattern follows known "
                "properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed "
-               "against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means "
-               "the first kind receives more attribution. (b) The same comparisons made inside every protein and "
-               "then tested across proteins, which removes effects that only reflect which proteins contribute many "
-               "residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural "
-               "property explains well under one percent of the variation on its own. (d) Every comparison placed by "
-               "its pooled and its within-protein evidence."),
-        note="regions of the hand-assembled page 37; (a) and (b) stay at scale 0.67 until they are redrawn"),
+               "against buried, or hydrophobic against charged) over all 36,832 residues, grouped by the property "
+               "they compare; a bar to the right means the first kind receives more attribution, and a dark bar "
+               "that the comparison is supported when all residues are pooled. (b) The same comparisons, on the "
+               "rows of (a), made inside every protein and then tested across proteins, which removes effects that "
+               "only reflect which proteins contribute many residues: six remain (dark bars), led by hydrophobic "
+               "against positively charged residues. (c) Each structural property explains well under one percent "
+               "of the variation on its own. (d) Every comparison placed by its pooled and its within-protein "
+               "evidence; the six that hold within proteins are named."),
+        note="panels: figures/redraw/residue_audit.py; (a) and (b) share their rows"),
     "supp_residue_audit_2": Figure(
         Col(Row(NB("ortholog_qc/i3c_cross_tissue_disagreement_portrait_grayscale", "e"),
                 Col(SRC("assembled/page37", "f", region=(258, 397, 520, 511)),
@@ -211,17 +211,46 @@ FIGS = {
                 "of input."),
         note=("panel: figures/redraw/residue.py")),
     "supp_protein_architecture": Figure(
-        Col(Row(P("supp_protein_architecture/properties", "a"), P("supp_protein_architecture/domains", "b"),
-                same_scale=True),
-            Row(P("supp_protein_architecture/age_duplication", "c"), width=205), gap=3),
+        Col(Row(X("supp_protein_architecture/properties", "a"), X("supp_protein_architecture/domains", "b"),
+            same_scale=True), X("supp_protein_architecture/age_duplication", "c"), gap=3),
         label="fig:supp-e2",
         title="Protein architecture and gene history against Δα",
-        shows=""),
+        shows=("Which features of a protein and of its gene's history go with deployment above or below the protein "
+               "prior, after protein identity, expression, detection and length are held fixed. Panel (a) lists 18 "
+               "properties. Tissue-specific genes, plasma-membrane and secreted proteins, genes with a signal peptide "
+               "and duplicates kept from the two ancient whole-genome duplications of vertebrates sit above the prior; "
+               "essential genes, members of protein complexes and nuclear proteins sit below. The large symbols are "
+               "medians over ten tissues, the small dots the single tissues, and the column at the right counts the "
+               "tissues in which the value with the per-gene gate has the sign of its median. Panel (b) does the same "
+               "for protein domains, with the median and the interquartile range over tissues. Proteins built from "
+               "signaling and cell-surface modules (calponin-homology, FERM, SH2, SH3, receptors, kinases) sit above "
+               "their prior by 0.2 to 0.6 SD; proteins built from RNA-binding, chromatin and protein-turnover modules "
+               "(RNA-recognition motif, helicase, bromodomain, WD40) sit below. In both panels three readings stand side "
+               "by side, named in the key under each panel: Δα with the protein-feature gate (circle), Δα with the "
+               "per-gene gate (hexagon), which sees no protein features, and direct profile correlation (triangle). They "
+               "give the same order. Panel (c) follows gene age, from the youngest genes (arisen in tetrapods or later) "
+               "to the oldest (shared with yeast): duplicates from the whole-genome duplications stay above singletons "
+               "at every age, and genes that arose with the vertebrates sit highest.")),
     "supp_regulatory_architecture": Figure(
-        Col(Row(P("supp_regulatory_architecture/properties", "a"), P("supp_regulatory_architecture/regulons", "b"),
-                same_scale=True),
-            Row(P("supp_regulatory_architecture/dose", "c"), width=230), gap=3),
+        Col(Row(X("supp_regulatory_architecture/properties", "a"), X("supp_regulatory_architecture/regulons",
+            "b"), same_scale=True), X("supp_regulatory_architecture/dose", "c"), gap=3),
         label="fig:supp-e5",
         title="Regulatory and gene-architecture features against Δα",
-        shows=""),
+        shows=("Which features of a gene's regulation go with deployment above or below the protein prior, after protein "
+               "identity, expression, detection and protein length are held fixed. Panel (a) lists 18 features. Genes "
+               "with many distal enhancers in their regulatory domain, genes controlled by many transcription factors "
+               "and developmental genes marked by Polycomb in stem cells sit above the prior in nine or ten of ten "
+               "tissues (enhancers: partial correlation +0.14 with the protein-feature gate, +0.11 with the per-gene "
+               "gate, +0.05 for direct profile correlation). Housekeeping genes and genes with CpG-island or "
+               "bidirectional promoters sit below. Transcript features such as the number of isoforms or alternative "
+               "promoters carry little. The large symbols are medians over ten tissues, the small dots the single "
+               "tissues, and the column at the right counts the tissues in which the value with the per-gene gate has "
+               "the sign of its median. Panel (b) looks at the targets of single transcription factors, with the number "
+               "of factors that regulate a gene held equal: targets of lineage and signaling factors such as ZEB2, "
+               "NR2F2, RBPJ and RUNX2 sit above the prior, targets of the CpG-promoter factors NRF1, NFYA and ZBTB33 "
+               "below. Panel (c) shows the dose-response: from the fifth of genes with the fewest enhancers (or "
+               "regulating factors) to the fifth with the most, the reading rises step by step, for both gates; the "
+               "dotted line shows that Δα with the per-gene gate keeps the rise when cell-type specificity is held "
+               "equal. In all panels the circle is Δα with the protein-feature gate, the hexagon Δα with the per-gene "
+               "gate and the triangle direct profile correlation.")),
 }

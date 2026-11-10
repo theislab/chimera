@@ -10,7 +10,4 @@ $R.names
 $R.summarize
 $R.q1_followup
 $R.figures
-S=${E4_SCRATCH:-$(mktemp -d)}; mkdir -p "$S/figures/revision" results/analysis/E4/figures
-CHIMERA_MANUSCRIPT=$S mamba run --no-capture-output -n chimera_env python -m analysis.tasks.F1_figures.compose --spec analysis/tasks/E4_translational/specs_e4.py --all
-cp "$S"/figures/revision/fig_e4*_composed.pdf results/analysis/E4/figures/
-cp results/analysis/F1/fig_e4*_composed.png results/analysis/E4/figures/
+bash figures/build.sh    # composes the figures whose panels changed (figures/specs/supp_tissues.py)

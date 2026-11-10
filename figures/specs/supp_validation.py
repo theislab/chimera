@@ -10,79 +10,110 @@ from figures.compose import Col, Figure, LANDSCAPE, P, Row, X
 
 FIGS = {
     "supp_bone_marrow_reference": Figure(
-        Col(Row(P("supp_bone_marrow_reference/a", "a"), P("supp_bone_marrow_reference/b", "b"),
-                P("supp_bone_marrow_reference/c", "c"), same_scale=True),
-            Row(P("supp_bone_marrow_reference/d", "d"), P("supp_bone_marrow_reference/e", "e"),
-                P("supp_bone_marrow_reference/f", "f"), same_scale=True)),
+        Col(Row(X("supp_bone_marrow_reference/a", "a"), X("supp_bone_marrow_reference/b", "b"),
+                X("supp_bone_marrow_reference/c", "c"), same_scale=True),
+            Row(X("supp_bone_marrow_reference/d", "d"), X("supp_bone_marrow_reference/e", "e"),
+                X("supp_bone_marrow_reference/f", "f"), same_scale=True)),
         label="fig:supp-bone-marrow",
         title="Bone marrow against sorted-lineage conservation of expression",
-        shows=""),
+        shows=("The figure tests Chimera on bone marrow of three species: human, mouse lemur and mouse. The "
+               "yardstick is a published score, from sorted blood cell types of human and mouse, of how well "
+               "each gene's expression pattern across blood lineages is conserved (COE). Panel a orders 4,111 "
+               "genes into ten groups by that score and shows, for each group, where the genes rank on Δα, on "
+               "the count evidence and on a direct comparison of expression profiles, after removing what "
+               "protein identity, expression level, detection and gene length explain: all three rise with the "
+               "published score. Panel b gives the same relation as one number per score, for all genes "
+               "(filled markers) and for the third of genes with the most conserved proteins (open markers): "
+               "about 0.09 for Δα, 0.12 for the count evidence and 0.20 for the profile correlation, all above "
+               "zero. Panel c asks whether the scores separate genes reported as divergent between human and "
+               "mouse from conserved ones (0.5 means no separation): in the comparison fixed in advance the "
+               "profile correlation places the divergent genes lower and the two Chimera readouts place them "
+               "higher; in an exploratory comparison with matched conserved genes all three place them lower. "
+               "Panel d takes ten genes whose divergent blood lineage is published and counts how often the "
+               "cell type that contributes most to the divergence is that lineage: two to four of ten, where "
+               "chance (the tick) gives about two. Panels e and f compare the species: the divergent part of "
+               "the count evidence comes more from the lemur than from the mouse cells, while expression "
+               "profiles are more alike between human and lemur than between human and mouse.")),
     "supp_gate_gap": Figure(
-        Col(Row(P("supp_gate_gap/scatter", "a"), P("supp_gate_gap/cohorts", "b")),
-            Row(P("supp_gate_gap/neighbors", "c"), P("supp_gate_gap/covariates", "d")), gap=3),
+        Col(Row(X("supp_gate_gap/scatter", "a"), X("supp_gate_gap/cohorts", "b")),
+            Row(X("supp_gate_gap/neighbors", "c"), X("supp_gate_gap/covariates", "d"))),
         label="fig:supp-gate-gap",
         title="Where the two readouts agree and differ",
-        shows=("Chimera can read each gene in two ways: through the default protein-feature gate, where a "
-               "network sets the gene's value from its protein features, and through the companion per-gene "
-               "gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from "
-               "human and mouse, and plots the two readings against each other for the 9,042 genes with count "
-               "evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the colored ones "
-               "differ by more than the noise between training seeds, 430 higher from their own counts and 803 "
-               "lower. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the "
-               "training seeds are split in two halves (0.47 to 0.99, against a band centered on zero when one "
-               "gate's seeds are split), how strongly the two readings agree (0.30 to 0.79), and what share of "
-               "genes is called different (0 to 32 %). Panel c asks whether proteins that look alike to a "
-               "protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share "
-               "little of the per-gene reading (median 0.09) and much more of the protein-feature reading "
-               "(median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene "
-               "read-out keeps its members apart. Panel d shows which gene properties go with the difference: "
-               "the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 "
-               "of 26 cohorts), and all seven properties together explain 12 to 49 % of it.")),
+        shows=("Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets "
+               "the gene's value from its protein features, and through the companion per-gene gate, where each gene "
+               "gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the "
+               "two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie "
+               "along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, "
+               "430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene "
+               "figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the "
+               "training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's "
+               "seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to "
+               "0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to "
+               "32 % in all. Panel c asks whether proteins that look alike to a protein language model (the 15 nearest "
+               "neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median "
+               "0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default "
+               "gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the "
+               "cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is "
+               "uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all "
+               "seven properties together explain 12 to 49 % of it.")),
     "supp_gate_gap_classes": Figure(
-        Col(Row(P("supp_gate_gap_classes/cross_tissue", "e"), P("supp_gate_gap_classes/sets", "f")),
-            Row(P("supp_gate_gap_classes/references", "g"), P("supp_gate_gap_classes/sequence", "h")), gap=3),
+        Col(Row(X("supp_gate_gap_classes/cross_tissue", "a"), X("supp_gate_gap_classes/sets", "b")),
+            X("supp_gate_gap_classes/references", "c"), X("supp_gate_gap_classes/sequence", "d")),
         label="fig:supp-gate-gap-cont",
         title="The difference between the readouts by tissue, gene class and independent reference",
-        shows=("This figure asks what the difference between the two readings of a gene is made of. Panel e "
-               "compares cohorts in pairs: each reading is similar between cohorts of the same tissue (median "
-               "Spearman 0.57 for the per-gene read-out, 0.54 for the protein-feature gate) and still related "
-               "between tissues (0.20 and 0.25), while the difference is related within a tissue (0.24) and "
-               "almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference "
-               "across eight tissues, against 22 to 23 % for either reading: the difference belongs to a gene in "
-               "a tissue. Panel f looks at whole gene classes. Mitochondrial proteins, the translation "
-               "machinery, proliferation programs and protein homeostasis read higher from their counts than "
-               "from their protein family in three or four of eight tissues; transcription factors, zinc-finger "
-               "factors and receptors read lower. The two columns at the right show that both readings place "
-               "these classes on the same side of the prior, the protein-feature gate further out. Panel g tests "
-               "each reading against independent data while holding the other reading fixed: the per-gene read-out "
-               "adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions "
-               "(0.16 to 0.28), and the protein-feature gate still adds agreement on liver pattern and on fine "
-               "kidney cell types. Panel h shows that the difference is unrelated to how constrained a gene's "
-               "sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).")),
+        shows=("This figure asks what the difference between the two readouts of a gene is made of. Panel a compares "
+               "cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between "
+               "cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene "
+               "gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue "
+               "(0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference "
+               "across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the "
+               "difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, "
+               "the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene "
+               "gate than with the protein-feature gate in three or four of eight tissues; transcription factors, "
+               "zinc-finger factors and receptors read lower. The two columns at the right print the mean of each "
+               "readout: both place these classes on the same side of the prior, the protein-feature gate further out. "
+               "Panel c tests each readout against independent data while holding the other fixed, one row per cohort "
+               "and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level "
+               "references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout "
+               "still adds agreement on liver pattern and on fine kidney cell types. Panel d shows that the difference "
+               "is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and "
+               "+0.10).")),
     "supp_gate_gap_named": Figure(
-        P("supp_gate_gap_named/named", "i"),
+        X("supp_gate_gap_named/named"),
         width=330,
         label="fig:supp-gate-gap-named",
         title="Named genes where the two readouts differ",
-        shows=("This figure gives named examples of genes whose own counts and whose protein family disagree. "
-               "Each row is a gene and each column a tissue. The color is the difference between the gene's per-gene "
-               "reading and its protein-feature reading: blue means the gene's own counts place it lower "
-               "than its protein features predict, red higher; a dot marks a tissue in which the difference "
-               "passes the test against seed noise. At the right of each row are the gene's three nearest "
-               "neighbors in the space of the protein language model, that is, the proteins it most resembles. "
-               "The upper rows are near-identical, broadly expressed core proteins that read lower from their "
-               "counts than their paralog families in three to five tissues: MARK2 (next to MARK1, MARK3, "
-               "MARK4), PPP2CB (PPP2CA, PPP4C, PPP6C), ARF5, GSK3B, XRCC6 and TERF2IP. The lower rows are "
-               "metabolic and nucleolar enzymes that read higher: HADH, ALDH6A1, QDPR, MSRB3 and fibrillarin "
-               "(FBL). The FKBP family shows both at once: the protein model groups FKBP4, FKBP5 and FKBP7 "
-               "together, while the counts separate them, FKBP4 and FKBP5 lower and FKBP7 higher.")),
+        shows=("This figure gives named examples of genes whose own counts and whose protein family disagree. Each row "
+               "is a gene and each column a tissue. The color is the difference between the gene's per-gene readout and "
+               "its protein-feature readout: blue means the gene's own counts place it lower than its protein features "
+               "do, red higher; a dot marks a tissue in which the difference passes the test against seed noise in at "
+               "least one cohort, and a gray cell a tissue in which the gene has no count evidence in both fits. At the "
+               "right of each row are the gene's three nearest neighbors in the space of the protein language model, "
+               "that is, the proteins it most resembles. The upper six rows are near-identical, broadly expressed core "
+               "proteins that read lower from their counts than their paralog families in three to five tissues: MARK2 "
+               "(next to MARK1, MARK3, MARK4), PPP2CB (PPP2CA, PPP4C, PPP6C), ARF5, GSK3B, XRCC6 and TERF2IP. The middle "
+               "three rows are the FKBP family: the protein model groups FKBP4, FKBP5 and FKBP7 together, while the "
+               "counts separate them, FKBP4 and FKBP5 lower and FKBP7 higher. The lower five rows are metabolic and "
+               "nucleolar enzymes that read higher: HADH, ALDH6A1, QDPR, MSRB3 and fibrillarin (FBL).")),
     "supp_published_differences": Figure(
-        Col(P("supp_published_differences/matched", "a"),
-            Row(P("supp_published_differences/conserved", "b"), width=360), gap=4),
-        shrink=0.85,
+        Col(X("supp_published_differences/matched", "a"), X("supp_published_differences/conserved", "b"), gap=4),
         label="fig:supp-e6",
         title="Published species differences on the count evidence",
-        shows=""),
+        shows=("Other groups have published lists of genes whose expression differs between species in a given "
+               "tissue, for example genes that are specific to the human cortex among primates, or genes "
+               "enriched in human or in mouse insulin-producing beta cells. These lists were collected and fixed "
+               "before any Chimera value was looked at. Panel (a) asks, for each of 20 lists in the model of the "
+               "matching tissue, whether the listed genes score lower than comparison genes of the same "
+               "expression, cell-type specificity and protein identity. The score is an AUROC: 0.5 means no "
+               "difference, below 0.5 means the listed genes sit lower. Five scores are compared: Chimera's "
+               "count evidence, Δα with each of the two gates, the correlation of expression profiles, and a "
+               "plain gap in detection between the species that uses no model. A double dagger marks a list "
+               "that was derived from the same data as the model. Human-specific cortex genes sit low on count "
+               "evidence (0.35) and lower than on profile correlation (0.45), and beta-cell differences sit low "
+               "on both (0.32 and 0.37); lists that define divergence by marker status or by timing sit above "
+               "0.5. Panel (b) compares each paper's divergent genes with the same paper's conserved genes: the "
+               "divergent genes sit lower on count evidence in 13 of the 14 comparisons shown, liver zonation "
+               "being the exception.")),
     "supp_benchmark_overview": Figure(
         X("supp_benchmark_overview/overview"),
         width=LANDSCAPE,

@@ -15,8 +15,8 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 7 | Figure 5 (continued) | `main_validation_2` | The tests and two named findings under the protein-feature gate and the per-gene gate | 478 x 348 | `specs/main.py` |
 | 8 | Figure 6 | `main_tissues` | Δα against protein identity and dN/dS, and named genes, in eight tissues | 477 x 521 | `specs/main.py` |
 | 9 | Figure 6 (continued) | `main_tissues_2` | Gene programs and classes across eight tissues | 487 x 400 | `specs/main.py` |
-| 10 | Figure 6 (continued) | `main_tissues_3` | Gene and tissue components of the readouts | 486 x 413 | `specs/main.py` |
-| 11 | Figure 6 (continued) | `main_tissues_4` | Home compartments, protein domains and regulatory features | 486 x 394 | `specs/main.py` |
+| 10 | Figure 6 (continued) | `main_tissues_3` | Gene and tissue components of the readouts | 486 x 412 | `specs/main.py` |
+| 11 | Figure 6 (continued) | `main_tissues_4` | Home compartments, protein domains and regulatory features | 486 x 414 | `specs/main.py` |
 | 12 | Figure 7 | `main_disease` | Transfer of disease programs between human and mouse | 486 x 400 | `specs/main.py` |
 | 13 | Figure 8 | `main_protein` | Inputs of the gate network and control trainings | 486 x 533 | `specs/main.py` |
 | 14 | Figure 8 (continued) | `main_protein_2` | Protein-space atlas | 484 x 272 | `specs/main.py` |
@@ -28,27 +28,27 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 20 | Supplementary Figure S6 | `supp_integration_metrics` | Raw integration metrics, seven-method panel | 481 x 490 | `specs/supp_model.py` |
 | 21 | Supplementary Figure S7 | `supp_integration_umap_testis` | UMAP by method, three-species testis | 476 x 560 | `specs/supp_model.py` |
 | 22 | Supplementary Figure S8 | `supp_integration_umap_liver` | UMAP by method, liver Human+Monkey | 476 x 583 | `specs/supp_model.py` |
-| 23 | Supplementary Figure S9 | `supp_integration_ten_methods` | Integration: mixing and conservation, ten-method panel | 486 x 358 | `specs/supp_model.py` |
-| 24 | Supplementary Figure S10 | `supp_integration_raw_metrics` | Raw integration metrics, ten-method panel | 487 x 255 | `specs/supp_model.py` |
+| 23 | Supplementary Figure S9 | `supp_integration_ten_methods` | Integration: mixing and conservation, ten-method panel | 340 x 460 | `specs/supp_model.py` |
+| 24 | Supplementary Figure S10 | `supp_integration_raw_metrics` | Raw integration metrics, ten-method panel | 475 x 460 | `specs/supp_model.py` |
 | 25 | Supplementary Figure S11 | `supp_integration_eleven_cohorts` | Integration benchmark on eleven cohorts | 450 x 531 | `specs/supp_model.py` |
-| 26 | Supplementary Figure S13 | `supp_sequence_axis` | Protein identity, dN/dS and Δα gene by gene | 486 x 529 | `specs/supp_deployment.py` |
-| 27 | Supplementary Figure S14 | `supp_known_measures` | Δα and count evidence among known gene measures | 486 x 541 | `specs/supp_deployment.py` |
-| 28 | Supplementary Figure S15 | `supp_relations_heatmap` | Relations of Δα and count evidence to sequence, expression and direct baselines | 486 x 527 | `specs/supp_deployment.py` |
-| 29 | Supplementary Figure S16 | `supp_relations_density` | The same relations gene by gene | 413 x 570 | `specs/supp_deployment.py` |
-| 30 | Supplementary Figure S17 | `supp_worked_genes` | Two worked genes in the counts | 486 x 173 | `specs/supp_deployment.py` |
-| 31 | Supplementary Figure S18 | `supp_categories_broad` | Δα by broad gene category, liver and testis | 430 x 548 | `specs/supp_deployment.py` |
+| 26 | Supplementary Figure S13 | `supp_sequence_axis` | Protein identity, dN/dS and Δα gene by gene | 478 x 448 | `specs/supp_deployment.py` |
+| 27 | Supplementary Figure S14 | `supp_known_measures` | Δα and count evidence among known gene measures | 479 x 507 | `specs/supp_deployment.py` |
+| 28 | Supplementary Figure S15 | `supp_relations_heatmap` | Relations of Δα and count evidence to sequence, expression and direct baselines | 483 x 459 | `specs/supp_deployment.py` |
+| 29 | Supplementary Figure S16 | `supp_relations_density` | The same relations gene by gene | 481 x 412 | `specs/supp_deployment.py` |
+| 30 | Supplementary Figure S17 | `supp_worked_genes` | Two worked genes in the counts | 477 x 163 | `specs/supp_deployment.py` |
+| 31 | Supplementary Figure S18 | `supp_categories_broad` | Δα by broad gene category, liver and testis | 481 x 337 | `specs/supp_deployment.py` |
 | 32 | Supplementary Figure S19 | `supp_categories_liver` | Δα by gene category, four-species liver, all 38 categories | 481 x 486 | `specs/supp_deployment.py` |
 | 33 | Supplementary Figure S20 | `supp_categories_testis` | Δα by gene category, testis Human+Macaque | 486 x 503 | `specs/supp_deployment.py` |
 | 34 | Supplementary Figure S21 | `supp_hallmark` | Hallmark pathway enrichment of Δα | 486 x 341 | `specs/supp_deployment.py` |
-| 35 | Supplementary Figure S22 | `supp_celltype_closure` | Closure of the cell-type decomposition of the count evidence | 486 x 246 | `specs/supp_deployment.py` |
+| 35 | Supplementary Figure S22 | `supp_celltype_closure` | Closure of the cell-type decomposition of the count evidence | 483 x 239 | `specs/supp_deployment.py` |
 | 36 | Supplementary Figure S23 | `supp_celltype_seeds` | Seed stability of cell-type contributions to the count evidence | 420 x 172 | `specs/supp_deployment.py` |
-| 37 | Supplementary Figure S24 | `supp_functional_layer` | Pathway and network coherence and conservation | 486 x 278 | `specs/supp_deployment.py` |
-| 38 | Supplementary Figure S25 | `supp_covariate_audit` | Covariate audit of Δα in seven cohorts | 330 x 297 | `specs/supp_deployment.py` |
+| 37 | Supplementary Figure S24 | `supp_functional_layer` | Pathway and network coherence and conservation | 484 x 274 | `specs/supp_deployment.py` |
+| 38 | Supplementary Figure S25 | `supp_covariate_audit` | Covariate audit of Δα in seven cohorts | 340 x 232 | `specs/supp_deployment.py` |
 | 39 | Supplementary Figure S26 | `supp_seed_reliability` | Agreement between training seeds | 340 x 192 | `specs/supp_deployment.py` |
-| 40 | Supplementary Figure S27 | `supp_gate_gap` | Where the two readouts agree and differ | 487 x 441 | `specs/supp_validation.py` |
-| 41 | Supplementary Figure S28 | `supp_gate_gap_classes` | The difference between the readouts by tissue, gene class and independent reference | 486 x 459 | `specs/supp_validation.py` |
-| 42 | Supplementary Figure S29 | `supp_gate_gap_named` | Named genes where the two readouts differ | 330 x 215 | `specs/supp_validation.py` |
-| 43 | Supplementary Figure S30 | `supp_published_differences` | Published species differences on the count evidence | 413 x 480 | `specs/supp_validation.py` |
+| 40 | Supplementary Figure S27 | `supp_gate_gap` | Where the two readouts agree and differ | 481 x 519 | `specs/supp_validation.py` |
+| 41 | Supplementary Figure S28 | `supp_gate_gap_classes` | The difference between the readouts by tissue, gene class and independent reference | 481 x 584 | `specs/supp_validation.py` |
+| 42 | Supplementary Figure S29 | `supp_gate_gap_named` | Named genes where the two readouts differ | 309 x 229 | `specs/supp_validation.py` |
+| 43 | Supplementary Figure S30 | `supp_published_differences` | Published species differences on the count evidence | 477 x 528 | `specs/supp_validation.py` |
 | 44 | Supplementary Figure S31 | `supp_ground_truth` | Ground-truth benchmark: level alterations and protein identity | 480 x 564 | `specs/supp_validation.py` |
 | 45 | Supplementary Figure S31 (continued) | `supp_ground_truth_2` | Ground-truth benchmark: pattern alterations and share of altered genes | 481 x 586 | `specs/supp_validation.py` |
 | 46 | Supplementary Figure S31 (continued) | `supp_ground_truth_3` | Ground-truth benchmark: loss alterations and practical cost | 481 x 586 | `specs/supp_validation.py` |
@@ -57,9 +57,9 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 49 | Supplementary Figure S32 | `supp_benchmark_overview` | Gene-level benchmark: overview | 643 x 371 | `specs/supp_validation.py` |
 | 50 | Supplementary Figure S33 | `supp_benchmark_tasks` | Gene-level benchmark: every task | 637 x 336 | `specs/supp_validation.py` |
 | 51 | Supplementary Figure S34 | `supp_tissues_recurrence` | All gene sets that recur across tissues | 449 x 490 | `specs/supp_tissues.py` |
-| 52 | Supplementary Figure S35 | `supp_programs_recurrent` | Gene programs that recur across eight tissues | 486 x 403 | `specs/supp_tissues.py` |
-| 53 | Supplementary Figure S36 | `supp_programs_by_tissue` | Tissue programs in each tissue | 420 x 341 | `specs/supp_tissues.py` |
-| 54 | Supplementary Figure S37 | `supp_programs_named_genes` | Named genes that recur across tissues | 190 x 320 | `specs/supp_tissues.py` |
+| 52 | Supplementary Figure S35 | `supp_programs_recurrent` | Gene programs that recur across eight tissues | 484 x 374 | `specs/supp_tissues.py` |
+| 53 | Supplementary Figure S36 | `supp_programs_by_tissue` | Tissue programs in each tissue | 479 x 338 | `specs/supp_tissues.py` |
+| 54 | Supplementary Figure S37 | `supp_programs_named_genes` | Named genes that recur across tissues | 473 x 235 | `specs/supp_tissues.py` |
 | 55 | Supplementary Figure S38 | `supp_tissue_bone_marrow` | The reading in bone marrow | 483 x 526 | `specs/supp_tissues.py` |
 | 56 | Supplementary Figure S39 | `supp_tissue_kidney` | The reading in kidney | 484 x 526 | `specs/supp_tissues.py` |
 | 57 | Supplementary Figure S40 | `supp_tissue_islet` | The reading in pancreatic islet | 483 x 526 | `specs/supp_tissues.py` |
@@ -69,14 +69,14 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 61 | Supplementary Figure S44 | `supp_tissue_muscle` | The reading in skeletal muscle | 483 x 526 | `specs/supp_tissues.py` |
 | 62 | Supplementary Figure S45 | `supp_tissue_tumor_myeloid` | The reading in lung-tumor myeloid cells | 483 x 526 | `specs/supp_tissues.py` |
 | 63 | Supplementary Figure S46 | `supp_tissues_lineage` | Lineage marker sets across tissues | 486 x 287 | `specs/supp_tissues.py` |
-| 64 | Supplementary Figure S47 | `supp_bone_marrow_reference` | Bone marrow against sorted-lineage conservation of expression | 486 x 284 | `specs/supp_validation.py` |
-| 65 | Supplementary Figure S48 | `supp_cell_compartments` | Home compartments of genes against Δα | 486 x 426 | `specs/supp_tissues.py` |
-| 66 | Supplementary Figure S49 | `supp_cell_lineages` | Cell types that carry shared deployment | 486 x 380 | `specs/supp_tissues.py` |
-| 67 | Supplementary Figure S50 | `supp_primate_branches` | Species-specific departures along the primate phylogeny | 486 x 147 | `specs/supp_tissues.py` |
-| 68 | Supplementary Figure S51 | `supp_protein_architecture` | Protein architecture and gene history against Δα | 487 x 432 | `specs/supp_protein.py` |
-| 69 | Supplementary Figure S52 | `supp_regulatory_architecture` | Regulatory and gene-architecture features against Δα | 486 x 435 | `specs/supp_protein.py` |
-| 70 | Supplementary Figure S53 | `supp_disease_genes` | Disease genes and drug targets by organ system | 438 x 436 | `specs/supp_tissues.py` |
-| 71 | Supplementary Figure S54 | `supp_drug_targets` | Approved drug targets against the protein prior | 486 x 163 | `specs/supp_tissues.py` |
+| 64 | Supplementary Figure S47 | `supp_bone_marrow_reference` | Bone marrow against sorted-lineage conservation of expression | 479 x 275 | `specs/supp_validation.py` |
+| 65 | Supplementary Figure S48 | `supp_cell_compartments` | Home compartments of genes against Δα | 481 x 418 | `specs/supp_tissues.py` |
+| 66 | Supplementary Figure S49 | `supp_cell_lineages` | Cell types that carry shared deployment | 482 x 360 | `specs/supp_tissues.py` |
+| 67 | Supplementary Figure S50 | `supp_primate_branches` | Species-specific departures along the primate phylogeny | 481 x 172 | `specs/supp_tissues.py` |
+| 68 | Supplementary Figure S51 | `supp_protein_architecture` | Protein architecture and gene history against Δα | 481 x 380 | `specs/supp_protein.py` |
+| 69 | Supplementary Figure S52 | `supp_regulatory_architecture` | Regulatory and gene-architecture features against Δα | 481 x 380 | `specs/supp_protein.py` |
+| 70 | Supplementary Figure S53 | `supp_disease_genes` | Disease genes and drug targets by organ system | 481 x 524 | `specs/supp_tissues.py` |
+| 71 | Supplementary Figure S54 | `supp_drug_targets` | Approved drug targets against the protein prior | 481 x 194 | `specs/supp_tissues.py` |
 | 72 | Supplementary Figure S56 | `supp_gin_linear_baseline` | Linear surrogate and scalar-correlation controls of the gate correction | 480 x 122 | `specs/supp_protein.py` |
 | 73 | Supplementary Figure S57 | `supp_gin_attribution_suite` | Attribution of the gate correction to input groups, all methods | 481 x 515 | `specs/supp_protein.py` |
 | 74 | Supplementary Figure S58 | `supp_gin_method_consensus` | Consensus of the attribution methods | 404 x 269 | `specs/supp_protein.py` |
@@ -85,7 +85,7 @@ the paper. A figure is composed from the panel files listed under it by the spec
 | 77 | Supplementary Figure S62 | `supp_atlas_spatial_autocorrelation` | Neighborhood coherence of α and Δα on the ESM-2 graph | 483 x 328 | `specs/supp_protein.py` |
 | 78 | Supplementary Figure S63 | `supp_atlas_archetype_trajectory` | Δα of the archetypes during training | 238 x 179 | `specs/supp_protein.py` |
 | 79 | Supplementary Figure S64 | `supp_atlas_archetype_enrichment` | Gene categories enriched in the archetypes | 385 x 439 | `specs/supp_protein.py` |
-| 80 | Supplementary Figure S65 | `supp_residue_audit` | Residue-level attribution audit | 487 x 467 | `specs/supp_protein.py` |
+| 80 | Supplementary Figure S65 | `supp_residue_audit` | Residue-level attribution audit | 483 x 480 | `specs/supp_protein.py` |
 | 81 | Supplementary Figure S65 (continued) | `supp_residue_audit_2` | Residue-level attribution audit, continued | 486 x 508 | `specs/supp_protein.py` |
 | 82 | Supplementary Figure S66 | `supp_residue_mixed_effects` | Residue-level mixed-effects regression | 301 x 203 | `specs/supp_protein.py` |
 | 83 | Supplementary Figure S67 | `supp_residue_cliffs_delta` | Protein-replicated effect sizes of residue features | 486 x 273 | `specs/supp_protein.py` |
@@ -217,8 +217,6 @@ Panels:
 - (f, g) `figures/panels/main_tissues/gene_by_tissue_row2.pdf`, region (0, 120, 512, 283), scale 1.00
 - (h, i) `figures/panels/main_tissues/gene_by_tissue_row3.pdf`, region (0, 283, 512, 429), scale 0.95
 
-Not yet in the house style: words (see `specs/_allow.py`).
-
 ## Page 11: Home compartments, protein domains and regulatory features
 
 Figure 6 (continued), key `main_tissues_4`, label `fig:one-reading`.
@@ -227,11 +225,9 @@ Figure 6 (continued), key `main_tissues_4`, label `fig:one-reading`.
 
 Panels:
 
-- (j) `figures/panels/supp_cell_compartments/compartments.pdf`, scale 1.06
-- (k) `figures/panels/supp_protein_architecture/domains.pdf`, scale 0.88
-- (l) `figures/panels/supp_regulatory_architecture/properties.pdf`, scale 0.88
-
-Not yet in the house style: scale; spelling; text (see `specs/_allow.py`).
+- (j) `figures/panels/supp_cell_compartments/compartments.pdf`, scale 1.01
+- (k) `figures/panels/supp_protein_architecture/domains.pdf`, scale 1.02
+- (l) `figures/panels/supp_regulatory_architecture/properties.pdf`, scale 1.02
 
 ## Page 12: Transfer of disease programs between human and mouse
 
@@ -387,23 +383,29 @@ Panels:
 
 Supplementary Figure S9, key `supp_integration_ten_methods`, label `fig:supp-integration-purity`.
 
-The four blocks score the same ten integration methods on the seven liver and testis datasets. The first block is a raw measure, before any scaling: among the nearest neighbors of a cell, what fraction comes from the cell's own species (1.0 means species stay apart, lower means they mix). The second and third blocks are the scaled scores for species mixing and for keeping cell types apart, and the fourth is their weighted sum. Methods are grouped by whether they are given cell-type labels in training.
+The four panels score the same ten integration methods (rows) on the seven liver and testis datasets (columns). Panel (a) is a raw measure, before any scaling: among the nearest neighbors of a cell, what fraction comes from the cell's own species (1.0 means species stay apart, lower means they mix). Panels (b) and (c) are the scaled scores for species mixing and for keeping cell types apart, and panel (d) is their weighted sum. Methods are grouped by whether they are given cell-type labels in training; Chimera is given none on liver and uses them on testis, where its cells have a dashed outline. In every panel a darker cell is a better value, and the best method of each dataset is in bold.
 
 Panels:
 
-- `notebooks/figures/baselines_master_ext/composite_mixing_bio_10models.pdf`, scale 1.01
-
-Not yet in the house style: spelling (see `specs/_allow.py`).
+- (a) `figures/panels/supp_integration_ten_methods/purity.pdf`, scale 1.00
+- (b) `figures/panels/supp_integration_ten_methods/mixing.pdf`, scale 1.00
+- (c) `figures/panels/supp_integration_ten_methods/conservation.pdf`, scale 1.00
+- (d) `figures/panels/supp_integration_ten_methods/composite.pdf`, scale 1.00
 
 ## Page 24: Raw integration metrics, ten-method panel
 
 Supplementary Figure S10, key `supp_integration_raw_metrics`, label `fig:supp-integration-raw`.
 
-Six measures of how well a method combines cells of different species, each before any scaling, for ten methods on the seven liver and testis datasets. The top row measures species mixing: how often a cell's nearest neighbors are of its own species, how evenly species are spread among neighbors, and how separate the species are as groups. The bottom row measures whether cell types are kept: how often neighbors share the cell type, how separate cell types are as groups, and how accurately a cell-type label can be carried from one species to another.
+Six measures of how well a method combines cells of different species, each before any scaling, for ten methods (rows) on the seven liver and testis datasets (columns). The top row measures species mixing: (a) how often a cell's nearest neighbors are of its own species, (b) how evenly species are spread among neighbors, and (c) how separate the species are as groups. The bottom row measures whether cell types are kept: (d) how often neighbors share the cell type, (e) how separate cell types are as groups, and (f) how accurately a cell-type label can be carried from one species to another. The value is printed in every cell. The arrow after the name of a measure says whether lower or higher is better, and each panel is colored over its own range with the better end dark.
 
 Panels:
 
-- `notebooks/figures/baselines_master_ext/raw_metrics_10models.pdf`, scale 1.00
+- (a) `figures/panels/supp_integration_raw_metrics/knn_species_purity.pdf`, scale 1.00
+- (b) `figures/panels/supp_integration_raw_metrics/knn_mixing_entropy.pdf`, scale 1.00
+- (c) `figures/panels/supp_integration_raw_metrics/silhouette_species.pdf`, scale 1.00
+- (d) `figures/panels/supp_integration_raw_metrics/knn_celltype_purity.pdf`, scale 1.00
+- (e) `figures/panels/supp_integration_raw_metrics/silhouette_celltype.pdf`, scale 1.00
+- (f) `figures/panels/supp_integration_raw_metrics/label_transfer_accuracy.pdf`, scale 1.00
 
 ## Page 25: Integration benchmark on eleven cohorts
 
@@ -423,6 +425,8 @@ Not yet in the house style: scale; text (see `specs/_allow.py`).
 
 Supplementary Figure S13, key `supp_sequence_axis`, label `fig:supp-sequence-axis`.
 
+Each dot is one gene, and each column is one cohort (liver of human and mouse, liver of four species, testis of human and mouse). The top row compares two classic measures taken from sequence alone: how similar the protein is between species (protein identity) and how strongly the gene's coding sequence has been constrained (dN/dS). They follow each other closely. The second row shows the model's raw estimate α against protein identity; the dashed line marks where the two would be equal, and most genes stay near it because the model starts from the protein. The third and fourth rows show Chimera's readout Δα, which is how far the counts move a gene above or below what its protein predicts, against the same two sequence measures. Those clouds are flat: the orange line of medians stays near zero. Blue genes have enough expressing cells for the counts to speak; for gray genes the readout is filled in from protein and expression features. Small triangles on the frame of a plot are genes that lie beyond its axis.
+
 Panels:
 
 - `figures/panels/supp_sequence_axis/sequence_axis.pdf`, scale 1.00
@@ -431,35 +435,37 @@ Panels:
 
 Supplementary Figure S14, key `supp_known_measures`, label `fig:supp-known-measures`.
 
+The figure places Chimera's two gene scores among ten measures that biologists already use. In the top row, each grid is one cohort; every square shows how strongly two measures rise and fall together across genes (red together, blue opposite, white unrelated, gray not available). The measures are protein identity, dN/dS, tolerance to damaging variants in humans (LOEUF), distance between the two species' proteins in a protein language model, how stable a gene's expression level is across mammals (EVEE), how similar its expression profile across cell types is between species, how similar its cell-type specificity is, expression level, cell-type specificity and coding length. The columns follow the order of the rows; the last two rows and the two wide columns at the right are Chimera's Δα and its count evidence, with the values printed in the columns. The second row places seven familiar gene groups, such as housekeeping genes and transcription factors, by their typical protein identity and typical Δα; bars cover the middle half of each group. All groups sit near zero except the handful of genes encoded in the mitochondrial genome. The lower rows show Δα gene by gene against three of the measures; the clouds are flat. Small triangles on the frame of a plot are genes that lie beyond its axis.
+
 Panels:
 
 - `figures/panels/supp_known_measures/known_measures.pdf`, scale 1.00
-
-Not yet in the house style: text (see `specs/_allow.py`).
 
 ## Page 28: Relations of Δα and count evidence to sequence, expression and direct baselines
 
 Supplementary Figure S15, key `supp_relations_heatmap`, label `fig:supp-relations-heatmap`.
 
+Each number says how closely one of Chimera's gene scores follows a known property of genes, in one of the seven liver and testis datasets (columns). The properties (rows) are sequence constraint (dN/dS), protein identity between species, tolerance to damaging variants in humans (LOEUF), expression level, cell-type specificity, coding length, and two direct comparisons of expression between species (profile correlation and specificity similarity). Red means the score rises with the property, blue that it falls, pale that the two are unrelated; a gray cell without a number means the property is not defined for that dataset. The top pair of maps is for Δα, the middle pair for Δα measured against the protein identity before it is capped, the bottom pair for the count evidence. In each pair the left map is the plain rank correlation and the right map the correlation after protein identity, expression, detection and coding length are held fixed. For the four liver datasets the middle maps repeat the top maps, because their prior is not capped. The rows of the sequence measures are pale; the expression row is strong in four-species liver and in testis; the count evidence follows the profile comparison moderately.
+
 Panels:
 
 - `figures/panels/supp_relations_heatmap/heatmap.pdf`, scale 1.00
-
-Not yet in the house style: words (see `specs/_allow.py`).
 
 ## Page 29: The same relations gene by gene
 
 Supplementary Figure S16, key `supp_relations_density`, label `fig:supp-relations-density`.
 
+This figure shows, gene by gene, the relations that the previous figure gives as single numbers. Each small plot takes all genes of one dataset and places them by a known gene property (horizontal) and by one of Chimera's two scores (vertical). Each dataset (liver Human+Mouse, four-species liver, testis Human+Mouse) has two rows of plots: Δα above, the count evidence below. Each column is one property, in the order of the rows of the previous figure: sequence constraint (dN/dS), protein identity, tolerance to damaging variants (LOEUF), expression level, cell-type specificity, coding length and two direct comparisons of expression between species. Darker blue means more genes in that spot; the orange line follows the typical value from low to high values of the property; the rank correlation and the number of genes stand above the plots. Against the sequence measures the clouds are flat. Against expression they slope, downward in four-species liver and upward in testis. The dark horizontal band in the count-evidence plots is the set of genes with too few expressing cells, whose count evidence is exactly zero.
+
 Panels:
 
-- `figures/panels/supp_relations_density/density.pdf`, scale 0.87
-
-Not yet in the house style: scale; text; words (see `specs/_allow.py`).
+- `figures/panels/supp_relations_density/density.pdf`, scale 1.00
 
 ## Page 30: Two worked genes in the counts
 
 Supplementary Figure S17, key `supp_worked_genes`, label `fig:supp-worked-genes`.
+
+The figure shows two example genes as they appear in the raw data, before any model. For each gene the counts of all cells of one type are summed per species and put on a common scale, so each line is one species and each point is one cell type. On the left is ZPBP2, a sperm protein whose sequence differs clearly between species (protein identity 0.82). Its expression rises to a peak in spermatocytes and falls afterward in human, mouse and macaque alike: the protein has changed, the pattern of use has not. On the right is ALAS1, the first enzyme of heme synthesis, whose protein is well conserved (protein identity 0.87). It is highest in hepatocytes in all three mammals, but the mouse expresses it far more strongly than human (about 24-fold in hepatocytes): the protein is kept, the level of use differs.
 
 Panels:
 
@@ -469,16 +475,14 @@ Panels:
 
 Supplementary Figure S18, key `supp_categories_broad`, label `fig:supp-dalpha-broad-categories`.
 
-Genes are sorted into ten broad functional groups: cytoskeleton and extracellular matrix, signaling pathways, immunity and inflammation, transcription factors, cell cycle, protein homeostasis, chromatin and DNA processing, mitochondria, metabolism, and translation. Panel a takes the liver fit with four species and shows, for each group, the spread of Δα over its genes as a box; the dashed line marks zero, where a gene's shared use is exactly what its protein conservation predicts. Groups are sorted from the highest to the lowest median, and mitochondrial, metabolic and translation genes sit furthest below the line. Panel b gives the same groups as two numbers each: "shift" is how far the group's average lies from zero, measured in units of the spread of all genes, and "amplitude" asks whether the group's genes lie farther from zero than other genes do; a star marks a statistically supported entry. Panels c and d repeat this for testis of human and macaque, where nine of the ten groups lie above zero, led by cytoskeleton and mitochondria, and translation sits at zero. The overall difference in sign between the tissues reflects where the protein prior sits in each tissue (in testis it is capped at 0.85), so the order of the groups within a tissue is the reading to take.
+Genes are sorted into ten broad functional groups: cytoskeleton and extracellular matrix, signaling pathways, immunity and inflammation, transcription factors, cell cycle, protein homeostasis, chromatin and DNA processing, mitochondria, metabolism, and translation. Panel a takes the liver fit with four species and shows, for each group, the spread of Δα over its genes as a box, with the number of genes in parentheses after the name; the dashed line marks zero, where a gene's shared use is exactly what its protein conservation predicts. Groups are sorted from the highest to the lowest median, and mitochondrial, metabolic and translation genes sit furthest below the line. A small gray triangle at the left edge of a row says that the row has genes below the end of the axis at -0.4 (four rows, twelve genes in all). Panel b gives the same groups as two numbers each: "shift" is how far the group's average lies from zero, measured in units of the spread of all genes, and "amplitude" asks whether the group's genes lie farther from zero than other genes do; a star marks a statistically supported entry. Panels c and d repeat this for testis of human and macaque, where nine of the ten groups lie above zero, led by cytoskeleton and mitochondria, and translation sits at zero. The values of the testis model span a smaller range, so the axis of panel c is narrower (-0.1 to 0.2 instead of -0.4 to 0.4) and holds every gene. The overall difference in sign between the tissues reflects where the protein prior sits in each tissue (in testis it is capped at 0.85), so the order of the groups within a tissue is the reading to take.
 
 Panels:
 
-- (a) `notebooks/figures/alpha_biology_simpler/a1_delta_alpha_by_category__panc_4sp__box.pdf`, scale 0.89
-- (b) `notebooks/figures/alpha_biology_simpler/a3_effect_size__panc_4sp.pdf`, scale 0.74
-- (c) `notebooks/figures/alpha_biology_simpler/a1_delta_alpha_by_category__test_hmac__box.pdf`, scale 0.89
-- (d) `notebooks/figures/alpha_biology_simpler/a3_effect_size__test_hmac.pdf`, scale 0.74
-
-Not yet in the house style: scale; text (see `specs/_allow.py`).
+- (a) `figures/panels/supp_categories_broad/liver_boxes.pdf`, scale 1.00
+- (b) `figures/panels/supp_categories_broad/liver_effect_sizes.pdf`, scale 1.00
+- (c) `figures/panels/supp_categories_broad/testis_boxes.pdf`, scale 1.00
+- (d) `figures/panels/supp_categories_broad/testis_effect_sizes.pdf`, scale 1.00
 
 ## Page 32: Δα by gene category, four-species liver, all 38 categories
 
@@ -520,11 +524,11 @@ Not yet in the house style: text (see `specs/_allow.py`).
 
 Supplementary Figure S22, key `supp_celltype_closure`, label `fig:supp-celltype-closure`.
 
-Chimera's count evidence for a gene is an average over all cells. That average can be split exactly into the part contributed by each cell type. This figure checks that the split adds up: for every gene, the value rebuilt from the cell-type parts (horizontal axis) is plotted against the value the model stored when training ended (vertical axis), in each of the seven liver and testis datasets. The points lie on the diagonal, with correlations from 0.969 to 0.997.
+Chimera's count evidence for a gene is an average over all cells. That average can be split exactly into the part contributed by each cell type. This figure checks that the split adds up: for every gene, the value rebuilt from the cell-type parts in one pass over all cells (horizontal axis) is plotted against the value the model stored when training ended (vertical axis), in each of the seven liver and testis datasets. Every gene is drawn, and each plot has its own range. The points lie on the diagonal, with correlations from 0.969 to 0.997.
 
 Panels:
 
-- `figures/panels/supp_celltype_closure/closure.pdf`, scale 1.01
+- `figures/panels/supp_celltype_closure/closure.pdf`, scale 1.00
 
 ## Page 36: Seed stability of cell-type contributions to the count evidence
 
@@ -542,22 +546,24 @@ Not yet in the house style: spelling (see `specs/_allow.py`).
 
 Supplementary Figure S24, key `supp_functional_layer`, label `fig:supp-functional-layer`.
 
+The figure asks whether Δα is organized by biology beyond single genes, in four ways. Panel a tests pathways: if genes of the same pathway have similar values, a coherence index rises above 1. It does so for the protein prior, for the count evidence and for Δα after known covariates are removed (Δα, adjusted), and it stays above the gray band of chance after the protein-language-model features are removed as well (Δα, adjusted + ESM-2), in two liver datasets and in testis. Panel b tests protein interaction networks: Moran's I measures whether interacting proteins have similar Δα. On the STRING network the fully adjusted value lies beyond the gray null band in every dataset; on the HuRI network it does not; open circles repeat the test without the most similar protein pairs. Panel c asks about conservation instead of coherence: whether genes whose interactions are retained in mouse differ in Δα; all four estimates lie inside the null band. Panel d asks the same for gene regulation, using transcription-factor binding that is conserved between human and mouse: the correlations are small, and the difference between liver and testis (open diamonds) is not distinguishable from zero for the fully adjusted Δα.
+
 Panels:
 
-- (a) `figures/panels/supp_functional_layer/a.pdf`, scale 0.97
-- (b) `figures/panels/supp_functional_layer/b_left.pdf`, scale 0.98
-- (b) `figures/panels/supp_functional_layer/b_right.pdf`, scale 0.96
-- (c) `figures/panels/supp_functional_layer/c.pdf`, scale 0.92
-
-Not yet in the house style: letters (see `specs/_allow.py`).
+- (a) `figures/panels/supp_functional_layer/pathways.pdf`, scale 1.00
+- (b) `figures/panels/supp_functional_layer/interactions.pdf`, scale 1.00
+- (c) `figures/panels/supp_functional_layer/interologs.pdf`, scale 1.00
+- (d) `figures/panels/supp_functional_layer/regulatory.pdf`, scale 1.00
 
 ## Page 38: Covariate audit of Δα in seven cohorts
 
 Supplementary Figure S25, key `supp_covariate_audit`, label `fig:supp-covariate-audit`.
 
+The figure asks how much of Chimera's reading Δα can be explained by simple, known properties of a gene. Each column is one of the seven liver and testis datasets. Each of the first eight rows is one property: how strongly and how widely the gene is expressed and how variable its expression is, how specific it is to a cell type, how conserved its protein is (the protein prior), the model's own count evidence, and the length and base composition of the coding sequence. The number in a cell is the rank correlation of that property with Δα; red means they rise together, blue the opposite. The ninth row shows that the count evidence stays related to Δα after expression is accounted for. The two gray rows at the bottom give the share of the variation of Δα that can be predicted from three expression features alone and from all 72 inputs of the protein-feature gate (darker means a larger share).
+
 Panels:
 
-- `figures/panels/supp_covariate_audit/covariate_audit.pdf`, scale 1.04
+- `figures/panels/supp_covariate_audit/covariate_audit.pdf`, scale 1.00
 
 ## Page 39: Agreement between training seeds
 
@@ -571,54 +577,48 @@ Panels:
 
 Supplementary Figure S27, key `supp_gate_gap`, label `fig:supp-gate-gap`.
 
-Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readings against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the colored ones differ by more than the noise between training seeds, 430 higher from their own counts and 803 lower. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a band centered on zero when one gate's seeds are split), how strongly the two readings agree (0.30 to 0.79), and what share of genes is called different (0 to 32 %). Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene reading (median 0.09) and much more of the protein-feature reading (median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene read-out keeps its members apart. Panel d shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.
+Chimera can read each gene in two ways: through the default protein-feature gate, where a network sets the gene's value from its protein features, and through the companion per-gene gate, where each gene gets its own value from its counts. Panel a takes one cohort, kidney from human and mouse, and plots the two readouts against each other for the 9,042 genes with count evidence in both fits. Most genes lie along the diagonal (Spearman 0.63); the dark ones differ by more than the noise between training seeds, 430 above the diagonal (higher with the per-gene gate) and 803 below, and five genes of the named-gene figure are marked. Panel b repeats this for all 26 cohorts: how reproducible the difference is when the training seeds are split in two halves (0.47 to 0.99, against a gray band around zero when one gate's seeds are split; two cohorts have one seed and no split), how strongly the two readouts agree (0.30 to 0.79), and what share of genes is called lower (bars to the left) and higher (bars to the right), 0 to 32 % in all. Panel c asks whether proteins that look alike to a protein language model (the 15 nearest neighbors in ESM-2 space) are read alike: they share little of the per-gene readout (hexagons, median 0.09) and much more of the protein-feature readout (circles, median 0.19, up to 0.70), so the default gate reads a protein family as a unit and the per-gene gate keeps its members apart. Panel d, with the cohorts in the rows of panel c, shows which gene properties go with the difference: the strongest is uneven detection between the species (partial correlation -0.23 to -0.56 in 21 of 26 cohorts), and all seven properties together explain 12 to 49 % of it.
 
 Panels:
 
-- (a) `figures/panels/supp_gate_gap/scatter.pdf`, scale 1.17
-- (b) `figures/panels/supp_gate_gap/cohorts.pdf`, scale 0.79
-- (c) `figures/panels/supp_gate_gap/neighbors.pdf`, scale 0.89
-- (d) `figures/panels/supp_gate_gap/covariates.pdf`, scale 1.03
-
-Not yet in the house style: scale; spelling; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_gate_gap/scatter.pdf`, scale 1.00
+- (b) `figures/panels/supp_gate_gap/cohorts.pdf`, scale 1.00
+- (c) `figures/panels/supp_gate_gap/neighbors.pdf`, scale 1.00
+- (d) `figures/panels/supp_gate_gap/covariates.pdf`, scale 1.00
 
 ## Page 41: The difference between the readouts by tissue, gene class and independent reference
 
 Supplementary Figure S28, key `supp_gate_gap_classes`, label `fig:supp-gate-gap-cont`.
 
-This figure asks what the difference between the two readings of a gene is made of. Panel e compares cohorts in pairs: each reading is similar between cohorts of the same tissue (median Spearman 0.57 for the per-gene read-out, 0.54 for the protein-feature gate) and still related between tissues (0.20 and 0.25), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either reading: the difference belongs to a gene in a tissue. Panel f looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher from their counts than from their protein family in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right show that both readings place these classes on the same side of the prior, the protein-feature gate further out. Panel g tests each reading against independent data while holding the other reading fixed: the per-gene read-out adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature gate still adds agreement on liver pattern and on fine kidney cell types. Panel h shows that the difference is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).
+This figure asks what the difference between the two readouts of a gene is made of. Panel a compares cohorts in pairs (45 pairs within a tissue, 280 between tissues): each readout is similar between cohorts of the same tissue (median Spearman 0.54 for the protein-feature gate, 0.57 for the per-gene gate) and still related between tissues (0.25 and 0.20), while the difference is related within a tissue (0.24) and almost not between tissues (0.03). A gene accounts for 8 % of the variance of the difference across eight tissues, against 22 to 23 % for either readout (the numbers in parentheses in the key): the difference belongs to a gene in a tissue. Panel b looks at whole gene classes. Mitochondrial proteins, the translation machinery, proliferation programs and protein homeostasis read higher with the per-gene gate than with the protein-feature gate in three or four of eight tissues; transcription factors, zinc-finger factors and receptors read lower. The two columns at the right print the mean of each readout: both place these classes on the same side of the prior, the protein-feature gate further out. Panel c tests each readout against independent data while holding the other fixed, one row per cohort and reference under tissue headings: the per-gene readout adds agreement on 26 of 32 gene-level references and on all nine held-out cortical regions (0.16 to 0.28), and the protein-feature readout still adds agreement on liver pattern and on fine kidney cell types. Panel d shows that the difference is unrelated to how constrained a gene's sequence is (dN/dS and LOEUF, all values between -0.07 and +0.10).
 
 Panels:
 
-- (e) `figures/panels/supp_gate_gap_classes/cross_tissue.pdf`, scale 1.05
-- (f) `figures/panels/supp_gate_gap_classes/sets.pdf`, scale 1.08
-- (g) `figures/panels/supp_gate_gap_classes/references.pdf`, scale 0.71
-- (h) `figures/panels/supp_gate_gap_classes/sequence.pdf`, scale 1.15
-
-Not yet in the house style: letters; scale; spelling; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_gate_gap_classes/cross_tissue.pdf`, scale 1.00
+- (b) `figures/panels/supp_gate_gap_classes/sets.pdf`, scale 1.00
+- (c) `figures/panels/supp_gate_gap_classes/references.pdf`, scale 1.00
+- (d) `figures/panels/supp_gate_gap_classes/sequence.pdf`, scale 1.00
 
 ## Page 42: Named genes where the two readouts differ
 
 Supplementary Figure S29, key `supp_gate_gap_named`, label `fig:supp-gate-gap-named`.
 
-This figure gives named examples of genes whose own counts and whose protein family disagree. Each row is a gene and each column a tissue. The color is the difference between the gene's per-gene reading and its protein-feature reading: blue means the gene's own counts place it lower than its protein features predict, red higher; a dot marks a tissue in which the difference passes the test against seed noise. At the right of each row are the gene's three nearest neighbors in the space of the protein language model, that is, the proteins it most resembles. The upper rows are near-identical, broadly expressed core proteins that read lower from their counts than their paralog families in three to five tissues: MARK2 (next to MARK1, MARK3, MARK4), PPP2CB (PPP2CA, PPP4C, PPP6C), ARF5, GSK3B, XRCC6 and TERF2IP. The lower rows are metabolic and nucleolar enzymes that read higher: HADH, ALDH6A1, QDPR, MSRB3 and fibrillarin (FBL). The FKBP family shows both at once: the protein model groups FKBP4, FKBP5 and FKBP7 together, while the counts separate them, FKBP4 and FKBP5 lower and FKBP7 higher.
+This figure gives named examples of genes whose own counts and whose protein family disagree. Each row is a gene and each column a tissue. The color is the difference between the gene's per-gene readout and its protein-feature readout: blue means the gene's own counts place it lower than its protein features do, red higher; a dot marks a tissue in which the difference passes the test against seed noise in at least one cohort, and a gray cell a tissue in which the gene has no count evidence in both fits. At the right of each row are the gene's three nearest neighbors in the space of the protein language model, that is, the proteins it most resembles. The upper six rows are near-identical, broadly expressed core proteins that read lower from their counts than their paralog families in three to five tissues: MARK2 (next to MARK1, MARK3, MARK4), PPP2CB (PPP2CA, PPP4C, PPP6C), ARF5, GSK3B, XRCC6 and TERF2IP. The middle three rows are the FKBP family: the protein model groups FKBP4, FKBP5 and FKBP7 together, while the counts separate them, FKBP4 and FKBP5 lower and FKBP7 higher. The lower five rows are metabolic and nucleolar enzymes that read higher: HADH, ALDH6A1, QDPR, MSRB3 and fibrillarin (FBL).
 
 Panels:
 
-- (i) `figures/panels/supp_gate_gap_named/named.pdf`, scale 1.13
-
-Not yet in the house style: letters; spelling (see `specs/_allow.py`).
+- `figures/panels/supp_gate_gap_named/named.pdf`, scale 1.00
 
 ## Page 43: Published species differences on the count evidence
 
 Supplementary Figure S30, key `supp_published_differences`, label `fig:supp-e6`.
 
+Other groups have published lists of genes whose expression differs between species in a given tissue, for example genes that are specific to the human cortex among primates, or genes enriched in human or in mouse insulin-producing beta cells. These lists were collected and fixed before any Chimera value was looked at. Panel (a) asks, for each of 20 lists in the model of the matching tissue, whether the listed genes score lower than comparison genes of the same expression, cell-type specificity and protein identity. The score is an AUROC: 0.5 means no difference, below 0.5 means the listed genes sit lower. Five scores are compared: Chimera's count evidence, Δα with each of the two gates, the correlation of expression profiles, and a plain gap in detection between the species that uses no model. A double dagger marks a list that was derived from the same data as the model. Human-specific cortex genes sit low on count evidence (0.35) and lower than on profile correlation (0.45), and beta-cell differences sit low on both (0.32 and 0.37); lists that define divergence by marker status or by timing sit above 0.5. Panel (b) compares each paper's divergent genes with the same paper's conserved genes: the divergent genes sit lower on count evidence in 13 of the 14 comparisons shown, liver zonation being the exception.
+
 Panels:
 
-- (a) `figures/panels/supp_published_differences/matched.pdf`, scale 0.87
-- (b) `figures/panels/supp_published_differences/conserved.pdf`, scale 0.78
-
-Not yet in the house style: scale; text; text_single (see `specs/_allow.py`).
+- (a) `figures/panels/supp_published_differences/matched.pdf`, scale 1.00
+- (b) `figures/panels/supp_published_differences/conserved.pdf`, scale 1.00
 
 ## Page 44: Ground-truth benchmark: level alterations and protein identity
 
@@ -708,34 +708,32 @@ Panels:
 
 Supplementary Figure S35, key `supp_programs_recurrent`, label `fig:supp-e1`.
 
-Panel a asks which groups of genes, such as pathways, protein classes and cell compartments, sit above or below what their protein conservation predicts, and whether this is the same in every tissue. Each row is one gene program and each column a tissue; red means the program's genes are used more alike across species than their proteins predict (above the prior), blue less (below), and a dot marks a significant tissue. The left block is read with the default protein-feature gate, the right block with the per-gene read-out, and they show the same picture. The rows are sorted into four groups by two properties: whether the proteins evolve fast or are conserved, and whether the program sits above or below the prior. Secreted and cell-surface proteins evolve fast yet sit above in all eight tissues; the nuclear RNA machinery is highly conserved yet sits below. The three number columns give, for each program, how its protein identity, its dN/dS and its direct profile correlation compare with matched genes. Panel b takes the two-species models of four tissues and orders them by the evolutionary distance of the partner species from human, from chimpanzee (6 million years) to zebrafish (429). The size of the above and below programs (left) and the agreement of each model's program order with the other tissues (right) stay flat with distance: the program-level reading is already present between human and chimpanzee.
+Panel (a) asks which groups of genes, such as pathways, protein classes and cell compartments, sit above or below what their protein conservation predicts, and whether this is the same in every tissue. Each row is one gene program, with its source in parentheses (GO, UniProt keywords, Reactome, the Hallmark collection, or the gene categories of this paper), and each column a tissue. Red means the program's genes are used more alike across species than their proteins predict (above the prior), blue less (below); an asterisk marks a tissue in which the difference is significant. The colors end at 1 SD, so the few larger effects (up to 1.7) keep the darkest red. The left block is read with the default protein-feature gate, the right block with the per-gene gate, and they show the same picture. The rows are sorted into four groups, named at the left and separated by rules, by two properties: whether the proteins evolve fast or are conserved, and whether the program sits above or below the prior. Secreted and cell-surface proteins evolve fast yet sit above in all eight tissues; the nuclear RNA machinery is highly conserved yet sits below. The three number columns at the right give, for each program, how its protein identity, its dN/dS and its direct profile correlation compare with matched genes, as one z value combined over the eight tissues. Panel (b) takes the two-species models of four tissues (symbol and color) and orders them by the evolutionary distance of the partner species from human, from chimpanzee (6 million years) to zebrafish (429). Filled symbols and solid lines are the protein-feature gate, open symbols and dashed lines the per-gene gate. The size of the programs above and below the prior (left) and the agreement of each model's program order with the other tissues (right) stay flat with distance: the program-level reading is already present between human and chimpanzee.
 
 Panels:
 
-- (a) `figures/panels/supp_programs_recurrent/atlas.pdf`, scale 1.01
-- (b) `figures/panels/supp_programs_recurrent/distance.pdf`, scale 1.11
-
-Not yet in the house style: spelling; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_programs_recurrent/atlas.pdf`, scale 1.00
+- (b) `figures/panels/supp_programs_recurrent/distance.pdf`, scale 1.00
 
 ## Page 53: Tissue programs in each tissue
 
 Supplementary Figure S36, key `supp_programs_by_tissue`, label `fig:supp-e1-cont`.
 
+For each of eight tissues a short list of gene programs that stand for the tissue's known biology was chosen before the analysis: bile acid and drug metabolism for liver, meiosis and cilia for testis, immune and heme programs for bone marrow, transporters for kidney, hormone secretion for islet, synapses for cortex, and so on. Each row is one of these 35 programs, grouped by its tissue (bold, at the left) and with its source in parentheses; each column is a tissue. Red means that the program's genes sit above comparable genes in that tissue. The colors end at a z of 12, and a gray cell is a program with fewer than 15 genes in that tissue's model, which gets no z. The cell of the program's own tissue is outlined: with a solid line when the own tissue is significantly above the other seven, with a dashed line when it is not. The three blocks give the same test with three readings: Δα with the default protein-feature gate, Δα with the per-gene gate, and the direct correlation of expression profiles between species. With both gates a tissue's own programs lead in seven of eight tissues (20 of 35 programs significantly, for each gate): synapse in cortex, transport in kidney, immune and heme programs in bone marrow, hormone programs in islet. In bone marrow, and for most islet programs, the direct profile correlation does not single them out (19 of 35 programs overall). Liver is the exception: its metabolic programs come first on profile correlation but not on Δα.
+
 Panels:
 
-- (c) `figures/panels/supp_programs_by_tissue/tissue.pdf`, scale 0.99
-
-Not yet in the house style: letters; text; words (see `specs/_allow.py`).
+- `figures/panels/supp_programs_by_tissue/tissue.pdf`, scale 1.00
 
 ## Page 54: Named genes that recur across tissues
 
 Supplementary Figure S37, key `supp_programs_named_genes`, label `fig:supp-e1-genes`.
 
+Single genes that land on the same side of the protein prior in several tissues, with both gates. Each row is a gene and each column one of eight tissues. A large vermilion dot means the gene is called above the prior in that tissue (its use across cell states is shared between species more than its protein predicts), a large blue dot means below, a small gray dot means tested but not called, and no dot means the gene could not be tested in that tissue. The left block lists the 24 genes that recur most often above the prior: the endothelial receptor HEG1 is called in seven of eight tissues; many of the others build cell junctions and the cell cortex (LIMA1, CADM1, AKAP12, TJP1, MACF1, EPB41L2, FERMT2, JAM2), and two are cytokine receptors (IL6R, IFNGR1). The right block lists the 14 genes that recur most often below the prior, mostly conserved nuclear RNA and DNA genes (XRCC5, UPF3A, RRP1, RPL3, TNRC6C). The two columns beside each block give the gene's protein identity between the species and in how many of the cohorts in which it was tested it is called (HEG1: 13 of 26).
+
 Panels:
 
-- (d) `figures/panels/supp_programs_named_genes/genes.pdf`, scale 1.02
-
-Not yet in the house style: letters; text (see `specs/_allow.py`).
+- `figures/panels/supp_programs_named_genes/genes.pdf`, scale 1.00
 
 ## Page 55: The reading in bone marrow
 
@@ -911,100 +909,96 @@ Panels:
 
 Supplementary Figure S47, key `supp_bone_marrow_reference`, label `fig:supp-bone-marrow`.
 
+The figure tests Chimera on bone marrow of three species: human, mouse lemur and mouse. The yardstick is a published score, from sorted blood cell types of human and mouse, of how well each gene's expression pattern across blood lineages is conserved (COE). Panel a orders 4,111 genes into ten groups by that score and shows, for each group, where the genes rank on Δα, on the count evidence and on a direct comparison of expression profiles, after removing what protein identity, expression level, detection and gene length explain: all three rise with the published score. Panel b gives the same relation as one number per score, for all genes (filled markers) and for the third of genes with the most conserved proteins (open markers): about 0.09 for Δα, 0.12 for the count evidence and 0.20 for the profile correlation, all above zero. Panel c asks whether the scores separate genes reported as divergent between human and mouse from conserved ones (0.5 means no separation): in the comparison fixed in advance the profile correlation places the divergent genes lower and the two Chimera readouts place them higher; in an exploratory comparison with matched conserved genes all three place them lower. Panel d takes ten genes whose divergent blood lineage is published and counts how often the cell type that contributes most to the divergence is that lineage: two to four of ten, where chance (the tick) gives about two. Panels e and f compare the species: the divergent part of the count evidence comes more from the lemur than from the mouse cells, while expression profiles are more alike between human and lemur than between human and mouse.
+
 Panels:
 
-- (a) `figures/panels/supp_bone_marrow_reference/a.pdf`, scale 1.01
-- (b) `figures/panels/supp_bone_marrow_reference/b.pdf`, scale 1.01
-- (c) `figures/panels/supp_bone_marrow_reference/c.pdf`, scale 1.01
-- (d) `figures/panels/supp_bone_marrow_reference/d.pdf`, scale 1.01
-- (e) `figures/panels/supp_bone_marrow_reference/e.pdf`, scale 1.01
-- (f) `figures/panels/supp_bone_marrow_reference/f.pdf`, scale 1.01
+- (a) `figures/panels/supp_bone_marrow_reference/a.pdf`, scale 1.00
+- (b) `figures/panels/supp_bone_marrow_reference/b.pdf`, scale 1.00
+- (c) `figures/panels/supp_bone_marrow_reference/c.pdf`, scale 1.00
+- (d) `figures/panels/supp_bone_marrow_reference/d.pdf`, scale 1.00
+- (e) `figures/panels/supp_bone_marrow_reference/e.pdf`, scale 1.00
+- (f) `figures/panels/supp_bone_marrow_reference/f.pdf`, scale 1.00
 
 ## Page 65: Home compartments of genes against Δα
 
 Supplementary Figure S48, key `supp_cell_compartments`, label `fig:supp-e3-compartments`.
 
-Every gene is given a "home": the cell type in which human cells use it most, or no home if it is used in all cells. Home cell types are grouped into four compartments: the specialized cells of a tissue (neurons, kidney tubule cells, germ cells), stromal cells, blood-vessel cells and immune cells. Panel (a) asks, for each compartment and each of the 26 cohorts, whether its genes score higher or lower than comparison genes with the same protein identity, expression, detection and cell-type specificity. Four scores stand side by side: Chimera's Δα with the default protein-feature gate, Δα read gene by gene, the correlation of cell-type expression profiles between species, and the similarity of expression level at the home cell type. Genes of specialized cells sit above their protein prior in 23 of 24 and 24 of 24 cohorts, while their expression level at the home cell type is the least similar between species (2 of 24 above zero); genes used in every cell show the reverse in 26 of 26 cohorts. Panel (b) splits the compartments into 70 finer cell groups from nine cohorts and plots how much the level differs between species against the per-gene Δα excess: specialized cell groups gather where both are positive, and the liver sinusoidal endothelium is the most shared program of all (+0.79 SD).
+Every gene is given a "home": the cell type in which human cells use it most, or no home if it is used in all cells. Home cell types are grouped into four compartments: the specialized cells of a tissue (neurons, kidney tubule cells, germ cells), stromal cells, blood-vessel cells and immune cells. Panel (a) asks, for each compartment and each of the 26 cohorts, whether its genes score higher or lower than comparison genes with the same protein identity, expression, detection and cell-type specificity. Four scores stand side by side: Δα with the protein-feature gate, Δα with the per-gene gate, the correlation of cell-type expression profiles between species, and the similarity of expression level at the home cell type. One mark is one cohort (filled when the difference is significant), the bar is the median, and the gray numbers count the cohorts above zero. Genes of specialized cells sit above their protein prior in 23 of 24 and 24 of 24 cohorts, while their expression level at the home cell type is the least similar between species (2 of 24 above zero); genes used in every cell sit below the prior in 25 and 26 of 26 cohorts while their level is similar (23 of 26 above zero). Panel (b) splits the compartments into 70 finer cell groups from nine cohorts (one per tissue, and skeletal muscle) and plots how much the level differs between species against the excess of Δα with the per-gene gate: specialized cell groups gather where both are positive, and the liver sinusoidal endothelium is the most shared program of all (+0.79 SD).
 
 Panels:
 
-- (a) `figures/panels/supp_cell_compartments/compartments.pdf`, scale 1.06
-- (b) `figures/panels/supp_cell_compartments/pattern_vs_level.pdf`, scale 1.14
-
-Not yet in the house style: spelling (see `specs/_allow.py`).
+- (a) `figures/panels/supp_cell_compartments/compartments.pdf`, scale 1.00
+- (b) `figures/panels/supp_cell_compartments/pattern_vs_level.pdf`, scale 1.00
 
 ## Page 66: Cell types that carry shared deployment
 
 Supplementary Figure S49, key `supp_cell_lineages`, label `fig:supp-e3-lineages`.
 
-Panel (a) takes four tissues for which several models were trained independently (liver 4, eye 6, cortex 7, testis 3) and asks, for the genes whose home is a given cell type, how far they sit above or below comparison genes with the same protein identity, expression and specificity. Each circle is Chimera's per-gene Δα in one model, each triangle the correlation of expression profiles between species in the same model, and the short bars are medians. Genes of the liver sinusoidal endothelium (the lining of the liver's blood channels) are the most shared program of any tissue, +0.79 to +1.19 SD in all four liver models, while hepatocyte genes sit near their prior. In the eye, genes of the trabecular meshwork (the tissue through which fluid leaves the eye, central to glaucoma), ciliary muscle and Schwann cells are above; in the cortex, the neurons; in the testis, spermatocytes and spermatids. Panel (b) names seven genes for four of these cell types and shows their per-gene Δα as a z-score in every model of the tissue: a row that is red in every column is a gene above its prior whichever species set was used. Examples are HEG1 and PLXND1 in the liver endothelium, the glaucoma gene MYOC in the trabecular meshwork, and ANK3 and GAP43 in neurons.
+Panel (a) takes four tissues for which several cohorts were trained independently (liver 4, eye 6, cortex 7, testis 3) and asks, for the genes whose home is a given cell type, how far they sit above or below comparison genes with the same protein identity, expression and specificity. Each hexagon is Δα with the per-gene gate in one cohort, each triangle the correlation of expression profiles between species in the same cohort, and the short bars are medians. Genes of the liver sinusoidal endothelium (the lining of the liver's blood channels) are the most shared program of any tissue, +0.79 to +1.19 SD in all four liver cohorts, while hepatocyte genes sit near their prior. In the eye, genes of the trabecular meshwork (the tissue through which fluid leaves the eye, central to glaucoma), ciliary muscle and Schwann cells are above; in the cortex, the neurons; in the testis, spermatocytes and spermatids. Panel (b) names seven genes for four of these cell types and prints their Δα with the per-gene gate as a z-score in every cohort of the tissue: a row that is red in every column is a gene above its prior whichever species set was used. The color scale ends at 3 and larger values keep the darkest red; a gray cell is a gene without count evidence in that cohort. Examples are HEG1 and PLXND1 in the liver endothelium, the glaucoma gene MYOC in the trabecular meshwork, and ANK3 and GAP43 in neurons.
 
 Panels:
 
-- (a) `figures/panels/supp_cell_lineages/lineages.pdf`, scale 1.04
-- (b) `figures/panels/supp_cell_lineages/named.pdf`, scale 1.13
-
-Not yet in the house style: spelling (see `specs/_allow.py`).
+- (a) `figures/panels/supp_cell_lineages/lineages.pdf`, scale 1.00
+- (b) `figures/panels/supp_cell_lineages/named.pdf`, scale 1.00
 
 ## Page 67: Species-specific departures along the primate phylogeny
 
 Supplementary Figure S50, key `supp_primate_branches`, label `fig:supp-e3-primates`.
 
-One model was fitted to prefrontal cortex cells of four primates at once: human, chimpanzee, macaque and marmoset. For every gene and cell type the model gives each species its own evidence value, and a species "departs" when its value is clearly lower than those of the other three. Panel (a) plots how often each species departs against the length of its own branch of the primate tree: about 9 to 11 % of gene-by-cell-type pairs for human and chimpanzee (6.4 million years), 13 % for macaque (28.8) and 24 % for marmoset (43). Both gates of Chimera and a direct comparison of expression levels give the same order. Panel (b) tests this in a second cortical region from another laboratory that the model never saw: genes that depart more on the marmoset branch than on the macaque branch also show the larger expression gap there (ρ = 0.17), and departures on the human branch agree with a human-specific gap (ρ = 0.07), with the chimpanzee branch as a control. Panel (c) shows five genes that an earlier study reported as changed on the human lineage: in the cell type named by that study the human bar lies below those of the other three primates, for example FOXP2 in microglia.
+One model was fitted to prefrontal cortex cells of four primates at once: human, chimpanzee, macaque and marmoset. For every gene and cell type the model gives each species its own evidence value, and a species "departs" when its value is clearly lower than those of the other three. Panel (a) shows how often each species departs, with the species in the order of the length of their own branch of the primate tree (printed under each name, in million years): about 9 to 11 % of gene-by-cell-type pairs for human and chimpanzee (6.4), 13 % for macaque (28.8) and 24 % for marmoset (43). Chimera with either gate and a direct comparison of expression levels give the same order. Panel (b) tests this in a second cortical region from another laboratory that the model never saw: genes that depart more on the marmoset branch than on the macaque branch also show the larger expression gap there (ρ = 0.17), and departures on the human branch agree with a human-specific gap (ρ = 0.07), with the chimpanzee branch as a control. Panel (c) shows five genes that an earlier study reported as changed on the human lineage: in the cell type named by that study the human bar lies below those of the other three primates, for example FOXP2 in microglia.
 
 Panels:
 
-- (a) `figures/panels/supp_primate_branches/branch.pdf`, scale 0.92
-- (b) `figures/panels/supp_primate_branches/mtg.pdf`, scale 0.87
-- (c) `figures/panels/supp_primate_branches/human_lineage.pdf`, scale 0.88
-
-Not yet in the house style: scale; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_primate_branches/branch.pdf`, scale 1.00
+- (b) `figures/panels/supp_primate_branches/mtg.pdf`, scale 1.00
+- (c) `figures/panels/supp_primate_branches/human_lineage.pdf`, scale 1.00
 
 ## Page 68: Protein architecture and gene history against Δα
 
 Supplementary Figure S51, key `supp_protein_architecture`, label `fig:supp-e2`.
 
+Which features of a protein and of its gene's history go with deployment above or below the protein prior, after protein identity, expression, detection and length are held fixed. Panel (a) lists 18 properties. Tissue-specific genes, plasma-membrane and secreted proteins, genes with a signal peptide and duplicates kept from the two ancient whole-genome duplications of vertebrates sit above the prior; essential genes, members of protein complexes and nuclear proteins sit below. The large symbols are medians over ten tissues, the small dots the single tissues, and the column at the right counts the tissues in which the value with the per-gene gate has the sign of its median. Panel (b) does the same for protein domains, with the median and the interquartile range over tissues. Proteins built from signaling and cell-surface modules (calponin-homology, FERM, SH2, SH3, receptors, kinases) sit above their prior by 0.2 to 0.6 SD; proteins built from RNA-binding, chromatin and protein-turnover modules (RNA-recognition motif, helicase, bromodomain, WD40) sit below. In both panels three readings stand side by side, named in the key under each panel: Δα with the protein-feature gate (circle), Δα with the per-gene gate (hexagon), which sees no protein features, and direct profile correlation (triangle). They give the same order. Panel (c) follows gene age, from the youngest genes (arisen in tetrapods or later) to the oldest (shared with yeast): duplicates from the whole-genome duplications stay above singletons at every age, and genes that arose with the vertebrates sit highest.
+
 Panels:
 
-- (a) `figures/panels/supp_protein_architecture/properties.pdf`, scale 0.94
-- (b) `figures/panels/supp_protein_architecture/domains.pdf`, scale 0.94
-- (c) `figures/panels/supp_protein_architecture/age_duplication.pdf`, scale 1.01
-
-Not yet in the house style: spelling; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_protein_architecture/properties.pdf`, scale 1.00
+- (b) `figures/panels/supp_protein_architecture/domains.pdf`, scale 1.00
+- (c) `figures/panels/supp_protein_architecture/age_duplication.pdf`, scale 1.00
 
 ## Page 69: Regulatory and gene-architecture features against Δα
 
 Supplementary Figure S52, key `supp_regulatory_architecture`, label `fig:supp-e5`.
 
+Which features of a gene's regulation go with deployment above or below the protein prior, after protein identity, expression, detection and protein length are held fixed. Panel (a) lists 18 features. Genes with many distal enhancers in their regulatory domain, genes controlled by many transcription factors and developmental genes marked by Polycomb in stem cells sit above the prior in nine or ten of ten tissues (enhancers: partial correlation +0.14 with the protein-feature gate, +0.11 with the per-gene gate, +0.05 for direct profile correlation). Housekeeping genes and genes with CpG-island or bidirectional promoters sit below. Transcript features such as the number of isoforms or alternative promoters carry little. The large symbols are medians over ten tissues, the small dots the single tissues, and the column at the right counts the tissues in which the value with the per-gene gate has the sign of its median. Panel (b) looks at the targets of single transcription factors, with the number of factors that regulate a gene held equal: targets of lineage and signaling factors such as ZEB2, NR2F2, RBPJ and RUNX2 sit above the prior, targets of the CpG-promoter factors NRF1, NFYA and ZBTB33 below. Panel (c) shows the dose-response: from the fifth of genes with the fewest enhancers (or regulating factors) to the fifth with the most, the reading rises step by step, for both gates; the dotted line shows that Δα with the per-gene gate keeps the rise when cell-type specificity is held equal. In all panels the circle is Δα with the protein-feature gate, the hexagon Δα with the per-gene gate and the triangle direct profile correlation.
+
 Panels:
 
-- (a) `figures/panels/supp_regulatory_architecture/properties.pdf`, scale 0.96
-- (b) `figures/panels/supp_regulatory_architecture/regulons.pdf`, scale 0.96
-- (c) `figures/panels/supp_regulatory_architecture/dose.pdf`, scale 1.07
-
-Not yet in the house style: spelling (see `specs/_allow.py`).
+- (a) `figures/panels/supp_regulatory_architecture/properties.pdf`, scale 1.00
+- (b) `figures/panels/supp_regulatory_architecture/regulons.pdf`, scale 1.00
+- (c) `figures/panels/supp_regulatory_architecture/dose.pdf`, scale 1.00
 
 ## Page 70: Disease genes and drug targets by organ system
 
 Supplementary Figure S53, key `supp_disease_genes`, label `fig:supp-e4`.
 
+For each of nine tissues with a human and mouse model, two gene lists were taken from public resources: genes in which a mutation causes an inherited disease of that organ system, and the targets of approved drugs used for diseases of that organ system. Panel (a) asks, for each list (rows) and each tissue's model (columns), whether the list sits above (red) or below (blue) comparison genes of the same protein identity and expression, for three scores: Δα with the protein-feature gate, Δα with the per-gene gate, and the correlation of expression profiles between species. The outlined cell in each row is the list's own tissue, and a solid outline means that the list is higher there than in the other tissues; values beyond 6 keep the end colors. Disease genes sit above the prior in their own tissue in seven of nine tissues under the protein-feature gate, led by bone marrow, testis and kidney, with liver at the prior and cortex below. Panel (b) repeats the own-tissue comparison after also accounting for how cell-type-specific and how well studied each gene is (filled marks: the interval excludes zero): bone-marrow drug targets stay above on both gates (+0.23 and +0.25 SD) where profile correlation shows nothing (-0.05), and cortex drug targets, eye disease genes and the bone-marrow and testis disease genes also remain. Panel (c) asks a different question, whether a higher score makes it more likely that a mouse mutant of the gene is a recorded model of the same human disease. The two resources point in opposite directions (odds ratios 0.87 to 0.90 for curated models, 1.04 to 1.06 for phenotype matches), so the reading does not predict which mouse mutants model the disease.
+
 Panels:
 
-- (a) `figures/panels/supp_disease_genes/heat.pdf`, scale 1.08
-- (b) `figures/panels/supp_disease_genes/partial.pdf`, scale 0.93
-- (c) `figures/panels/supp_disease_genes/q1.pdf`, scale 1.03
-
-Not yet in the house style: scale; spelling; text; words (see `specs/_allow.py`).
+- (a) `figures/panels/supp_disease_genes/heat.pdf`, scale 1.00
+- (b) `figures/panels/supp_disease_genes/partial.pdf`, scale 1.00
+- (c) `figures/panels/supp_disease_genes/q1.pdf`, scale 1.00
 
 ## Page 71: Approved drug targets against the protein prior
 
 Supplementary Figure S54, key `supp_drug_targets`, label `fig:supp-e4-targets`.
 
+Each of the four plots is one tissue: bone marrow, cortex, eye and kidney. Every gene with count evidence is a light gray dot, placed by the rank of its protein identity between the species (left, less conserved; right, more; the genes at the upper bound of the prior share one position) and by its Δα with the per-gene gate (up, above what the protein predicts; down, below). The targets of approved drugs are drawn on top. Vermilion marks targets that sit above the prior on both gates of the model, blue marks those below on both, and gray marks targets without a call; a diamond means that the drug is used for a disease of that organ system. Named examples above the prior are immune receptors in bone marrow whose proteins evolve fast (IL6R, IL4R, IFNGR1, CD86), neuronal channels and receptors in cortex (SCN8A, GABRA1, OPRM1) and transporters in kidney (SCNN1G, SLC9A3, SLC22A12). Named examples below the prior are conserved proteins that the mouse deploys differently, such as PDE10A, FAAH and KCNQ1 in cortex and ROCK2 in the eye.
+
 Panels:
 
-- (d) `figures/panels/supp_drug_targets/targets.pdf`, scale 1.11
-
-Not yet in the house style: letters (see `specs/_allow.py`).
+- `figures/panels/supp_drug_targets/targets.pdf`, scale 1.00
 
 ## Page 72: Linear surrogate and scalar-correlation controls of the gate correction
 
@@ -1111,16 +1105,14 @@ Panels:
 
 Supplementary Figure S65, key `supp_residue_audit`, label `fig:supp-main-gin-protein`.
 
-The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues; a bar to the right means the first kind receives more attribution. (b) The same comparisons made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain, led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence.
+The default gate of the model reads features of each protein that a protein language model computes from its sequence. For 70 well-studied proteins the figure asks which amino-acid positions those features draw on most when the model sets a gene's correction, and whether that pattern follows known properties of protein structure. (a) Twenty comparisons of kinds of residues (for example exposed against buried, or hydrophobic against charged) over all 36,832 residues, grouped by the property they compare; a bar to the right means the first kind receives more attribution, and a dark bar that the comparison is supported when all residues are pooled. (b) The same comparisons, on the rows of (a), made inside every protein and then tested across proteins, which removes effects that only reflect which proteins contribute many residues: six remain (dark bars), led by hydrophobic against positively charged residues. (c) Each structural property explains well under one percent of the variation on its own. (d) Every comparison placed by its pooled and its within-protein evidence; the six that hold within proteins are named.
 
 Panels:
 
-- (a) `figures/sources/assembled/page37.pdf`, region (0, 0, 375, 384), scale 0.67
-- (b) `figures/sources/assembled/page37.pdf`, region (375, 0, 724, 384), scale 0.67
-- (c) `figures/sources/assembled/page37.pdf`, region (724, 0, 958, 188), scale 1.13
-- (d) `figures/sources/assembled/page37.pdf`, region (724, 200, 958, 384), scale 1.07
-
-Not yet in the house style: scale; text; text_single; unreadable_text_layer (see `specs/_allow.py`).
+- (a) `figures/panels/supp_residue_audit/pooled.pdf`, scale 1.00
+- (b) `figures/panels/supp_residue_audit/per_gene.pdf`, scale 1.00
+- (c) `figures/panels/supp_residue_audit/variance.pdf`, scale 1.00
+- (d) `figures/panels/supp_residue_audit/diagnostic.pdf`, scale 1.00
 
 ## Page 81: Residue-level attribution audit, continued
 
