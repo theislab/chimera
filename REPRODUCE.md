@@ -148,7 +148,8 @@ The SATURN ESM-2 embeddings are not redistributed; the gene features derived fro
 inside the AnnData objects. EVEE evolutionary statistics carry no stated license, so per-gene
 EVEE columns are removed from the deposited tables and are rebuilt from the EVEE download listed
 in `data/analysis/gold/G1/MANIFEST.tsv`. Altered objects of the benchmark and the models fitted
-on them are rebuilt by the task code. Licenses of third-party sources:
+on them are rebuilt by the task code. Our own files in the records are released under
+CC BY 4.0; third-party sources keep their terms, listed in
 [`release/zenodo/LICENSES.md`](release/zenodo/LICENSES.md).
 
 ## 4. From the paper to the code and data

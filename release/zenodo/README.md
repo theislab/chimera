@@ -13,6 +13,10 @@ holds what builds them.
 | [`texts/`](texts/) | Text files that are packed into a bundle (the column description of the gene tables). |
 | `staging/` | The modules behind `stage.py`: `declaration` (reads `bundles.yaml`), `selection` (resolves members), `scrub` (dropped columns, text rules), `packing` (tarball, manifest, checksums), `records` (metadata and READMEs), `status` (`--check`). |
 
+The records of the deposit, the data records and the code archive, are released under CC BY 4.0
+(`license` under `deposit` in `bundles.yaml`), like the code repository; third-party sources
+keep their own terms, as listed in `LICENSES.md`.
+
 ## Use
 
 Inside the project environment:

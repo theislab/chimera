@@ -16,7 +16,7 @@ authors:
     given-names: Fabian J.
     affiliation: "Institute of Computational Biology, Helmholtz Munich"
 repository-code: "https://github.com/theislab/chimera"
-license: BSD-3-Clause
+license: CC-BY-4.0
 version: 0.1.0
 doi: 10.5281/zenodo.24137767
 date-released: "2026-11-11"

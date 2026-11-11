@@ -30,12 +30,13 @@ class Deposit:
 
     name: str
     code_repository: str
-    license: str
+    license: str                            # license of the records, as Zenodo identifies it
     citation_file: str
     licenses_file: str
     docs_naming_every_bundle: tuple[str, ...]
     record_limit_bytes: int
     split_part_bytes: int
+    license_name: str = ""                  # the license as a reader is told it; "" = the identifier
     release_tag: str = ""                   # identifiers of the archived release; "" = not declared
     code_doi: str = ""
     paper_doi: str = ""
@@ -316,7 +317,7 @@ def load(path: Path, private_rules: Path | None = None) -> Declaration:
     dep = _take(d["deposit"], "deposit", required=(
         "name", "code_repository", "license", "citation_file", "licenses_file",
         "record_limit_gb", "split_part_gb"),
-        optional=("docs_naming_every_bundle", "release_tag", "code_doi", "paper_doi"))
+        optional=("docs_naming_every_bundle", "license_name", "release_tag", "code_doi", "paper_doi"))
     npk = _take(d["never_packed"], "never_packed", optional=("names", "suffixes", "name_contains"))
     dc = _take(d["dropped_columns"], "dropped_columns", required=("label", "columns", "reason"))
     bundles = {name: _bundle(name, raw_b) for name, raw_b in d["bundles"].items()}
@@ -334,6 +335,7 @@ def load(path: Path, private_rules: Path | None = None) -> Declaration:
             docs_naming_every_bundle=tuple(dep["docs_naming_every_bundle"] or ()),
             record_limit_bytes=int(float(dep["record_limit_gb"]) * 10**9),
             split_part_bytes=int(float(dep["split_part_gb"]) * 10**9),
+            license_name=str(dep["license_name"] or dep["license"]).strip(),
             release_tag=str(dep["release_tag"] or "").strip(), code_doi=code_doi,
             paper_doi=_doi(dep["paper_doi"], "deposit.paper_doi")),
         never_packed=NeverPacked(frozenset(npk["names"] or ()), tuple(npk["suffixes"] or ()),

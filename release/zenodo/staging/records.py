@@ -170,6 +170,13 @@ def record_readme(bundle: Bundle, declaration: Declaration, manifest: Sequence[t
     ]
     if bundle.unpacks_to:
         lines += [f"The files unpack to {bundle.unpacks_to}.", ""]
+    lines += [
+        "## License",
+        "",
+        f"The files of this record that are our own work are released under {dep.license_name}; third-party sources",
+        "keep their terms, see `LICENSES.md`.",
+        "",
+    ]
     lines += ["## Content", "", "| Path | Files | Size |", "|---|---|---|"]
     lines += [f"| `{key}` | {n} | {gigabytes(size)} |" for key, n, size in _content_rows(manifest)]
     if bundle.not_included:

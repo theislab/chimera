@@ -208,6 +208,8 @@ see [`CITATION.cff`](CITATION.cff).
 
 ## License
 
-BSD 3-Clause; see [LICENSE](LICENSE). Chimera follows the conventions of
+CC BY 4.0 (Creative Commons Attribution 4.0 International); see [LICENSE](LICENSE). The records
+of the deposit are released under the same license; third-party sources keep their own terms
+([`release/zenodo/LICENSES.md`](release/zenodo/LICENSES.md)). Chimera follows the conventions of
 [scvi-tools](https://scvi-tools.org/) for model registration, AnnData handling and training
 plans.

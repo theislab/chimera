@@ -46,7 +46,8 @@ format: 1
 deposit:
   name: Chimera
   code_repository: https://github.com/theislab/chimera
-  license: bsd-3-clause                  # Zenodo license identifier written into every record
+  license: cc-by-4.0                     # license of every record, data and code: its identifier in Zenodo's license vocabulary
+  license_name: CC BY 4.0                # the same license as the README of a record names it
   citation_file: CITATION.cff            # creators and keywords of the records
   licenses_file: release/zenodo/LICENSES.md   # third-party sources and their licenses; copied into every record
   docs_naming_every_bundle: [REPRODUCE.md]    # `--check` fails when one of these files does not name a bundle
