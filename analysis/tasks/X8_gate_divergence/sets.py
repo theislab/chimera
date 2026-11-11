@@ -1,6 +1,7 @@
-"""X8 step (b), sets: H1's set machinery unchanged (Hallmarks, X3 gene classes, first-submission categories; INT of the readout within
-the universe; permutation within pi x expression strata; z, two-sided p, BH within cohort; recurrence over the eight thread tissues,
-R >= 3 and q_rec < 0.05; tissue-specific sets), with readouts delta, delta_res, z_free and z_can on X8's universe.
+"""Step (b), sets: the set machinery of analysis/tasks/H1_harmonise unchanged (Hallmarks, gene classes of X3_cross_cohort, broad
+gene categories; INT of the readout within the universe; permutation within pi x expression strata; z, two-sided p, BH within
+cohort; recurrence over the eight thread tissues, R >= 3 and q_rec < 0.05; tissue-specific sets), with readouts delta, delta_res,
+z_free and z_can on the universe of this task.
 
     PYTHONPATH=$PWD python -m analysis.tasks.X8_gate_divergence.sets [--jobs 10]
 Output: results/analysis/X8/set_z.csv, set_recurrence.csv, set_tissue_specific.csv

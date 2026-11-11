@@ -8,7 +8,7 @@ The pre-specified validation: partial rank correlation of Δα with four indepen
 | Question | Pre-specified validation: Do independent data back Δα and the count evidence S_g, and how do direct baselines compare? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.4 (`sec:validation`); Table 1 (`tab:validation`); Figure 5a, b, c (`fig:validation`); Supplementary Section C.21.8 (`sssec:rev-validation`); Supplementary Section D.3 (`ssec:er-validation`) |
+| Used in the paper | Section 3.4 (`sec:validation`); Supplementary Table S25 (`tab:validation`); Supplementary Figure S26a, b, c (`fig:supp-validation-tests`); Supplementary Section C.21.8 (`sssec:rev-validation`); Supplementary Section D.3 (`ssec:er-validation`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

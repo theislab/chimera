@@ -6,9 +6,26 @@ A continuation float has the key of its figure with ``_2``, ``_3`` and the same 
 
 from __future__ import annotations
 
-from figures.compose import Col, Figure, NB, P, Row, SRC, TEXTWIDTH, X
+from figures.compose import Col, Figure, NB, P, Row, TEXTWIDTH, X
+
+# One panel needs the hidden state of the trained gate network and a map fitted on it, and is placed as the notebook
+# stored it, without its heading line (the first 11 bp of the page).
+STORED_ARCHETYPE_MAP = NB("gene_archetypes/a3_archetype_umap", "b", region=(0, 11, 328.0, 270.4))
 
 FIGS = {
+    "supp_gin_inputs_controls": Figure(
+        Col(Row(X("main_protein/attribution_shares", "a"), X("supp_gin_inputs_controls/contributions", "b"), same_scale=True),
+            P("main_protein/controls", "c")),
+        label="fig:supp-main-gin-esm2",
+        title="Inputs of the gate network and control trainings",
+        shows=("(a) Four ways of asking which inputs the gate network uses. Protein-language features (ESM-2) "
+               "lead in three of them; expression features lead when whole groups of inputs are removed. (b) For "
+               "each gene, the part of the correction that comes from protein features against the part that "
+               "comes from expression features. The two are nearly unrelated and both are needed. (c) Control "
+               "trainings: gene features removed, randomized or set to zero; counts shuffled between genes. Each "
+               "dot compares one control run with normal training. The count evidence S_g (right) stays the same "
+               "when features are changed and collapses when counts are shuffled. Δα (left) shows how much "
+               "follows the features and how much follows the counts.")),
     "supp_gin_linear_baseline": Figure(
         Row(X("supp_gin_linear_baseline/r2_by_input_set", "a"), X("supp_gin_linear_baseline/spearman_single_inputs", "b"), same_scale=True),
         label="fig:supp-gin-esm2-linear-baseline",
@@ -87,6 +104,19 @@ FIGS = {
                 "(e) Δα, (f) the prior."),
         note=("panels: figures/redraw/atlas.py (the neighbor search is repeated as in the notebook; see the note on "
               "ties in that script)")),
+    "supp_atlas_archetypes": Figure(
+        Col(Row(X("main_protein/archetype_number", "a"), STORED_ARCHETYPE_MAP, X("main_protein/archetype_delta_alpha", "c")),
+            Row(X("main_protein/archetype_protein_map", "d"), X("main_protein/archetype_neighbors", "e"),
+                X("main_protein/archetype_prediction", "f"), same_scale=True)),
+        label="fig:supp-archetypes",
+        title="Gene archetypes of the gate network",
+        shows=("The gate network sorts genes into groups (archetypes) in its hidden layer. (a) How well the groups "
+               "separate and how well they repeat between random starts, for 3 to 12 groups: three is chosen. "
+               "(b) The three archetypes on a map of the hidden layer. (c) Δα of the genes of each archetype: "
+               "A0 below the prior, A1 near it, A2 above it. (d) The archetypes on the protein map of the "
+               "protein-space atlas. (e) Protein neighbors share the archetype more often than chance. (f) The "
+               "archetype can be predicted in part from expression level alone (0.57) and almost fully from all "
+               "inputs of the gate network (0.94), so expression level alone does not explain it.")),
     "supp_atlas_archetype_trajectory": Figure(
         P("supp_atlas_archetype_trajectory/trajectory"),
         width=238,
@@ -128,20 +158,17 @@ FIGS = {
                "evidence; the six that hold within proteins are named."),
         note="panels: figures/redraw/residue_audit.py; (a) and (b) share their rows"),
     "supp_residue_audit_2": Figure(
-        Col(Row(NB("ortholog_qc/i3c_cross_tissue_disagreement_portrait_grayscale", "e"),
-                Col(SRC("assembled/page37", "f", region=(258, 397, 520, 511)),
-                    SRC("assembled/page37", "g", region=(258, 524, 520, 650)))),
-            SRC("assembled/page37", "h", region=(520, 397, 958, 650)),
+        Col(Row(X("supp_residue_audit/by_class", "e"), X("supp_residue_audit/class_chemistry", "f"), same_scale=True, width=457.48),
+            X("supp_residue_audit/controls", "g"),
             gap=6),
         label="fig:supp-main-gin-protein", part=2,
         title="Residue-level attribution audit, continued",
-        shows=("(e) The genes shared by liver and testis: mean Δα in liver against mean Δα in testis, shaded by the "
-               "quadrant a gene falls in. (f, g) Three hand-curated groups of proteins: their overall attribution "
-               "does not differ, and the contrast of hydrophobic against polar residues is clearest in the first "
-               "group. (h) Six properties that are often assumed to drive such maps (disorder, glycine, proline, "
-               "conservation and others) look strong when residues are pooled and disappear within proteins, except "
-               "for contact density."),
-        note="regions of the hand-assembled page 37 and one notebook panel"),
+        shows=("(e, f) Three hand-curated groups of proteins: their overall attribution does not differ, and the "
+               "contrast of hydrophobic against polar residues is clearest in the first group. (g) Six properties "
+               "that are often assumed to drive such maps (disorder, glycine, proline, conservation and others) "
+               "look strong when residues are pooled and disappear within proteins, except for contact density."),
+        note=("panels: figures/redraw/residue_audit.py. (e) and (f) are pages of one width and nearly one height and "
+              "stand side by side at scale 1")),
     "supp_residue_mixed_effects": Figure(
         P("supp_residue_mixed_effects/forest"),
         width=300,

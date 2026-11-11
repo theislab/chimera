@@ -8,7 +8,7 @@ Eye cohort: the tidy summary table of all eye data sets and a figure of the eye 
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`) |
+| Used in the paper | Section 3.5 (`sec:tissues`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

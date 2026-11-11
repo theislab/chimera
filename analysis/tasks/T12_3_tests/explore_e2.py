@@ -1,4 +1,5 @@
-"""T12.3 exploratory (decided after E2 was seen; not part of the section 12 test or success rule).
+"""Exploratory follow-up to the bone-marrow test E2 (decided after E2 was seen; not part of the test or
+success rule of the pre-specified analysis plan, section 12).
 
 E2 compares Shay divergent genes (COE < 0.25 and a log2 range of lineage means >= 2 in both species)
 with COE-conserved genes (COE above the median), which carry no lineage-range requirement. S_g, and so
@@ -6,7 +7,7 @@ D, rewards cell-state pattern the shared decoder explains, which is larger for l
 This repeats E2 with the conserved set restricted to the same range rule (>= 2 in both species), and
 reports the stratified AUROC of the range itself as a check of the imbalance. Same strata and
 bootstrap as ``tests.py``; the range-matched set is smaller, so its cells are kept on the absolute
-reading (>= 5 conserved genes per cell, the section 4 Family 3 sensitivity).
+reading (>= 5 conserved genes per cell, the Family 3 sensitivity of plan, section 4).
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T12_3_tests/explore_e2.py
 """

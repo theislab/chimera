@@ -3,8 +3,7 @@
 Tests alpha ranking robustness to 2x lambda perturbations and multi-seed
 stability.  Key publishability gate: Spearman r > 0.8 across perturbations.
 
-Round2: ortholog_aware_integration_guide_initial.md, Component 12 sixth-pass
-"Alpha as relative metric"; publishability criteria item 3.
+Rationale: alpha is read as a relative metric, so its ranking must be stable.
 
 Usage
 -----

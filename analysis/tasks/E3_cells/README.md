@@ -8,7 +8,7 @@ Cell types and lineages: genes grouped by their home compartment, their excess o
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Figure 6j (`fig:one-reading`); Supplementary Section D.8 (`ssec:er-e3`); Supplementary Figure S48 (`fig:supp-e3-compartments`); Supplementary Figure S49 (`fig:supp-e3-lineages`); Supplementary Figure S50 (`fig:supp-e3-primates`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Figure 8 (`fig:above-prior`); Supplementary Section D.9 (`ssec:er-e3`); Supplementary Figure S54 (`fig:supp-e3-compartments`); Supplementary Figure S55 (`fig:supp-e3-lineages`); Supplementary Figure S56 (`fig:supp-e3-primates`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

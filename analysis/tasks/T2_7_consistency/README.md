@@ -14,13 +14,17 @@ Measures, from the archived runs, the values that the recipe and assumption tabl
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
     python -m analysis.tasks.T2_7_consistency.run
+    python -m analysis.tasks.T2_7_consistency.run --values-only
 
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
 
-- `results/analysis/T2_7/`: bundle `analysis_results`
+- `results/analysis/T2_7/values.csv`: bundle `analysis_results`
+- `results/analysis/T2_7/attribution_candidates_vs_rule.csv`: bundle `analysis_results`
 
 **Reads** (as named in the code)
 
 - `data/processed/`
 - `data/raw/`
 - `training/runs/`
+
+**Notes.** values.csv has one row per measured value: item, measured_value, source (the object, run file or code line it is read from). It is the deposited table and the source of the numbers in the two tables of the Supplement. The task writes it together with consistency_values.csv, a working table that sets each measured value beside the value stated in the tables when the task was run, with the place of the statement; that table is not deposited. The second command writes values.csv from a stored consistency_values.csv and measures nothing again. attribution_candidates_vs_rule.csv lists the attribution candidates with the flag that the ortholog rule gives each.

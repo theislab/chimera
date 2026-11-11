@@ -91,7 +91,7 @@ def style_problems(row: dict, fig: C.Figure) -> dict:
         out["scale"] = f"the whole figure is shrunk to {row['shrink']}"
     elif small:
         out["scale"] = f"{len(small)} of {len(row['panels'])} panels below scale {MIN_SCALE}, smallest {min(p['scale'] for p in small):.3f}"
-    clipped = [p["file"] for p in row["panels"] if p["clipped"] and "/sources/" not in p["file"]]  # a source page is its own box
+    clipped = [p["file"] for p in row["panels"] if p["clipped"]]
     if clipped:
         out["edge"] = "ink reaches the page edge of " + ", ".join(sorted({Path(c).name for c in clipped})[:4])
     words = " ".join(row.get("words", []))
@@ -120,7 +120,7 @@ def machine_path_scan(root: Path | None = None, jobs: int = 4) -> list:
     files += [p for p in sorted(C.COMPOSED.glob("*.pdf"))]
     files += [p for d in sorted((root / "redraw").rglob("assets")) for p in sorted(d.rglob("*")) if p.is_file()]
     files += [p for p in (out_root / "figures.pdf", out_root / "manifest.tsv", out_root / "manifest.json", out_root / "INDEX.md",
-                          root / "panel_names.tsv", root / "order.txt", root / "numbers.tsv") if p.exists()]
+                          root / "panel_names.tsv", root / "producers.tsv", root / "order.txt", root / "numbers.tsv") if p.exists()]
     with ThreadPoolExecutor(jobs) as ex:
         res = list(ex.map(style.machine_paths, files))
     return [(str(p.relative_to(root.parent)) if root.parent in p.parents else str(p), h) for p, h in zip(files, res) if h]

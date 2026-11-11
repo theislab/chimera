@@ -8,7 +8,7 @@ Builds the annotated objects of the liver MASH case study (human and mouse, heal
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Table S18 (`tab:data-preparation`); Supplementary Section C.21.14 (`sssec:rev-disease`) |
+| Used in the paper | Supplementary Table S18 (`tab:data-preparation`); Supplementary Section C.21.13 (`sssec:rev-disease`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

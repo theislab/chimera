@@ -5,8 +5,6 @@ label transfer accuracy using each training species as encoder proxy.
 GIN alpha is zero-shot (gene features only); encoder is few-shot via
 proxy species.
 
-Round2: ortholog_aware_integration_guide_initial.md, Validation section 5.
-
 Usage
 -----
     python -m scripts.fewshot_transfer \

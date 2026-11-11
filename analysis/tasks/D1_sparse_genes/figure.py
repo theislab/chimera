@@ -1,4 +1,9 @@
-"""D1 (EXPLORATORY): panels of one figure from the D1 result tables; composed through F1_figures.compose with specs_d1.py.
+"""Genes with few counts (exploratory): three panels (masked genes, thinned depth, held-out chromosomes) from the
+result tables of this task. The figure is not in the paper; its layout is ``extra_sparse_genes`` in
+``figures/specs/not_in_paper.py``.
+
+Inputs: ``results/analysis/D1/`` (``a_rho.csv``, ``b_rho.csv``, ``c_rho.csv``, ``c_ceiling.csv``), bundle
+``analysis_results``. Writes ``results/analysis/D1/panels/``.
     python -m analysis.tasks.D1_sparse_genes.figure
 """
 

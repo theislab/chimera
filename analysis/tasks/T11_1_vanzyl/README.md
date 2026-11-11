@@ -8,14 +8,14 @@ Rebuilds the eye cohort (aqueous-humor outflow tissue of five species, Van Zyl e
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Supplementary Section C.21.14 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section C.21.13 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
     python -m analysis.tasks.T11_1_vanzyl.build_vanzyl [--out DIR] [--no-compare]
     python -m analysis.tasks.T11_1_vanzyl.verify_build [--out DIR]
-    bash analysis/tasks/T11_1_vanzyl/fetch_glaucoma_sources.sh
+    bash analysis/tasks/T11_1_vanzyl/fetch_glaucoma_sources.sh $PWD
     python -m analysis.tasks.T11_1_vanzyl.build_glaucoma_list
 
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
@@ -32,4 +32,4 @@ Rebuilds the eye cohort (aqueous-humor outflow tissue of five species, Van Zyl e
 - `data/processed/`
 - `data/raw/`
 
-**Notes.** Folders T11_1 to T11_8 are the eye cohort; T11_4 to T11_7 write to results/analysis/T11/.
+**Notes.** Folders T11_1 to T11_8 are the eye cohort; T11_4 to T11_7 write to results/analysis/T11/. Inputs from notebooks/01_data_preparation.ipynb: the five GEO count matrices (data/raw/van_zyl_raw/, downloaded by chimera._data_utils.download_van_zyl_raw), the SATURN ESM-2 embeddings (data/raw/saturn_esm2/) and the source ortholog table data/processed/ortholog_table_van_zyl.csv. build_report.json records the checksum of every input. The eye object that the notebook itself writes (data/processed/van_zyl_unified.h5ad) is not the cohort of the paper; this task's object is.

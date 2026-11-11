@@ -1,6 +1,6 @@
 """Integration benchmark on the new cohorts, a track of its own (Track I). Integration is the substrate of Chimera's readouts, not its aim; this track says whether the latent is usable.
 
-Same benchmark as Fig 3: the 10-model panel, compute_integration_metrics unmodified (k 15, seed 42), direction correction, min-max across the models of each cohort, mixing and biology means, composite 0.4 mixing + 0.6 biology
+Same benchmark as the integration figure of the paper (``fig:integration``): the 10-model panel, compute_integration_metrics unmodified (k 15, seed 42), direction correction, min-max across the models of each cohort, mixing and biology means, composite 0.4 mixing + 0.6 biology
 (T5_5_benchmark score_external.score_table). Scaling is PER COHORT, so adding a cohort cannot change any value of the original seven; `score.py` checks this, and the seven-cohort aggregate is kept as reported, with the extended one beside it.
 
 Objects and Chimera fit: those of analysis/tasks/H1_harmonise, kept s42 fit. Batch keys: `config_key` is the run's config.json batch key, and fills the "scVI-donor", Harmony, scANVI, sysVI columns. On kidney and bone marrow that key is one-to-one with species, as `batch` is on

@@ -1,4 +1,4 @@
-"""C1 figure: further use cases on the added cohorts (not in the paper). Five panels in the style of
+"""Further use cases on the added cohorts (not in the paper). Five panels in the style of
 `T8_4_figures/common.py`, saved to figures/panels/extra_new_use_cases/ and composed by figures/compose.py from
 figures/specs/not_in_paper.py (key extra_new_use_cases). Reads result tables of results/analysis/C1/ only.
 

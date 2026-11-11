@@ -40,7 +40,7 @@ UP, DOWN = style.ABOVE, style.BELOW  # above and below the protein prior; positi
 BLUE, GREY, TREND = style.COUNT_EVIDENCE, style.IMPUTED, style.TREND  # genes with count evidence, without it, median trend
 THEME_COL = list(style.GENE_THEME.values())  # lineage groups of the landscape, the colors of the liver landscape
 CT_COL = list(style.LIVER_CELL_TYPE.values())  # cell types of the driver bars, the colors of the liver driver bars; the last is "other"
-NA_CELL = "#F2F2F2"  # heat-map cell without an estimate
+NA_CELL = "#D9D9D9"  # heat-map cell without an estimate: darker than the center of the diverging map, so it cannot be read as a value near zero
 BOX_FACE, BAR_GREY, REF_GREY = "#dddddd", "#bdbdbd", "#888888"  # boxes, histogram bars, reference lines
 MODEL_GREY = "#C4C4C4"  # the other models of a tissue beside the model of the figure (ink)
 PRIOR = "protein prior π"
@@ -638,7 +638,7 @@ def dominant_cells(c):
 
 
 def p_drivers(ax, c, g, tissue):
-    """Fig 4d form: contribution of each cell type to S_g of the genes labelled in the landscape; top-weight types, the rest as other."""
+    """Form of the cell-type drivers panel (main_delta_alpha_liver/celltype_drivers): contribution of each cell type to S_g of the genes labeled in the landscape; top-weight types, the rest as other."""
     C = dominant_cells(c)
     nm = lineage_named(tissue, g)
     if C is None:
@@ -729,7 +729,7 @@ def p_count(ax, g):
 
 
 def p_support(ax, g):
-    """Fig 4e form: fraction of tail genes whose Delta-alpha is backed by count evidence of the same sign."""
+    """Form of the margin-support panel (main_delta_alpha_liver/margin_support): fraction of tail genes whose Delta-alpha is backed by count evidence of the same sign."""
     un = g.count_support.to_numpy()
     thr = np.median(g.S_ema.abs()[un])
     ok = g.count_support & (np.sign(g.S_ema) == np.sign(g.delta_alpha)) & (g.S_ema.abs() >= thr)
@@ -832,7 +832,6 @@ def main_axis() -> plt.Figure:
         ax.axvline(0, ymax=0.52, color=REF_GREY, lw=0.5, ls="--")
         ax.set_xlim(-0.3, 0.3)
         ax.set_xticks([-0.2, 0, 0.2])
-        ax.set_xlabel(D_LABEL, fontsize=S_TICK)
         ax.set_title(TISSUE_LABEL[t], fontsize=S_TITLE, fontweight="bold", pad=3)
         beyond_count(ax, g.D, at=0, axis="x")
         # the note stands above the histogram: the density axis runs to twice the highest peak of the row
@@ -848,7 +847,6 @@ def main_axis() -> plt.Figure:
         ax.set_ylim(*ylim)
         ax.set_yticks([-0.25, 0, 0.25])
         ax.set_xticks([0.4, 0.7, 1.0])
-        ax.set_xlabel("protein identity π", fontsize=S_TICK)
         beyond(ax, d.pi_raw.to_numpy(), d.D.to_numpy(), s=5)
         note(ax, f"Δα ρ = {signed(r_all.rho_D_pi)}\n$S_g$ ρ = {signed(r_sup.rho_S_pi)}", "lower left")
         ax = axes[2, j]
@@ -860,7 +858,6 @@ def main_axis() -> plt.Figure:
         ax.set_ylim(*ylim)
         ax.set_yticks([-0.25, 0, 0.25])
         ax.set_xticks([-2, -1, 0])
-        ax.set_xlabel("dN/dS (log10)", fontsize=S_TICK)
         beyond(ax, x, d.D.to_numpy(), s=5)
         note(ax, f"Δα ρ = {signed(r_all.rho_D_dNdS)}\nπ ρ = {signed(r_all.rho_pi_dNdS)}", "lower left")
     axes[0, 0].set_ylim(0, 2.0 * peak)
@@ -869,11 +866,211 @@ def main_axis() -> plt.Figure:
     axes[2, 0].set_ylabel(D_LABEL, fontsize=S_TICK)
     for ax in axes.ravel():
         ax.tick_params(labelsize=S_TEXT, length=2)
+        ax.set_xlabel(" ", fontsize=S_TICK)  # room for the one axis title of the row
     hs = [Line2D([], [], ls="none", marker="o", ms=3, color=BLUE, label="count evidence"), Line2D([], [], ls="none", marker="o", ms=3, color=GREY, label="no count evidence (imputed from features)"),
           Line2D([], [], color=TREND, lw=1.1, label="median trend"), Line2D([], [], ls="none", label="↑ ↓  share of genes with Δα above +0.05, below −0.05")]
     fig.legend(handles=hs, loc="outside lower center", ncol=4, fontsize=S_TEXT, frameon=False, handletextpad=0.4, columnspacing=1.2)
     settle(fig)
+    nt = len(RU.TISSUE_ORDER)
+    for i, lab in enumerate((D_LABEL, "protein identity π", "dN/dS (log10)")):  # one axis title per row, under its middle: eight side by side touch
+        a, q = axes[i, nt // 2 - 1], axes[i, nt // 2 - 1].get_position()
+        mid = (axes[i, 0].get_position().x0 + axes[i, -1].get_position().x1) / 2
+        a.set_xlabel(lab, fontsize=S_TICK, x=(mid - q.x0) / q.width, ha="center")
     return fig
+
+
+# ---------------------------------------------------------------- main figure "Deployment is an axis of its own in every tissue"
+# The five correlations of the summary panel: (group, what is correlated, column of axis.csv, universe of axis.csv,
+# how the paper states the eight values). "range": from the value nearest zero to the value farthest from it, two
+# decimals; "size": the largest absolute value, two decimals. The panel stops if the stored table says otherwise.
+AXIS_ROWS = [
+    ("Sequence measures", "protein identity π  vs  dN/dS", "rho_pi_dNdS", "all", ("range", -0.76, -0.89)),
+    ("Count evidence $S_g$", "vs  protein identity π", "rho_S_pi", "count_support", ("size", 0.14)),
+    ("Count evidence $S_g$", "vs  dN/dS", "rho_S_dNdS", "count_support", ("size", 0.17)),
+    ("Δα", "vs  protein identity π", "rho_D_pi", "all", ("size", 0.18)),
+    ("Δα", "vs  dN/dS", "rho_D_dNdS", "all", ("size", 0.19)),
+]
+
+
+def axis_values() -> pd.DataFrame:
+    """The correlations of the summary panel, read from ``axis.csv``: one row per entry of ``AXIS_ROWS`` and tissue
+    (columns row, tissue, rho). Nothing is computed. Each row of the panel is checked against the statement of the paper."""
+    ax_t = pd.read_csv(OUT / "axis.csv").set_index(["cohort", "universe"])
+    out = []
+    for i, (_, _, col, universe, printed) in enumerate(AXIS_ROWS):
+        v = np.array([float(ax_t.loc[(RU.PRIMARY[t], universe), col]) for t in RU.TISSUE_ORDER])
+        if printed[0] == "range":
+            near, far = sorted(v, key=abs)[0], sorted(v, key=abs)[-1]
+            assert (round(near, 2), round(far, 2)) == printed[1:], f"{col}: {near:.3f} to {far:.3f} in axis.csv, the paper prints {printed[1:]}"
+        else:
+            assert round(np.abs(v).max(), 2) == printed[1], f"{col}: largest size {np.abs(v).max():.3f} in axis.csv, the paper prints {printed[1]}"
+        out += [dict(row=i, tissue=t, rho=x) for t, x in zip(RU.TISSUE_ORDER, v)]
+    return pd.DataFrame(out)
+
+
+def _stack(x_bp: np.ndarray, d: float) -> np.ndarray:
+    """Levels (0, +1, −1, +2, ...) for marks on one line so that two marks closer than ``d`` do not share a level: the
+    marks are taken from left to right and each takes the first level that is free."""
+    level = np.zeros(len(x_bp), dtype=int)
+    last = {}
+    for i in np.argsort(x_bp, kind="stable"):
+        for lv in (0, 1, -1, 2, -2, 3, -3):
+            if lv not in last or x_bp[i] - last[lv] >= d:
+                level[i], last[lv] = lv, x_bp[i]
+                break
+    return level
+
+
+# Compact type of the main-figure panels of this task (pt at print size): headings, axis titles, tick labels, notes.
+M_HEAD, M_LABEL, M_TICK, M_NOTE = 6.5, 6.0, 5.5, 5.2
+
+
+def main_axis_summary() -> plt.Figure:
+    """Summary panel of the main figure on the separate axis (``main_axis_tissues/summary``, 486 x 77 bp).
+
+    What it draws. One horizontal axis, the Spearman correlation across genes, and five rows; in each row one mark per
+    tissue (the color and marker of the tissue in ``figures/style.py``). First row: protein identity against dN/dS, the
+    two sequence measures. Rows two to five: the count evidence S_g and Δα, each against protein identity and against
+    dN/dS. The sequence measures go together in every tissue (far left); the two readouts stay at zero against both.
+    A gray bar in each row runs from zero over the eight marks, so its length is the size of the correlation; the
+    statement of the paper stands in each row (the range of the first row, the largest size of the others), and the
+    genes a group is computed on stand under its name.
+
+    Reads ``results/analysis/H1/axis.csv`` and nothing else, columns ``cohort``, ``universe``, ``rho_pi_dNdS``,
+    ``rho_S_pi``, ``rho_S_dNdS``, ``rho_D_pi``, ``rho_D_dNdS``: the rows of the eight models of ``rules.PRIMARY``, universe
+    ``all`` for protein identity and Δα and ``count_support`` (genes with count evidence) for S_g. No value is computed
+    here; ``axis_values`` stops if a row does not agree with what the paper prints (``AXIS_ROWS``).
+
+        python -m analysis.tasks.H1_harmonise.figures --panel main_axis_tissues/summary        # in chimera_env, from the repository root
+    """
+    v = axis_values()
+    Wb, Hb = W_FULL, 77.0
+    x_ax, w_ax, y_ax, h_ax = 166.0, 228.0, 19.5, 55.5  # the axes box, bp
+    xlim = (-1.0, 0.32)
+    slot = [0.0, 1.3, 2.3, 3.45, 4.45]  # row centers, in rows from the top; a wider step between the three groups
+    fig = plt.figure(figsize=(style.inch(Wb), style.inch(Hb)))
+    ax = fig.add_axes([x_ax / Wb, y_ax / Hb, w_ax / Wb, h_ax / Hb])
+    ax.set_xlim(*xlim)
+    ax.set_ylim(slot[-1] + 0.56, -0.56)
+    bp_x, bp_y = w_ax / (xlim[1] - xlim[0]), h_ax / (slot[-1] + 1.12)
+    ms = 3.7  # marker size, pt
+    for i, (group, what, col, universe, printed) in enumerate(AXIS_ROWS):
+        r = v[v.row == i]
+        x = r.rho.to_numpy()
+        lo, hi = x.min(), x.max()
+        ax.barh(slot[i], max(hi, 0) - min(lo, 0), left=min(lo, 0), height=0.7, color="#E6E6E6", lw=0, zorder=1)  # zero and the eight marks
+        if printed[0] == "range":
+            ax.text(hi + 0.06, slot[i], f"ρ = {signed(printed[1])} to {signed(printed[2])}", ha="left", va="center", fontsize=M_TICK, color=INK, zorder=3)
+        else:
+            ax.text(-0.27, slot[i], f"|ρ| ≤ {printed[1]:.2f}", ha="right", va="center", fontsize=M_TICK, color=INK, zorder=3)
+        level = _stack(x * bp_x, ms * 0.8)
+        for t, xx, lv in zip(r.tissue, x, level):
+            m = style.TISSUE[_TISSUE_KEY.get(t, t)]
+            ax.plot(xx, slot[i] - lv * (ms * 0.55) / bp_y, ls="none", marker=m.marker, ms=ms, mfc=m.color, mec="white", mew=0.3, zorder=4, clip_on=False)
+    ax.axvline(0, color=INK, lw=0.7, zorder=2)
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    ax.set_xticks([-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2])
+    ax.set_xticklabels(["−1", "−0.8", "−0.6", "−0.4", "−0.2", "0", "+0.2"])
+    ax.tick_params(labelsize=M_TICK, length=2, pad=1.5)
+    ax.set_xlabel("Spearman correlation across genes, ρ   (one mark per tissue)", fontsize=M_LABEL, labelpad=1.5)
+    # names of the rows at the left: the group once, bold, and what is correlated in each row
+    tr = ax.get_yaxis_transform()
+    x_group, x_what = -(x_ax - 2.0) / w_ax, -(x_ax - 76.0) / w_ax
+    universe_name = {"all": "all genes", "count_support": "genes with count evidence"}
+    for i, (group, what, *_rest) in enumerate(AXIS_ROWS):
+        if i == 0 or AXIS_ROWS[i - 1][0] != group:
+            ax.text(x_group, slot[i], group, transform=tr, ha="left", va="center", fontsize=M_LABEL, fontweight="bold", color=INK, clip_on=False)
+        else:  # under the name of the group: the genes its two rows are computed on
+            ax.text(x_group, slot[i], universe_name[AXIS_ROWS[i][3]], transform=tr, ha="left", va="center", fontsize=M_NOTE, color=MUTED, clip_on=False)
+        ax.text(x_what, slot[i], what, transform=tr, ha="left", va="center", fontsize=M_LABEL, color=INK, clip_on=False)
+    for a, b in ((0, 1), (2, 3)):  # a thin rule between the groups
+        y = (slot[a] + slot[b]) / 2
+        ax.plot([x_group, 1.0], [y, y], transform=tr, color=RULE, lw=0.5, clip_on=False, zorder=0)
+    hs = [Line2D([], [], ls="none", marker=style.TISSUE[_TISSUE_KEY.get(t, t)].marker, ms=ms, mfc=style.TISSUE[_TISSUE_KEY.get(t, t)].color, mec="white", mew=0.3, label=TISSUE_LABEL[t])
+          for t in RU.TISSUE_ORDER]
+    fig.legend(handles=hs, loc="center left", bbox_to_anchor=((x_ax + w_ax + 9) / Wb, (y_ax + h_ax / 2) / Hb), ncol=2, fontsize=M_TICK, frameon=False, handletextpad=0.1, labelspacing=0.45,
+               columnspacing=0.5, handlelength=1.0, borderpad=0, borderaxespad=0)
+    return fig
+
+
+def main_axis_clouds() -> plt.Figure:
+    """Gene-level panel of the main figure on the separate axis (``main_axis_tissues/clouds``, 486 x 136 bp).
+
+    What it draws. Eight tissues in columns, two rows on one Δα scale: centered Δα of every gene against protein identity
+    (top) and against dN/dS (bottom). Blue, genes with count evidence; gray, genes without it (imputed from features);
+    orange line, the median of Δα in 14 bins of equal gene number (the line of ``main_axis``); ρ, the Spearman correlation
+    of Δα with the x axis as stored. A gene beyond an axis is a small triangle on the frame. It is ``main_axis`` (the
+    panel of the supplementary figure, kept as it is) without the row of histograms, at a smaller size, with one axis
+    title per row.
+
+    Reads ``results/analysis/H1/genes/<cohort>.parquet`` for the eight models of ``rules.PRIMARY`` (columns ``D``,
+    ``pi_raw``, ``dNdS``, ``count_support``) and ``results/analysis/H1/axis.csv`` (``rho_D_pi``, ``rho_D_dNdS``, universe
+    ``all``). The printed correlations are the stored ones.
+
+        python -m analysis.tasks.H1_harmonise.figures --panel main_axis_tissues/clouds         # in chimera_env, from the repository root
+    """
+    ax_t = pd.read_csv(OUT / "axis.csv")
+    nt = len(RU.TISSUE_ORDER)
+    fig, axes = plt.subplots(2, nt, figsize=(style.inch(W_FULL), style.inch(136)), sharey=True, sharex="row", layout="constrained")
+    fig.get_layout_engine().set(w_pad=0.012, h_pad=0.012, wspace=0.015, hspace=0.02)
+    ylim = (-0.47, YLIM_D[1])  # the range of the other panels, and room under the clouds for the correlation
+    rows = (("pi_raw", (0.3, 1.0), [0.4, 0.7, 1.0], "rho_D_pi"), ("dNdS", (-2.5, 0.3), [-2, -1, 0], "rho_D_dNdS"))
+    for j, t in enumerate(RU.TISSUE_ORDER):
+        c = RU.PRIMARY[t]
+        r_all = ax_t[(ax_t.cohort == c) & (ax_t.universe == "all")].iloc[0]
+        d = genes(c).dropna(subset=["dNdS"])
+        d = d[d.dNdS > 0]
+        sup = d.count_support.to_numpy()
+        for i, (col, xlim, xticks, rho) in enumerate(rows):
+            ax = axes[i, j]
+            x = d.pi_raw.to_numpy() if col == "pi_raw" else np.log10(d.dNdS.clip(lower=1e-3)).to_numpy()
+            cloud(ax, x, d.D.to_numpy(), sup)
+            trend(ax, x, d.D.to_numpy())
+            ax.axhline(0, color="#333333", lw=0.5, ls=":")
+            ax.set_xlim(*xlim)
+            ax.set_ylim(*ylim)
+            ax.set_yticks([-0.25, 0, 0.25])
+            ax.set_xticks(xticks)
+            beyond(ax, x, d.D.to_numpy(), s=4)
+            ax.text(0.05, 0.07, f"ρ = {signed(r_all[rho])}", transform=ax.transAxes, ha="left", va="bottom", fontsize=M_NOTE, color=INK)
+            ax.tick_params(labelsize=M_NOTE, length=1.8, pad=1.2)
+        axes[0, j].set_title(TISSUE_LABEL[t], fontsize=M_HEAD, fontweight="bold", pad=2)
+    for i in range(2):
+        axes[i, 0].set_ylabel(D_LABEL, fontsize=M_TICK, labelpad=1.5)
+        for a in axes[i]:  # room for the one axis title of the row
+            a.set_xlabel(" ", fontsize=M_TICK, labelpad=0.5)
+    hs = [Line2D([], [], ls="none", marker="o", ms=2.6, color=BLUE, label="count evidence"), Line2D([], [], ls="none", marker="o", ms=2.6, color=GREY, label="no count evidence (imputed from features)"),
+          Line2D([], [], color=TREND, lw=1.1, label="median trend"), Line2D([], [], ls="none", label="ρ  Spearman correlation of Δα with the x axis")]
+    fig.legend(handles=hs, loc="outside lower center", ncol=4, fontsize=M_NOTE, frameon=False, handletextpad=0.4, columnspacing=1.4, borderpad=0, borderaxespad=0.2)
+    settle(fig)
+    for i, lab in enumerate(("protein identity π", "dN/dS (log10)")):  # one axis title per row, under the middle of the row
+        a, q = axes[i, nt // 2 - 1], axes[i, nt // 2 - 1].get_position()
+        mid = (axes[i, 0].get_position().x0 + axes[i, -1].get_position().x1) / 2
+        a.set_xlabel(lab, fontsize=M_TICK, labelpad=0.5, x=(mid - q.x0) / q.width, ha="center")
+    return fig
+
+
+def wrap_to_width(fig, text: str, size: float, width: float) -> str:
+    """``text`` broken at spaces into lines that are at most ``width`` bp wide at font size ``size`` (measured, so that
+    formulas and arrows count with their true width)."""
+    renderer = fig.canvas.get_renderer()
+
+    def measure(s: str) -> float:
+        t = fig.text(0, 0, s, fontsize=size)
+        w = t.get_window_extent(renderer).width * 72 / fig.dpi
+        t.remove()
+        return w
+
+    lines, line = [], ""
+    for word in text.split(" "):
+        trial = f"{line} {word}".strip()
+        if line and measure(trial) > width:
+            lines.append(line)
+            line = word
+        else:
+            line = trial
+    return "\n".join(lines + [line])
 
 
 def label_set(k: str) -> str:
@@ -901,21 +1098,57 @@ def recurrence_rows(mode: str):
     return tabs, keys, len(ab), spec, opp
 
 
-def main_recurrence(mode: str = "strong") -> plt.Figure:
+def main_recurrence(mode: str = "strong", compact: bool = False) -> plt.Figure:
     """Gene sets (rows) by tissue (columns): z of the set against matched genes, with the recurrence columns at the right.
-    The rows stand in blocks with a heading each; the page is 486 bp wide, lengths below in bp."""
+    The rows stand in blocks with a heading each; the page is 486 bp wide, lengths below in bp.
+
+    ``compact`` is the form of the main figure (``main_tissues/recurrence``, 486 x about 306 bp): the same rows, columns,
+    values and key at a row pitch of 5.9 bp with 5.0 to 5.4 pt type, 2.2 bp of white before each block heading with the
+    rule in its middle, and the color scale without a title of its own (the key names it).
+
+    Both forms carry the number of sets of a block after its heading and the same key, wrapped to the width of the
+    panel: what a cell is, what the columns at the right are, and what gray type means for each of them.
+    Which entries at the right are gray: the $q$ of a set that is not among the rows the panel selects as recurrent
+    (main figure: recurrent on Δα and under every control, ``recurrence_rows("strong")``; supplementary figure:
+    recurrent on Δα, ``recurrence_rows("all")``); an entry of S_g or of profile correlation whose own ``recurrent``
+    flag is false; a mean $z$ of π or dN/dS below ``rules.Z_CALL`` in size. Without it the panel is the one of the supplementary figure
+    (``supp_tissues_recurrence/recurrence_all`` with ``mode="all"``).
+
+    Reads ``results/analysis/H1/recurrence.csv`` (one row per gene set and readout: ``z_<tissue>``, ``q_<tissue>``,
+    ``q_rec``, ``recurrent``, ``direction``, ``stouffer``, ``n_up``, ``n_down``, ``mean_z``, ``family``; readouts ``D``,
+    ``D_tau``, ``D_block``, ``S``, ``S_block``, ``B1``, ``pi``, ``dNdS``) and ``tissue_specific.csv``; the choice and order
+    of the rows is ``recurrence_rows``. No value is computed here.
+
+        python -m analysis.tasks.H1_harmonise.figures --panel main_tissues/recurrence          # in chimera_env, from the repository root
+    """
     tabs, keys, n_ab, spec, opp = recurrence_rows(mode)
     D, S, B, PI, W = tabs["D"], tabs["S"], tabs["B1"], tabs["pi"], tabs["dNdS"]
     blocks = [(h, r) for h, r in (("Recurrent, above the prior", keys[:n_ab]), ("Recurrent, below the prior", keys[n_ab:]),
                                   ("Called in one tissue only", spec), ("Opposite signs between tissues", opp)) if r]
+    # the headings carry the number of sets drawn under them; the numbers of recurrent sets are those the paper states
+    if mode == "strong":
+        assert (n_ab, len(keys) - n_ab) == (26, 9), f"{n_ab} sets recur above the prior and {len(keys) - n_ab} below; the paper states 26 and 9"
+    else:
+        assert len(keys) == 57, f"{len(keys)} sets recur on Δα; the paper states 57"
+    blocks = [(f"{h} ({len(r)})", r) for h, r in blocks]
     slots = [s for h, r in blocks for s in [("head", h)] + [("row", k) for k in r]]  # one line per heading and per set
     cols = RU.TISSUE_ORDER
     n, nc = len(slots), len(cols)
-    rh, w_label, w_col, w_gap, w_side, top, bottom, pad = 7.7, 118.0, 29.0, 6.0, 25.0, 19.0, 46.0, 2.5
-    Wb, Hb = pad + w_label + nc * w_col + w_gap + 5 * w_side + pad, top + n * rh + bottom
+    rh, w_label, w_col, w_gap, w_side, top, bottom, pad = (5.9, 118.0, 29.0, 6.0, 25.0, 13.0, 22.0, 2.5) if compact else (7.7, 118.0, 29.0, 6.0, 25.0, 19.0, 46.0, 2.5)
+    # type: block headings, cell values, tissue names, set names, headings and values of the columns at the right, key
+    s_head, s_cell, s_col, s_row, s_side_head, s_side, s_key = (5.4, 5.0, 5.4, 5.1, 5.2, 5.0, 5.0) if compact else (S_TEXT + 0.3, S_TEXT, S_TICK, S_TEXT + 0.1, S_TEXT + 0.1, S_TEXT, S_TEXT)
+    # the center of every line, in lines from the top; in the compact form a block heading stands a little lower, so
+    # that the rule above it is clear of the last set of the block before and of the heading itself
+    lead = 2.2 / rh if compact else 0  # lines of white before a block heading (2.2 bp)
+    yc, shift = [], 0
+    for i, (kind, _) in enumerate(slots):
+        shift += lead if (kind == "head" and i) else 0
+        yc.append(i + shift)
+    n_y = n + shift  # height of all lines, in lines
+    Wb, Hb = pad + w_label + nc * w_col + w_gap + 5 * w_side + pad, top + n_y * rh + bottom
     fig = plt.figure(figsize=(style.inch(Wb), style.inch(Hb)))
     box = lambda x, y, w, h: [x / Wb, y / Hb, w / Wb, h / Hb]  # noqa: E731
-    ax = fig.add_axes(box(pad + w_label, bottom, nc * w_col, n * rh))
+    ax = fig.add_axes(box(pad + w_label, bottom, nc * w_col, n_y * rh))
     vmax = 8.0
     M = np.full((n, nc), np.nan)
     Q = np.full((n, nc), np.nan)
@@ -924,59 +1157,75 @@ def main_recurrence(mode: str = "strong") -> plt.Figure:
             M[i], Q[i] = D.loc[k, [f"z_{t}" for t in cols]].to_numpy(float), D.loc[k, [f"q_{t}" for t in cols]].to_numpy(float)
     cmap = plt.get_cmap(style.DIVERGING).copy()
     cmap.set_bad("white")
-    ax.imshow(np.ma.masked_invalid(M), cmap=cmap, vmin=-vmax, vmax=vmax, aspect="auto", interpolation="nearest")
+    if compact:  # one image per block of sets, so that the white before a heading is not part of a cell
+        first = [i for i, (kind, _) in enumerate(slots) if kind == "row" and slots[i - 1][0] == "head"]
+        last = [i for i, (kind, _) in enumerate(slots) if kind == "row" and (i == n - 1 or slots[i + 1][0] == "head")]
+        for a, b in zip(first, last):
+            ax.imshow(np.ma.masked_invalid(M[a:b + 1]), cmap=cmap, vmin=-vmax, vmax=vmax, aspect="auto", interpolation="nearest",
+                      extent=(-0.5, nc - 0.5, yc[b] + 0.5, yc[a] - 0.5))
+        ax.set_xlim(-0.5, nc - 0.5)
+        ax.set_ylim(n_y - 0.5, -0.5)
+    else:
+        ax.imshow(np.ma.masked_invalid(M), cmap=cmap, vmin=-vmax, vmax=vmax, aspect="auto", interpolation="nearest")
     yt = ax.get_yaxis_transform()
     x_left, x_right = -w_label / (nc * w_col), 1 + (w_gap + 5 * w_side) / (nc * w_col)
     for i, (kind, k) in enumerate(slots):
         if kind == "head":
-            ax.text(x_left, i, k, transform=yt, ha="left", va="center", fontsize=S_TEXT + 0.3, fontweight="bold", color=INK, clip_on=False)
-            if i:
-                ax.plot([x_left, x_right], [i - 0.5, i - 0.5], transform=yt, color=INK, lw=0.6, clip_on=False)
+            ax.text(x_left, yc[i], k, transform=yt, ha="left", va="center", fontsize=s_head, fontweight="bold", color=INK, clip_on=False)
+            if i:  # the rule: on the upper edge of the heading line, or (compact) in the middle of the white above it
+                ax.plot([x_left, x_right], [yc[i] - 0.5 - lead / 2, yc[i] - 0.5 - lead / 2], transform=yt, color=INK, lw=0.6, clip_on=False)
             continue
         for j in range(nc):
             v = M[i, j]
             if not np.isfinite(v):
-                ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, facecolor=NA_CELL, edgecolor="none"))
+                ax.add_patch(Rectangle((j - 0.5, yc[i] - 0.5), 1, 1, facecolor=NA_CELL, edgecolor="none"))
                 continue
-            ax.text(j, i, signed(v, 1) + (style.SIGNIFICANT if Q[i, j] < 0.05 else ""), ha="center", va="center", fontsize=S_TEXT, color="#ffffff" if abs(v) > 0.62 * vmax else INK)
+            ax.text(j, yc[i], signed(v, 1) + (style.SIGNIFICANT if Q[i, j] < 0.05 else ""), ha="center", va="center", fontsize=s_cell, color="#ffffff" if abs(v) > 0.62 * vmax else INK)
     rows = [i for i, (kind, _) in enumerate(slots) if kind == "row"]
     ax.set_xticks(range(nc))
-    ax.set_xticklabels([TISSUE_LABEL[t].replace(" ", "\n") for t in cols], fontsize=S_TICK, linespacing=0.95)
+    ax.set_xticklabels([TISSUE_LABEL[t].replace(" ", "\n") for t in cols], fontsize=s_col, linespacing=0.95)
     ax.xaxis.tick_top()
-    ax.set_yticks(rows)
-    ax.set_yticklabels([label_set(slots[i][1]) for i in rows], fontsize=S_TEXT + 0.1)
-    ax.tick_params(length=0, pad=2)
+    ax.set_yticks([yc[i] for i in rows])
+    ax.set_yticklabels([label_set(slots[i][1]) for i in rows], fontsize=s_row)
+    ax.tick_params(length=0, pad=1.5 if compact else 2)
     for sp in ax.spines.values():
         sp.set_visible(False)
-    ax2 = fig.add_axes(box(pad + w_label + nc * w_col + w_gap, bottom, 5 * w_side, n * rh), sharey=ax)
+    ax2 = fig.add_axes(box(pad + w_label + nc * w_col + w_gap, bottom, 5 * w_side, n_y * rh), sharey=ax)
     ax2.set_xlim(-0.5, 4.5)
     for j, hd in enumerate(["$q$", "$S_g$", "profile\ncorrelation", "π", "dN/dS"]):
-        ax2.text(j, -0.75, hd, fontsize=S_TEXT + 0.1, ha="center", va="bottom", color=INK, linespacing=0.95)
-    kw = dict(fontsize=S_TEXT, ha="center", va="center")
+        ax2.text(j, -0.75, hd, fontsize=s_side_head, ha="center", va="bottom", color=INK, linespacing=0.95)
+    kw = dict(fontsize=s_side, ha="center", va="center")
     for i in rows:
         k = slots[i][1]
         q = D.q_rec[k]
-        ax2.text(0, i, f"{q:.3f}" if q >= 0.001 else "<.001", color=INK if k in keys else MUTED, **kw)
+        ax2.text(0, yc[i], f"{q:.3f}" if q >= 0.001 else "<.001", color=INK if k in keys else MUTED, **kw)
         for j, tab in zip((1, 2), (S, B)):
             r = tab.loc[k]
-            ax2.text(j, i, f"{int(r.n_up)}↑{int(r.n_down)}↓", color=INK if r.recurrent else MUTED, **kw)
+            ax2.text(j, yc[i], f"{int(r.n_up)}↑{int(r.n_down)}↓", color=INK if r.recurrent else MUTED, **kw)
         for j, tab in zip((3, 4), (PI, W)):
             r = tab.loc[k]
-            ax2.text(j, i, signed(r.mean_z, 1), color=INK if abs(r.mean_z) >= RU.Z_CALL else MUTED, **kw)
+            ax2.text(j, yc[i], signed(r.mean_z, 1), color=INK if abs(r.mean_z) >= RU.Z_CALL else MUTED, **kw)
     ax2.axis("off")
     ax2.set_ylim(ax.get_ylim())
     # under the rows: the color scale at the left, the key of the cells and of the columns at the right
-    cax = fig.add_axes(box(pad + 8, bottom - 13, 96, 5))
+    cax = fig.add_axes(box(pad + 12, bottom - 8.5, 88, 3.5) if compact else box(pad + 8, bottom - 13, 96, 5))
     cb = fig.colorbar(plt.cm.ScalarMappable(norm=plt.Normalize(-vmax, vmax), cmap=cmap), cax=cax, orientation="horizontal")
     cb.set_ticks([-8, -4, 0, 4, 8])
     cb.set_ticklabels(["≤ −8", "−4", "0", "+4", "≥ +8"])
-    cb.ax.tick_params(labelsize=S_TEXT, length=2, pad=1.5)
+    cb.ax.tick_params(labelsize=s_key, length=1.5 if compact else 2, pad=1 if compact else 1.5)
     cb.outline.set_linewidth(0.4)
-    cax.set_xlabel("set $z$ (color clipped at ±8)", fontsize=S_TEXT, labelpad=1.5)
-    key = (f"Cells: $z$ of the set against matched genes of the tissue; {style.SIGNIFICANT} $q$ < 0.05; gray cell, fewer than {RU.MIN_SET} genes.\n"
-           "Right: $q$, recurrence across tissues; $S_g$ and profile correlation, tissues with the set above (↑) and below (↓);\n"
-           f"π and dN/dS, mean $z$ of the set over tissues. Gray type: not recurrent, or |mean $z$| below {RU.Z_CALL}.")
-    fig.text((pad + w_label) / Wb, (bottom - 7) / Hb, key, ha="left", va="top", fontsize=S_TEXT, color=INK, linespacing=1.25)
+    # the key: one vocabulary for the two forms. The color scale has its own title in the form of the supplementary
+    # figure; in the compact form the key names it. What "gray type" means for q depends on the rows the panel selects.
+    if not compact:
+        cax.set_xlabel("set $z$ (color clipped at ±8)", fontsize=S_TEXT, labelpad=1.5)
+    cells = "Cells: $z$ of the set against genes permuted within identity and expression bins of the tissue" + (" (color clipped at ±8)" if compact else "")
+    gray_q = "not recurrent under every control" if mode == "strong" else "not recurrent on Δα"
+    key = (f"{cells}; {style.SIGNIFICANT} $q$ < 0.05; gray cell, fewer than {RU.MIN_SET} genes. "
+           "Right: $q$, recurrence across tissues; $S_g$ and profile correlation, tissues with the set above (↑) and below (↓); π and dN/dS, mean $z$ over tissues. "
+           f"Gray type: {gray_q} ($q$), on that readout ($S_g$, profile correlation), or |mean $z$| below {RU.Z_CALL} (π, dN/dS).")
+    key = wrap_to_width(fig, key, s_key, Wb - pad - (pad + w_label))
+    assert not compact or key.count("\n") <= 2, "the key of the compact form needs more than its three lines"
+    fig.text((pad + w_label) / Wb, (bottom - (3.0 if compact else 7.0)) / Hb, key, ha="left", va="top", fontsize=s_key, color=INK, linespacing=1.12 if compact else 1.25)
     return fig
 
 
@@ -1058,8 +1307,10 @@ def main_genes(k_top=4, k_lin=5, k_down=5) -> plt.Figure:
 
 
 # the panels that are not part of a tissue figure: name in figures/panels -> the function that draws it
-SINGLE = {"main_tissues/axis": lambda: main_axis(), "main_tissues/genes": lambda: main_genes(), "main_tissues/recurrence": lambda: main_recurrence(),
-          "supp_tissues_recurrence/recurrence_all": lambda: main_recurrence("all"), "supp_tissues_lineage/lineage": lambda: main_lineage()}
+SINGLE = {"main_tissues/axis": lambda: main_axis(), "main_tissues/genes": lambda: main_genes(), "main_tissues/recurrence": lambda: main_recurrence(compact=True),
+          "supp_tissues_recurrence/recurrence_all": lambda: main_recurrence("all"), "supp_tissues_lineage/lineage": lambda: main_lineage(),
+          "main_axis_tissues/summary": lambda: main_axis_summary(), "main_axis_tissues/clouds": lambda: main_axis_clouds()}
+EXACT = {"main_axis_tissues/summary"}  # saved at the size of the figure (placed with ``X`` in the figure spec)
 
 
 def draw_panels(tissues=None, single=None, reference: bool = False) -> None:
@@ -1074,14 +1325,18 @@ def draw_panels(tissues=None, single=None, reference: bool = False) -> None:
         for t in ("liver", "testis"):
             supp_panels(t, RU.PRIMARY[t], f"extra_reference_{t}")
     for name in SINGLE if single is None else single:
-        psave(SINGLE[name](), name)
+        psave(SINGLE[name](), name, exact=name in EXACT)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--reference", action="store_true", help="also render the standard panels for liver and testis, to compare with the originals")
+    ap.add_argument("--panel", nargs="+", choices=sorted(SINGLE), metavar="NAME", help="draw only these panels of SINGLE (family/name), no tissue figure")
     a = ap.parse_args()
-    draw_panels(reference=a.reference)
+    if a.panel:
+        draw_panels(tissues=[], single=a.panel)
+    else:
+        draw_panels(reference=a.reference)
     return 0
 
 

@@ -6,7 +6,7 @@
 
 **Region.** This is **not DLPFC.** The data are snRNA-seq and snATAC-seq of the **posterior cingulate cortex, Brodmann area 23**, from human, chimpanzee and rhesus macaque. The text says: "we examined the evolution of Brodmann area 23 (BA23)… part of the posterior cingulate cortex". The snRNA-seq covers 148,540 nuclei: human 41,397, chimpanzee 53,539, macaque 53,604.
 
-**Circularity.** These are new donors in a different region from our cohorts, so `circular = no`. The paper re-analyses Ma 2022 and Bakken 2021 only for side checks on cell proportion and FOXP2. Those checks do not feed Table S3.
+**Circularity.** These are new donors in a different region from our cohorts, so `circular = no`. The paper re-analyzes Ma 2022 and Bakken 2021 only for side checks on cell proportion and FOXP2. Those checks do not feed Table S3.
 
 **Files.** All files are in `data/analysis/E6/caglayan2023/`; see `MANIFEST.tsv`.
 - The files come from the PMC author-manuscript supplement, fetched with the proof-of-work step described in jorstad2023.md.

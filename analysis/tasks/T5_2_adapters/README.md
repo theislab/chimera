@@ -8,7 +8,7 @@ Adapters that run SATURN (its native genes, and the cohort's one-to-one ortholog
 | Question | Cell-level integration: Does one fit align the cells across species, and how does it compare with other tools? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `saturn_env`, `camex_env`, `chimera_env` |
-| Used in the paper | Supplementary Section C.21.9 (`sssec:rev-benchmark`) |
+| Used in the paper | Supplementary Section C.19.2 (`sssec:rev-benchmark`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

@@ -12,7 +12,7 @@ Asks whether Δα or the count evidence relate to data outside expression: mouse
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/Y2_functional/fetch.sh
+    bash analysis/tasks/Y2_functional/fetch.sh small (then: big)
     python -I analysis/tasks/Y2_functional/annot_pheno.py
     python -I analysis/tasks/Y2_functional/annot_reg.py
     python -m analysis.tasks.Y2_functional.build

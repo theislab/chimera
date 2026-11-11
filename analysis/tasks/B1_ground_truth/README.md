@@ -8,7 +8,7 @@ Gene-level benchmark with known truth: pattern, level or loss changes are writte
 | Question | What the count evidence adds: What do the readouts add to direct baselines and to other tools, on real and on ground-truth data? |
 | Status | in the paper |
 | Environment | `chimera_env`, `saturn_env`, `camex_env`, `samap_env`, `genespectra_env`, `cacimar_env` |
-| Used in the paper | Section 3.6 (`sec:adds`); Supplementary Section D.6 (`ssec:er-b1`); Supplementary Figure S31 (`fig:supp-b1`); Table 2 (`tab:when-to-use`); Supplementary Section C.21.16 (`sssec:rev-gene-benchmark`) |
+| Used in the paper | Section 3.4 (`sec:adds`); Supplementary Section D.6 (`ssec:er-b1`); Supplementary Figure S34 (`fig:supp-b1`); Table 1 (`tab:when-to-use`); Supplementary Section C.21.14 (`sssec:rev-gene-benchmark`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
@@ -43,7 +43,7 @@ Gene-level benchmark with known truth: pattern, level or loss changes are writte
 - `training/runs/`
 - code of `T2_5_celltype_margin`, `T4_2_gene_baselines`, `X6_adds_beyond`
 
-**Notes.** README.md and PREDICTIONS.md in the folder state design and predictions. queue.tsv is the run order (see README.md there for its paths); queue_full_planned.tsv keeps planned tiers that were not run. Altered objects and their models are rebuilt by step.py and are not deposited.
+**Notes.** README.md and PREDICTIONS.md in the folder state design and predictions. queue.tsv is the run order (see README.md there for its paths); queue_full_planned.tsv keeps planned tiers that were not run. The tool grid in use is grid_tools_v2.tsv (written by tools.py, with the tier of each run); grid_tools.tsv and its byte-identical copy grid_tools_superseded_running.tsv are the first form of that grid, without tiers, which no script reads. Altered objects and their models are rebuilt by step.py and are not deposited.
 <!-- glance:end -->
 
 Written before any altered fit was scored. Definitions in `rules.py`, alteration in `alter.py`, metrics in `metrics.py`, expected signs in `PREDICTIONS.md`.

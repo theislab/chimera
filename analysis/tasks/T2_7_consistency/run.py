@@ -13,9 +13,14 @@ and the source of the measurement. Items:
 * M/F ortholog-QC flags: the rule as written, counts per cohort, and whether the
   hand-labeled attribution candidates satisfy it.
 
+Two tables are written. ``consistency_values.csv`` has every column named above.
+``values.csv`` has the measured values alone (item, measured value, source), without the rows
+that quote a line of the package source; ``--values-only`` writes it from a stored
+``consistency_values.csv`` and measures nothing again.
+
 Usage::
 
-    python analysis/tasks/T2_7_consistency/run.py [--outdir DIR] [--prerun]
+    python analysis/tasks/T2_7_consistency/run.py [--outdir DIR] [--prerun] [--values-only]
 """
 
 from __future__ import annotations
@@ -245,7 +250,7 @@ def esm_rows() -> list[dict]:
         except Exception as exc:  # noqa: BLE001
             dims[f.name] = f"unreadable: {type(exc).__name__}"
     rows.append(row("ESM-2 embedding dimension (SATURN ESM2 files)", "extended_methods:139,1616; main.tex:209",
-                    "5120 dimensions, esm2_t48_15B_UR50D (corrected in T9.2)",
+                    "5120 dimensions, esm2_t48_15B_UR50D",
                     "; ".join(f"{k}: {v}" for k, v in dims.items()) or "files not found",
                     "data/raw/saturn_esm2/protein_embeddings_export/ESM2/*.torch (tensor shapes read from data.pkl)",
                     note="esm2_t36_3B_UR50D has 2560 dimensions; esm2_t48_15B_UR50D has 5120"))
@@ -253,8 +258,8 @@ def esm_rows() -> list[dict]:
     for i, line in enumerate(src, 1):
         if "emb_dim = 5120" in line or ("ESM-2 3B" in line):
             rows.append(row("ESM-2 in package code", f"chimera/_data_utils.py:{i}", "-", line.strip(),
-                            "package source (not modified)",
-                            note="docstring still names 3B" if "3B" in line else ""))
+                            "package source",
+                            note="docstring names 3B" if "3B" in line else ""))
     return rows
 
 
@@ -323,10 +328,38 @@ def mf_rows() -> list[dict]:
     return rows, det
 
 
+VALUE_COLUMNS = ["item", "measured_value", "source"]
+SOURCE_LINE_ITEM = "ESM-2 in package code"
+
+
+def values_table(outdir: Path) -> pd.DataFrame:
+    """The measured values of a stored ``consistency_values.csv``: item, measured value, source.
+
+    Rows that quote a line of the package source are left out: the code is in the repository.
+    Every cell keeps the text of the stored table.
+    """
+    stored = pd.read_csv(outdir / "consistency_values.csv", dtype=str, keep_default_na=False)
+    return stored.loc[stored["item"] != SOURCE_LINE_ITEM, VALUE_COLUMNS].reset_index(drop=True)
+
+
+def write_values(outdir: Path) -> Path:
+    """Write ``values.csv`` beside the stored ``consistency_values.csv``; nothing is measured again."""
+    final = outdir / "values.csv"
+    tmp = final.with_name(final.name + ".tmp")
+    values_table(outdir).to_csv(tmp, index=False)
+    tmp.replace(final)
+    return final
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     add_common_args(ap)
+    ap.add_argument("--values-only", action="store_true",
+                    help="write values.csv from the stored consistency_values.csv and stop; nothing is measured again")
     args = ap.parse_args()
+    if args.values_only:
+        print(write_values(Path(args.outdir) if args.outdir else ROOT / "results" / "analysis" / "T2_7"))
+        return
     out = TaskOutput("T2_7", args.outdir, prerun=args.prerun, force=args.force)
     rows = []
     for c in C.COHORT_ORDER:
@@ -339,6 +372,7 @@ def main():
     rows += mf
     df = pd.DataFrame(rows)
     out.csv(df, "consistency_values.csv")
+    out.csv(values_table(out.dir), "values.csv")
     out.csv(det, "attribution_candidates_vs_rule.csv")
     pd.set_option("display.width", 250, "display.max_colwidth", 110, "display.max_rows", 300)
     print(df[["item", "manuscript_value", "measured_value", "matches"]].to_string())

@@ -7,18 +7,20 @@ PDF by page number.
 | File or folder | What it is |
 |---|---|
 | `figures.pdf` | the single PDF: one figure per page, in the order of the paper, each page at print size |
-| `INDEX.md` | one entry per figure: page, title, what it shows, the panel files it is made of (generated) |
-| `manifest.tsv`, `manifest.json` | page, key, label, title, size, spec, panels, smallest text, checks, checksum (generated) |
+| `INDEX.md` | one entry per figure: page, title, what it shows, the panel files it is made of and the script that draws each (generated) |
+| `manifest.tsv`, `manifest.json` | page, key, label, title, size, spec, panels with their scripts, smallest text, checks, checksum (generated) |
 | `composed/<key>.pdf` | the figures one by one, before they are merged |
-| `panels/<family>/<name>.pdf` | the panel files the figures are composed from; `<family>` is the key of the figure that owns the panel |
+| `panels/<family>/<name>.pdf` | the panel files the figures are composed from; `<family>` is the key of the figure the panel was first drawn for (a panel keeps its folder when it is placed in another figure) |
 | `specs/*.py` | the figures: one entry per float of the paper (layout, label, title, plain description) |
 | `specs/_allow.py` | the figures that do not pass the house style yet, each with its reason |
+| `specs/not_in_paper.py` | figures that can be composed and are not in the paper: extra figures and retired ones |
 | `order.txt` | the keys in the order of the paper (written from the manuscript) |
+| `numbers.tsv` | key and printed number of every figure, written from the manuscript; the index takes "Figure 6", "Supplementary Figure S26" from it |
 | `compose.py` | the layout tool: rows, columns and panels, solved exactly, written through pdflatex |
 | `registry.py`, `build.py`, `check.py`, `guide.py` | collect the specs; build; check; write the index |
 | `style.py` | the house style as code: type sizes, colors and markers of every recurring entity, names, `save_panel` |
 | `redraw/` | scripts that draw panels and belong to no analysis task (for example the overview figure) |
-| `sources/` | pages that are placed whole because they are not composed from panel files yet |
+| `producers.tsv` | the script that draws each panel file, with its command: figure -> panel -> script |
 | `panel_names.tsv` | former file names of panels and their place in `panels/` (used while scripts still save under the old names) |
 | `environment.yml` | the small environment of the build |
 | `build.sh` | the one command |
@@ -51,19 +53,26 @@ What the build does:
 
 ```python
 "main_validation": Figure(
-    Col(Row(P("main_validation/prespecified_tests", "a"), P("main_validation/gene_sets", "b"), same_scale=True),
-        X("main_validation/head_to_head", "c"), X("main_validation/incremental", "d")),
+    Col(Row(X("main_validation/worked_genes", {"a": 88, "b": 252}), X("main_validation/celltype_drivers_enzymes", "c"),
+            same_scale=True),
+        Row(X("main_validation/readouts_vs_references", "d"), X("main_validation/named_findings", "e"), same_scale=True)),
     label="fig:validation",
-    title="Pre-specified tests against independent data and comparison with direct baselines",
+    title="Two worked genes, the cell types behind the count evidence, and the readouts against independent data",
     shows="..."),
 ```
 
-- The key says what the figure is about: `main_<topic>` or `supp_<topic>`. A continuation float is `<key>_2`, `<key>_3`
-  with the same `label` and `part=2`, `part=3`. Keys carry no figure number, because numbers move.
+- The key says what the figure is about: `main_<topic>` or `supp_<topic>`. Every main figure is one float. A
+  supplementary figure that needs a second page has a continuation float `<key>_2`, `<key>_3` with the same `label`
+  and `part=2`, `part=3`. Keys carry no figure number, because numbers move.
 - `Row` gives its children one height and fills the width; `Col` stacks; `same_scale=True` keeps the panels of a row at
   one scale; `Row(..., width=330)` is a narrower, centered row.
 - `P` crops a panel to its ink; `X` keeps the page of a panel that was saved at its exact size, so axes line up; `NB`
-  takes a panel from `notebooks/figures/`; `SRC` takes a file from `sources/`.
+  takes a panel from `notebooks/figures/`.
+- A panel file that holds two plots takes two letters: `X("family/name", {"a": 88, "b": 252})`, each with the
+  position of its letter in bp from the left edge of the page.
+- `notebooks/figures/` holds the panels as the notebooks rendered them (the first drawing of most analyses). The figures of
+  the paper take from it only the few files that a spec names with `NB(...)`; every other panel is drawn at print size
+  by a script of `producers.tsv`.
 - Width is 486 bp (the text width) unless `width=` says otherwise; a figure on a landscape page is 648 bp wide.
 
 ```bash
@@ -78,7 +87,10 @@ PYTHONPATH=$PWD python -m figures.compose main_validation    # compose one figur
    the analysis they belong to (`analysis/tasks/<task>/`) or in `figures/redraw/`; they read cached result tables,
    call `figures.style.apply()` and save with `figures.style.save_panel(fig, "family/name")`. For a dry run set
    `CHIMERA_FIGURES_OUT=<folder>`: panels and build products go there and the repository is not touched
-   (`CHIMERA_FIGURES_ORDER=<file>` tries another order of the floats in the same way).
+   (`CHIMERA_FIGURES_ORDER=<file>` tries another order of the floats in the same way). Which script draws a panel,
+   and with which command, is in `producers.tsv` (and under each figure in `INDEX.md`); a new panel folder gets a row
+   there. When a panel shows something else than before, the `shows=` text of its figure in `specs/` and the caption
+   in the paper change with it.
 3. **A new figure**: add an entry to the spec module of its part of the paper. Until its float exists in the manuscript
    the figure is *pending*: it is composed, the build names it, and it is not in `figures.pdf`. Then write the order
    and build. `order.txt` is normally written from the manuscript (`sync_figures.py --write-order`), so a float that moves
@@ -98,6 +110,7 @@ checks the result on every figure:
 | `scale` | no panel placed below 0.9 of its drawn size; no figure shrunk as a whole |
 | `letters` | letters run a, b, c ... over a figure and its continuation floats, in reading order |
 | `words`, `spelling` | no internal name (cohort keys, method codes, column names) and no British spelling in the artwork |
+| panel scripts | every panel of a figure has a row in `producers.tsv` whose script exists (named by the build; an error with `--strict`) |
 
 A figure that does not pass yet is listed in `specs/_allow.py` with its reason; the build prints the list every time,
 `--strict` fails on it, and an entry whose check passes is an error, so the list can only shrink.
@@ -121,8 +134,29 @@ change that should not alter a figure.
 <manuscript>/figures`). There each float includes its page and names its figure on the same line,
 
 ```latex
-\centerline{\includegraphics[page=7]{figures/figures.pdf}}% figure: main_validation_2
+\centerline{\includegraphics[page=6]{figures/figures.pdf}}% figure: main_validation
 ```
 
 and the manuscript's `figures/sync_figures.py` writes the page numbers from the manifest and checks that paper and
 figure file are in step.
+
+## Retired figures
+
+A figure or a panel is retired when a later analysis of the same question on the same data replaced it in the paper.
+Its entry moves from its spec module to the dictionary `RETIRED` of `specs/not_in_paper.py`, with a comment that says
+what it showed, what replaced it (figure key and analysis task) and when. Nothing is deleted: the panel files stay in
+`panels/`, the script that draws them stays in `producers.tsv`, and the figure can still be composed:
+
+```bash
+PYTHONPATH=$PWD python -m figures.compose supp_integration_seven_methods    # writes composed/<key>.pdf
+```
+
+| Key in `RETIRED` | What it showed | Replaced by |
+|---|---|---|
+| `supp_alpha_decorrelation` | Δα against detection rate, mean count and count variance, liver Human+Monkey | `supp_covariate_audit`: the same statistics on seven cohorts (task `T2_4_covariates`) |
+| `supp_integration_seven_methods` | composite integration score of seven methods on seven cohorts | the benchmark of ten methods: `main_integration`, `supp_integration_ten_methods`, `supp_integration_eleven_cohorts` (tasks `T5_5_benchmark`, `B2_benchmark`) |
+| `supp_integration_metrics` | six raw integration metrics of seven methods | `supp_integration_raw_metrics`: the same metrics for ten methods (task `T5_5_benchmark`) |
+| `retired_tissue_programs_clamped_prior` | program means of Δα, liver against testis, against the clamped prior (two former panels of `supp_alpha_robustness`) | panel d of `supp_delta_alpha_sources`: the comparison against the raw prior (task `T2_3_tissue`) |
+| `retired_tissue_sign_classes_clamped_prior` | genes shared by liver and testis by sign class of Δα, clamped prior (a former panel of `supp_residue_audit_2`) | panel d of `supp_delta_alpha_sources` (task `T2_3_tissue`) |
+
+A retired figure is not in `figures.pdf`, `order.txt` or `INDEX.md`, and the paper does not cite it.

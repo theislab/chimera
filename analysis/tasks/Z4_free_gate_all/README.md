@@ -8,7 +8,7 @@ Trains the per-gene gate on every one of the 26 cohorts with the cohort's own re
 | Question | The per-gene gate: What does Δα show when it is read gene by gene from counts, without the protein-feature network? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Section 3.8 (`sec:disease`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section D.12 (`sec:disease`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

@@ -23,7 +23,7 @@ Ezran C, Liu S, et al. (Tabula Microcebus Consortium). Mouse lemur cell atlas in
 
 **Files** (`data/analysis/E6/ezran2025b_tmc/`): `41586_2025_9114_MOESM1_ESM.pdf` and `41586_2025_9114_MOESM3_ESM.zip`. Tables 5, 6, 7 and 9 were extracted to `unz/`, and Table 5 was converted to `tsv/`.
 
-**Why not derived.** This paper's gene-level content does not fit the E6 test:
+**Why not derived.** This paper's gene-level content does not fit the test of this task:
 - Its primate genes are genes missing in mice, so they have no 1:1 ortholog by definition.
 - Table 5, "Expression homolog triads of human, lemur, and mouse detected by SAMap", lists conserved expression homologs only. It has 1,279 Lung rows and 1,686 Limb_Muscle rows, and contains no divergent set.
 

@@ -12,7 +12,7 @@ Worked genes, by a stated rule (the tables were already read in X1_testis_discov
     Changed after the first run, before any text: the first liver rule was largest |S| with counts in all four
     species, which gave ASL. ASL is a poor example of its class: macaque cells of every type detect it at 66-100%
     and zebrafish has 3 UMI in 5,289 hepatocytes, so its macaque profile is nearly flat. It stays a robust margin call,
-    named in the Fig 4 text, but it does not show "pattern shared, level differs" in raw counts. The rule above
+    named in the text on liver gene categories (fig:dalpha-biology), but it does not show "pattern shared, level differs" in raw counts. The rule above
     was written after seeing the table, so the choice of worked gene is illustration, not evidence.
 
 Set-level checks, on the same tables:

@@ -365,7 +365,7 @@ cells.append(md("""
 
     The registry covers two organs (4 pancreas datasets, 3 testis
     datasets). For paper-ready figures we group panels by organ so a
-    reviewer can read off each organ's enrichment story in a single
+    reader can read off each organ's enrichment story in a single
     glance, without flipping back and forth between mixed grids.
 
     Pathway names from MSigDB / Reactome carry library-specific
@@ -1164,7 +1164,7 @@ cells.append(md("""
     For each of the top-10 most-reproducible Reactome pathways,
     dump leading-edge genes per dataset to CSV under each run-dir's
     `tables/`. The leading-edge subset drives the enrichment — the
-    genes a reviewer can quote.
+    genes a reader can quote.
 """))
 cells.append(code(r"""
     def dump_leading_edge(GSEA: dict, library_short: str, top_paths: list[str]):

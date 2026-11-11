@@ -70,6 +70,9 @@ GATE_INPUT = {
 }
 GATE_GROUP = {"ESM-2 PCs": "ESM-2 components", "esm2_intersp_var": "ESM-2 distance between species", "mean_identity": "mean ortholog identity",
               "expression": "expression", "identity_spread": "identity spread"}
+# One color per group of gate inputs, wherever shares of the groups are drawn (attribution shares, strips of the residue cards).
+GATE_GROUP_COLOR = {"ESM-2 PCs": "#cccccc", "esm2_intersp_var": "#56B4E9", "mean_identity": "#0072B2", "expression": "#D55E00",
+                    "identity_spread": "#888888"}
 # Gene categories of ``notebooks/_gene_categories.py``: key -> name on a figure.
 CATEGORY = {
     "apoptosis": "Apoptosis", "autophagy": "Autophagy", "cell_cycle": "Cell cycle", "chaperones_hsp": "Chaperones (HSP)",

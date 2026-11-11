@@ -8,15 +8,15 @@ Builds the bone-marrow cohort (human, mouse lemur, mouse) from the CELLxGENE fil
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Supplementary Section C.21.14 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section C.21.13 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/T12_1_bone_marrow/fetch_bm.sh
+    bash analysis/tasks/T12_1_bone_marrow/fetch_bm.sh $PWD
     python -m analysis.tasks.T12_1_bone_marrow.build_orthologs [--out CSV]
     python -m analysis.tasks.T12_1_bone_marrow.build_bm [--out DIR]
-    bash analysis/tasks/T12_1_bone_marrow/fetch_probe_maps.sh
+    bash analysis/tasks/T12_1_bone_marrow/fetch_probe_maps.sh $PWD
     python -I analysis/tasks/T12_1_bone_marrow/compute_coe.py [--out DIR]
     python -I analysis/tasks/T12_1_bone_marrow/fetch_portal_coe.py
 
@@ -32,4 +32,4 @@ Builds the bone-marrow cohort (human, mouse lemur, mouse) from the CELLxGENE fil
 - `data/processed/`
 - `data/raw/`
 
-**Notes.** The tests on this cohort are in T12_3_tests, which writes to results/analysis/P12/.
+**Notes.** The tests on this cohort are in T12_3_tests, which writes to results/analysis/P12/. The cohort of the paper is the second build, data/analysis/bone_marrow/v2/ (no mitochondrial filter, a cap per cell type); the object of the first build stays in the parent folder and is not deposited.

@@ -1,7 +1,7 @@
 """Chimera: Cross-species Harmonization via Integrated Mixing of Evolutionary Residual Alphas.
 
-A scvi-tools model for cross-species scRNA-seq integration with learnable
-per-gene evolutionary gating.
+A scvi-tools model for cross-species single-cell data with a per-gene gate that
+reads expression deployment relative to protein conservation.
 """
 
 __version__ = "0.1.0"

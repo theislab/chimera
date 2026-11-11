@@ -1,4 +1,4 @@
-"""T12.3 step 1: per-seed health of the bone-marrow seed runs, before any readout (plan section 12).
+"""Step 1: per-seed health of the bone-marrow seed runs, before any readout (pre-specified analysis plan, section 12).
 
 Runs: ``analysis/tasks/T12_2b_recipe/seed_map.tsv`` (s42 = the selected grid run
 ``rev-bm2-grid5-s42``, s43-s46). Per run:
@@ -8,16 +8,17 @@ Runs: ``analysis/tasks/T12_2b_recipe/seed_map.tsv`` (s42 = the selected grid run
   (Var(z_mean) >= 0.01); both tails of alpha - prior (> +0.05 and < -0.05) in >= 2% of genes;
 * Delta-alpha sign profile against the prior the run anchored on (clamped at 0.85) and against
   the raw prior (``var['conservation_prior']``): fractions positive / negative, > +0.05 / < -0.05,
-  SD, median (coordinator note, ``ledgers/T12_2.md``);
+  SD, median;
 * species mixing: ``knn_mixing_entropy`` and ``knn_species_purity`` from
   ``training/compare_vs_scvi.py::compute_integration_metrics`` (k = 15, seed 42, labels
   ``cell_ontology_class``), final adversary accuracy.
 
 Flag, fixed before the seed runs were read: a seed with ``knn_mixing_entropy`` below 0.75 x that of
-s42 is listed as poorly mixed and reported separately (the P13 rule); poorly mixed healthy seeds stay
-in D. Seed entry (amendment "New cohorts ... G-V training-health gate", chimera-private a82eaad): a
-seed failing G-V does not enter D or S_ema and is reported with its health row; the sensitivity D
-uses every non-NaN seed; with fewer than 2 passing seeds the cohort is descriptive only.
+s42 is listed as poorly mixed and reported separately (the rule of P13_kidney); poorly mixed healthy
+seeds stay in D. Seed entry (amendment log of the pre-specified analysis plan, row "New cohorts ... G-V
+training-health gate"): a seed failing G-V does not enter D or S_ema and is reported with its health
+row; the sensitivity D uses every non-NaN seed; with fewer than 2 passing seeds the cohort is
+descriptive only.
 
 No D, S_g, COE, baseline or biology readout is computed here.
 
@@ -90,7 +91,7 @@ def main() -> int:
     tab.to_csv(OUT / "seed_health.tsv", sep="\t", index=False)
     (OUT / "seed_health.json").write_text(json.dumps(dict(
         flag_rule=f"knn_mixing_entropy < {FLAG_RATIO} x s42 ({FLAG_RATIO * ref:.4f})",
-        enters_D_rule="pass G-V (chimera-private a82eaad); sensitivity: every finite seed",
+        enters_D_rule="pass G-V; sensitivity: every finite seed",
         seeds_enter_D=[int(s) for s in tab.loc[tab.enters_D, "seed"]],
         seeds_finite=[int(s) for s in tab.loc[tab.finite, "seed"]],
         descriptive_only=bool(tab.enters_D.sum() < 2)), indent=2))

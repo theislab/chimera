@@ -1,4 +1,4 @@
-"""T6.9: BH family (m = 7, 05 section 7) and the supplementary functional-layer figure.
+"""BH family (m = 7; pre-specified analysis plan, section 7) and the supplementary functional-layer figure.
 
 Four panels, one file each in figures/panels/supp_functional_layer/, drawn at their exact size on the page (house style:
 figures/style.py): pathways (F1, coherence), interactions (F2, coherence), interologs (F3, conservation), regulatory

@@ -1,25 +1,25 @@
 label	where	figure_key	title	code
-fig:overview	Figure 1	main_overview	Overview: what the model takes, does and returns	`figures/redraw/` (drawn, not computed)
+fig:overview	Figure 1	main_overview	Overview: what the model takes, does and returns	`figures/redraw/overview/overview.py` (drawn, not computed); inputs: its tracked `assets/`, made by `build_assets.py` from the liver Human+Monkey run (bundle `models_canonical`), its cached UMAP (bundle `notebook_caches`) and `results/analysis/H1/axis.csv` (bundle `analysis_results`)
 sec:methods	Section 2		Methods	`chimera/` (the model)
-fig:alpha-intro	Figure 2	main_alpha_vs_prior	The gate value α against the protein prior	`notebooks/03_alpha_master.ipynb`
 sec:model	Section 3.1		One fit aligns the cells and reads each gene against its protein	`notebooks/07_baselines_master.ipynb`; `notebooks/08_chimera_umap.ipynb`
+fig:alpha-intro	Figure 2	main_alpha_vs_prior	The gate value α against the protein prior	panels: `figures/redraw/main_figures.py` (`scatter`, `shift`, `distribution`); input: `final_state.npz` of the liver Human+Monkey run (bundle `models_canonical`); first analysis: `notebooks/03_alpha_master.ipynb`
+fig:integration	Figure 3	main_integration	Composite integration score of ten methods on eleven cohorts	panel: `analysis/tasks/T8_4_figures/fig3_integration_ext.py` (`composite_strip`); input: `results/analysis/B2/integration/master_table_extended.csv` (bundle `gene_level_benchmark`); the scores of seven of the ten methods come from `notebooks/02_baselines.ipynb` (latents) and `notebooks/07_baselines_master.ipynb` (scores) (bundle `notebook_caches`)
 sec:axis	Section 3.2		Deployment is an axis of its own, beside protein sequence	
-fig:integration	Figure 3	main_integration	Integration benchmark on the seven liver and testis cohorts	`notebooks/02_baselines.ipynb`; `notebooks/07_baselines_master.ipynb`
+fig:dalpha-biology	Figure 4	main_delta_alpha_liver	Δα by gene category and across the protein prior, four-species liver	panels a, b: `figures/redraw/main_figures.py` (`category_boxes`, `category_effect_sizes`); panel c: `analysis/tasks/T8_4_figures/fig4_additions.py` (`panel_landscape`); inputs: `final_state.npz` of the four-species liver run (bundle `models_canonical`), the gene names of its data object (bundle `data_liver_testis`), `results/analysis/T2_5/liv_4sp__genes.parquet` and, for the three genes named in bold, `results/analysis/X2/named_genes.csv` (bundle `analysis_results`); first analysis: `notebooks/04_delta_alpha_biology.ipynb`, `notebooks/05_esm_alpha_geometry.ipynb`
 sec:findings	Section 3.3		The axis reveals less conserved proteins used alike and conserved proteins used differently	
-fig:dalpha-biology	Figure 4	main_delta_alpha_liver	Δα by gene category and across the protein prior, four-species liver	`notebooks/04_delta_alpha_biology.ipynb`; `notebooks/04_delta_alpha_biology_simpler.ipynb`; `notebooks/06_pathway_analysis.ipynb`
+fig:axis-tissues	Figure 5	main_axis_tissues	Protein identity, dN/dS, count evidence and Δα in eight tissues	panels: `analysis/tasks/H1_harmonise/figures.py` (`main_axis_summary`, `main_axis_clouds`); inputs: `results/analysis/H1/axis.csv`, `results/analysis/H1/genes/<cohort>.parquet` (bundle `analysis_results`)
 sec:validation	Section 3.4		Independent data back the count evidence on cell-state pattern; Δα passes on liver pattern	
-tab:validation	Table 1		Pre-specified validation of Δα against independent data	
-fig:validation	Figure 5	main_validation	Pre-specified tests against independent data and comparison with direct baselines	
+sec:per-gene	Section 3.4		Read gene by gene from counts and evaluated afterward, Δα agrees with independent data in liver and testis	
+fig:validation	Figure 6	main_validation	Two worked genes, the cell types behind the count evidence, and the readouts against independent data	panels a, b: `analysis/tasks/Y3_findings/figures.py`; c: `analysis/tasks/T8_4_figures/fig4_additions.py` (`panel_drivers_enzymes`); d, e: `analysis/tasks/F2_per_gene/panels.py` (`panel_readouts`, `panel_named_compact`); inputs: `results/analysis/Y3/worked_pseudobulk.csv`, `worked_readouts.csv`; `results/analysis/T2_5/liv_4sp__C_gk.parquet`; `results/analysis/Z3/compare_hyp.csv`, `compare_y3.csv` (bundle `analysis_results`)
+sec:adds	Section 3.4		The count evidence adds to direct baselines on pattern and needs no labels in liver	
 sec:reliability	Section 3.4		Reliability and feature dependence (paragraph)	
-sec:per-gene	Section 3.5		Read gene by gene from counts and evaluated afterward, Δα agrees with independent data in liver and testis	
-sec:adds	Section 3.6		The count evidence adds to direct baselines on pattern and needs no labels in liver	
-sec:tissues	Section 3.7		One reading across eight tissues	
-fig:one-reading	Figure 6	main_tissues	Δα against protein identity and dN/dS, and named genes, in eight tissues	
-sec:disease	Section 3.8		Program transfer shows which human disease responses a mouse model reproduces	
-fig:disease	Figure 7	main_disease	Transfer of disease programs between human and mouse	
-sec:protein	Section 3.9		The protein-feature gate maps deployment over protein space	`notebooks/09_gin_attention_overall.ipynb`; `notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`; `notebooks/10_gin_attribution_protein_structure.ipynb`
-fig:gin-esm2	Figure 8	main_protein	Inputs of the gate network and control trainings	`notebooks/09_gin_attention_overall.ipynb`; `notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-tab:when-to-use	Table 2		When to use which readout or method	
+sec:tissues	Section 3.5		One reading across eight tissues	
+fig:one-reading	Figure 7	main_tissues	Gene programs and classes across eight tissues	panel: `analysis/tasks/H1_harmonise/figures.py` (`main_recurrence`, compact form); inputs: `results/analysis/H1/recurrence.csv`, `tissue_specific.csv` (bundle `analysis_results`)
+fig:above-prior	Figure 8	main_specialized_cells	Home compartments of genes: Δα under both gates, profile correlation and level similarity	panel: `analysis/tasks/E3_cells/figure.py` (`panel_compartments`); input: `results/analysis/E3/excess.csv` (bundle `analysis_results`)
+sec:protein	Section 3.6		The protein-feature gate maps deployment over protein space	`notebooks/09_gin_attention_overall.ipynb`; `notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`; `notebooks/10_gin_attribution_protein_structure.ipynb`
+fig:drug-targets	Figure 9	main_drug_targets	Approved drug targets against the protein prior	panel: `analysis/tasks/E4_translational/figures.py` (`p_targets`); inputs: `results/analysis/E4/tables/cohorts.parquet`, `results/analysis/E4/annot/targets.parquet` and, for the printed counts, `results/analysis/E4/q23_callshare.csv` and `callshare_perm.csv` (bundle `analysis_results`)
+fig:gin-esm2	Figure 10	main_protein	Protein-space atlas	panels: `figures/redraw/main_figures.py` (`atlas_alpha`, `atlas_delta_alpha`, `atlas_correction`, `atlas_categories`, `atlas_categories_key`, `atlas_clusters`); inputs: `final_state.npz` of the four liver runs and `cache/esm2_umap.npy` of the four-species liver run (bundle `models_canonical`), the ESM-2 components stored with the data objects (bundle `data_liver_testis`); first analysis: `notebooks/05_esm_alpha_geometry.ipynb`
+tab:when-to-use	Table 1		When to use which readout or method	
 tab:tool-inclusion	Supplementary Table S1		Tools considered for comparison and why each was included or not	text of the manuscript (no computed values)
 tab:related-work-comparison	Supplementary Table S2		Comparison with related methods	text of the manuscript (no computed values)
 tab:assumptions-summary	Supplementary Table S3		Summary of assumptions and limitations	text of the manuscript (no computed values)
@@ -28,6 +28,8 @@ tab:notation	Supplementary Table S4		Notation	text of the manuscript (no compute
 tab:notation-continued	Supplementary Table S5		Notation (continued)	text of the manuscript (no computed values)
 sssec:per-gene-gate	Supplementary Section C.8.4		The per-gene gate	
 par:latent-guard	Supplementary Section C.12.2		Latent guard (paragraph)	
+sssec:rev-residue	Supplementary Section C.15.8		Residue specificity control	
+sssec:rev-benchmark	Supplementary Section C.19.2		Integration benchmark with SATURN and CAMEX, and the testis label ablation	
 ssec:revision-analyses	Supplementary Section C.21		Pre-specified Analysis Plan and Departures	
 sssec:rev-plan	Supplementary Section C.21.1		Pre-specified analysis plan	
 sssec:rev-seeds	Supplementary Section C.21.2		Seeds, seed pooling and training states	
@@ -37,14 +39,12 @@ sssec:rev-decomposition	Supplementary Section C.21.5		Cell-type decomposition of
 sssec:rev-categories	Supplementary Section C.21.6		Category tests under matching	
 sssec:rev-controls	Supplementary Section C.21.7		Retraining controls	
 sssec:rev-validation	Supplementary Section C.21.8		Independent validation and direct baselines	
-sssec:rev-benchmark	Supplementary Section C.21.9		Integration benchmark with SATURN and CAMEX, and the testis label ablation	
-sssec:rev-gene-level	Supplementary Section C.21.10		Gene-level comparison with SATURN and CAMEX	
-sssec:rev-functional	Supplementary Section C.21.11		Functional layer and prior swap	
-sssec:rev-exploratory	Supplementary Section C.21.12		Exploratory analyses	
-sssec:rev-residue	Supplementary Section C.21.13		Residue specificity control	
-sssec:rev-disease	Supplementary Section C.21.14		Disease case studies, bone marrow and eye	
-sssec:rev-dataprep	Supplementary Section C.21.15		Data preparation of the cohorts beyond liver and testis	
-sssec:rev-gene-benchmark	Supplementary Section C.21.16		Gene-level benchmark	
+sssec:rev-gene-level	Supplementary Section C.21.9		Gene-level comparison with SATURN and CAMEX	
+sssec:rev-functional	Supplementary Section C.21.10		Functional layer and prior swap	
+sssec:rev-exploratory	Supplementary Section C.21.11		Exploratory analyses	
+sssec:rev-dataprep	Supplementary Section C.21.12		Data preparation of the cohorts beyond liver and testis	
+sssec:rev-disease	Supplementary Section C.21.13		Disease case studies, bone marrow and eye	
+sssec:rev-gene-benchmark	Supplementary Section C.21.14		Gene-level benchmark	
 ssec:reproducibility	Supplementary Section C.22		Reproducibility	`REPRODUCE.md`, `release/`
 tab:failure-modes	Supplementary Table S6		Failure modes and the loss term that closes each	text of the manuscript (no computed values)
 tab:covariate-flow	Supplementary Table S7		Which covariate enters which module	text of the manuscript (no computed values)
@@ -65,90 +65,101 @@ sec:supp-gate-gap	Supplementary Section D.4		The two readouts differ reproducibl
 ssec:er-e6	Supplementary Section D.5		Published species differences in expression level sit low on the count evidence	
 ssec:er-b1	Supplementary Section D.6		In a ground-truth benchmark, S_g detects level and pattern changes from one fit	
 ssec:er-e1	Supplementary Section D.7		Deployment programs recur across eight tissues and cut across protein conservation	
-ssec:er-e3	Supplementary Section D.8		Cell-type programs sit above their protein prior while their levels move	
-ssec:er-e2	Supplementary Section D.9		Protein architecture and gene history predict where deployment sits relative to protein conservation	
-ssec:er-e5	Supplementary Section D.10		Regulatory input predicts where deployment sits relative to protein conservation	
-ssec:er-disease	Supplementary Section D.11		Mouse ischemic injury reproduces human kidney-injury programs by stage	
-ssec:er-e4	Supplementary Section D.12		Drug targets and disease genes sit above their protein prior in their own tissue	
-ssec:er-gin	Supplementary Section D.13		Chimera's GIN projects count evidence onto protein-language and expression features	`notebooks/09_gin_attention_overall.ipynb`
-ssec:er-atlas	Supplementary Section D.14		Chimera learns a protein-space atlas of sequence-relative expression deployment	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-ssec:er-residue	Supplementary Section D.15		Exploratory projection of Δα attribution onto protein structure	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
+ssec:er-tissues	Supplementary Section D.8		Each tissue adds its own genes to the reading	
+ssec:er-e3	Supplementary Section D.9		Cell-type programs sit above their protein prior while their levels move	
+ssec:er-e2	Supplementary Section D.10		Protein architecture and gene history predict where deployment sits relative to protein conservation	
+ssec:er-e5	Supplementary Section D.11		Regulatory input predicts where deployment sits relative to protein conservation	
+ssec:er-disease	Supplementary Section D.12		Mouse ischemic injury reproduces human kidney-injury programs by stage	
+sec:disease	Supplementary Section D.12		Program transfer shows which human disease responses a mouse model reproduces	
+ssec:er-e4	Supplementary Section D.13		Drug targets and disease genes sit above their protein prior in their own tissue	
+ssec:er-gin	Supplementary Section D.14		Chimera's GIN projects count evidence onto protein-language and expression features	`figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+ssec:er-atlas	Supplementary Section D.15		Chimera learns a protein-space atlas of sequence-relative expression deployment	`figures/redraw/atlas.py`; first analysis: `notebooks/05_esm_alpha_geometry.ipynb`, `notebooks/11_gene_archetypes.ipynb`
+ssec:er-residue	Supplementary Section D.16		Exploratory projection of Δα attribution onto protein structure	`figures/redraw/residue.py`, `figures/redraw/residue_audit.py`; first analysis: `notebooks/10_gin_attribution_protein_structure.ipynb`, `notebooks/10b_gin_attribution_figures.ipynb`
 tab:data-preparation	Supplementary Table S18		Data preparation of every cohort	`notebooks/01_data_preparation.ipynb` (liver and testis)
 tab:harmonised-cohorts	Supplementary Table S19		The 26 cohorts: cells, genes, recipe, runs and training health	
 tab:harmonised-rules	Supplementary Table S20		Rules of the per-gene tables and of gene naming	
 tab:harmonised-rules-c1	Supplementary Table S21		Rules for the cohorts of cortex, lung, muscle and tumor	
-fig:supp-main-alpha-intro	Supplementary Figure S1		Extended description of Figure 2 (text only)	`notebooks/03_alpha_master.ipynb`
-fig:supp-alpha-training-dynamics	Supplementary Figure S2	supp_alpha_training	Training dynamics of α	`notebooks/03_alpha_master.ipynb`
-fig:supp-alpha-robustness	Supplementary Figure S3	supp_alpha_robustness	Program-level Δα across seeds, species sets and tissues	`notebooks/03_alpha_master.ipynb`
-fig:supp-alpha-decorrelation	Supplementary Figure S4	supp_alpha_decorrelation	Δα against expression magnitude statistics	`notebooks/03_alpha_master.ipynb`
-fig:supp-main-integration	Supplementary Figure S5	supp_integration_seven_methods	Integration scores, seven-method panel	`notebooks/02_baselines.ipynb`; `notebooks/07_baselines_master.ipynb`
-fig:supp-integration-metrics	Supplementary Figure S6	supp_integration_metrics	Raw integration metrics, seven-method panel	`notebooks/07_baselines_master.ipynb`
-fig:supp-integration-testis-umap	Supplementary Figure S7	supp_integration_umap_testis	UMAP by method, three-species testis	`notebooks/08_chimera_umap.ipynb`
-fig:supp-integration-liver-umap	Supplementary Figure S8	supp_integration_umap_liver	UMAP by method, liver Human+Monkey	`notebooks/08_chimera_umap.ipynb`
-fig:supp-integration-purity	Supplementary Figure S9	supp_integration_ten_methods	Integration: mixing and conservation, ten-method panel	
-fig:supp-integration-raw	Supplementary Figure S10	supp_integration_raw_metrics	Raw integration metrics, ten-method panel	
-fig:supp-integration-ext	Supplementary Figure S11	supp_integration_eleven_cohorts	Integration benchmark on eleven cohorts	
+fig:supp-main-overview	Supplementary Figure S1		Extended caption of fig:overview (text only)	
+fig:supp-main-alpha-intro	Supplementary Figure S2		Extended caption of fig:alpha-intro (text only)	`notebooks/03_alpha_master.ipynb`
+fig:supp-alpha-training-dynamics	Supplementary Figure S3	supp_alpha_training	Training dynamics of α	panels: `figures/redraw/alpha.py`; first analysis: `notebooks/03_alpha_master.ipynb`
+fig:supp-alpha-robustness	Supplementary Figure S4	supp_alpha_robustness	Program-level Δα across seeds and species sets	panels: `figures/redraw/robustness.py`; first analysis: `notebooks/03_alpha_master.ipynb`
+fig:supp-main-integration	Supplementary Figure S5		Extended caption of fig:integration (text only)	
+fig:supp-integration-testis-umap	Supplementary Figure S6	supp_integration_umap_testis	UMAP by method, three-species testis	panels: `figures/redraw/integration_umap.py`; stored coordinates: `notebooks/08_chimera_umap.ipynb`
+fig:supp-integration-liver-umap	Supplementary Figure S7	supp_integration_umap_liver	UMAP by method, liver Human+Monkey	panels: `figures/redraw/integration_umap.py`; stored coordinates: `notebooks/08_chimera_umap.ipynb`
+fig:supp-integration-purity	Supplementary Figure S8	supp_integration_ten_methods	Integration: mixing and conservation, ten-method panel	panels: `figures/redraw/integration_ten_methods.py`
+fig:supp-integration-raw	Supplementary Figure S9	supp_integration_raw_metrics	Raw integration metrics, ten-method panel	panels: `figures/redraw/integration_ten_methods.py`
+fig:supp-integration-ext	Supplementary Figure S10	supp_integration_eleven_cohorts	Integration benchmark on eleven cohorts	
 tab:benchmark-label-use	Supplementary Table S22		Use of cell-type labels by each integration method	text of the manuscript (no computed values)
 tab:integration-per-gene-gate	Supplementary Table S23		Integration scores of the per-gene gate, seven canonical cohorts	
 tab:integration-per-gene-gate-harmonised	Supplementary Table S24		Integration scores of the per-gene gate, all cohorts	
-fig:supp-main-dalpha-biology	Supplementary Figure S12		Extended description of Figure 4 (text only)	`notebooks/04_delta_alpha_biology.ipynb`
-fig:supp-sequence-axis	Supplementary Figure S13	supp_sequence_axis	Protein identity, dN/dS and Δα gene by gene	
-fig:supp-known-measures	Supplementary Figure S14	supp_known_measures	Δα and count evidence among known gene measures	
-fig:supp-relations-heatmap	Supplementary Figure S15	supp_relations_heatmap	Relations of Δα and count evidence to sequence, expression and direct baselines	
-fig:supp-relations-density	Supplementary Figure S16	supp_relations_density	The same relations gene by gene	
-fig:supp-worked-genes	Supplementary Figure S17	supp_worked_genes	Two worked genes in the counts	
-fig:supp-dalpha-broad-categories	Supplementary Figure S18	supp_categories_broad	Δα by broad gene category, liver and testis	`notebooks/04_delta_alpha_biology_simpler.ipynb`
-fig:supp-dalpha-liver-detailed	Supplementary Figure S19	supp_categories_liver	Δα by gene category, four-species liver, all 38 categories	`notebooks/04_delta_alpha_biology.ipynb`
-fig:supp-dalpha-testis-detailed	Supplementary Figure S20	supp_categories_testis	Δα by gene category, testis Human+Macaque	`notebooks/04_delta_alpha_biology.ipynb`
-fig:supp-dalpha-hallmark	Supplementary Figure S21	supp_hallmark	Hallmark pathway enrichment of Δα	`notebooks/06_pathway_analysis.ipynb`
+fig:supp-main-dalpha-biology	Supplementary Figure S11		Extended caption of fig:dalpha-biology (text only)	`notebooks/04_delta_alpha_biology.ipynb`
+fig:supp-dalpha-sources	Supplementary Figure S12	supp_delta_alpha_sources	Cell-type sources of the count evidence, margin support, sequence measures and tissue comparison	panels a, b, d: `analysis/tasks/T8_4_figures/fig4_additions.py`; panel c: `analysis/tasks/T8_4_figures/fig7_validation.py`; inputs: `results/analysis/T2_5/`, `results/analysis/T2_3/tissue_comparison.csv`, `results/analysis/H1/`, `results/analysis/X5/` (bundle `analysis_results`), `final_state.npz` of the first kept run of the cohorts beyond liver and testis (bundle `models_seeds_controls_cohorts`)
+fig:supp-main-axis-tissues	Supplementary Figure S13		Extended caption of fig:axis-tissues (text only)	
+fig:supp-sequence-axis	Supplementary Figure S14	supp_sequence_axis	Protein identity, dN/dS and Δα gene by gene	
+fig:supp-known-measures	Supplementary Figure S15	supp_known_measures	Δα and count evidence among known gene measures	
+fig:supp-relations-heatmap	Supplementary Figure S16	supp_relations_heatmap	Relations of Δα and count evidence to sequence, expression and direct baselines	
+fig:supp-relations-density	Supplementary Figure S17	supp_relations_density	The same relations gene by gene	
+fig:supp-dalpha-broad-categories	Supplementary Figure S18	supp_categories_broad	Δα by broad gene category, liver and testis	panels: `figures/redraw/categories_broad.py`; first analysis: `notebooks/04_delta_alpha_biology_simpler.ipynb`
+fig:supp-dalpha-liver-detailed	Supplementary Figure S19	supp_categories_liver	Δα by gene category, four-species liver, all 38 categories	panels: `figures/redraw/categories.py`; first analysis: `notebooks/04_delta_alpha_biology.ipynb`
+fig:supp-dalpha-testis-detailed	Supplementary Figure S20	supp_categories_testis	Δα by gene category, testis Human+Macaque	panels: `figures/redraw/categories.py`; first analysis: `notebooks/04_delta_alpha_biology.ipynb`
+fig:supp-dalpha-hallmark	Supplementary Figure S21	supp_hallmark	Hallmark pathway enrichment of Δα	panels: `analysis/tasks/F1_figures/notebook_panels.py`; enrichment tables: `notebooks/06_pathway_analysis.ipynb`
 fig:supp-celltype-closure	Supplementary Figure S22	supp_celltype_closure	Closure of the cell-type decomposition of the count evidence	
 fig:supp-celltype-seeds	Supplementary Figure S23	supp_celltype_seeds	Seed stability of cell-type contributions to the count evidence	
 fig:supp-functional-layer	Supplementary Figure S24	supp_functional_layer	Pathway and network coherence and conservation	
-fig:supp-covariate-audit	Supplementary Figure S25	supp_covariate_audit	Covariate audit of Δα in seven cohorts	
-fig:supp-seed-reliability	Supplementary Figure S26	supp_seed_reliability	Agreement between training seeds	
-fig:supp-gate-gap	Supplementary Figure S27	supp_gate_gap	Where the two readouts agree and differ	
-fig:supp-gate-gap-cont	Supplementary Figure S28	supp_gate_gap_classes	The difference between the readouts by tissue, gene class and independent reference	
-fig:supp-gate-gap-named	Supplementary Figure S29	supp_gate_gap_named	Named genes where the two readouts differ	
-fig:supp-e6	Supplementary Figure S30	supp_published_differences	Published species differences on the count evidence	
-fig:supp-b1	Supplementary Figure S31	supp_ground_truth	Ground-truth benchmark: level alterations and protein identity	
-fig:supp-b2-overview	Supplementary Figure S32	supp_benchmark_overview	Gene-level benchmark: overview	
-fig:supp-b2-tasks	Supplementary Figure S33	supp_benchmark_tasks	Gene-level benchmark: every task	
-fig:supp-h1-recurrence-all	Supplementary Figure S34	supp_tissues_recurrence	All gene sets that recur across tissues	
-fig:supp-e1	Supplementary Figure S35	supp_programs_recurrent	Gene programs that recur across eight tissues	
-fig:supp-e1-cont	Supplementary Figure S36	supp_programs_by_tissue	Tissue programs in each tissue	
-fig:supp-e1-genes	Supplementary Figure S37	supp_programs_named_genes	Named genes that recur across tissues	
-fig:supp-h1-bone-marrow	Supplementary Figure S38	supp_tissue_bone_marrow	The reading in bone marrow	
-fig:supp-h1-kidney	Supplementary Figure S39	supp_tissue_kidney	The reading in kidney	
-fig:supp-h1-islet	Supplementary Figure S40	supp_tissue_islet	The reading in pancreatic islet	
-fig:supp-h1-eye	Supplementary Figure S41	supp_tissue_eye	The reading in the eye	
-fig:supp-h1-cortex	Supplementary Figure S42	supp_tissue_cortex	The reading in cerebral cortex	
-fig:supp-h1-lung	Supplementary Figure S43	supp_tissue_lung	The reading in lung	
-fig:supp-h1-muscle	Supplementary Figure S44	supp_tissue_muscle	The reading in skeletal muscle	
-fig:supp-h1-tumour	Supplementary Figure S45	supp_tissue_tumor_myeloid	The reading in lung-tumor myeloid cells	
-fig:supp-h1-lineage	Supplementary Figure S46	supp_tissues_lineage	Lineage marker sets across tissues	
-fig:supp-bone-marrow	Supplementary Figure S47	supp_bone_marrow_reference	Bone marrow against sorted-lineage conservation of expression	
-fig:supp-e3-compartments	Supplementary Figure S48	supp_cell_compartments	Home compartments of genes against Δα	
-fig:supp-e3-lineages	Supplementary Figure S49	supp_cell_lineages	Cell types that carry shared deployment	
-fig:supp-e3-primates	Supplementary Figure S50	supp_primate_branches	Species-specific departures along the primate phylogeny	
-fig:supp-e2	Supplementary Figure S51	supp_protein_architecture	Protein architecture and gene history against Δα	
-fig:supp-e5	Supplementary Figure S52	supp_regulatory_architecture	Regulatory and gene-architecture features against Δα	
-fig:supp-e4	Supplementary Figure S53	supp_disease_genes	Disease genes and drug targets by organ system	
-fig:supp-e4-targets	Supplementary Figure S54	supp_drug_targets	Approved drug targets against the protein prior	
-fig:supp-main-gin-esm2	Supplementary Figure S55		Extended description of Figure 8a-c (text only)	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-gin-esm2-linear-baseline	Supplementary Figure S56	supp_gin_linear_baseline	Linear surrogate and scalar-correlation controls of the gate correction	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-gin-esm2-attribution-suite	Supplementary Figure S57	supp_gin_attribution_suite	Attribution of the gate correction to input groups, all methods	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-gin-esm2-method-consensus	Supplementary Figure S58	supp_gin_method_consensus	Consensus of the attribution methods	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-gin-esm2-orthogonality	Supplementary Figure S59	supp_gin_orthogonality	ESM-2 and expression inputs: orthogonality and ablation	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-gin-esm2-per-pc	Supplementary Figure S60	supp_gin_per_pc	Contribution of single ESM-2 principal components	`notebooks/09_gin_attention_overall.ipynb`
-fig:supp-main-esm2-umap	Supplementary Figure S61		Extended description of Figure 8d-n (text only)	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-fig:supp-esm2-umap-spatial-autocorr	Supplementary Figure S62	supp_atlas_spatial_autocorrelation	Neighborhood coherence of α and Δα on the ESM-2 graph	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-fig:supp-esm2-umap-archetype-trajectory	Supplementary Figure S63	supp_atlas_archetype_trajectory	Δα of the archetypes during training	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-fig:supp-esm2-umap-archetype-enrichment	Supplementary Figure S64	supp_atlas_archetype_enrichment	Gene categories enriched in the archetypes	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
-tab:residue-specificity	Supplementary Table S25		Specificity of the residue-level contrasts	
-fig:supp-main-gin-protein	Supplementary Figure S65	supp_residue_audit	Residue-level attribution audit	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`; `notebooks/08_ortholog_qc.ipynb`
-fig:supp-gin-protein-residue-beta	Supplementary Figure S66	supp_residue_mixed_effects	Residue-level mixed-effects regression	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
-fig:supp-gin-protein-cliffs-delta	Supplementary Figure S67	supp_residue_cliffs_delta	Protein-replicated effect sizes of residue features	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
-fig:supp-gin-protein-attention-by-feature	Supplementary Figure S68	supp_residue_attention_by_feature	Per-residue attribution by structural feature	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
-fig:supp-gin-protein-etv1	Supplementary Figure S69	supp_residue_card_etv1	Per-gene card: ETV1	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
-fig:supp-gin-protein-hprt1	Supplementary Figure S70	supp_residue_card_hprt1	Per-gene card: HPRT1	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
-fig:supp-gin-protein-runx1	Supplementary Figure S71	supp_residue_card_runx1	Per-gene card: RUNX1	`notebooks/10_gin_attribution_protein_structure.ipynb`; `notebooks/10b_gin_attribution_figures.ipynb`
+fig:supp-worked-genes	Supplementary Figure S25		Extended caption of fig:validation, with the two worked genes (text only; the float also carries fig:supp-main-validation)	
+tab:validation	Supplementary Table S25		Pre-specified validation of Δα against independent data	
+fig:supp-validation-tests	Supplementary Figure S26	supp_validation_tests	Pre-specified tests against independent data and comparison with direct baselines	panels: `analysis/tasks/T8_4_figures/fig7_validation.py`; inputs: `results/analysis/T4_3/`, `results/analysis/X6/` (bundle `analysis_results`), `results/analysis/T5_6/` (bundle `tool_runs_saturn_camex`)
+fig:supp-gates	Supplementary Figure S27	supp_gates_readouts	The tests and two named findings under the protein-feature gate and the per-gene gate	panels: `analysis/tasks/F2_per_gene/panels.py`; inputs: `results/analysis/Z3/` (`compare_hyp.csv`, `compare_pairs.csv`, `compare_reversal.csv`, `compare_y3.csv`, `compare_x5.csv`), `results/analysis/F2/` (bundle `analysis_results`)
+fig:supp-covariate-audit	Supplementary Figure S28	supp_covariate_audit	Covariate audit of Δα in seven cohorts	
+fig:supp-seed-reliability	Supplementary Figure S29	supp_seed_reliability	Agreement between training seeds	
+fig:supp-gate-gap	Supplementary Figure S30	supp_gate_gap	Where the two readouts agree and differ	
+fig:supp-gate-gap-cont	Supplementary Figure S31	supp_gate_gap_classes	The difference between the readouts by tissue, gene class and independent reference	
+fig:supp-gate-gap-named	Supplementary Figure S32	supp_gate_gap_named	Named genes where the two readouts differ	
+fig:supp-e6	Supplementary Figure S33	supp_published_differences	Published species differences on the count evidence	
+fig:supp-b1	Supplementary Figure S34	supp_ground_truth	Ground-truth benchmark: level alterations and protein identity	
+fig:supp-b2-overview	Supplementary Figure S35	supp_benchmark_overview	Gene-level benchmark: overview	
+fig:supp-b2-tasks	Supplementary Figure S36	supp_benchmark_tasks	Gene-level benchmark: every task	
+fig:supp-main-one-reading	Supplementary Figure S37		Extended caption of fig:one-reading (text only)	
+fig:supp-h1-recurrence-all	Supplementary Figure S38	supp_tissues_recurrence	All gene sets that recur across tissues	
+fig:supp-e1	Supplementary Figure S39	supp_programs_recurrent	Gene programs that recur across eight tissues	
+fig:supp-e1-cont	Supplementary Figure S40	supp_programs_by_tissue	Tissue programs in each tissue	
+fig:supp-e1-genes	Supplementary Figure S41	supp_programs_named_genes	Named genes that recur across tissues	
+fig:supp-gene-by-tissue	Supplementary Figure S42	supp_gene_by_tissue	Gene and tissue components of the readouts	panels: `analysis/tasks/Y1_gene_tissue/figure.py`; inputs: `results/analysis/Y1/` (`variance_split.csv`, `contrast_rho.csv`, `contrast_delta.csv` and the tables beside them; bundle `analysis_results`)
+fig:supp-tissue-genes	Supplementary Figure S43	supp_tissues_named_genes	Δα against protein identity and dN/dS, and named genes, in eight tissues	panels: `analysis/tasks/H1_harmonise/figures.py` (`main_axis`, `main_genes`); inputs: `results/analysis/H1/genes/<cohort>.parquet`, `results/analysis/H1/axis.csv` (bundle `analysis_results`)
+fig:supp-h1-bone-marrow	Supplementary Figure S44	supp_tissue_bone_marrow	The reading in bone marrow	
+fig:supp-h1-kidney	Supplementary Figure S45	supp_tissue_kidney	The reading in kidney	
+fig:supp-h1-islet	Supplementary Figure S46	supp_tissue_islet	The reading in pancreatic islet	
+fig:supp-h1-eye	Supplementary Figure S47	supp_tissue_eye	The reading in the eye	
+fig:supp-h1-cortex	Supplementary Figure S48	supp_tissue_cortex	The reading in cerebral cortex	
+fig:supp-h1-lung	Supplementary Figure S49	supp_tissue_lung	The reading in lung	
+fig:supp-h1-muscle	Supplementary Figure S50	supp_tissue_muscle	The reading in skeletal muscle	
+fig:supp-h1-tumour	Supplementary Figure S51	supp_tissue_tumor_myeloid	The reading in lung-tumor myeloid cells	
+fig:supp-h1-lineage	Supplementary Figure S52	supp_tissues_lineage	Lineage marker sets across tissues	
+fig:supp-bone-marrow	Supplementary Figure S53	supp_bone_marrow_reference	Bone marrow against sorted-lineage conservation of expression	
+fig:supp-e3-compartments	Supplementary Figure S54	supp_cell_compartments	Home compartments of genes against Δα	
+fig:supp-e3-lineages	Supplementary Figure S55	supp_cell_lineages	Cell types that carry shared deployment	
+fig:supp-e3-primates	Supplementary Figure S56	supp_primate_branches	Species-specific departures along the primate phylogeny	
+fig:supp-e2	Supplementary Figure S57	supp_protein_architecture	Protein architecture and gene history against Δα	
+fig:supp-e5	Supplementary Figure S58	supp_regulatory_architecture	Regulatory and gene-architecture features against Δα	
+fig:disease	Supplementary Figure S59	supp_disease_transfer	Transfer of disease programs between human and mouse	panels: `analysis/tasks/T7_10_fig8/fig8_disease.py`; inputs: `results/analysis/P13/`, `results/analysis/T7_3/`, `results/analysis/T7_9/`, `results/analysis/T7_10/` (bundle `analysis_results`)
+fig:supp-e4-targets	Supplementary Figure S60		Extended caption of fig:drug-targets (text only)	
+fig:supp-e4	Supplementary Figure S61	supp_disease_genes	Disease genes and drug targets by organ system	
+fig:supp-main-gin-esm2	Supplementary Figure S62	supp_gin_inputs_controls	Inputs of the gate network and control trainings	panel a: `figures/redraw/main_figures.py` (`attribution_shares`, values stored by `notebooks/09_gin_attention_overall.ipynb`); panel b: `figures/redraw/gate_network.py` (`inputs_contributions`; it evaluates the stored gate network of the four-species liver run, bundle `models_canonical`); panel c: `analysis/tasks/T8_4_figures/fig5_controls.py`; inputs: `results/analysis/T3_4/`, `results/analysis/T3_5/`, `results/analysis/T3_6/` (bundle `analysis_results`)
+fig:supp-gin-esm2-linear-baseline	Supplementary Figure S63	supp_gin_linear_baseline	Linear surrogate and scalar-correlation controls of the gate correction	panels: `figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+fig:supp-gin-esm2-attribution-suite	Supplementary Figure S64	supp_gin_attribution_suite	Attribution of the gate correction to input groups, all methods	panels: `figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+fig:supp-gin-esm2-method-consensus	Supplementary Figure S65	supp_gin_method_consensus	Consensus of the attribution methods	panels: `figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+fig:supp-gin-esm2-orthogonality	Supplementary Figure S66	supp_gin_orthogonality	ESM-2 and expression inputs: orthogonality and ablation	panels: `figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+fig:supp-gin-esm2-per-pc	Supplementary Figure S67	supp_gin_per_pc	Contribution of single ESM-2 principal components	panels: `figures/redraw/gate_network.py`; first analysis: `notebooks/09_gin_attention_overall.ipynb`
+fig:supp-main-esm2-umap	Supplementary Figure S68		Extended caption of fig:gin-esm2, protein-space atlas (text only)	`notebooks/05_esm_alpha_geometry.ipynb`; `notebooks/11_gene_archetypes.ipynb`
+fig:supp-archetypes	Supplementary Figure S69	supp_atlas_archetypes	Gene archetypes of the gate network	panels a, c to f: `figures/redraw/main_figures.py` (`archetype_number`, `archetype_delta_alpha`, `archetype_protein_map`, `archetype_neighbors`, `archetype_prediction`); panel b: stored by `notebooks/11_gene_archetypes.ipynb` (needs the trained gate network); inputs: `tables/gene_archetypes.csv` and `cache/esm2_umap.npy` of the four-species liver run (bundle `models_canonical`)
+fig:supp-esm2-umap-spatial-autocorr	Supplementary Figure S70	supp_atlas_spatial_autocorrelation	Neighborhood coherence of α and Δα on the ESM-2 graph	panels: `figures/redraw/atlas.py`; first analysis: `notebooks/05_esm_alpha_geometry.ipynb`
+fig:supp-esm2-umap-archetype-trajectory	Supplementary Figure S71	supp_atlas_archetype_trajectory	Δα of the archetypes during training	panels: `figures/redraw/atlas.py`; archetype table: `notebooks/11_gene_archetypes.ipynb`
+fig:supp-esm2-umap-archetype-enrichment	Supplementary Figure S72	supp_atlas_archetype_enrichment	Gene categories enriched in the archetypes	panels: `figures/redraw/atlas.py`; archetype table: `notebooks/11_gene_archetypes.ipynb`
+tab:residue-specificity	Supplementary Table S26		Specificity of the residue-level contrasts	
+fig:supp-main-gin-protein	Supplementary Figure S73	supp_residue_audit	Residue-level attribution audit	panels: `figures/redraw/residue_audit.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`
+fig:supp-gin-protein-residue-beta	Supplementary Figure S74	supp_residue_mixed_effects	Residue-level mixed-effects regression	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`
+fig:supp-gin-protein-cliffs-delta	Supplementary Figure S75	supp_residue_cliffs_delta	Protein-replicated effect sizes of residue features	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`
+fig:supp-gin-protein-attention-by-feature	Supplementary Figure S76	supp_residue_attention_by_feature	Per-residue attribution by structural feature	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`
+fig:supp-gin-protein-etv1	Supplementary Figure S77	supp_residue_card_etv1	Per-gene card: ETV1	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`
+fig:supp-gin-protein-hprt1	Supplementary Figure S78	supp_residue_card_hprt1	Per-gene card: HPRT1	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`
+fig:supp-gin-protein-runx1	Supplementary Figure S79	supp_residue_card_runx1	Per-gene card: RUNX1	panels: `figures/redraw/residue.py`; residue tables: `notebooks/10_gin_attribution_protein_structure.ipynb`; sequences: `notebooks/09_protein_structure_visualization.ipynb`

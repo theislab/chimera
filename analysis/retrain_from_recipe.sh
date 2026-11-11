@@ -11,6 +11,7 @@
 # PRINT_ONLY=1 to print the command without running it. CONFIG=M trains the per-gene (free) gate
 # with the same recipe (the canonical runs use CONFIG=A, the default).
 set -euo pipefail
+case "${1:-}" in -h|--help) sed -n '2,/^set -euo/{/^set -euo/d;s/^# \{0,1\}//;p}' "${BASH_SOURCE[0]}"; exit 0 ;; esac
 
 cohort="${1:?cohort}"; seed="${2:?seed}"
 run="${3:-retrain-$cohort-s$seed}"; acc="${4:-cpu}"

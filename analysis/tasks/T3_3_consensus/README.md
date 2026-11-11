@@ -8,7 +8,7 @@ Applies the seed-pooling rule and builds the seed-consensus per-gene tables of t
 | Question | Reliability and controls: How stable are the readouts across seeds, and what do they read from counts and from features? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.4 (`sec:reliability`); Supplementary Figure S26 (`fig:supp-seed-reliability`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.2 (`sssec:rev-seeds`) |
+| Used in the paper | Section 3.4 (`sec:reliability`); Supplementary Figure S29 (`fig:supp-seed-reliability`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.2 (`sssec:rev-seeds`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

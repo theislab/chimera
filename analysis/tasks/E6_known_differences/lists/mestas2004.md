@@ -3,7 +3,7 @@
 **Citation.** Mestas J, Hughes CCW. Of mice and not men: differences between mouse and human immunology. *J Immunol* 172(5), 2731–2738 (2004). DOI 10.4049/jimmunol.172.5.2731; PMID 14978070 (no PMC copy).
 **DOI verified.** `curl -sIL https://doi.org/10.4049/jimmunol.172.5.2731` gave 302 to academic.oup.com/jimmunol/article/172/5/2731/8060352 (2026-11-03). That page answers 403 to curl because of a bot wall.
 
-**File.** `data/analysis/E6/mestas2004/table1_transcribed_webfetch.tsv` is a transcription of Table I, "Summary of some known immunological differences between mouse and human". It has 67 rows with columns feature / mouse / human / refs, and was obtained with WebFetch of the OUP article page on 2026-11-03.
+**File.** `data/analysis/E6/mestas2004/table1_transcribed_webfetch.tsv` is a transcription of Table I, "Summary of some known immunological differences between mouse and human". It has 67 rows with columns feature / mouse / human / refs, and was transcribed from the OUP article page, fetched on 2026-11-03.
 - Direct download was blocked, so this is a transcription and not an original file.
 - MANIFEST.tsv records the source URL and the hash of the transcription.
 - The italic markup on c-kit and flt-3 was removed.

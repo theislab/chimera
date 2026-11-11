@@ -3,7 +3,7 @@
 Fixed before any integration value of the per-gene gate was computed by this task.
 
 Metrics, code and keys are the paper's, imported unmodified:
-  * Fig 3 / T5_5_benchmark: ``compute_integration_metrics`` (training/compare_vs_scvi.py), k 15, seed 42, ``species`` and ``cell_type`` of the seven
+  * integration benchmark (``fig:integration``, T5_5_benchmark): ``compute_integration_metrics`` (training/compare_vs_scvi.py), k 15, seed 42, ``species`` and ``cell_type`` of the seven
     T5_5_benchmark objects; direction correction, min-max and 0.4/0.6 composite from ``T5_5_benchmark/score_external.score_table``. A seed of either
     gate is placed on the frozen 10-model panel's per-cohort bounds (``master_table_ext.csv``), so no other method's value moves; the
     replace-the-Chimera-column composite is a sensitivity.
@@ -29,12 +29,12 @@ RES = REPO / "results" / "analysis"
 OUT = RES / "I1"
 RUNS = REPO / "training" / "runs"
 Z3_COHORTS = ["liv_hmouse", "test_hmouse", "liv_4sp"]
-# cohort -> T5_5_benchmark dataset key (Fig 3 rows)
+# cohort -> T5_5_benchmark dataset key (rows of the integration benchmark, fig:integration)
 FIG3 = {"liv_hmonkey": "panc_hmonkey", "liv_hmouse": "panc_hmouse", "liv_hzeb": "panc_hzeb", "liv_4sp": "panc_4sp",
         "test_hmac": "test_hmac", "test_hmouse": "test_hmouse", "test_3sp": "test_3sp"}
 FIG3_METRICS = ["knn_species_purity", "knn_mixing_entropy", "sil_species", "knn_celltype_purity", "sil_celltype", "label_transfer_acc"]
 # Primary metrics, in the verdict. Higher is better for all of them.
-PRIMARY_FIG3 = ["mixing", "biology", "total_score"]          # Fig 3 rows, frozen-panel bounds
+PRIMARY_FIG3 = ["mixing", "biology", "total_score"]          # rows of the integration benchmark, frozen-panel bounds
 PRIMARY_H1 = ["knn_mixing_entropy", "label_transfer_acc"]   # every cohort, H1_harmonise key
 PRIMARY_Z2 = ["within_auroc"]                                # Z2_embedding cohorts: mean in-model AUROC (logistic) over the cohort's within-label tasks
 LOWER_BETTER = {"knn_species_purity", "sil_species", "lib_r2", "pc1_share"}

@@ -120,7 +120,7 @@ def unit(c: str, run: str, stages=STAGES) -> None:
 
 
 def check() -> dict:
-    """Canonical runs only: Fig 3 Chimera s42 rows, H1_harmonise integration cache, Z2_embedding measure and encoded tables must be reproduced."""
+    """Canonical runs only: the Chimera s42 rows of the integration benchmark (fig:integration), H1_harmonise integration cache, Z2_embedding measure and encoded tables must be reproduced."""
     out = {}
     from analysis.tasks.Z2_embedding import rules as Z2R
     cache = SE.REPO / "notebooks" / "cache" / "baselines_master"

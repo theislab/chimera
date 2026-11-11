@@ -8,7 +8,7 @@ Protein architecture and gene history: Pfam domains, protein families, complexes
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Figure 6k (`fig:one-reading`); Supplementary Section D.9 (`ssec:er-e2`); Supplementary Figure S51 (`fig:supp-e2`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section D.10 (`ssec:er-e2`); Supplementary Figure S57 (`fig:supp-e2`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

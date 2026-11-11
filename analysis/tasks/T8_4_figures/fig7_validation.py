@@ -1,16 +1,25 @@
-"""Fig 7 (new main figure): independent validation and benchmark.
+"""Panels of the supplementary figure on the pre-specified tests (fig:supp-validation-tests).
 
-Panels, one PDF each (``figures/revision/fig7{a..e}_*.pdf``):
+Panels, one PDF each (``figures/panels/main_validation/{prespecified_tests,gene_sets,head_to_head,incremental}.pdf``
+and ``figures/panels/main_delta_alpha_liver/sequence_axis.pdf``):
   a  forest of H1-H4: rho_p of Delta-alpha (D) with 95% block-bootstrap CI, primary cohort and the
-     multi-species cohort used in Figs 4-6, status letter (T4.3 ``scoreboard.csv``, ``row.json``).
-  b  set discrimination, the 9 pre-specified H5/H6 tests (T4.3 ``sets.csv``, family F2).
+     canonical multi-species cohort (family ``F3_figs4_6``), status letter (``scoreboard.csv``, ``row.json``
+     of T4_3_scoreboard).
+  b  set discrimination, the 9 pre-specified H5/H6 tests (``sets.csv`` of T4_3_scoreboard, family F2).
   c  head-to-head: Delta = rho_p(D) - rho_p(baseline) for B1b, B1c, B2b, B3a, B1z on each gold
-     (T4.3 ``head_to_head.csv``); gene-level tool scalars of SATURN and CAMEX against the
-     three-seed D (T5.6). Testis tool rows are drawn as a marked placeholder until T5.6 writes them.
+     (``head_to_head.csv`` of T4_3_scoreboard); gene-level tool scalars of SATURN and CAMEX against the
+     three-seed D (T5_6_gene_level). Testis tool rows are drawn as a marked placeholder until
+     T5_6_gene_level writes them.
   d  incremental information: each score given covariates and all other simple baselines
-     (X6 ``incremental_rho.csv``, exploratory).
-  e  sequence axis: rank correlations of protein identity, dN/dS, alpha and Delta-alpha in every cohort
-     (H1 ``axis.csv``; later cohorts join when H1 adds them; equal to X5 ``sequence_axis_rho.csv`` where both exist).
+     (``incremental_rho.csv`` of X6_adds_beyond, exploratory).
+  e  sequence axis (drawn in fig:dalpha-biology): rank correlations of protein identity, dN/dS, alpha and
+     Delta-alpha in every cohort (``axis.csv`` of H1_harmonise; later cohorts join when H1_harmonise adds
+     them; equal to ``sequence_axis_rho.csv`` of X5_sequence_axis where both exist).
+
+Inputs: ``results/analysis/T4_3/`` (``scoreboard.csv``, ``row.json``, ``sets.csv``, ``head_to_head.csv``),
+``results/analysis/T5_6/scoreboard/head_to_head.csv``, ``results/analysis/X6/incremental_rho.csv``,
+``results/analysis/H1/axis.csv``, ``results/analysis/X5/sequence_axis_rho.csv`` (bundles ``analysis_results`` and,
+for T5_6, ``tool_runs_saturn_camex``).
 """
 
 from __future__ import annotations
@@ -90,7 +99,7 @@ def panel_forest() -> plt.Figure:
 
 
 def _tool_rows() -> tuple[pd.DataFrame, bool]:
-    """Tool head-to-head rows; final T5.6 output if present, else the liver-first run."""
+    """Tool head-to-head rows; final output of T5_6_gene_level if present, else the liver-first run."""
     final = cm.RES / "T5_6" / "scoreboard" / "head_to_head.csv"
     src = final if final.exists() else cm.RES / "T5_6" / "liver_first" / "scoreboard" / "head_to_head.csv"
     t = pd.read_csv(src)
@@ -237,13 +246,14 @@ SEQ_TISSUE = {"liver": ("o", "#0072B2"), "testis": ("^", "#D55E00"), "bone marro
 def panel_sequence_axis() -> plt.Figure:
     ax_t = pd.read_csv(cm.RES / "H1" / "axis.csv")
     x5 = pd.read_csv(cm.RES / "X5" / "sequence_axis_rho.csv").set_index(["cohort", "panel"])
-    ax_t = ax_t[ax_t.tissue.isin(SEQ_TISSUE)]  # H1 also lists the C1 cohorts; Fig 4g keeps the 16 until its layout is extended
+    # H1_harmonise also lists the cohorts of C1_cohorts; this panel keeps the 16 until its layout is extended
+    ax_t = ax_t[ax_t.tissue.isin(SEQ_TISSUE)]
     A, E = ax_t[ax_t.universe == "all"].set_index("cohort"), ax_t[ax_t.universe == "count_support"].set_index("cohort")
-    for (coh, panel), r in x5.iterrows():  # the same statistic as X5 on the cohorts both have
+    for (coh, panel), r in x5.iterrows():  # the same statistic as X5_sequence_axis on the cohorts both have
         col = dict((k, c) for k, c, _ in SEQ_ROWS)[panel]
         assert abs(A.loc[coh, col] - r.rho) < 1e-6, (coh, panel, A.loc[coh, col], r.rho)
         assert abs(E.loc[coh, col] - r.rho_count_evidence) < 1e-6, (coh, panel)
-    # Exact size and axes, shared with the margin-support panel above it in Fig 4 (F1).
+    # Exact size and axes, shared with the margin-support panel above it in fig:dalpha-biology (F1).
     fig = plt.figure(figsize=(3.4, 1.85))
     ax = fig.add_axes([1.06 / 3.4, 0.62 / 1.85, 2.3 / 3.4, 1.21 / 1.85])
     cohorts = list(A.index)

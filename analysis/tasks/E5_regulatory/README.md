@@ -8,7 +8,7 @@ Regulatory input and gene architecture: enhancer number, promoter class, regulon
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Figure 6l (`fig:one-reading`); Supplementary Section D.10 (`ssec:er-e5`); Supplementary Figure S52 (`fig:supp-e5`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section D.11 (`ssec:er-e5`); Supplementary Figure S58 (`fig:supp-e5`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

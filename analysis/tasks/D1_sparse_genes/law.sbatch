@@ -3,7 +3,6 @@
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --time=08:00:00
-#SBATCH --exclude=cpusrv114
 # Arm L: as array.sbatch with the anchor scaled by the object's depth.
 source analysis/slurm/_body.sh
 command -v mamba >/dev/null || { echo "no mamba on $(hostname)"; exit 3; }

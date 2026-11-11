@@ -8,7 +8,7 @@ Compares Δα between liver and testis for the matched species pairs, with genes
 | Question | Δα as an axis of its own: Is deployment relative to the protein prior separate from protein sequence? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.2 (`sec:axis`); Figure 4f (`fig:dalpha-biology`); Supplementary Section C.21.3 (`sssec:rev-identity`); Supplementary Section D.2 (`ssec:er-axis`) |
+| Used in the paper | Section 3.2 (`sec:axis`); Supplementary Figure S12d (`fig:supp-dalpha-sources`); Supplementary Section C.21.3 (`sssec:rev-identity`); Supplementary Section D.2 (`ssec:er-axis`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
@@ -18,3 +18,5 @@ Compares Δα between liver and testis for the matched species pairs, with genes
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
 
 - `results/analysis/T2_3/`: bundle `analysis_results`
+
+**Notes.** The comparison against the clamped prior is computed for the record and not shown in the paper; the paper shows the comparison against the raw prior, centered, with genes matched on the human Ensembl gene ID.

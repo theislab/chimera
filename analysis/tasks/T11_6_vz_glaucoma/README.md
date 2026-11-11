@@ -8,7 +8,7 @@ Eye cohort: where glaucoma genes sit on Δα and the count evidence, and the per
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Supplementary Section C.21.14 (`sssec:rev-disease`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section C.21.13 (`sssec:rev-disease`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

@@ -12,7 +12,7 @@ Tries four further uses of existing fits: checking genome annotation, choosing a
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/Y6_uses/fetch.sh
+    bash analysis/tasks/Y6_uses/fetch.sh ensembl (then: small, big)
     python -I analysis/tasks/Y6_uses/annot_genome.py
     python -I analysis/tasks/Y6_uses/labels.py
     python -I analysis/tasks/Y6_uses/golds.py

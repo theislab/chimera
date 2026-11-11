@@ -1,10 +1,11 @@
-"""X8 step (e): named examples that pass every check.
+"""Step (e): named examples that pass every check.
 
 Per (gene, cohort) with a call: in the universe (count-supported in both gates), call also at q < 0.01, not saturated in either
 gate (alpha > 0.95 in any seed), per-gene-gate `nameable` (strict support, no zero or quiet species, no mapping flag, no reference
-artefact), O1 table-wide flags clean (flags_by_cohort: not T2_table, R2_table, T3, TZ; covers the zebrafish pairs that enter liver
-priors), every table pair of the gene at identity >= MIN_PAIR_IDENTITY. A gene is listed when it passes in >= 1 thread cohort; its
-calls in all 26 cohorts and its recurrence over the thread are reported beside, with its five nearest ESM-2 neighbours.
+artifact), table-wide flags of analysis/tasks/O1_orthologs clean (flags_by_cohort: not T2_table, R2_table, T3, TZ; covers the
+zebrafish pairs that enter liver priors), every table pair of the gene at identity >= MIN_PAIR_IDENTITY. A gene is listed when it
+passes in >= 1 thread cohort; its calls in all 26 cohorts and its recurrence over the thread are reported beside, with its five
+nearest ESM-2 neighbors.
 
     PYTHONPATH=$PWD python -m analysis.tasks.X8_gate_divergence.named
 Output: results/analysis/X8/named_checks.csv (every call with every check), named.csv (passing genes, one row per gene)
@@ -23,7 +24,7 @@ O1 = RU.RES / "O1" / "flags_by_cohort.parquet"
 
 
 def table_identity(c: str, reg: dict, var_names: pd.Index, hs: pd.Series) -> pd.Series:
-    """Minimum identity over the table's non-human pairs, per gene; checks the human ID against the X8 table."""
+    """Minimum identity over the table's non-human pairs, per gene; checks the human ID against the gene table of this task."""
     for key in (c, reg[c].get("table")):
         try:
             t = gene_ids.load_table(key)
@@ -58,7 +59,7 @@ def main() -> int:
             if col in f:
                 o1_bad |= f[col].fillna(False).astype(bool).to_numpy()
         o1_missing = f.cohort.isna().to_numpy()
-        if c not in set(fl.cohort):  # C1 cohorts (joined by Ensembl ID, no table-wide audit): O1's core flags on the gene table
+        if c not in set(fl.cohort):  # cohorts of C1_cohorts (joined by Ensembl ID, no table-wide audit): core flags of O1_orthologs on the gene table
             o1_bad = g.o1_T2_free.fillna(True).astype(bool).to_numpy() | g.o1_zero_any_free.fillna(True).astype(bool).to_numpy()
             o1_missing = np.zeros(len(g), bool)
         ident = table_identity(c, reg, g.index, g.hsapiens_gene_id)

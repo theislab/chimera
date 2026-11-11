@@ -24,7 +24,7 @@ The rules below are the paper's own; nothing was tuned.
    - **Rule.** Genes are ranked by score, descending, and the top **3,382** are kept. This is the paper's own count: "Twenty-three per cent of genes (3,382) were more highly divergent than 95% of 252 housekeeping genes".
    - **Why rank and not the housekeeping cut.** The 252-gene housekeeping list (ref. 49) is not in the supplement, so the cut is set by the published count. There is no tie at the cut-off (2.6653 vs 2.6646).
    - **Tiers.** `note` records the paper's other two cut-offs as tiers. top3pct means rank ≤ 437 (437 genes). top10pct means rank ≤ 1,455 (1,018 more genes). The other 1,927 genes are tagged top23pct.
-   - **Not per cell type.** The score summarises all 37 types, so the gene list has no cell-type resolution. `cell_type = all_37_homologous_types`. `note` also gives the human cluster with the highest FPKM.
+   - **Not per cell type.** The score summarizes all 37 types, so the gene list has no cell-type resolution. `cell_type = all_37_homologous_types`. `note` also gives the human cluster with the highest FPKM.
    - **Direction.** `divergent`, unsigned. A high score means the cell-type pattern shifted between species.
    - **Effect column.** `effect` = `homol_expr_score`, rank and `homol_cor`.
 2. **`conserved_control`** (175 rows, 152 unique genes, 31 cell types)

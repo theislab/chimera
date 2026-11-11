@@ -1,9 +1,10 @@
-"""E5 annotation table: one row per human gene, every E5 property. Run with `python -I` (reads downloaded files only).
+"""Annotation table: one row per human gene, every property of this task. Run with `python -I` (reads downloaded files only).
 
 Usage (from chimera/):  mamba run -n chimera_env python -I analysis/tasks/E5_regulatory/annotate.py
 Writes results/analysis/E5/: props.parquet, props_coverage.csv, regulons.parquet (DoRothEA A-C TF -> target gene),
 paralogs_any.parquet (Compara 110 human within-species paralog pairs), genes_pos.parquet (canonical TSS, strand, span).
-Reused: Y2 regulatory annotation (phyloP, CpG, TATA, ABC, UTR lengths, canonical TSS), E2 props, Y2 PubMed.
+Reused: the regulatory annotation of Y2_functional (phyloP, CpG, TATA, ABC, UTR lengths, canonical TSS) and its PubMed
+counts, the props of E2_protein.
 """
 from __future__ import annotations
 
@@ -132,7 +133,7 @@ def great_domains(P: pd.DataFrame) -> pd.Series:
         bs = np.where(plus, tss - up, tss - down)
         be = np.where(plus, tss + down, tss + up)
         n = len(d)
-        # extension: to the nearest basal domain of the neighbouring genes, at most 1 Mb from the TSS
+        # extension: to the nearest basal domain of the neighboring genes, at most 1 Mb from the TSS
         prev_be = np.r_[-np.inf, np.maximum.accumulate(be)[:-1]]
         next_bs = np.r_[np.minimum.accumulate(bs[::-1])[::-1][1:], np.inf]
         lo = np.minimum(bs, np.maximum(tss - RU.GREAT_MAX, prev_be))
@@ -181,7 +182,7 @@ def main():
     t["n_exons"] = np.log1p(t.index.map(pd.Series(exons)).astype(float))
     t["log_gene_span"] = np.log(t.index.map((G.end - G.start).astype(float)).astype(float))
 
-    # positions of protein-coding canonical TSSs (GREAT, density, bidirectional, neighbourhood)
+    # positions of protein-coding canonical TSSs (GREAT, density, bidirectional, neighborhood)
     pos = t[t.tss.notna() & t.chrom.isin(CHROMS)][["chrom", "strand", "tss", "biotype"]].copy()
     pos["tss"] = pos.tss.astype(np.int64)
     pos["gstart"] = pos.index.map(G.start)
@@ -293,7 +294,7 @@ def main():
     for k, ss in used.items():
         gs = {hg.get(x) for s in ss for x in sets[s]} - {None}
         t[k] = t.index.isin(gs).astype(float)
-    # PubMed (Y2) and E2 class columns
+    # PubMed (Y2_functional) and class columns of E2_protein
     ph = pd.read_parquet(REPO / "results/analysis/Y2/annot/pheno.parquet", columns=["log_pubmed_h"])
     t["log_pubmed_h"] = t.index.map(ph.log_pubmed_h)
     e2 = pd.read_parquet(REPO / "results/analysis/E2/props.parquet").set_index("hsapiens_gene_id")

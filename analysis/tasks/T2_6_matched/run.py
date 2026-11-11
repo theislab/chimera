@@ -2,13 +2,13 @@
 
 Sets, per cohort, with true gene identity (``gene_ids``):
 * every narrow category of ``notebooks/_gene_categories.py`` and every broad umbrella of
-  ``notebooks/_gene_categories_broad.py`` with >= 5 genes (Fig 4a, b; Fig 6d uses the same
+  ``notebooks/_gene_categories_broad.py`` with >= 5 genes (the category panels of fig:dalpha-biology; the category panel of fig:gin-esm2 uses the same
   vocabulary), ``other`` excluded;
-* the Fig 4c landmark themes (``notebooks/_alpha_biology_simpler_builder.py`` H_THEMES):
+* the landmark themes of the prior landscape panel of fig:dalpha-biology (``notebooks/_alpha_biology_simpler_builder.py`` H_THEMES):
   urea cycle / gluconeogenesis, mtDNA OXPHOS, liver supporting tissue, housekeeping controls;
 * the urea-cycle enzyme list and the mtDNA / nuclear OXPHOS categories of the
   reference table below (``REFERENCE``);
-* the Fig 6 GIN archetypes A0-A2 (canonical 4-sp run, ``tables/gene_archetypes.csv``), 4-sp only.
+* the archetypes A0-A2 of the gate network (canonical 4-sp run, ``tables/gene_archetypes.csv``), 4-sp only.
 
 For each set: mean delta-alpha raw (uncentered), centered on the cohort median, Cohen-style
 d = mean / SD of all genes (uncentered, centered on the cohort median as in the
@@ -48,7 +48,7 @@ RANDOM_SIZES = (10, 30, 100)
 N_RANDOM = 2000
 N_CALIB = 200
 
-# Fig 4c themes, verbatim from notebooks/_alpha_biology_simpler_builder.py (H_THEMES).
+# Landmark themes of the prior landscape panel (fig:dalpha-biology), verbatim from notebooks/_alpha_biology_simpler_builder.py (H_THEMES).
 FIG4C_THEMES = {
     "Urea cycle / GNG": ["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"],
     "mtDNA OXPHOS": ["MT-CO1", "MT-CO2", "MT-CO3", "MT-CYB", "MT-ND1", "MT-ND2", "MT-ND4", "MT-ATP6"],

@@ -1,5 +1,7 @@
 # Chimera Training — Iteration Workflow
 
+> Record of the tuning period (April 2026); it is not maintained. The recipes of the paper are in `configs/canonical_recipes.tsv`. "pancreas" means liver. Design notes named here (`refinement.md`) are not part of the repository.
+
 > **PROMOTION REMINDER.** On every promotion, update
 > [workflow-best.md](workflow-best.md) **atomically** with: (1) the
 > default config in `_constants.py`, (2) the notebook pointers, (3) the
@@ -13,7 +15,7 @@
 
 ## Current iteration
 
-**iter124 (2026-04-26, this invocation) — co-tuned adv classifier capacity + LOWER adv_weight on 4-sp. ROLLBACK.**
+**iter124 (2026-04-26) — co-tuned adv classifier capacity + LOWER adv_weight on 4-sp. ROLLBACK.**
 Tier-2 (loss-weight + capacity co-tune). Direct mechanistic test of iter123's
 ROLLBACK lesson: keep the (64,32) classifier but halve adv_weight 200→100,
 predicting the encoder gets headroom to find a real species-blind manifold
@@ -152,8 +154,8 @@ Rollback plan
       iter125 (η-r): --n-hidden 256 (encoder capacity bump, structurally
                      different — leaves the adv-side family entirely).
                      Verify --n-hidden flag is plumbed before running.
-      iter125b (θ): cycle-consistency Tier-3 (multi-day; explicit user OK).
-      iter125c (β): Refine 4-sp E8 expectations (requires user approval).
+      iter125b (θ): cycle-consistency Tier-3 (multi-day; needs an explicit decision).
+      iter125c (β): Refine 4-sp E8 expectations (requires a change of the expectation definitions).
 ```
 
 ### iter124 measured vs predicted (POST-RUN, ROLLBACK)
@@ -219,8 +221,8 @@ Both flags default-safe: omitting `--adv-classifier-hidden` reverts to (32,) leg
 
 - **iter125 (η-r) RECOMMENDED**: `--n-hidden 256` on iter101 recipe (encoder capacity 128→256, no other changes). Structurally different from adv-side family entirely. Hypothesis: encoder needs more capacity to encode 4-species shared celltype structure WITHOUT losing CT separation under the iter101 adv_weight=200 + lambda_mmd=100 regime. **Pre-flight**: verify `--n-hidden` flag is plumbed; if not, small code change.
 - iter125b (η-d): Encoder DEPTH bump (n_layers 1→2) on iter101 recipe.
-- iter126 (θ): Cycle-consistency Tier-3 (multi-day, explicit user authorization).
-- iter127 (β): Refine 4-sp E8 expectations (requires user approval to amend refinement.md).
+- iter126 (θ): Cycle-consistency Tier-3 (multi-day; needs an explicit decision).
+- iter127 (β): Refine 4-sp E8 expectations (requires a change of the expectation definitions).
 
 **Artifacts**: `runs/xds-4sp-iter124-advhid64-32-advw100-200ep-s42/{model, final_state.npz, summary.json, integration_vs_scvi.{md,json}, z_leakage_probe.json, gin_signed_diagnostics.json, plots/umap.png, lightning/metrics.csv, alpha_snapshots/}`.
 
@@ -250,7 +252,7 @@ between MMD/adv/z-side and FQR/α-side machinery.
    it (collapse CT structure) rather than learning a robust species-blind
    manifold. Future capacity bumps MUST co-tune `adv_weight` lower
    (e.g., (64,32) needs `adv_weight ≈ 80–120`, not 200). **iter124 (this
-   invocation) is the direct co-tune test at adv_weight=100.**
+   iteration) is the direct co-tune test at adv_weight=100.**
 2. **Post-hoc z-leakage is the right metric, in-training adv_acc is misleading.**
    Adopt `z_leakage_probe.py` as a co-primary diagnostic for any iteration
    touching adv/MMD machinery. iter101 4-sp baseline excess: linear=+0.575,
@@ -260,7 +262,7 @@ between MMD/adv/z-side and FQR/α-side machinery.
    adversary is over-strong on 4-sp; confirms iter121's same-direction finding.
    Any 4-sp attack on z-side machinery must include sil-ct as a HARD floor.
 
-**Audit-trail finding (iter123 invocation)**: Tier-0 audit overturned the
+**Audit-trail finding (iter123)**: Tier-0 audit overturned the
 prior workflow narrative: 4-sp Endothelial Δ_excess vs scVI = +0.128 is the
 binding worst-CT (NOT Hepatocytes +0.045 as workflow had been claiming).
 Per-source-species neighbor distribution shows close-3 species (H+Mo+Mouse)
@@ -276,7 +278,7 @@ post-hoc).
 
 ### iter123 audit context (preserved for reproducibility — collapsed from full body)
 
-Tier-0 audit findings from iter123 invocation, retained because they inform
+Tier-0 audit findings from iter123, retained because they inform
 iter124's predictions:
 
 1. **Mis-attributed bottleneck:** workflow had been calling Hepatocytes the worst-CT,
@@ -301,7 +303,7 @@ iter124's predictions:
    isolated under both Chimera 1.00 and scVI 0.92–1.00 — that part IS structural).
 3. **z-leakage probe gap.** `check_expectations.py` does NOT run a non-linear z
    probe; it relies on the in-training adversary's adv_acc. New script
-   `training/z_leakage_probe.py` (this invocation) runs LinearLR / kNN5 / MLP-32 /
+   `training/z_leakage_probe.py` (this iteration) runs LinearLR / kNN5 / MLP-32 /
    MLP-64-32 on `z_mean` post-hoc (n=8000 subsample, 3-fold CV); writes
    `runs/<name>/z_leakage_probe.json`. Cross-config baselines (excess over chance):
 
@@ -324,7 +326,7 @@ iter124's predictions:
    neighbor clustering is tolerated by E8 today). For iter123, the BASELINE to
    beat is +0.738; success means MLP-64-32 excess drops to ≤ +0.50 (matching the
    2-sp envelope).
-4. **Identifiability + baseline audit (closes the user's outstanding question).**
+4. **Identifiability + baseline audit (closes the outstanding question).**
    Pancreas: NO `sample_batch` column exists in the .h5ad files. `batch` IS the
    donor column (3 in H+Mo, 2 in H+Mouse / H+Zeb / 4-sp). 4-sp `batch` has 5
    values (Monkey has 2 within-species batches; others 1 each), so
@@ -350,7 +352,7 @@ through the GRL → encoder must purge more species info from z to fool it.
 This attacks the *capacity-undersized adversary* root cause directly. **Not in
 the MMD family** — anti-pattern rule passes.
 
-**Decision (iter123 invocation, 2026-04-26)**: ran iter123, ROLLBACK. Distilled body + lessons + measured-vs-predicted retained in "iter123 distilled lesson" near the top of this file. Artifacts at `runs/xds-4sp-iter123-advhid64-32-200ep-s42/`. iter101 retained as 4-sp best-known.
+**Decision (iter123, 2026-04-26)**: ran iter123, ROLLBACK. Distilled body + lessons + measured-vs-predicted retained in "iter123 distilled lesson" near the top of this file. Artifacts at `runs/xds-4sp-iter123-advhid64-32-200ep-s42/`. iter101 retained as 4-sp best-known.
 
 ### iter122 distilled lesson (ROLLBACK 2026-04-26)
 
@@ -527,7 +529,7 @@ Rollback plan
 
 **Decision**: ROLLBACK iter121. iter101 retained as 4-sp best-known. `--lambda-mmd-aux` flag preserved opt-in (default 0.0 = byte-identical). Artifacts at `runs/xds-4sp-iter121-dualmmd-200ep-s42/`.
 
-**Lesson for iter122 (this invocation)**: Two MMD-family attacks on 4-sp under uniform-pair-weight regimes (iter107 CT-cond ALONE, iter121 dual MMD) have failed. The next 4-sp attack must use a structurally-different mechanism — heterogeneous per-pair weighting based on pre-known divergences (option α, this iteration), or pivot to other gaps (testis E9.2 down resolution paths δ/ε remain open but blocked on user approval / Tier-3 multi-week work).
+**Lesson for iter122 (this iteration)**: Two MMD-family attacks on 4-sp under uniform-pair-weight regimes (iter107 CT-cond ALONE, iter121 dual MMD) have failed. The next 4-sp attack must use a structurally-different mechanism — heterogeneous per-pair weighting based on pre-known divergences (option α, this iteration), or pivot to other gaps (testis E9.2 down resolution paths δ/ε remain open but blocked on a change of the expectation definitions / Tier-3 multi-week work).
 
 ### Recent rejections — testis E9.2 down per-gene-mechanism family (DISTILLED)
 
@@ -548,11 +550,11 @@ Eight consecutive testis E9.2 down attacks rejected (iter113–iter120). **Famil
 2. **Per-gene mechanism family converges by ~ep55** on testis (iter120 trajectory was identical from ep55 to ep200). For future per-gene experiments, 80–100ep suffices — saves 2× iteration time.
 3. **All iter113–iter120 CLI flags are preserved opt-in with default-OFF byte-identical behavior**: `--lambda-fit`, `--gin-hidden`, `--sg-ema-beta`, `--lambda-anchor-neg-factor`, `--use-per-gene-bias`, plus the `_training_plan.py:configure_optimizers` per_gene_bias→1e-3 carve-out (active only when `use_per_gene_bias=True`). Zero impact on existing best-knowns.
 
-**Testis 2-sp E9.2 down resolution paths still open**: (B) refine E9.2 expectation to be data-adaptive [requires user approval to amend refinement.md], (C) Tier-3 FQR baseline redesign `baseline = mu_full_ema.detach()` [multi-week, re-validates all loss-balance numbers]. iter121 (this invocation) elects a structurally-different pivot — see **Current iteration** above.
+**Testis 2-sp E9.2 down resolution paths still open**: (B) refine E9.2 expectation to be data-adaptive [requires a change of the expectation definitions], (C) Tier-3 FQR baseline redesign `baseline = mu_full_ema.detach()` [multi-week, re-validates all loss-balance numbers]. iter121 (this iteration) elects a structurally-different pivot — see **Current iteration** above.
 
 ---
 
-**iter117 REJECTED (2026-04-26, prior invocation, distilled).** Re-running iter115 recipe at 200ep on testis_unified produced **YET ANOTHER stochastic basin** distinct from both iter115 100ep finished and killed-200ep — three basins now observed for the same seed 42 + same recipe + same data:
+**iter117 REJECTED (2026-04-26, earlier iteration, distilled).** Re-running iter115 recipe at 200ep on testis_unified produced **YET ANOTHER stochastic basin** distinct from both iter115 100ep finished and killed-200ep — three basins now observed for the same seed 42 + same recipe + same data:
 
 | Run | E9.2 down | E9.2 up | frac>0.95 | mean correction on neg-S_g |
 |---|---|---|---|---|
@@ -566,11 +568,11 @@ E8 6/6 PASS vs both scVI(donor=sample_batch) AND scVI(species=batch); LT-acc 0.9
 
 **Decision: ROLLBACK. iter115 100ep remains testis_unified best-known.** No code change to roll back. Architectural ceiling diagnosis is now CONFIRMED for both 2-sp (testis H+Mac/H+Mouse) and 3-sp (testis_unified) — Tier-3 code change is the required next attack class.
 
-**Decision tree resolved**: iter117's hypothesis ("200ep reliably closes E9.2 down") is FALSIFIED → iter118 (this invocation) attacks the loss STRUCTURE via asymmetric L_anchor, not the workflow's prior planned per-gene bias hybrid. Asymmetric L_anchor was chosen for: (a) cheaper iteration (~3 hr vs ~4 hr), (b) lower scientific-story risk (GIN still learns from features rather than degenerating to per-gene memorization), (c) structurally different from all 5 prior failed attacks (none touched the L_anchor symmetric squash).
+**Decision tree resolved**: iter117's hypothesis ("200ep reliably closes E9.2 down") is FALSIFIED → iter118 (this iteration) attacks the loss STRUCTURE via asymmetric L_anchor, not the workflow's prior planned per-gene bias hybrid. Asymmetric L_anchor was chosen for: (a) cheaper iteration (~3 hr vs ~4 hr), (b) lower scientific-story risk (GIN still learns from features rather than degenerating to per-gene memorization), (c) structurally different from all 5 prior failed attacks (none touched the L_anchor symmetric squash).
 
-**iter116 REJECTED (2026-04-25, prior invocation, distilled).** Slower SG_EMA_BETA (0.9 → 0.97) on testis H+Mac — falsified the per-minibatch S_g noise hypothesis. PRIMARY metric (E9.2 push<-0.05) UNCHANGED at 0.007% (predicted 2-15%). Spearman r(S_g_ema, correction) slightly WORSE (0.490 vs iter109 0.514). UMAP aspect REGRESSED (PC1/PC2 2.52 vs 1.64). Code change (`--sg-ema-beta` CLI flag) preserved as opt-in diagnostic; default β=0.9 unchanged.
+**iter116 REJECTED (2026-04-25, earlier iteration, distilled).** Slower SG_EMA_BETA (0.9 → 0.97) on testis H+Mac — falsified the per-minibatch S_g noise hypothesis. PRIMARY metric (E9.2 push<-0.05) UNCHANGED at 0.007% (predicted 2-15%). Spearman r(S_g_ema, correction) slightly WORSE (0.490 vs iter109 0.514). UMAP aspect REGRESSED (PC1/PC2 2.52 vs 1.64). Code change (`--sg-ema-beta` CLI flag) preserved as opt-in diagnostic; default β=0.9 unchanged.
 
-**iter115 ACCEPTED — testis_unified E3.2 HARD FAIL CURED, promoted to best-known (2026-04-25).** Applied iter111 coupled recipe (prior-clamp 0.85 + CT-cond MMD on cell_ontology_class) to testis 3-sp unified at 100 epochs (early termination from planned 200 to give the user fast iteration). **30/33 + 6/6 E8 vs scVI(donor) + 6/6 E8 vs scVI(species)**. **E3.2 frac>0.95: 29.06% → 1.32%** (22× cure — the registry's only remaining HARD FAIL is now resolved). E5.3 also cured. All integration metrics improved: kNN-sp 0.792 → 0.730, LT-acc 0.989 → 0.992, sil-ct 0.347 → 0.320 (slight). UMAP aspect 0.91 (round, not thin). E9.2 down 1.57% (still below 2% PASS threshold but 200× better than iter102's ~0% — the killed 200ep run reached 2.43% PASS, indicating the 200ep schedule is what crosses the line; 100ep's faster LR decay produces a more aggressive but slightly less downward-skewed equilibrium). E6.1/E6.2 z-leakage gates fail (adv_acc=0.609 vs chance 0.333) — long-standing testis issue, not new from this iteration. **Same recipe + ★ status as iter109 H+Mac and iter111 H+Mouse: integration done, E9.2 down architectural ceiling at 2-sp.** With 3-sp the ceiling is much closer to passing — confirms "gradient-signal-density" hypothesis from the brainstorm.
+**iter115 ACCEPTED — testis_unified E3.2 HARD FAIL CURED, promoted to best-known (2026-04-25).** Applied iter111 coupled recipe (prior-clamp 0.85 + CT-cond MMD on cell_ontology_class) to testis 3-sp unified at 100 epochs (early termination from planned 200 for fast iteration). **30/33 + 6/6 E8 vs scVI(donor) + 6/6 E8 vs scVI(species)**. **E3.2 frac>0.95: 29.06% → 1.32%** (22× cure — the registry's only remaining HARD FAIL is now resolved). E5.3 also cured. All integration metrics improved: kNN-sp 0.792 → 0.730, LT-acc 0.989 → 0.992, sil-ct 0.347 → 0.320 (slight). UMAP aspect 0.91 (round, not thin). E9.2 down 1.57% (still below 2% PASS threshold but 200× better than iter102's ~0% — the killed 200ep run reached 2.43% PASS, indicating the 200ep schedule is what crosses the line; 100ep's faster LR decay produces a more aggressive but slightly less downward-skewed equilibrium). E6.1/E6.2 z-leakage gates fail (adv_acc=0.609 vs chance 0.333) — long-standing testis issue, not new from this iteration. **Same recipe + ★ status as iter109 H+Mac and iter111 H+Mouse: integration done, E9.2 down architectural ceiling at 2-sp.** With 3-sp the ceiling is much closer to passing — confirms "gradient-signal-density" hypothesis from the brainstorm.
 
 **iter113 + iter114 (REJECTED 2026-04-25 — distilled).** Both attacked testis 2-sp E9.2 down, both rejected after a single iteration; details in *Distilled Lessons* below. TWO false ceilings ruled out: (a) loss-weight scaling (iter113 λ_fit×3 → Δρ=+0.020), (b) MLP capacity (iter114 width×2.6 → Δρ=-0.011). The 72-d GIN input features ARE discriminable for pos- vs neg-S_g testis genes (separability AUC = 0.84 linear / 0.80 nonlinear via `iter114_input_separability.py`). Bottleneck is the **gradient signal STRUCTURE** (class imbalance / L_anchor symmetry / per-minibatch noise / FQR baseline) — iter115's 3-sp result lends weight to the per-minibatch S_g noise hypothesis (3-sp averages over more cells per gene, reducing noise).
 
@@ -592,7 +594,7 @@ iter115 transferred iter111's coupled recipe (prior-clamp 0.85 + CT-cond MMD on 
 
 **H+Zebrafish — structural at 450 Myr divergence.** iter85 with --lambda-mmd 10 reaches 28/33 + 4/6 E8. Species too divergent to mix in z without destroying celltype structure (sil-ct -0.093, LT-acc 0.704). Treated as structural.
 
-**Identifiability audit (user-prompted, iter112).** Pancreas H+Mouse / H+Zeb have `batch == species` (1-to-1); ConstrainedBatchOffset is mathematically inert. Pancreas H+Mo has 3 batches (Monkey has 2) — ConstrainedBatchOffset has ~1 dof. Testis datasets DO have `sample_batch` (5–9 donor batches/species) but Chimera uses `batch_key=batch` (==species) while scVI baseline uses `batch_key=sample_batch` (donors). iter94 tested Chimera with `batch_key=sample_batch` and rolled back (z contracted 4×). The interaction between Chimera's ConstrainedBatchOffset / adversary / MMD and a multi-batch-per-species `batch_key` is an **open Tier-3 architectural question**, not addressable as an HP tune.
+**Identifiability audit (iter112).** Pancreas H+Mouse / H+Zeb have `batch == species` (1-to-1); ConstrainedBatchOffset is mathematically inert. Pancreas H+Mo has 3 batches (Monkey has 2) — ConstrainedBatchOffset has ~1 dof. Testis datasets DO have `sample_batch` (5–9 donor batches/species) but Chimera uses `batch_key=batch` (==species) while scVI baseline uses `batch_key=sample_batch` (donors). iter94 tested Chimera with `batch_key=sample_batch` and rolled back (z contracted 4×). The interaction between Chimera's ConstrainedBatchOffset / adversary / MMD and a multi-batch-per-species `batch_key` is an **open Tier-3 architectural question**, not addressable as an HP tune.
 
 ---
 
@@ -604,7 +606,7 @@ iter115 transferred iter111's coupled recipe (prior-clamp 0.85 + CT-cond MMD on 
 
 **Critical finding.** Mean correction on neg-S_g genes ROSE to +1.024 (vs iter115's +0.655) despite ρ(S_g,corr) IMPROVING to 0.448 (vs 0.355) — so wider corr range incidentally boosts ρ without fixing the rare-class assignment problem. **ρ(S_g,corr) is misleading as a primary metric.** Future iterations must report mean correction on neg-S_g class as a co-primary metric — that's what determines E9.2 down magnitude.
 
-**Design implication.** "Just train longer" is exhausted as an attack on testis E9.2 down. Architectural ceiling extends to 3-sp (was already confirmed on 2-sp via iter113/114/116). Tier-3 code change is the only remaining attack class. iter118 (asymmetric L_anchor — this invocation) attacks the loss STRUCTURE; if it falsifies, per-gene bias hybrid is the next Tier-3 candidate.
+**Design implication.** "Just train longer" is exhausted as an attack on testis E9.2 down. Architectural ceiling extends to 3-sp (was already confirmed on 2-sp via iter113/114/116). Tier-3 code change is the only remaining attack class. iter118 (asymmetric L_anchor — this iteration) attacks the loss STRUCTURE; if it falsifies, per-gene bias hybrid is the next Tier-3 candidate.
 
 Artifacts preserved at `runs/testis-unified-iter117-200ep-s42/{model,final_state.npz,summary.json,plots/,integration_vs_scvi.{md,json},report.md}`.
 
@@ -660,7 +662,7 @@ In priority order. Re-evaluate on every iteration; the queue is informational on
 - **Testis triad E9.2 down**: per-gene mechanism family EXHAUSTED (iter113–
   iter120). Architectural ceiling in FQR baseline `p_null × lib` (math caps
   E9.2 down attainable mass below 2% on testis regardless of mechanism). The
-  remaining paths are expectation refinement (β/δ; user approval) or Tier-3
+  remaining paths are expectation refinement (β/δ; a change of the expectation definitions) or Tier-3
   FQR redesign (ε; multi-week).
 
 **Strategic queue (post-iter124, ordered by lowest blast radius first)**:
@@ -670,8 +672,8 @@ In priority order. Re-evaluate on every iteration; the queue is informational on
 | **(η-r) iter125 — RECOMMENDED NEXT** | `--n-hidden 256` on iter101 recipe (encoder capacity 128→256). Structurally different from adv-side family entirely. Hypothesis: encoder needs more capacity to encode 4-species shared celltype structure WITHOUT losing CT separation under the iter101 adv_weight=200 + lambda_mmd=100 regime. | 1 | NEXT | Pros: enters NEW family (encoder, not adversary); falsified by clear E8.1 / sil-ct trigger pattern; ~80 min run. Cons: verify `--n-hidden` flag is plumbed before running; if not, small code change to `_constants.py`/`_module.py`. |
 | **(η-d) iter125b** | Encoder DEPTH bump (n_layers 1 → 2) on iter101 recipe. | 1 | If (η-r) does not help | Same family as (η-r) but different lever; cheap. |
 | **(θ) iter126** | Cycle-consistency / cross-species reconstruction. Encode species A, decode through residual as if species B; enforce within-celltype distribution consistency in species B. | 3 | If (η-r) and (η-d) exhausted | Tier-3, multi-day; refinement.md explicitly authorizes as a primary lever for cross-species integration. |
-| **(β) Refine 4-sp E8 expectations** | Accept structural 2-shared-CT limit; relax E8.1 / E8.4 thresholds for low-shared-CT-count scenarios. | 0 | After (η-r), (η-d), (θ) all fail | REQUIRES USER APPROVAL — refinement.md change. |
-| **(δ) Refine E9.2 down for testis** | `frac(Δα<-0.05) ≥ min(2%, 60% × frac(S_g<-0.05))`. | 0 | When 4-sp pancreas closed | REQUIRES USER APPROVAL. Closes ★ on testis_unified iter115 only; 2-sp testis remains arch-ceilinged. |
+| **(β) Refine 4-sp E8 expectations** | Accept structural 2-shared-CT limit; relax E8.1 / E8.4 thresholds for low-shared-CT-count scenarios. | 0 | After (η-r), (η-d), (θ) all fail | REQUIRES A CHANGE OF THE EXPECTATION DEFINITIONS. |
+| **(δ) Refine E9.2 down for testis** | `frac(Δα<-0.05) ≥ min(2%, 60% × frac(S_g<-0.05))`. | 0 | When 4-sp pancreas closed | REQUIRES A CHANGE OF THE EXPECTATION DEFINITIONS. Closes ★ on testis_unified iter115 only; 2-sp testis remains arch-ceilinged. |
 | **(ε) Tier-3 FQR baseline redesign** | `baseline = mu_full_ema.detach()` instead of `p_null × lib`. Expected to make S_g_ema bidirectional on testis. | 3 (multi-week) | Last resort | Re-validates ALL loss-balance numbers and ALL best-known recipes; high risk of regression on currently-★ datasets. |
 | **(ζ) Multi-seed E9.1 verification of new accepted configs** | Run seeds 43 & 44 on any newly-promoted config; verify cross-seed Spearman ρ ≥ 0.50. | 1 | After every promotion | Routine — cheap, only run when something gets promoted. |
 | **(η-id) Tier-3: Chimera × multi-batch-per-species `batch_key`** | Investigate iter94 z-contraction root cause; possibly separate batch_key (donor) from species_key. | 3 (multi-week) | Long-term backlog | Architectural; not in immediate path. |
@@ -689,7 +691,7 @@ In priority order. Re-evaluate on every iteration; the queue is informational on
 |---|------|--------|-----------|-----------|
 | E1.1 | `conservation_signal` | Spearman r(conservation_prior, per-gene CPM-log-mean similarity) | `r ≥ 0.02` OR `\|r\| < 0.15` AND prior_std ≥ 0.05 | refinement.md §"alpha biology" |
 | E1.2 | `gene_features_normalized` | per-feature mean abs < 0.1 AND std in [0.5, 1.5] | all 72 active dims (after 2026-04-18 GIN input fix) | refinement.md §"GIN input" |
-| E1.3 | `p_null_dynamic_range` | frac of (species, gene) with 1e-5 < p_null < 0.5 | ≥ 0.5 | implementation prompt (p_null Laplace) |
+| E1.3 | `p_null_dynamic_range` | frac of (species, gene) with 1e-5 < p_null < 0.5 | ≥ 0.5 | implementation note (p_null Laplace) |
 | E1.4 | `batch_to_species_unique` | every batch maps to exactly one species | 100% | model setup invariant |
 | E1.5 | `conservation_prior_range` | min ≥ 0.05, max ≤ 0.95, std ≥ 0.05 | hard | GIN logit stability |
 
@@ -771,7 +773,7 @@ E8 is evaluated by [`compare_vs_scvi.py`](compare_vs_scvi.py): trains/loads a va
 
 | # | Name | Metric | Threshold | What it gates |
 |---|------|--------|-----------|---------------|
-| E9.1 | `alpha_cross_seed_robust` | min Spearman ρ(α_i, α_j) over all seed pairs of same config (≥ 2 seeds; if 1 seed → `skipped`) | **≥ 0.50** (revised 2026-04-25 from prior ≥ 0.90 per user direction) | α reproducible across seeds. Currently PASS on H+Mo iter90 (3 seeds; min ρ = 0.83) and H+Mouse iter90 (3 seeds, iter112; min ρ = 0.762). |
+| E9.1 | `alpha_cross_seed_robust` | min Spearman ρ(α_i, α_j) over all seed pairs of same config (≥ 2 seeds; if 1 seed → `skipped`) | **≥ 0.50** (revised 2026-04-25 from prior ≥ 0.90) | α reproducible across seeds. Currently PASS on H+Mo iter90 (3 seeds; min ρ = 0.83) and H+Mouse iter90 (3 seeds, iter112; min ρ = 0.762). |
 | E9.2 | `gin_bidirectional_push` | frac(α − prior > 0.05) AND frac(α − prior < -0.05) | both ≥ 2% | GIN actively pushes α in BOTH directions. Currently FAILS on every testis run (downward ≈ 0%) — universal GIN architectural ceiling. |
 
 **E9.1 rationale (revised threshold)**: ρ ≥ 0.5 means the dominant ordering of conserved-vs-divergent genes is preserved across seeds while still allowing meaningful seed-to-seed variation in the long tail of mid-range genes (where the loss landscape is genuinely flat). The previous 0.90 bar treated per-gene α as a deterministic fingerprint; in practice with VAMP K=500 random init + adversarial training, ρ ≈ 0.6–0.85 is the attainable range. Headline scientific story (top-K most conserved/divergent gene-sets, top-10% Jaccard 0.44 on H+Mouse) preserved at ρ ≥ 0.5.
@@ -780,7 +782,7 @@ E8 is evaluated by [`compare_vs_scvi.py`](compare_vs_scvi.py): trains/loads a va
 
 ## Operating norms
 
-### The loop (per invocation, exactly one iteration)
+### The loop (exactly one iteration at a time)
 
 ```
             diagnose → hypothesize → fix → retrain → evaluate → compare → commit
@@ -790,7 +792,7 @@ E8 is evaluated by [`compare_vs_scvi.py`](compare_vs_scvi.py): trains/loads a va
                                                                       boundary
 ```
 
-User re-invokes for the next iteration. Inside one invocation, do NOT auto-continue.
+The next iteration is started by hand. Do NOT auto-continue within one.
 
 ### Scripts (under `chimera/training/`)
 
@@ -844,7 +846,7 @@ Rollback plan: <exact revert path: config key, checkpoint, code commit>
 
 A change is **accepted** only if (a) primary metric moved in predicted direction by predicted magnitude AND (b) no flagged module regressed silently. Otherwise: rollback.
 
-### Stopping condition (per invocation)
+### Stopping condition (per iteration)
 
 One iteration's record in workflow.md must include:
 - Measured deltas vs every predicted delta (signed, magnitude per metric).
@@ -904,7 +906,7 @@ This file is the loop's control plane AND institutional memory. Pruning rule: wh
 
 3-seed run of iter90 H+Mouse recipe (s42 cached, s43+s44 new). Each seed: **33/33 + 6/6 E8** ✓; **E9.1 cross-seed Spearman ρ_min = 0.762** ≥ 0.50 (revised threshold). LT-acc 0.971 ± 0.005, sil-ct 0.444 ± 0.036, kNN-sp 0.853 ± 0.038, UMAP aspect 1.34 ± 0.12 (round). **★ awarded to H+Mouse iter90; H+Mo iter90 ρ=0.83 also re-gated to ★ under revised threshold.**
 
-**Lesson** (E9.1 threshold revision, 2026-04-25, user-directed): Cross-seed α ρ ≥ 0.50 is the right bar. With VAMP K=500 random init + adversarial training, ρ ≈ 0.6-0.85 is the attainable range; the prior 0.90 bar treated per-gene α as a deterministic fingerprint, which it is not. Top-K Jaccard (top-10% 0.44) verifies that the headline scientific story (most-conserved/most-divergent gene-sets) is preserved across seeds even when long-tail per-gene rank ordering is approximate.
+**Lesson** (E9.1 threshold revision, 2026-04-25): Cross-seed α ρ ≥ 0.50 is the right bar. With VAMP K=500 random init + adversarial training, ρ ≈ 0.6-0.85 is the attainable range; the prior 0.90 bar treated per-gene α as a deterministic fingerprint, which it is not. Top-K Jaccard (top-10% 0.44) verifies that the headline scientific story (most-conserved/most-divergent gene-sets) is preserved across seeds even when long-tail per-gene rank ordering is approximate.
 
 **Lesson** (falsified hypothesis preserved as anti-pattern): Predicted that stronger regularization (adv=200 vs 100, free_bits=1.0 vs 0.5) gives TIGHTER cross-seed α, because larger penalties resist seed-init noise. Measured the OPPOSITE (H+Mouse 0.762 < H+Mo 0.83). Adversarial training strength is **inversely correlated** with cross-seed α reproducibility — stronger adv aggressively reshapes z; small init differences amplify into larger trajectory divergences. **Future iterations attacking E9.1 should NOT push adv higher.**
 
@@ -1033,7 +1035,7 @@ The adv fool_loss was O(1) vs L_recon O(G) — fool_loss was 0.001% of total los
 
 - **iter108**: H+Mo iter90 3-seed audit gave Spearman ρ pairwise 0.831/0.842/0.827. Initial threshold ≥ 0.90 → MARGINAL FAIL. Top-K Jaccard high (top-1% 0.76).
 - **iter112**: H+Mouse iter90 3-seed gave min ρ = 0.762, Top-1% Jaccard 0.24, Top-10% 0.44. Stronger regularization (adv=200 vs 100, fb=1.0 vs 0.5) gave LOWER cross-seed reproducibility — falsifying the "stronger reg → tighter cross-seed" hypothesis.
-- **2026-04-25 user-revised threshold**: ≥ 0.50 (was ≥ 0.90). Rationale in E9.1 row above. Both H+Mo and H+Mouse PASS under revised; ★ promoted on both.
+- **Threshold revised 2026-04-25**: ≥ 0.50 (was ≥ 0.90). Rationale in E9.1 row above. Both H+Mo and H+Mouse PASS under revised; ★ promoted on both.
 - **Lesson**: adversarial-training strength is **inversely correlated** with cross-seed α reproducibility. Future iterations attacking E9.1 should NOT push adv higher.
 
 ### Other rejected / investigated approaches
@@ -1104,7 +1106,7 @@ The full run-by-run history is preserved in `iteration_log.md`. Below is a compa
 | iter116 | Testis H+Mac (slower SG_EMA β 0.9→0.97) | iter109 + `--sg-ema-beta 0.97` (NEW opt-in CLI flag; default 0.9 unchanged) | 28/33 + 6/6 E8 vs scVI(donor); E9.2 down 0.007% UNCHANGED, ρ(S_g, corr) 0.490 (vs iter109 0.514); corr range NARROWED (max 1.169 vs 1.373); UMAP PC1/PC2 aspect 2.52 (vs 1.64, REGRESSED) | per-minibatch S_g noise NOT the bottleneck; signal density via temporal averaging refuted | **ROLLBACK** (iter109 retained as best-known; CLI flag preserved opt-in) |
 | iter117 | Testis unified (3-sp, iter115 recipe at **200ep** s42) | same as iter115; just `--max-epochs 200` | 30/33 + 6/6 E8 vs scVI(donor) + 6/6 E8 vs scVI(species); E9.2 down **1.04%** (FAIL, below predicted 1.5-2.5%, below iter115's 1.57%); E9.2 up 23.71%; α mean=0.856 std=0.058; corr range [-0.696, +2.134] WIDER; ρ(S_g, corr)=0.448 ↑ but mean corr on neg-S_g=+1.024 (more positive — MLP even WORSE at rare class); z PC1/PC2=1.77 REGRESSED, UMAP aspect 1.147 round; LT-acc 0.992 (matches iter115) | NO CODE CHANGE; testis_unified 3-sp E9.2 down stochastic basin distribution is ~1.7%±0.6%, below 2% PASS at most realizations — architectural ceiling extends to 3-sp; killed-200ep 2.43% was stochastic fluke | **ROLLBACK** (iter115 100ep remains best-known; pivot to iter118 Tier-3 attack on loss STRUCTURE) |
 | iter118 | Testis H+Mac (asymmetric L_anchor factor=0.3, 200ep s42) | iter109 + `--lambda-anchor-neg-factor 0.3` (NEW opt-in CLI flag; default 1.0 unchanged) | 29/33 + 6/6 E8 vs scVI(donor); E9.2 down **0.39%** (FAIL, below predicted 1.5-5%, below 2% PASS line); mean corr on neg-S_g **+0.279** (FAIL falsifying probe ≤+0.15); frac_corr_neg_on_neg_S_g 5%→16% (3× directional shift IS real); Δα<-0.02 1.6%→7.1% (4.4×); ρ(S_g, corr)=0.472 (DOWN from 0.514); z PC1/PC2=3.35 (REGRESSED from 1.64); UMAP aspect 1.23 (round); LT-acc 0.891 (-0.008 from 0.899; within E8.6 tol) | Anchor relaxation produces a real but ~5× too small directional shift on rare class — confirms MLP feature-space smoothness is the dominant binding constraint, not anchor symmetry; per-gene bias hybrid is now strongly motivated | **ROLLBACK** (iter109 retained as testis H+Mac best-known; CLI flag preserved opt-in default 1.0) |
-| iter119 | Testis H+Mac (per-gene bias hybrid, 200ep s42) | iter109 + `--use-per-gene-bias` (NEW opt-in CLI flag; default OFF unchanged) | 28/33 + 6/6 E8 vs scVI(donor); E9.2 down **0.0068%** (HARD FAIL, far below predicted 5-15%); **bias_share_of_total_magnitude=2.7%** (corrected — original 0.0% reading was a diagnostic bug, see iter120 invocation lessons; mechanism DID engage but only weakly); mean corr on neg-S_g +0.239 (vs +0.353 iter109, +0.279 iter118); mean_per_gene_bias_on_neg_S_g=-0.027, on_pos_S_g=+0.019 (correct DIRECTION but tiny magnitude); ρ(S_g, corr)=0.450 (vs 0.514 iter109); z PC1/PC2=4.43 (REGRESSED from 1.64; same 200ep over-fit pattern as iter117/118); UMAP aspect 1.17 (PASS round); E3.2 std=0.0495 marginal numerical FAIL (0.0009 below 0.05 floor) | Bias engaged in correct direction but bounded by Adam's per-step LR-magnitude update at LR=1e-4 (cumulative movement over 20K steps capped at ~LR×N). config M's per_gene_correction works because it has its own LR=1e-3 param group at line 326 of _training_plan.py. iter120 fixes this LR mismatch. | **ROLLBACK** (iter109 retained as testis H+Mac best-known; flag preserved opt-in default OFF; iter119_bias_extract.py BUG FIXED in iter120 invocation — `.copy()` after `.numpy()` to prevent storage aliasing) |
+| iter119 | Testis H+Mac (per-gene bias hybrid, 200ep s42) | iter109 + `--use-per-gene-bias` (NEW opt-in CLI flag; default OFF unchanged) | 28/33 + 6/6 E8 vs scVI(donor); E9.2 down **0.0068%** (HARD FAIL, far below predicted 5-15%); **bias_share_of_total_magnitude=2.7%** (corrected — original 0.0% reading was a diagnostic bug, see iter120 lessons; mechanism DID engage but only weakly); mean corr on neg-S_g +0.239 (vs +0.353 iter109, +0.279 iter118); mean_per_gene_bias_on_neg_S_g=-0.027, on_pos_S_g=+0.019 (correct DIRECTION but tiny magnitude); ρ(S_g, corr)=0.450 (vs 0.514 iter109); z PC1/PC2=4.43 (REGRESSED from 1.64; same 200ep over-fit pattern as iter117/118); UMAP aspect 1.17 (PASS round); E3.2 std=0.0495 marginal numerical FAIL (0.0009 below 0.05 floor) | Bias engaged in correct direction but bounded by Adam's per-step LR-magnitude update at LR=1e-4 (cumulative movement over 20K steps capped at ~LR×N). config M's per_gene_correction works because it has its own LR=1e-3 param group at line 326 of _training_plan.py. iter120 fixes this LR mismatch. | **ROLLBACK** (iter109 retained as testis H+Mac best-known; flag preserved opt-in default OFF; iter119_bias_extract.py BUG FIXED in iter120 — `.copy()` after `.numpy()` to prevent storage aliasing) |
 | iter120 | Testis H+Mac (per-gene bias hybrid + LR=1e-3 param group, 200ep s42) | iter109 + `--use-per-gene-bias` + 5-line `_training_plan.py:configure_optimizers` change | E9.2 down **0.020%** HARD FAIL (predicted 5-15%); bias_share 22.6% (PASS — LR fix engages mechanism 8×); mean corr on neg-S_g class shifted +0.353→+0.011; E8 6/6 maintained; UMAP 1.07 round | Per-gene mech engages but primary metric capped by testis S_g_ema distribution (only 1.06% genes S_g<-0.05) — architectural ceiling is in FQR baseline definition, not any per-gene mechanism. 8 consecutive testis E9.2 down attacks now ruled out. PIVOT REQUIRED. | **ROLLBACK** (iter109 best-known retained; flag opt-in default OFF; LR fix kept in `_training_plan.py` reversible/benign at default; full detail in workflow-best.md §6 last-iter120 entry) |
 | iter121 | 4-sp panc DUAL MMD | iter101 + `--lambda-mmd 50 --lambda-mmd-aux 100 --celltype-conditional-mmd --celltype-key cell_type` (NEW `--lambda-mmd-aux` flag, opt-in default 0.0 = byte-identical) | E8 **2/6** (REGRESSED); kNN-sp 0.976 (HARD FAIL — vs predicted 0.85-0.92); sil-ct 0.408→**0.244** (HARD FAIL); z_mean_var_min=**0.003** (HARD — 4/10 dims collapsed); α biology preserved | Uniform high MMD pressure over-pressures z; 4-sp w/ only 2 shared CTs has no "free room" to push more MMD without sacrificing CT structure. MMD/z-side and FQR/α-side architecturally separable (α biology preserved). | **ROLLBACK** (iter101 retained 4-sp best-known) |
 | iter122 | 4-sp panc species-pair-conditional MMD | iter101 + `--mmd-pair-weights "1.0,1.0,0.3,1.0,0.3,0.3"` (NEW opt-in flag — heterogeneous per-pair averaging, default None = byte-identical) | **TRAINING NaN at ep17→18** (before FQR/KL warmup completion). Pre-NaN ep15-17: grad_enc=1.7-2.6, L_recon=2500-2900 (healthy). All final_state tensors NaN (α, correction, S_g_ema, z_mean, mu_full, residual). | Heterogeneous per-pair weighting concentrates MMD gradient on close pairs at ~1.5× uniform per-pair magnitude (close: 1.0/3.9 = 0.256 vs uniform 1/6 = 0.167). At iter101's already-aggressive regime (adv=200, mmd=100, fb=1.0), this concentration tipped encoder past stability. Per-pair heterogeneous more catastrophic than uniform high pressure (iter121 graceful 4/10 collapse vs iter122 instant NaN). Future per-pair attempts must lower lambda_mmd to compensate (e.g. ~65) or use softer weight ratios. | **ROLLBACK** (iter101 retained 4-sp best-known; `--mmd-pair-weights` flag preserved opt-in default None = byte-identical) |
@@ -1123,23 +1125,23 @@ The full run-by-run history is preserved in `iteration_log.md`. Below is a compa
    - **Pancreas 4-sp (iter101 retained as best-known)**: 3/6 E8, kNN-sp 0.979 vs scVI 0.930 (Chimera WORSE). **FIVE 4-sp attacks have now failed**: iter107 CT-cond → over-integrates; iter121 dual MMD → 4/10 z collapse; iter122 per-pair heterogeneous → NaN; iter123 adv capacity (64,32) at adv_weight=200 → sil-ct collapse 0.408→0.096; **iter124 adv (64,32) co-tuned at adv_weight=100 → sil-ct collapsed FURTHER to 0.079, LT-acc 0.753**. **Adv-side family is now EXHAUSTED on 4-sp** (2 consecutive sil-ct collapses iter123+iter124, and MMD family was already exhausted). Per refinement.md anti-pattern rule, the next 4-sp attack MUST be structurally different — encoder/residual capacity (η-r), cycle-consistency (θ), or expectation refinement (β).
    - **Testis triad (H+Mac iter109, H+Mouse iter111, unified iter115)**: 6/6 E8 vs scVI(donor) on all three; **E9.2 down hits architectural ceiling** (0%, 0%, 1.57%). Per-gene mechanism family EXHAUSTED (8 failed attacks iter113–iter120). ★ withheld until E9.2 down resolved.
 
-3. **What this invocation did (iter124)**:
+3. **What this iteration did (iter124)**:
    - Trained iter124 = iter101 recipe + `--adv-classifier-hidden "64,32" --adv-weight 100` (200ep s42, 66 min). Direct mechanistic test of iter123's "co-tune lower" lesson.
    - **Result: HARD ROLLBACK.** 33/33 PASS on E1-E9 (same as iter123) BUT E8 still 2/6 (same FAIL pattern as iter123): sil-ct collapsed FURTHER to 0.079 (vs iter123 0.096, iter101 0.408 — HARD <0.30 trigger), LT-acc REGRESSED FURTHER to 0.753 (vs iter123 0.893, iter101 0.985, scVI 0.929 — fails E8.6). kNN-sp improved to 0.946 (hit lower predicted band 0.91-0.95) but still FAIL E8.1 (Δ vs scVI=+0.016 > 0.01). Post-hoc MLP-64-32 z-leakage 0.738→0.694 (predicted ≤0.50; encoder DID do somewhat more legitimate species-scrubbing than iter123, but inadequate).
    - **Critical α-biology degeneration finding**: gin_signed_diagnostics revealed `mean_corr_on_pos_S_g = −1.58` (WRONG SIGN — GIN pushes positive class toward divergence) and `frac_corr_pos_on_pos_S_g = 0.00` (every positive-class gene gets a negative correction). E9.2 PASS metrics MASKED this in iter123; iter124 surfaces it. **Adopt `mean_corr_on_pos_S_g` and `frac_corr_pos_on_pos_S_g` as co-primary diagnostics** for any 4-sp z-side perturbation.
    - **z PC1/PC2 SVD aspect = 5.27** (HARD thin) while UMAP aspect = 1.19 (round) — linear-projection diagnostic catches encoder collapse onto thin manifold even when non-linear UMAP looks fine.
    - Workflow.md updated with iter124 measured-vs-predicted + 5 distilled lessons + active hypothesis queue refresh + Scripts table additions.
 
-4. **Strategic question for the NEXT invocation (adv-side EXHAUSTED on 4-sp)**:
+4. **Strategic question for the NEXT iteration (adv-side EXHAUSTED on 4-sp)**:
    - **Gap A: 4-sp pancreas integration** (Chimera kNN-sp 0.946 iter124 / 0.979 iter101 > scVI 0.930). MMD family AND adv-side-at-any-adv_weight family are both exhausted. Remaining structurally-different paths:
      - **(η-r, NOW RECOMMENDED) Encoder n_hidden 128→256 on iter101 recipe** — bumps encoder capacity (NOT adversary). Hypothesis: encoder needs more capacity to encode 4-species shared celltype structure WITHOUT losing CT separation under the iter101 adv_weight=200 + lambda_mmd=100 regime. CLI: `--n-hidden 256` (verify this flag is plumbed before running; if not, small code change to `_constants.py`/`_module.py`). 1 iteration; ~80 min.
      - **(η-d) Encoder DEPTH bump** (n_layers 1→2) on iter101 recipe.
      - **(θ) Cycle-consistency / cross-species reconstruction** — Tier-3, multi-day.
-     - **(β) Refine 4-sp E8 expectations** — accept 2-shared-CT structural limit (requires user approval to amend refinement.md).
+     - **(β) Refine 4-sp E8 expectations** — accept 2-shared-CT structural limit (requires a change of the expectation definitions).
    - **Gap B: Testis triad E9.2 down** (per-gene mechanism family exhausted, iter113–iter120). Open paths unchanged:
-     - **(δ) Refine E9.2 expectation to be data-adaptive** — Requires user approval to amend refinement.md.
+     - **(δ) Refine E9.2 expectation to be data-adaptive** — Requires a change of the expectation definitions.
      - **(ε) Tier-3 FQR baseline redesign** — Multi-week.
-   - **Recommended ordering for next invocation**: **option (η-r)** — encoder capacity bump. Structurally different from adv-side family entirely. If it fails, pivot to (η-d) depth, then (θ) cycle-consistency. (β) E8 refinement should be raised to the user only after (η-r), (η-d), and (θ) are all exhausted.
+   - **Recommended ordering for the next iteration**: **option (η-r)** — encoder capacity bump. Structurally different from adv-side family entirely. If it fails, pivot to (η-d) depth, then (θ) cycle-consistency. (β) E8 refinement should be raised only after (η-r), (η-d), and (θ) are all exhausted.
 
 5. **CRITICAL diagnostic findings preserved from iter117–iter124 (do NOT lose)**:
    - **iter124 lesson — adv-side family EXHAUSTED on 4-sp.** Two consecutive sil-ct collapses (iter123 at adv_weight=200, iter124 at adv_weight=100, both with classifier=(64,32)). The (64,32) × 4-sp encoder interaction is the binding mechanism; adv_weight is second-order. Future capacity bumps to the in-training adversary on 4-sp are deprecated.
@@ -1158,7 +1160,7 @@ The full run-by-run history is preserved in `iteration_log.md`. Below is a compa
 
 6. **Identifiability state (closed audit, 2026-04-26)**: Verified per-dataset batch/species columns. Testis Chimera uses `batch_key=batch` (==species) while scVI baseline uses `batch_key=sample_batch` (donors). The asymmetry is INTENTIONAL — scVI(donor) is the STRONGER baseline (more batch-correction power), and Chimera STILL beats it on integration metrics. Pancreas has no `sample_batch` column (donors live in `batch`); both Chimera and scVI use the same key. NO re-runs needed. The architectural Chimera × multi-batch-per-species problem (iter94 rollback root cause) remains a Tier-3 open question deferred indefinitely.
 
-7. **Next-iteration evaluation steps** (after any training completes — this invocation verified the pipeline works for 4-sp):
+7. **Next-iteration evaluation steps** (after any training completes — this iteration verified the pipeline works for 4-sp):
    - (a) `check_expectations.py` auto-runs from `run_experiment.py` → produces `report.md` + `summary.json`.
    - (b) Run `compare_vs_scvi.py --chimera-run-name <name> --adata <adata-path> --batch-key batch` (use `--batch-key sample_batch` for testis); auto-uses cached baselines at `runs/baselines_scvi/`.
    - (c) Run `gin_signed_diagnostics.py <run-dir>` for per-gene signed metrics (rare-class mean corr is co-primary; ρ alone misleading).
@@ -1168,10 +1170,10 @@ The full run-by-run history is preserved in `iteration_log.md`. Below is a compa
    - **NOTE**: `compare_vs_scvi.py`, `umap_check.py`, `gin_signed_diagnostics.py` are NOT auto-invoked from `run_experiment.py` — must be run manually.
 
 8. **Code state at end of iter123**:
-   - **NEW this invocation**: `training/z_leakage_probe.py` — post-hoc non-linear z-leakage probe (linear/kNN5/MLP-32/MLP-64-32). Run as `python training/z_leakage_probe.py --run-name <name> [--adata <path>]`. Reads `final_state.npz`, writes `z_leakage_probe.json`. Closes a refinement.md gap (non-linear z probe was missing from `check_expectations.py`).
+   - **NEW this iteration**: `training/z_leakage_probe.py` — post-hoc non-linear z-leakage probe (linear/kNN5/MLP-32/MLP-64-32). Run as `python training/z_leakage_probe.py --run-name <name> [--adata <path>]`. Reads `final_state.npz`, writes `z_leakage_probe.json`. Closes a refinement.md gap (non-linear z probe was missing from `check_expectations.py`).
    - `--adv-classifier-hidden "h1,h2,..."` — already plumbed (run_experiment.py:209, train_and_diagnose.py:454); was used as iter123's only knob, no code change required. Default None → (32,) hidden as before, byte-identical legacy.
    - **All earlier opt-in flags retained from prior iterations**: `--mmd-pair-weights` (iter122), `--lambda-mmd-aux` (iter121), `--use-per-gene-bias` (iter119), `--lambda-anchor-neg-factor` (iter118), `--sg-ema-beta` (iter116), `--gin-hidden` (iter114), `--prior-clamp-max` (iter109), `--celltype-conditional-mmd`, `--celltype-key`. All default OFF / byte-identical legacy.
    - `_training_plan.py:configure_optimizers` per_gene_bias→1e-3 carve-out (from iter120) preserved; only active when `use_per_gene_bias=True`.
    - **All existing best-knowns** (iter90 H+Mo / iter90 H+Mouse / iter101 4-sp / iter109 H+Mac / iter111 H+Mouse / iter115 unified) UNAFFECTED — iter123's only change was the `--adv-classifier-hidden` CLI value at runtime, not a default change. workflow-best.md unchanged.
 
-9. **Stop after one iteration.** The user drives the outer loop. Do not auto-continue.
+9. **Stop after one iteration.** The outer loop is driven by hand. Do not auto-continue.

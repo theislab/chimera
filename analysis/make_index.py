@@ -14,17 +14,20 @@ repository root (standard library only, any Python 3.10+):
 
     python analysis/make_index.py            # rewrite the generated views
     python analysis/make_index.py --check    # write nothing; exit 1 if a view is stale or a row is wrong
-    python analysis/make_index.py --paper-aux <manuscript build>/main.aux   # refresh printed numbers in PAPER.tsv
+    python analysis/make_index.py --paper-aux <manuscript build>/main.aux   # PAPER.tsv from a build: numbers, order, figures
 
 ``--check`` also verifies the rows: every task folder has exactly one row, every script and
 module named in ``entry`` exists, every label in ``paper`` is in ``PAPER.tsv``, and (when the
-results are on disk) every result folder named in ``outputs`` exists.
+results are on disk) every result folder named in ``outputs`` exists. It warns, without failing,
+when a figure of ``PAPER.tsv`` and ``figures/manifest.tsv`` disagree on its key or when a figure
+label of the manifest has no row: then correct ``PAPER.tsv`` (columns ``figure_key`` and ``title``).
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -44,11 +47,11 @@ GROUPS = {
     "findings": ("What the readouts find in liver and testis", "Which genes, cell types, pathways and gene classes sit above or below the protein prior?", "Results 3.3"),
     "validation": ("Pre-specified validation", "Do independent data back Δα and the count evidence S_g, and how do direct baselines compare?", "Results 3.4"),
     "reliability": ("Reliability and controls", "How stable are the readouts across seeds, and what do they read from counts and from features?", "Results 3.4"),
-    "per_gene_gate": ("The per-gene gate", "What does Δα show when it is read gene by gene from counts, without the protein-feature network?", "Results 3.5"),
-    "adds": ("What the count evidence adds", "What do the readouts add to direct baselines and to other tools, on real and on ground-truth data?", "Results 3.6"),
-    "tissues": ("One reading across tissues", "Does the reading hold across tissues, and what goes with deployment above the prior?", "Results 3.7"),
-    "disease": ("Disease", "Which human disease responses does a mouse model reproduce, and where do drug targets and disease genes sit?", "Results 3.8"),
-    "protein": ("Protein space", "Is the residue-level attribution specific?", "Results 3.9"),
+    "per_gene_gate": ("The per-gene gate", "What does Δα show when it is read gene by gene from counts, without the protein-feature network?", "Results 3.4"),
+    "adds": ("What the count evidence adds", "What do the readouts add to direct baselines and to other tools, on real and on ground-truth data?", "Results 3.4"),
+    "tissues": ("One reading across tissues", "Does the reading hold across tissues, and what goes with deployment above the prior?", "Results 3.5"),
+    "disease": ("Disease", "Which human disease responses does a mouse model reproduce, and where do drug targets and disease genes sit?", "Results 3.5 (drug targets); Supplementary Results (disease case studies)"),
+    "protein": ("Protein space", "Is the residue-level attribution specific?", "Results 3.6"),
     "figures": ("Figures and tables", "Which scripts draw panels or measure table values from cached results?", "all figures"),
     "infrastructure": ("Infrastructure", "Environment and checkpoint checks.", ""),
 }
@@ -59,6 +62,17 @@ STATUS = {
     "recipe": "recipe search",
     "infrastructure": "infrastructure",
 }
+# A task whose result a later task replaced has the status ``retired:<folder of the later task>``. Its code, manifests
+# and results stay as the record of what was run; the paper uses the later task.
+RETIRED = "retired:"
+
+
+def status_text(status: str, short: bool = False) -> str:
+    if status.startswith(RETIRED):
+        return f"retired, replaced by `{status[len(RETIRED):]}`" + ("" if short else " (kept as the record of what was run; the paper uses the later task)")
+    return STATUS[status].split(" (")[0] if short else STATUS[status]
+
+
 BASIS = {
     "numbers": "numbers printed in the paper are read from this task's result files",
     "figure": "a script of this task draws panels of the figure",
@@ -84,6 +98,7 @@ BUNDLES = [
     (r"training/runs/(b1|b2-)", "bundle `gene_level_benchmark` (configuration, summary and final state)"),
     (r"training/runs/(rev-|g1-)", "bundle `models_seeds_controls_cohorts`"),
     (r"training/runs/(z2-|d1-|o1-)", "not deposited (the tables computed from these runs are)"),
+    (r"training/runs/baselines_", "bundle `notebook_caches`"),
     (r"notebooks/cache", "bundle `notebook_caches`"),
     (r"notebooks/figures|figures/panels", "tracked in git"),
 ]
@@ -171,7 +186,7 @@ def readme_tables(rows: list[dict], names: dict[str, dict]) -> str:
             run = f"`{cmds[0]}`" + (f" (+{len(cmds) - 1} more steps)" if len(cmds) > 1 else "")
             writes = "<br>".join(f"`{o}`" for o in items(r["outputs"]))
             paper = merged_where(r["paper"], names) if r["paper"] else "not in the paper"
-            out.append(f"| [`{r['folder']}`](tasks/{r['folder']}/README.md) | {r['summary']} | {run} | {writes} | {paper} | {STATUS[r['status']].split(' (')[0]} |")
+            out.append(f"| [`{r['folder']}`](tasks/{r['folder']}/README.md) | {r['summary']} | {run} | {writes} | {paper} | {status_text(r['status'], short=True)} |")
         out.append("")
     return "\n".join(out).rstrip() + "\n"
 
@@ -181,7 +196,7 @@ def glance(r: dict, names: dict[str, dict], owners: dict[str, list[str]]) -> str
     results, data, imports = code_inputs(r["folder"], owners)
     lines = [r["summary"], "", "| | |", "|---|---|",
              f"| Question | {title}: {question} |",
-             f"| Status | {STATUS[r['status']]} |",
+             f"| Status | {status_text(r['status'])} |",
              f"| Environment | {', '.join(f'`{e}`' if re.fullmatch(r'[a-z_]+_env', e) else e for e in items(r['env']))} |"]
     if r["paper"]:
         lines.append(f"| Used in the paper | {merged_where(r['paper'], names, with_label=True)} |")
@@ -221,8 +236,26 @@ def replace_block(text: str, name: str, body: str, after_first_heading: bool = F
     return "\n".join(lines[:at]) + "\n\n" + block + "\n" + "\n".join(lines[at:]).lstrip("\n")
 
 
+def figure_scripts() -> dict[str, list[str]]:
+    """Figure label -> the scripts that draw its panels, in panel order, from ``figures/manifest.json``."""
+    manifest = ROOT / "figures" / "manifest.json"
+    out: dict[str, list[str]] = {}
+    if manifest.is_file():
+        for fig in json.loads(manifest.read_text(encoding="utf-8"))["figures"]:
+            scripts = out.setdefault(fig["label"], [])
+            for panel in fig["panels"]:
+                if panel.get("script") and panel["script"] not in scripts:
+                    scripts.append(panel["script"])
+    return out
+
+
 def paper_map(rows: list[dict], paper: list[dict]) -> str:
-    """One row per figure, table and section of the paper: the tasks behind it."""
+    """One row per figure, table and section of the paper: the tasks behind it.
+
+    A figure row whose ``code`` cell is empty names the scripts of its panels from the figure manifest. A title that
+    is an extended caption names its figure by the printed number ("Extended caption of Figure 1").
+    """
+    scripts, names = figure_scripts(), paper_names(paper)
     by_label: dict[str, list[str]] = {}
     for r in rows:
         for it in items(r["paper"]):
@@ -239,7 +272,13 @@ def paper_map(rows: list[dict], paper: list[dict]) -> str:
             merged.setdefault(name, []).extend([letter.strip("()")] if letter else [])
         cell = ", ".join(name + (f" ({', '.join(letters)})" if letters else "") for name, letters in merged.items())
         key = f"; figure key `{p['figure_key']}`" if p["figure_key"] else ""
-        out.append(f"| {p['where']} | `{p['label']}`{key} | {p['title']} | {cell or '-'} | {p['code'] or '-'} |")
+        code = p["code"]
+        if not code and p["figure_key"] and scripts.get(p["label"]):
+            code = ("panels: " if len(scripts[p["label"]]) > 1 else "panel script: ") + ", ".join(f"`{s}`" for s in scripts[p["label"]])
+        title = p["title"]
+        if title.startswith("Extended caption of "):
+            title = re.sub(r"\b(?:fig|tab):[A-Za-z0-9-]+", lambda m: names[m.group(0)]["where"] if m.group(0) in names else m.group(0), title)
+        out.append(f"| {p['where']} | `{p['label']}`{key} | {title} | {cell or '-'} | {code or '-'} |")
     return "\n".join(out) + "\n"
 
 
@@ -260,7 +299,11 @@ def check_rows(rows: list[dict], names: dict[str, dict]) -> tuple[list[str], lis
             continue
         if r["group"] not in GROUPS:
             errors.append(f"{f}: unknown group {r['group']}")
-        if r["status"] not in STATUS:
+        if r["status"].startswith(RETIRED):
+            later = r["status"][len(RETIRED):]
+            if later == f or later not in listed:
+                errors.append(f"{f}: status names a task that has no row: {later}")
+        elif r["status"] not in STATUS:
             errors.append(f"{f}: unknown status {r['status']}")
         errors += [f"{f}: unknown basis {b}" for b in items(r["basis"]) if b not in BASIS]
         if bool(r["paper"]) != (r["basis"] != "-"):
@@ -284,6 +327,23 @@ def check_rows(rows: list[dict], names: dict[str, dict]) -> tuple[list[str], lis
     return errors, warnings
 
 
+def check_figure_keys(paper: list[dict]) -> list[str]:
+    """Warnings where PAPER.tsv and figures/manifest.tsv (written by the figure build) disagree on the figures."""
+    manifest = ROOT / "figures" / "manifest.tsv"
+    if not manifest.is_file():
+        return []
+    first: dict[str, str] = {}
+    for r in read_tsv(manifest):
+        first.setdefault(r["label"], r["key"])
+    out = []
+    for p in paper:
+        if p["label"].startswith("fig:") and p["figure_key"] != first.get(p["label"], ""):
+            out.append(f"PAPER.tsv: {p['label']} has figure key {p['figure_key'] or '(none)'}, figures/manifest.tsv has {first.get(p['label'], '(no figure)')}")
+    known = {p["label"] for p in paper}
+    out += [f"PAPER.tsv has no row for {label} (figure key {key} in figures/manifest.tsv)" for label, key in first.items() if label not in known]
+    return out
+
+
 def result_owners(rows: list[dict]) -> dict[str, list[str]]:
     owners: dict[str, list[str]] = {}
     for r in rows:
@@ -295,39 +355,82 @@ def result_owners(rows: list[dict]) -> dict[str, list[str]]:
 
 
 def refresh_paper(aux: Path) -> None:
-    """Rewrite the printed numbers of PAPER.tsv from a LaTeX .aux file of the manuscript; titles are kept."""
-    found = {}
+    """Bring PAPER.tsv in line with a build of the manuscript (its LaTeX .aux file) and with the figure manifest.
+
+    Printed numbers and the order of the rows follow the build. Key and title of a figure follow
+    ``figures/manifest.tsv`` (written by the figure build); a figure label of the build without a row gets one, and a
+    figure row whose label is not in the build is dropped. Titles of sections, of tables and of floats without a
+    figure, and the column ``code``, are kept as written; rows of sections and tables are never added or dropped
+    here (a label that is not in the build is reported).
+    """
+    order: dict[str, int] = {}
+    number: dict[str, str] = {}
     for m in re.finditer(r"\\newlabel\{([^}@]+)\}\{\{([^}]*)\}\{(\d+)\}", aux.read_text(encoding="utf-8", errors="replace")):
-        found[m.group(1)] = m.group(2)
+        if m.group(1) not in order:
+            order[m.group(1)], number[m.group(1)] = len(order), m.group(2)
+    manifest = ROOT / "figures" / "manifest.tsv"
+    figures: dict[str, dict] = {}
+    for r in read_tsv(manifest) if manifest.is_file() else []:
+        figures.setdefault(r["label"], r)
+
+    def where(label: str) -> str:
+        noun = {"fig": "Figure", "tab": "Table"}.get(label.split(":")[0], "Section")
+        return ("Supplementary " if not number[label][:1].isdigit() else "") + f"{noun} {number[label]}"
+
     paper = read_tsv(PAPER)
-    changed = 0
+    if sum(p["label"] in order for p in paper) < len(paper) / 2:
+        raise SystemExit(f"{aux}: fewer than half of the labels of PAPER.tsv are in this file; it is not a build of the current manuscript. Nothing written.")
+    kept, changed = [], 0
     for p in paper:
-        num = found.get(p["label"])
-        if num is None:
-            print(f"label not in the build (row kept as is): {p['label']}")
-            continue
-        kind = p["label"].split(":")[0]
-        noun = {"fig": "Figure", "tab": "Table"}.get(kind, "Section")
-        new = ("Supplementary " if not num[:1].isdigit() else "") + f"{noun} {num}"
-        changed += new != p["where"]
-        p["where"] = new
+        label = p["label"]
+        if label not in order:
+            if label.startswith("fig:"):
+                print(f"dropped (figure label not in the build): {label} {p['figure_key']}")
+                continue
+            print(f"label not in the build (row kept as is): {label}")
+        else:
+            changed += where(label) != p["where"]
+            p["where"] = where(label)
+        if label.startswith("fig:") and figures:
+            fig = figures.get(label)
+            if fig is None and p["figure_key"]:
+                print(f"no figure carries {label} any more (was {p['figure_key']}): key removed, check its title")
+            if fig is not None and (p["figure_key"], p["title"]) != (fig["key"], fig["title"]):
+                print(f"figure of {label}: {p['figure_key'] or '(none)'} -> {fig['key']}")
+            p["figure_key"], p["title"] = (fig["key"], fig["title"]) if fig is not None else ("", p["title"])
+        kept.append(p)
+    known = {p["label"] for p in kept}
+    placed = {p["where"] for p in kept}
+    for label in order:
+        if label.startswith("fig:") and label not in known and where(label) not in placed:  # a second label of a float gets no row
+            fig = figures.get(label)
+            kept.append({"label": label, "where": where(label), "figure_key": fig["key"] if fig else "",
+                         "title": fig["title"] if fig else "Extended caption (text only)", "code": ""})
+            print(f"added: {label} {fig['key'] if fig else '(no figure)'}")
+    # the order of the paper; a row that is not in the build stays behind the row it followed
+    rank, last = {}, -1.0
+    for i, p in enumerate(kept):
+        last = float(order[p["label"]]) if p["label"] in order else last + 1e-6
+        rank[i] = last
+    kept = [kept[i] for i in sorted(range(len(kept)), key=lambda i: (rank[i], i))]
     with PAPER.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(paper[0]), delimiter="\t", lineterminator="\n", quoting=csv.QUOTE_NONE)
         w.writeheader()
-        w.writerows(paper)
-    print(f"{PAPER.relative_to(ROOT)}: {changed} of {len(paper)} locations changed")
+        w.writerows(kept)
+    print(f"{PAPER.name}: {len(kept)} rows ({len(paper)} before), {changed} printed locations changed")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--check", action="store_true", help="write nothing; exit 1 if a generated view is stale or a row is wrong")
-    ap.add_argument("--paper-aux", type=Path, help="main.aux of a manuscript build: refresh the printed numbers in PAPER.tsv first")
+    ap.add_argument("--paper-aux", type=Path, help="main.aux of a manuscript build: first bring PAPER.tsv in line with it (numbers, order, figure keys and titles)")
     a = ap.parse_args()
     if a.paper_aux:
         refresh_paper(a.paper_aux)
     rows, paper = read_tsv(INDEX), read_tsv(PAPER)
     names = paper_names(paper)
     errors, warnings = check_rows(rows, names)
+    warnings += check_figure_keys(paper)
     for w in warnings:
         print("warning:", w)
     if errors:

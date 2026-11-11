@@ -8,7 +8,7 @@ Retraining control on four-species liver restricted to the two cell types that a
 | Question | Reliability and controls: How stable are the readouts across seeds, and what do they read from counts and from features? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.3 (`sec:findings`); Figure 8c (`fig:gin-esm2`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.7 (`sssec:rev-controls`) |
+| Used in the paper | Section 3.3 (`sec:findings`); Supplementary Figure S62c (`fig:supp-main-gin-esm2`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.7 (`sssec:rev-controls`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

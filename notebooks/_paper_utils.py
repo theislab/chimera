@@ -234,7 +234,7 @@ def nonlinear_z_leakage_probe(
 ) -> dict[str, float]:
     """Train a small 2-hidden-layer MLP on z → species and report heldout accuracy.
 
-    Round2 Caveat 34 / cross-ref §1609: the linear adversarial classifier used in
+    The linear adversarial classifier used in
     training only catches linearly-separable z-leakage. A nonlinear probe on a
     test split is the canonical post-hoc confirmation that z is species-free.
 
@@ -294,7 +294,7 @@ def per_dim_z_stats(z_mean: np.ndarray) -> pd.DataFrame:
     The full per-dim KL needs z_logvar which we do not save post-hoc. A useful
     proxy is `0.5 * (Var(z_mean) + mean(z_mean)^2 - 1 - log Var(z_mean))` assuming
     negligible within-cell q variance — a *lower bound* on the true per-dim KL
-    under a unit-Normal prior. Round2 OAI §904 flags any dim with KL < 0.01
+    under a unit-Normal prior. The design flags any dim with KL < 0.01
     (collapse) and > 5.0 nats (species-encoding signature).
     """
     m = z_mean.mean(0)
@@ -317,7 +317,7 @@ def adv_tail_stability(
     min_tail: int = 10,
     tolerance: float = 0.05,
 ) -> dict[str, Any]:
-    """Round2 OAI §905/§933 stopping criterion: adv_acc within ±tolerance of chance
+    """Stopping criterion: adv_acc within ±tolerance of chance
     for the last `max(min_tail, tail_frac * max_epochs)` epochs.
 
     Our E6.2 is a *point* check; this is a *tail-stability* check that rounds

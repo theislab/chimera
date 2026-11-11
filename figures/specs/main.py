@@ -1,40 +1,40 @@
 """The main figures.
 
-One entry per float of the paper: the layout, the label it belongs to, a short title and what it shows.
-A continuation float has the key of its figure with ``_2``, ``_3`` and the same label. See ``figures/README.md``.
+One entry per figure: the layout, the label it belongs to, a short title and what it shows. Every main figure is one
+float on one page (no continuation floats). See ``figures/README.md``.
 """
 
 from __future__ import annotations
 
-from figures.compose import Col, Figure, NB, P, Row, X
-
-# Two panels of the protein figure need the trained gate network and are placed as the notebooks stored them, without
-# their heading line (the first 11 bp of the page).
-STORED_CONTRIBUTIONS = NB("gin_attention_overall/c3_per_gene_esm2_vs_expression_disagreement", "b", region=(0, 11, 306.4, 191.2))
-STORED_ARCHETYPE_MAP = NB("gene_archetypes/a3_archetype_umap", "j", region=(0, 11, 328.0, 270.4))
+from figures.compose import COLUMNWIDTH, Col, Figure, P, Row, X
 
 FIGS = {
-    # Drawn by figures/redraw/overview/overview.py at print size; the five panels are placed as whole pages.
+    # Drawn by figures/redraw/overview/overview.py at print size; the four panel files are placed as whole pages.
+    # Panels (b) and (c) are one file, because arrows lead from the inputs into the model: its two letters stand
+    # under the centers of the two cards (LETTER_X in the script).
     "main_overview": Figure(
-        Col(Row(X("main_overview/problem", "a"), X("main_overview/inputs", "b"), X("main_overview/model", "c")),
+        Col(Row(X("main_overview/problem", "a"), X("main_overview/inputs_model", {"b": 47.2, "c": 234.2})),
             Row(X("main_overview/outputs", "d"), X("main_overview/applications", "e"))),
         label="fig:overview",
         title="Overview: what the model takes, does and returns",
-        shows=("A protein can stay almost the same between species while the cells use its gene differently, and "
-               "a protein can change while the cells use it alike. Panel (a) shows these two cases with two toy "
-               "genes: protein sequence on top, expression across cell states below. Panel (b) lists what the "
-               "model is given: single-cell counts from several species for genes that have exactly one "
+        shows=("A protein can stay almost the same between species while the cells use its gene at a different "
+               "level, and a protein can change while the cells use it alike. Panel (a) shows these two cases with "
+               "two toy genes: protein sequence on the left, expression across cell states on the right. Panel (b) lists "
+               "what the model is given: single-cell counts from several species for genes that have exactly one "
                "counterpart in each species, how similar the proteins are (the protein prior), and a description "
-               "of each gene (protein language model, protein similarity, expression statistics). Panel (c) is "
-               "the model. Cells of all species are placed on one map. Two decoders explain the counts together: "
-               "one does not know the species, the other does. A gate per gene decides how much of the species-aware "
-               "decoder is let in. The gate starts where the protein similarity puts it and moves only "
-               "when the counts say so; that count evidence is called S_g. Panel (d) shows what comes out: the "
-               "cell map, and for every gene the count evidence, the gate, and how far the gate ended from its "
-               "protein-based start (Δα). Above the prior means the cells of the species share the gene's "
-               "pattern; below means the pattern or the level differs. Genes with too few counts get a value "
-               "from genes with similar proteins, shown in gray. Panel (e) lists what the paper does with these "
-               "readouts.")),
+               "of each gene (protein language model, protein similarity, expression statistics); an arrow leads "
+               "each input to the part of the model that reads it. Panel (c) is the model. Cells of all species "
+               "are placed on one map. Two decoders explain the counts together: one does not know the species, "
+               "the other does. A gate per gene, drawn as a dial, decides how much of the species-aware decoder "
+               "is let in. The gate starts where the protein similarity puts it (the tick of the dial) and moves "
+               "(the needle) only when the counts say so; that count evidence is called S_g, and the distance "
+               "from tick to needle is Δα. Panel (d) shows what comes out: the cell map, and for every gene the "
+               "count evidence, the gate, and how far the gate ended from its protein-based start (Δα). Above "
+               "the prior means the cells of the species share the gene's pattern; below means the pattern or "
+               "the level differs. Genes with too few counts get a value from genes with similar proteins, shown "
+               "in gray. Panel (e) lists what the paper does with these readouts; its strip shows for each of "
+               "eight tissues that Δα does not follow protein similarity, while dN/dS, a second measure of "
+               "sequence conservation, does.")),
     # Drawn by figures/redraw/main_figures.py at print size: three pages with the same axes box.
     "main_alpha_vs_prior": Figure(
         Row(X("main_alpha_vs_prior/scatter", "a"), X("main_alpha_vs_prior/shift", "b"),
@@ -45,17 +45,30 @@ FIGS = {
                "is between the species (the protein prior). During training the gene's value α can move away "
                "from that start when the counts say so. (a) α against the prior: most genes stay near the "
                "diagonal and many leave it. (b) The move itself, Δα = α minus the prior: about half of the genes "
-               "move up and half move down. (c) The distribution of α beside that of the prior: the same overall "
-               "shape, shifted by the data.")),
+               "move up and half move down. The dotted lines stand at +0.05 and −0.05; 16% of the genes end "
+               "above the first and 22% below the second. (c) The distribution of α beside that of the prior: "
+               "the same overall shape, shifted by the data.")),
+    # One column wide. Drawn by analysis/tasks/T8_4_figures/fig3_integration_ext.py (composite_strip) from the stored table
+    # of the benchmark on eleven cohorts.
     "main_integration": Figure(
-        Row(X("main_integration/mixing", "a"), X("main_integration/conservation", "b"),
-            X("main_integration/composite", "c"), same_scale=True, gap=4),
+        X("main_integration/composite_strip"),
+        width=COLUMNWIDTH,
         label="fig:integration",
-        title="Integration benchmark on the seven liver and testis cohorts",
-        shows=("Rows are methods that align cells across species; columns are the seven liver and testis "
-               "cohorts. Each cell is a score from 0 (lowest method on that cohort) to 1 (highest). (a) How well "
-               "cells of different species mix. (b) How well cell types stay apart. (c) A weighted mean of the "
-               "two. Methods are grouped by whether they see cell-type labels during training.")),
+        title="Composite integration score of ten methods on eleven cohorts",
+        shows=("Before genes are read, the cells of the species must be lined up. Each row is one of eleven "
+               "cohorts (species sets of liver, testis, bone marrow, kidney, islet and eye); each mark is one of "
+               "ten methods that align cells across species. The position of a mark is the method's composite "
+               "score on that cohort: a weighted mean of how well cells of different species mix (40%) and how "
+               "well cell types stay apart (60%), where every measurement behind it is scaled within the cohort "
+               "from 0 (the lowest method) to 1 (the highest). Chimera is drawn in color and joined by a line; "
+               "the nine other methods are gray, and two of them, SATURN (dark gray) and CAMEX (open), have "
+               "marks of their own and are named in the key. The shape of a mark says whether the method is given cell-type "
+               "labels (circle: none; triangle: clusters found within each species; square: cell-type labels); "
+               "Chimera uses none on the liver cohorts and labels on the others. Chimera lies in the upper "
+               "group on most cohorts: the alignment is good enough to read genes from, which is what the paper "
+               "needs from it. All three scores of every method, by name: the supplementary integration "
+               "figures.")),
+    # Panels a and b drawn by figures/redraw/main_figures.py, panel c by analysis/tasks/T8_4_figures/fig4_additions.py.
     "main_delta_alpha_liver": Figure(
         Row(X("main_delta_alpha_liver/category_boxes", "a"), X("main_delta_alpha_liver/category_effect_sizes", "b"),
             P("main_delta_alpha_liver/prior_landscape", "c")),
@@ -68,152 +81,122 @@ FIGS = {
                "protein prior on the x axis and Δα on the y axis. Named genes: liver enzyme genes (urea cycle, "
                "gluconeogenesis) and mitochondrially encoded genes far below the prior, genes of supporting cell "
                "types above it. A dagger marks a gene whose position comes from its protein features and not "
-               "from its own counts.")),
-    "main_delta_alpha_liver_2": Figure(
-        Col(Row(P("main_delta_alpha_liver/celltype_drivers", "d"),
-                Col(X("main_delta_alpha_liver/margin_support", "e"), X("main_delta_alpha_liver/sequence_axis", "f"))),
-            P("main_delta_alpha_liver/cross_tissue", "g")),
-        label="fig:dalpha-biology", part=2,
-        title="Cell-type sources of the count evidence, margin support, tissue comparison and sequence measures",
-        shows=("(d) For each named gene, the cell types its count evidence comes from: hepatocytes carry most of "
-               "it. (e) For each cohort, the share of genes in the upper and in the lower tail whose Δα is "
-               "backed by count evidence of the same sign. (f) How α and Δα correlate with protein identity and "
-               "dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (g) Δα of the same genes "
-               "in liver against testis for two species pairs: no agreement beyond chance, so the reading belongs "
-               "to the tissue.")),
+               "from its own counts. Three hepatocyte enzymes that pass every check (the same sign in all five "
+               "seeds, margin support, counts in every species) are named in bold: HAL, ARG2 and CYP7A1.")),
+    # Drawn by analysis/tasks/H1_harmonise/figures.py (main_axis_summary, main_axis_clouds) from the stored table of
+    # correlations and the stored gene tables of the eight tissues.
+    "main_axis_tissues": Figure(
+        Col(X("main_axis_tissues/summary", "a"), P("main_axis_tissues/clouds", "b")),
+        label="fig:axis-tissues",
+        title="Protein identity, dN/dS, count evidence and Δα in eight tissues",
+        shows=("Is how a gene is used across cell states just another view of how conserved its protein is? Eight "
+               "tissues, one model each. (a) Each mark is one tissue; the axis is a rank correlation across genes "
+               "(−1 or +1: two measures order the genes the same way; 0: they are unrelated). Top row: protein "
+               "identity against dN/dS, two measures of sequence conservation. They agree strongly in every "
+               "tissue (−0.76 to −0.89; negative because a conserved protein has high identity and low dN/dS). "
+               "The four rows below: the count evidence S_g and Δα, each against protein identity and against "
+               "dN/dS. All marks sit close to zero (0.19 at most), so the model's readouts do not follow sequence "
+               "conservation. The gray bar in each row runs from zero over the eight marks. (b) The same "
+               "gene by gene: every dot is a gene, Δα on the y axis, protein identity (top row) or dN/dS (bottom "
+               "row) on the x axis, one column per tissue. Blue dots are genes whose value rests on their own "
+               "counts, gray dots genes whose value comes from their protein features. The orange line, the "
+               "median of Δα along the x axis, is flat in every tissue. Small gray triangles on the frame mark "
+               "genes beyond an axis.")),
+    # Panels a and b (one file, two letters): analysis/tasks/Y3_findings/figures.py; c: T8_4_figures/fig4_additions.py
+    # (panel_drivers_enzymes); d and e: F2_per_gene/panels.py (panel_readouts, panel_named_compact).
     "main_validation": Figure(
-        Col(Row(P("main_validation/prespecified_tests", "a"), P("main_validation/gene_sets", "b"), same_scale=True),
-            X("main_validation/head_to_head", "c"), X("main_validation/incremental", "d")),
+        Col(Row(X("main_validation/worked_genes", {"a": 88, "b": 252}), X("main_validation/celltype_drivers_enzymes", "c"),
+                same_scale=True),
+            Row(X("main_validation/readouts_vs_references", "d"), X("main_validation/named_findings", "e"), same_scale=True)),
         label="fig:validation",
-        title="Pre-specified tests against independent data and comparison with direct baselines",
-        shows=("(a) Four tests fixed before the analysis: does Δα agree with independent data on expression "
-               "level and on cell-type pattern, in liver and in testis? Points right of zero mean agreement; the "
-               "dotted line is the bar set in advance. Liver pattern passes. (b) Sets of genes with a known "
-               "expectation, tested against matched background genes. (c) Δα against simpler direct scores and "
-               "against the gene scores of SATURN and CAMEX: right of zero, Δα is closer to the independent "
-               "data. (d) What each score adds when all the others are known: the count evidence S_g adds on "
-               "pattern.")),
-    "main_validation_2": Figure(
-        Col(Row(X("main_validation/gates_tests", "e"), X("main_validation/gates_testis_level", "f"), same_scale=True,
-                gap=4),
-            Row(X("main_validation/gates_vs_count_evidence", "g"), X("main_validation/gates_named_findings", "h"),
-                X("main_validation/gates_sequence_measures", "i"), same_scale=True, gap=4),
-            gap=4),
-        label="fig:validation", part=2,
-        title="The tests and two named findings under the protein-feature gate and the per-gene gate",
-        shows=("The model can read Δα in two ways: through the protein-feature gate (the default) or gene by "
-               "gene from each gene's own counts (the per-gene gate). (e) The four tests of panel a for both "
-               "gates: with the per-gene gate Δα agrees with independent pattern data in liver and in testis. "
-               "Right: the difference between the gates. (f) Testis: Δα against independent expression level; "
-               "the per-gene readout follows the count evidence. (g) Δα against the count evidence of the same "
-               "fit: loosely related with the protein-feature gate, almost identical with the per-gene gate. (h) "
-               "Two named findings, spermatocyte genes above the prior and hepatocyte catabolic genes below it, "
-               "hold under both gates. (i) Under both gates Δα stays unrelated to dN/dS and to the protein "
-               "prior.")),
-    # 476 bp wide: at the text width the float with its caption is as tall as the page (smallest text 5.1 pt here).
+        title="Two worked genes, the cell types behind the count evidence, and the readouts against independent data",
+        shows=("(a) and (b) show two example genes in the raw counts, before any model. Each line is one species "
+               "and each point the expression of the gene in one cell type or stage (the counts of all cells of "
+               "that type summed, on a log scale). (a) ZPBP2, a sperm protein whose sequence differs between "
+               "species: its expression peaks at the same stage, spermatocytes (shaded), in human, mouse and "
+               "macaque. The protein changed, its pattern of use did not, and the model places the gene above "
+               "its protein prior (Δα +0.17). SG, SC, rSD, eSD: spermatogonia, spermatocytes, round and "
+               "elongated spermatids. (b) ALAS1, the first enzyme of heme synthesis, a conserved protein: it is "
+               "highest in hepatocytes in all three mammals, but the mouse expresses it 4.6 log2 units (about "
+               "24-fold) above human. The model places it below its prior (Δα −0.24). The corner of each plot "
+               "gives Δα and the count evidence S_g of the gene; the protein identities of the two genes are "
+               "measured on different sets of species and are given in the caption, not on the panels. (c) For "
+               "seven such liver enzymes, the cell types the count evidence comes from: "
+               "nearly all of it is contributed by hepatocytes (the black tick is the total). (d) Do the "
+               "readouts agree with independent data, from samples the model never saw? Rows are four "
+               "references: cell-state pattern and expression level, in liver and in testis. Marks right of zero "
+               "mean agreement; the shaded side clears the bar that was fixed before the analysis. The count "
+               "evidence S_g (squares) and Δα read gene by gene (hexagons) agree with independent pattern in "
+               "both tissues. Δα from the default gate (circles) carries the outcome of the test fixed in "
+               "advance, written beside each row: supported for liver pattern, null for testis pattern and "
+               "liver level, reversed for testis level. (e) The two findings as gene sets, under both ways of reading Δα: genes "
+               "that peak in spermatocytes sit above matched genes, the hepatocyte enzyme program below.")),
+    # Drawn by analysis/tasks/H1_harmonise/figures.py (main_recurrence, compact form).
     "main_tissues": Figure(
-        Col(P("main_tissues/axis", "a"), P("main_tissues/genes", "b"), gap=3),
-        width=476,
+        P("main_tissues/recurrence"),
         label="fig:one-reading",
-        title="Δα against protein identity and dN/dS, and named genes, in eight tissues",
-        shows=("The same reading in eight tissues, one column or block per tissue. (a) Top row: how far genes "
-               "move from the prior, with the spread and the shares of genes clearly above and below. Middle and "
-               "bottom rows: Δα against protein identity and against dN/dS, with the correlations under each "
-               "cloud. The orange trend line is flat, so deployment does not follow sequence conservation in any "
-               "tissue. Small gray triangles mark genes beyond an axis. (b) For each tissue, the genes furthest "
-               "above the prior (orange), the tissue's own lineage genes (bold) and the genes furthest below "
-               "(blue), every bar at its full length.")),
-    "main_tissues_2": Figure(
-        P("main_tissues/recurrence", "c"),
-        label="fig:one-reading", part=2,
         title="Gene programs and classes across eight tissues",
         shows=("Rows are gene programs and gene classes, columns the eight tissues. A red cell means the program "
                "sits above the protein prior in that tissue, a blue cell below; a star marks significance, a gray "
-               "cell a program with too few genes. The rows stand in four blocks with headings: programs above "
-               "the prior in tissue after tissue (receptors, cell contacts and signaling), programs below it "
-               "(translation, mitochondria and chromatin), programs found in one tissue, and programs with "
-               "opposite signs in different tissues. The columns at the right, explained by the key under the "
+               "cell a program with too few genes. The rows stand in four blocks, each with a heading and its "
+               "number of programs: 26 above the prior in tissue after tissue (receptors, cell contacts and "
+               "signaling), 9 below it (translation, mitochondria and chromatin), 3 found in one tissue, and 3 "
+               "with opposite signs in different tissues. The columns at the right, explained by the key under the "
                "panel, show that the count evidence and direct profile correlation agree with this, and that "
                "protein identity and dN/dS do not predict it.")),
-    "main_tissues_3": Figure(
-        Col(Row(P("main_tissues/gene_by_tissue_row1", {"d": 150, "e": 400}, region=(0, 0, 512, 119)), same_scale=True),
-            Row(P("main_tissues/gene_by_tissue_row2", {"f": 150, "g": 395}, region=(0, 120, 512, 283)),
-                same_scale=True),
-            Row(P("main_tissues/gene_by_tissue_row3", {"h": 145, "i": 385}, region=(0, 283, 512, 429)),
-                same_scale=True),
-            gap=3),
-        label="fig:one-reading", part=3,
-        title="Gene and tissue components of the readouts",
-        shows=("(d) How much of each readout belongs to the gene in every tissue, to the gene in one tissue, or "
-               "to noise. (e) Each tissue's readout against independent data of every tissue: the matching "
-               "tissue (outlined) agrees best. (f) The advantage of the matching tissue over the others. (g) "
-               "Within one gene, differences between tissues in the readout follow differences between tissues "
-               "in the independent data. (h) For genes whose reading flips between tissues, what is low in the "
-               "low tissue: mostly a gap in expression level. (i) Six example genes.")),
-    "main_tissues_4": Figure(
-        Col(P("supp_cell_compartments/compartments", "j"),
-            Row(P("supp_protein_architecture/domains", "k"), P("supp_regulatory_architecture/properties", "l"),
-                same_scale=True, gap=10),
-            gap=4),
-        label="fig:one-reading", part=4,
-        title="Home compartments, protein domains and regulatory features",
-        shows=("(j) Genes grouped by the kind of cell that uses them most. Genes of specialized cells sit above "
-               "their protein prior in nearly every cohort; broadly used genes sit below. Direct level "
-               "similarity (right column) shows the opposite order. (k) Protein families: signaling and cell-surface "
-               "domains above the prior; RNA, chromatin and protein-turnover domains below. (l) "
-               "Regulatory features: genes with many enhancers and many regulating transcription factors above; "
-               "housekeeping genes and CpG-island promoters below.")),
-    "main_disease": Figure(
-        Col(Row(P("main_disease/kidney_transfer", "a"), P("main_disease/stage_transfer", "b"), same_scale=True),
-            Row(P("main_disease/healthy_tissue_test", "c"), P("main_disease/transfer_vs_null", "d"),
-                P("main_disease/injury_genes", "e"), same_scale=True)),
-        label="fig:disease",
-        title="Transfer of disease programs between human and mouse",
-        shows=("(a) Kidney: for each cell type, how many disease programs that are active in human acute kidney "
-               "injury also change the same way in the mouse injury model. (b) Early (2 days) against late (4 to "
-               "20 weeks) mouse injury: the early stage reproduces more of the human programs. (c) The test "
-               "fixed in advance: does Δα from healthy tissue predict which genes respond alike in human and "
-               "mouse disease? The estimates sit at zero, inside the grey null bands. (d) The number of "
-               "transferring programs against its null in kidney, liver and islet. (e) Published lists of shared "
-               "and human-specific injury genes.")),
+    # The first panel of the supplementary figure supp_cell_compartments, alone (analysis/tasks/E3_cells/figure.py).
+    "main_specialized_cells": Figure(
+        P("supp_cell_compartments/compartments"),
+        label="fig:above-prior",
+        title="Home compartments of genes: Δα under both gates, profile correlation and level similarity",
+        shows=("Every gene is given a \"home\": the cell type in which human cells use it most, or no home if it "
+               "is used in all cells. Home cell types are grouped into four compartments: the specialized cells "
+               "of a tissue (neurons, kidney tubule cells, germ cells), stromal cells, blood-vessel cells and "
+               "immune cells. For each compartment and each of the 26 cohorts the figure asks whether its genes "
+               "score higher or lower than comparison genes with the same protein identity, expression, "
+               "detection and cell-type specificity. Four scores stand side by side: Δα with the protein-feature "
+               "gate, Δα with the per-gene gate, the correlation of cell-type expression profiles between "
+               "species, and the similarity of expression level at the home cell type. One mark is one cohort "
+               "(filled when the difference is significant), the bar is the median, and the gray numbers count "
+               "the cohorts above zero. Genes of specialized cells sit above their protein prior in 23 of 24 and "
+               "24 of 24 cohorts, while their expression level at the home cell type is the least similar "
+               "between species (2 of 24 above zero); genes used in every cell sit below the prior in 25 and 26 "
+               "of 26 cohorts while their level is similar (23 of 26 above zero).")),
+    # One panel, drawn by analysis/tasks/E4_translational/figures.py (p_targets).
+    "main_drug_targets": Figure(
+        X("supp_drug_targets/targets"),
+        label="fig:drug-targets",
+        title="Approved drug targets against the protein prior",
+        shows=("Each of the four plots is one tissue: bone marrow, cortex, eye and kidney. Every gene with count "
+               "evidence is a light gray dot, placed by the rank of its protein identity between the species "
+               "(left, less conserved; right, more; the genes at the upper bound of the prior share one "
+               "position) and by its Δα with the per-gene gate (up, above what the protein predicts; down, "
+               "below). The targets of approved drugs are drawn on top. Vermilion marks targets that sit above "
+               "the prior on both gates of the model, blue marks those below on both, and gray marks targets "
+               "without a call; a diamond means that the drug is used for a disease of that organ system. Named "
+               "examples above the prior are immune receptors in bone marrow whose proteins evolve fast (IL6R, "
+               "IL4R, IFNGR1, CD86), neuronal channels and receptors in cortex (SCN8A, GABRA1, OPRM1) and "
+               "transporters in kidney (SCNN1G, SLC9A3, SLC22A12). Named examples below the prior are conserved "
+               "proteins that the mouse deploys differently, such as PDE10A, FAAH and KCNQ1 in cortex and ROCK2 "
+               "in the eye. The two lines under the title of each plot give the number of approved targets "
+               "called above and below the prior, each with the number expected from genes of equal identity and "
+               "expression.")),
+    # Drawn by figures/redraw/main_figures.py at 157 bp per map and placed at 0.86 to 0.87 of that size (specs/_allow.py):
+    # 422 bp wide, so that the figure is at most 242 bp high and its smallest text stays at 5.0 pt.
     "main_protein": Figure(
-        Col(Row(X("main_protein/attribution_shares", "a"), STORED_CONTRIBUTIONS),
-            P("main_protein/controls", "c")),
+        Col(Row(X("main_protein/atlas_alpha", "a"), X("main_protein/atlas_delta_alpha", "b"),
+                X("main_protein/atlas_correction", "c"), same_scale=True),
+            Row(X("main_protein/atlas_categories", "d"),
+                Col(X("main_protein/atlas_categories_key"), X("main_protein/atlas_clusters", "e")))),
+        width=422,
         label="fig:gin-esm2",
-        title="Inputs of the gate network and control trainings",
-        shows=("(a) Four ways of asking which inputs the gate network uses. Protein-language features (ESM-2) "
-               "lead in three of them; expression features lead when whole groups of inputs are removed. (b) For "
-               "each gene, the part of the correction that comes from protein features against the part that "
-               "comes from expression features. The two are nearly unrelated and both are needed. (c) Control "
-               "trainings: gene features removed, randomized or set to zero; counts shuffled between genes. Each "
-               "dot compares one control run with normal training. The count evidence S_g (right) stays the same "
-               "when features are changed and collapses when counts are shuffled. Δα (left) shows how much "
-               "follows the features and how much follows the counts.")),
-    "main_protein_2": Figure(
-        Col(Row(X("main_protein/atlas_alpha", "d"), X("main_protein/atlas_delta_alpha", "e"),
-                X("main_protein/atlas_correction", "f"), same_scale=True),
-            Row(X("main_protein/atlas_categories", "g"),
-                Col(X("main_protein/atlas_categories_key"), X("main_protein/atlas_clusters", "h")))),
-        label="fig:gin-esm2", part=2,
         title="Protein-space atlas",
         shows=("A map of all genes arranged by protein similarity: each dot is a gene, and dots that lie close "
-               "have similar protein-language features. (d) The map colored by the gate value α. (e) Colored by "
-               "Δα: neighboring genes tend to share the sign. (f) Colored by the size of the correction the gate "
-               "network makes to the prior. (g) Twelve gene categories on the map, at most 30 genes each; the key "
-               "is at the right. (h) The genes of each of four liver cohorts sorted into twelve protein "
+               "have similar protein-language features. (a) The map colored by the gate value α. (b) Colored by "
+               "Δα: neighboring genes tend to share the sign; three categories of (d) whose genes lie together "
+               "are named. (c) Colored by the size of the correction the gate "
+               "network makes to the prior. (d) Twelve gene categories on the map, at most 30 genes each; the key "
+               "is at the right. (e) The genes of each of four liver cohorts sorted into twelve protein "
                "clusters; each cell is the median Δα of one cluster, sorted from lowest to highest within the "
                "cohort. The spread is widest in the four-species cohort.")),
-    "main_protein_3": Figure(
-        Col(Row(X("main_protein/archetype_number", "i"), STORED_ARCHETYPE_MAP, X("main_protein/archetype_delta_alpha", "k")),
-            Row(X("main_protein/archetype_protein_map", "l"), X("main_protein/archetype_neighbors", "m"),
-                X("main_protein/archetype_prediction", "n"), same_scale=True)),
-        label="fig:gin-esm2", part=3,
-        title="Gene archetypes of the gate network",
-        shows=("The gate network sorts genes into groups (archetypes) in its hidden layer. (i) How well the groups "
-               "separate and how well they repeat between random starts, for 3 to 12 groups: three is chosen. "
-               "(j) The three archetypes on a map of the hidden layer. (k) Δα of the genes of each archetype: "
-               "A0 below the prior, A1 near it, A2 above it. (l) The archetypes on the protein map of panels d "
-               "to g. (m) Protein neighbors share the archetype more often than chance. (n) The archetype can "
-               "be predicted in part from expression level alone (0.57) and almost fully from all inputs of the "
-               "gate network (0.94), so expression level alone does not explain it.")),
 }

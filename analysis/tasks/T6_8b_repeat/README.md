@@ -8,7 +8,7 @@ Trains liver Human+Mouse seeds 46 and 47 a second time with unchanged arguments 
 | Question | Model fits beyond the canonical runs: Which further seeds, platform repeats and cohort recipes were trained, and how was each recipe chosen? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.2 (`sssec:rev-seeds`); Supplementary Section C.21.11 (`sssec:rev-functional`) |
+| Used in the paper | Supplementary Section C.21.2 (`sssec:rev-seeds`); Supplementary Section C.21.10 (`sssec:rev-functional`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

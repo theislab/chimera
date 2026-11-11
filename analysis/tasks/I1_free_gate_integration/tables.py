@@ -1,6 +1,6 @@
 """Tables: both gates side by side.
 
-(a) Fig 3 rows: the ten frozen methods unchanged (s42, as Fig 3), Chimera canonical gate as in Fig 3 (s42 run), canonical gate over seeds,
+(a) rows of the integration benchmark (fig:integration): the ten frozen methods unchanged (s42, as in the benchmark), Chimera canonical gate as in the benchmark (s42 run), canonical gate over seeds,
     per-gene gate over seeds; mixing score, conservation score, composite on the frozen panel bounds.
 (b) Harmonized cohorts: kNN mixing entropy, label transfer, kNN cell-type purity (H1_harmonise key) and the Z2_embedding within-label AUROC,
     both gates; scVI on the same object beside (H1_harmonise table for the cortex, lung, muscle and tumor cohorts; the scVI latents of
@@ -236,7 +236,7 @@ def caption_a(C, cohorts) -> str:
                 f"{sum(x[2] - x[0] - x[1] for x in b)} of {sum(x[2] for x in b)} lie within the range of the protein-feature seeds; the per-gene gate "
                 f"is better and worse than every protein-feature seed on, respectively: " + "; ".join(parts) + f" of {n} cohorts. ")
     return (head + "Scores as in \\cref{fig:integration}: scIB-style metrics, min--max scaled within each cohort, composite $0.4$ mixing $+$ $0.6$ "
-            "conservation. Rows of the other methods and of the \\textit{Chimera} run are those of \\cref{fig:integration} (seed 42); "
+            "conservation. Rows of the other methods and of the \\textit{Chimera} run are those of Supplementary~\\cref{fig:supp-integration-purity} (seed 42); "
             "the seed rows give mean (range) over the healthy fits of each gate, with the number of seeds under each cohort (protein-feature / "
             "per-gene). Liver Human+Mouse and testis Human+Mouse use the same seed numbers and platform under both gates; elsewhere the per-gene fits "
             "are other seeds of the same recipe with only the gate switched (liver Human+Zebrafish and testis Human+Macaque have one kept protein-feature "
@@ -261,7 +261,7 @@ def caption_b(C, rb) -> str:
             "type (hepatocyte zonation; kidney proximal tubule segment and state, thick ascending limb and endothelial state; beta-cell stress; "
             "marrow maturation and progression; testis stages), from the latent of the model. Values are mean (range) over seeds; protein-feature "
             "fits are the kept runs of Supplementary~\\cref{tab:harmonised-cohorts}, per-gene fits pass the same health rule for the gate "
-            "(species mixing is not used to select them). scVI on the same object, unchanged: mixing; label transfer; within-label AUROC. "
+            "(species mixing is not used to select them). The last column gives scVI on the same object: mixing entropy; label transfer; within-label AUROC. "
             "$^{\\uparrow}$, $^{\\downarrow}$: every per-gene seed above, below every protein-feature seed."
             + kept_note(["h1|knn_mixing_entropy", "h1|label_transfer_acc", "h1|knn_celltype_purity", "z2|within_auroc"]))
 

@@ -2,6 +2,7 @@
 
     python build_assets.py silhouettes                 # assets/silhouettes.json
     python build_assets.py data --repo <chimera repo>  # assets/liver_human_monkey_*.csv
+    python build_assets.py tissues --repo <chimera repo>  # assets/eight_tissues.csv
 
 Silhouettes
     The species outlines (human, macaque, mouse, zebrafish) are traced from the background picture of the
@@ -20,6 +21,14 @@ Data (panel d)
       liver_human_monkey_umap.csv          1,500 cells drawn without replacement (seed 0): the cached UMAP
                                            of the latent (``notebooks/cache/chimera_umap/
                                            panc_hmonkey__chimera__umap.npy``), species and cell type
+
+Tissues (panel e)
+    Real values of the eight models of the one-reading figure (one human+mouse model per tissue; bone marrow
+    and lung, the human, mouse lemur, mouse models), from the cached table of the separate-axis statistics of
+    ``analysis/tasks/H1_harmonise`` (``results/analysis/H1/axis.csv``, rows ``universe == all``):
+      eight_tissues.csv   one row per tissue: the model, the number of genes in the correlations, and the
+                          Spearman correlations of protein identity with dN/dS, of delta alpha with protein
+                          identity and of delta alpha with dN/dS
 """
 
 from __future__ import annotations
@@ -48,6 +57,9 @@ ADATA = "data/processed/camex_human_monkey.h5ad"
 UMAP = "notebooks/cache/chimera_umap/panc_hmonkey__chimera__umap.npy"
 N_CELLS_SHOWN = 1500
 DELTA_ALPHA_BINS = np.linspace(-0.4, 0.4, 81)  # notebooks/_figure_design.py
+# The eight tissues in the order of the paper and the model read in each (analysis/tasks/H1_harmonise/rules.py).
+TISSUE_MODEL = {"liver": "liv_hmouse", "testis": "test_hmouse", "bone marrow": "bone_marrow", "kidney": "kidney",
+                "islet": "islet", "eye": "vz_hmouse", "cortex": "brain_m1_hmouse", "lung": "lung_healthy"}
 
 
 def _simplify(p: np.ndarray, tol: float) -> np.ndarray:
@@ -141,12 +153,35 @@ def data(repo: Path) -> None:
     print(u.species.value_counts().to_dict(), u.cell_type.value_counts().to_dict())
 
 
+def tissues(repo: Path) -> None:
+    import pandas as pd
+
+    axis = pd.read_csv(repo / "results" / "analysis" / "H1" / "axis.csv")
+    axis = axis[axis.universe == "all"].set_index("cohort")
+    rows = []
+    for tissue, cohort in TISSUE_MODEL.items():
+        a = axis.loc[cohort]
+        assert a.tissue == tissue, (a.tissue, tissue)
+        rows.append({"tissue": tissue, "model": cohort, "n_genes": int(a.n),
+                     "rho_identity_dnds": round(float(a.rho_pi_dNdS), 4),
+                     "rho_delta_alpha_identity": round(float(a.rho_D_pi), 4),
+                     "rho_delta_alpha_dnds": round(float(a.rho_D_dNdS), 4)})
+    t = pd.DataFrame(rows)
+    with (ASSETS / "eight_tissues.csv").open("w") as f:
+        f.write("# the eight models of the one-reading figure; Spearman correlations over the genes with a dN/dS value "
+                "(results/analysis/H1/axis.csv, universe all)\n")
+        t.to_csv(f, index=False)
+    print(t.to_string(index=False))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("what", choices=["silhouettes", "data"])
-    ap.add_argument("--repo", type=Path, default=None, help="chimera repository (for 'data')")
+    ap.add_argument("what", choices=["silhouettes", "data", "tissues"])
+    ap.add_argument("--repo", type=Path, default=None, help="chimera repository (for 'data' and 'tissues')")
     args = ap.parse_args()
     if args.what == "silhouettes":
         silhouettes()
-    else:
+    elif args.what == "data":
         data(args.repo)
+    else:
+        tissues(args.repo)

@@ -57,7 +57,7 @@ TOP_EFFECT = {"level": "8", "pattern": "1", "loss": "1"}  # the strongest effect
 QUARTILE = {"low": "1", "midlow": "2", "midhigh": "3", "high": "4"}  # expression bands of rules.BANDS: quartiles, lowest to highest
 QUARTILE_WORD = {"low": "first", "midlow": "second", "midhigh": "third", "high": "fourth"}
 IDENT = {"id_low": "low", "id_mid": "mid", "id_high": "high"}  # tertiles of protein identity
-# Kidney cell types in upper-case abbreviations, as in Fig 7 (no lower-case "fi" pair for the text check)
+# Kidney cell types in upper-case abbreviations, as in the disease figure, fig:disease (no lower-case "fi" pair for the text check)
 KTYPE = {"atl": "ATL", "cnt": "CNT", "dct": "DCT", "dtl": "DTL", "ec": "EC", "fib": "FIB", "ic": "IC", "lymphoid": "LYM",
          "myeloid": "MYE", "pape": "PapE", "pc": "PC", "pec": "PEC", "pod": "POD", "pt": "PT", "tal": "TAL", "vsm_p": "VSM/P"}
 # Methods of the practical-cost panel: name, color, marker. The two other tools are grays, so no readout color is reused for a tool.

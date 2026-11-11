@@ -32,6 +32,19 @@ K_SUPPORT = "(k) gives the share of genes far above and far below the prior that
 K_MODELS = "(k) shows the distribution of Δα in every model of this tissue, one row per model, the model of this figure first."
 
 FIGS = {
+    # 476 bp wide: at the text width the float with its caption is as tall as the page (smallest text 5.1 pt here).
+    "supp_tissues_named_genes": Figure(
+        Col(P("main_tissues/axis", "a"), P("main_tissues/genes", "b"), gap=3),
+        width=476,
+        label="fig:supp-tissue-genes",
+        title="Δα against protein identity and dN/dS, and named genes, in eight tissues",
+        shows=("The same reading in eight tissues, one column or block per tissue. (a) Top row: how far genes "
+               "move from the prior, with the spread and the shares of genes clearly above and below. Middle and "
+               "bottom rows: Δα against protein identity and against dN/dS, with the correlations under each "
+               "cloud. The orange trend line is flat, so deployment does not follow sequence conservation in any "
+               "tissue. Small gray triangles mark genes beyond an axis. (b) For each tissue, the genes furthest "
+               "above the prior (orange), the tissue's own lineage genes (bold) and the genes furthest below "
+               "(blue), every bar at its full length.")),
     "supp_tissue_bone_marrow": Figure(
         tissue("supp_tissue_bone_marrow"),
         label="fig:supp-h1-bone-marrow",
@@ -155,6 +168,21 @@ FIGS = {
                "below the prior, mostly conserved nuclear RNA and DNA genes (XRCC5, UPF3A, RRP1, RPL3, TNRC6C). The two "
                "columns beside each block give the gene's protein identity between the species and in how many of the "
                "cohorts in which it was tested it is called (HEG1: 13 of 26).")),
+    "supp_gene_by_tissue": Figure(
+        Col(Row(P("main_tissues/gene_by_tissue_row1", {"a": 150, "b": 400}, region=(0, 0, 512, 119)), same_scale=True),
+            Row(P("main_tissues/gene_by_tissue_row2", {"c": 150, "d": 395}, region=(0, 120, 512, 283)),
+                same_scale=True),
+            Row(P("main_tissues/gene_by_tissue_row3", {"e": 145, "f": 385}, region=(0, 283, 512, 429)),
+                same_scale=True),
+            gap=3),
+        label="fig:supp-gene-by-tissue",
+        title="Gene and tissue components of the readouts",
+        shows=("(a) How much of each readout belongs to the gene in every tissue, to the gene in one tissue, or "
+               "to noise. (b) Each tissue's readout against independent data of every tissue: the matching "
+               "tissue (outlined) agrees best. (c) The advantage of the matching tissue over the others. (d) "
+               "Within one gene, differences between tissues in the readout follow differences between tissues "
+               "in the independent data. (e) For genes whose reading flips between tissues, what is low in the "
+               "low tissue: mostly a gap in expression level. (f) Six example genes.")),
     "supp_cell_compartments": Figure(
         Col(X("supp_cell_compartments/compartments", "a"),
             Row(X("supp_cell_compartments/pattern_vs_level", "b"), width=300), gap=3),
@@ -215,6 +243,20 @@ FIGS = {
                "five genes that an earlier study reported as changed on the human lineage: in the cell type "
                "named by that study the human bar lies below those of the other three primates, for example "
                "FOXP2 in microglia.")),
+    # Program transfer between human disease and its mouse models (panels: analysis/tasks/T8_4_figures/fig8_disease.py).
+    "supp_disease_transfer": Figure(
+        Col(Row(P("main_disease/kidney_transfer", "a"), P("main_disease/stage_transfer", "b"), same_scale=True),
+            Row(P("main_disease/healthy_tissue_test", "c"), P("main_disease/transfer_vs_null", "d"),
+                P("main_disease/injury_genes", "e"), same_scale=True)),
+        label="fig:disease",
+        title="Transfer of disease programs between human and mouse",
+        shows=("(a) Kidney: for each cell type, how many disease programs that are active in human acute kidney "
+               "injury also change the same way in the mouse injury model. (b) Early (2 days) against late (4 to "
+               "20 weeks) mouse injury: the early stage reproduces more of the human programs. (c) The test "
+               "fixed in advance: does Δα from healthy tissue predict which genes respond alike in human and "
+               "mouse disease? The estimates sit at zero, inside the gray null bands. (d) The number of "
+               "transferring programs against its null in kidney, liver and islet. (e) Published lists of shared "
+               "and human-specific injury genes.")),
     "supp_disease_genes": Figure(
         Col(X("supp_disease_genes/heat", "a"),
             Row(X("supp_disease_genes/partial", "b"), X("supp_disease_genes/q1", "c")), gap=4),
@@ -239,20 +281,4 @@ FIGS = {
                "same human disease. The two resources point in opposite directions (odds ratios 0.87 to 0.90 "
                "for curated models, 1.04 to 1.06 for phenotype matches), so the reading does not predict which "
                "mouse mutants model the disease.")),
-    "supp_drug_targets": Figure(
-        X("supp_drug_targets/targets"),
-        label="fig:supp-e4-targets",
-        title="Approved drug targets against the protein prior",
-        shows=("Each of the four plots is one tissue: bone marrow, cortex, eye and kidney. Every gene with count "
-               "evidence is a light gray dot, placed by the rank of its protein identity between the species "
-               "(left, less conserved; right, more; the genes at the upper bound of the prior share one "
-               "position) and by its Δα with the per-gene gate (up, above what the protein predicts; down, "
-               "below). The targets of approved drugs are drawn on top. Vermilion marks targets that sit above "
-               "the prior on both gates of the model, blue marks those below on both, and gray marks targets "
-               "without a call; a diamond means that the drug is used for a disease of that organ system. Named "
-               "examples above the prior are immune receptors in bone marrow whose proteins evolve fast (IL6R, "
-               "IL4R, IFNGR1, CD86), neuronal channels and receptors in cortex (SCN8A, GABRA1, OPRM1) and "
-               "transporters in kidney (SCNN1G, SLC9A3, SLC22A12). Named examples below the prior are conserved "
-               "proteins that the mouse deploys differently, such as PDE10A, FAAH and KCNQ1 in cortex and ROCK2 "
-               "in the eye.")),
 }

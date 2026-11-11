@@ -7,7 +7,7 @@
 **Region.** snRNA-seq covers three regions, each from human, chimpanzee, bonobo and rhesus macaque (3 individuals per species, pooled per region):
 - **anterior cingulate cortex (AC, BA24)**, the only cortical region;
 - caudate nucleus (CN);
-- cerebellar grey matter (CB).
+- cerebellar gray matter (CB).
 
 **Circularity.** These are not our donors or regions, so `circular = no`.
 

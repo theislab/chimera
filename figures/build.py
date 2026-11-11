@@ -9,8 +9,9 @@ Steps: (1) every figure of ``figures/specs`` is composed into ``composed/<key>.p
 the house style; (2) the composed figures are merged in the order of ``order.txt``; (3) the merged file is cropped with
 ``pdf-crop-margins -v -p 0`` into ``figures.pdf``; (4) the crop is verified page by page (no ink lost, scale unchanged);
 (5) ``manifest.tsv``, ``manifest.json`` and ``INDEX.md`` are written; (6) every panel, composed figure, asset and the
-single PDF is searched for traces of the machine it was made on (paths, user name), and the build fails on a hit.
-Nothing is recomputed: the build reads panel files only.
+single PDF is searched for traces of the machine it was made on (paths, user name), and the build fails on a hit;
+(7) every panel of a figure must have its script recorded in ``producers.tsv`` (named by the build, an error with
+``--strict``). Nothing is recomputed: the build reads panel files only.
 
 The crop. ``pdf-crop-margins -v -p 0`` with its defaults finds the content of a page on a 150 dpi MuPDF render and
 treats every pixel lighter than 191 of 255 as background. On these figures that cuts into light ink (panel frames,
@@ -137,6 +138,7 @@ def write_manifest(figs: dict, rows: dict, problems: dict, allowed: dict) -> Non
     cols = ["page", "key", "label", "part", "number", "title", "width_bp", "height_bp", "spec", "n_panels", "panels",
             "smallest_text_pt", "share_under_5pt", "checks", "sha256"]
     numbers = guide.numbers()  # printed figure numbers, when the manuscript's sync script has written them
+    scripts = guide.producers()  # the script that draws each panel file
     table, full = [], []
     for i, (k, f) in enumerate(figs.items(), 1):
         r = rows[k]
@@ -154,8 +156,9 @@ def write_manifest(figs: dict, rows: dict, problems: dict, allowed: dict) -> Non
                           panels="; ".join((("".join(p["letters"]) + ": ") if p["letters"] else "") + p["file"] + (f" p.{p['page']}" if p["page"] != 1 else "")
                                            for p in r["panels"]),
                           smallest_text_pt=min((s["size"] for s in body), default=""), share_under_5pt=f"{under:.2f}", checks=chk, sha256=r["sha256"]))
+        panels = [dict(p, script=(guide.producer(p["file"], scripts) or ("", ""))[0]) for p in r["panels"]]
         full.append(dict(table[-1], shows=f.shows, signature=r["signature"], shrink=r.get("shrink", 1.0), composed_size=[r["width_bp"], r["height_bp"]],
-                         panels=r["panels"], problems=problems.get(k, {}), listed=allowed.get(k, {})))
+                         panels=panels, problems=problems.get(k, {}), listed=allowed.get(k, {})))
     with MANIFEST_TSV.open("w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, delimiter="\t", lineterminator="\n")
         w.writeheader()
@@ -285,6 +288,7 @@ def main() -> int:
     write_manifest(figs, rows, problems, allowed)
     guide.write_index()
     leaks = K.machine_path_scan(jobs=a.jobs)
+    unrecorded = guide.unrecorded([p["file"] for k in figs for p in rows[k]["panels"]])
 
     n_listed = sum(len(v) for v in allowed.values())
     print(f"\nfigures.pdf: {len(figs)} pages, {SINGLE.stat().st_size / 1e6:.1f} MB")
@@ -302,11 +306,13 @@ def main() -> int:
         print("CROP:", m)
     if pending:
         print("\nPending (specified, not yet a float of the paper; composed, not in figures.pdf): " + ", ".join(pending))
+    for m in unrecorded:
+        print("PANEL SCRIPT:", m)
     for f, hits in leaks:
         print(f"MACHINE PATH: {f}: {', '.join(hits)}")
     print(f"no trace of a working machine in the panels, composed figures, assets and figures.pdf" if not leaks
           else f"{len(leaks)} files carry traces of a working machine: the build fails")
-    return 1 if (problems or bad or leaks or broken or (a.strict and (allowed or pending))) else 0
+    return 1 if (problems or bad or leaks or broken or (a.strict and (allowed or pending or unrecorded))) else 0
 
 
 if __name__ == "__main__":

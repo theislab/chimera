@@ -1,4 +1,4 @@
-"""E1 step 1: gene-set libraries by human Ensembl ID over the union vocabulary of the 26 cohorts (definitions in rules.py).
+"""Step 1: gene-set libraries by human Ensembl ID over the union vocabulary of the 26 cohorts (definitions in rules.py).
 
 Writes results/analysis/E1/sets/{membership.parquet, sets.csv}. Reads no read-out.
 

@@ -8,7 +8,7 @@ Computes the direct baselines for every cohort from the same counts: pseudobulk 
 | Question | Pre-specified validation: Do independent data back Δα and the count evidence S_g, and how do direct baselines compare? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.4 (`sec:validation`); Table 1 (`tab:validation`); Figure 5c (`fig:validation`); Supplementary Section C.21.8 (`sssec:rev-validation`) |
+| Used in the paper | Section 3.4 (`sec:validation`); Supplementary Table S25 (`tab:validation`); Supplementary Figure S26c (`fig:supp-validation-tests`); Supplementary Section C.21.8 (`sssec:rev-validation`) |
 | How we know | read by tasks whose results are in the paper |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

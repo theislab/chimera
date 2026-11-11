@@ -19,6 +19,7 @@ gene-level readouts from the same fit:
 | to train Chimera on your own cohort | [Quick start](#quick-start-your-own-cohort) |
 | the per-gene tables of the paper | [`REPRODUCE.md`](REPRODUCE.md), section 3 (bundle `gene_tables`) |
 | the code and data behind a figure, table or number of the paper | [`REPRODUCE.md`](REPRODUCE.md), section 4 |
+| the whole chain, from the raw data to the figures | [`REPRODUCE.md`](REPRODUCE.md), section 1 (the chain) and section 8 (raw data to objects) |
 | to find your way in the repository | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
 
 ## What the model does
@@ -164,11 +165,11 @@ latent.
 | [`chimera/`](chimera/) | the package: model (`_model.py`), module and loss (`_module.py`), gate network and other components (`_components.py`), training plan, data preparation (`_data_utils.py`), diagnostics, constants |
 | [`configs/`](configs/) | `canonical_recipes.tsv` (the recipe of every canonical model), `optuna_search_space.json` |
 | [`training/`](training/README.md) | `run_experiment.py` (train, evaluate, summarize), baselines, diagnostics; `runs/` holds trained models (not in git) |
-| [`notebooks/`](notebooks/) | the workflow notebooks 00 to 11, their builders, rendered panels in `notebooks/figures/` |
+| [`notebooks/`](notebooks/README.md) | the workflow on the liver and testis cohorts: environment, data preparation, baselines and the first analyses of the gate (notebooks 00 to 11), with their builders, stored outputs and caches; the guide says what each still produces |
 | [`analysis/`](analysis/README.md) | the analyses of the paper, one folder per analysis, with an index; shared helpers; environments; job templates |
 | [`figures/`](figures/README.md) | every figure of the paper: panels, specs, the build, one PDF with one figure per page, an index |
 | [`release/`](release/README.md) | how a release is staged for Zenodo and tested from a clean clone |
-| [`scripts/`](scripts/README.md) | stand-alone evaluation scripts (ablations, hyperparameter search, robustness, demonstrations) |
+| [`scripts/`](scripts/README.md) | stand-alone scripts of the first version of the model, kept as starting points (no analysis of the paper uses them; none was run again for the release): ablations, hyperparameter search, robustness, demonstrations |
 | [`tests/`](tests/) | the test suite (`pytest -q`) |
 | `data/`, `results/`, `training/runs/`, `notebooks/cache/` | data, results, models and caches; not in git, filled from the deposit ([`REPRODUCE.md`](REPRODUCE.md), section 3) |
 
@@ -181,13 +182,14 @@ All analyzed data are public; no new data were generated. The canonical cohorts:
 | Liver: human, macaque, mouse | Guilliams et al. 2022, *Cell* 185:379, GEO GSE192742 |
 | Liver: zebrafish | Wang et al. 2023, *Nucleic Acids Res.*, doi:10.1093/nar/gkac633, GEO GSE198832 |
 | Testis: human, macaque, mouse | Murat et al. 2023, *Nature*, doi:10.1038/s41586-022-05547-7, E-MTAB-11063, E-MTAB-11068, E-MTAB-11071 |
-| Both, as processed counts | CAMEX bundle, Guo, Huang and Zhang 2026, *Nat. Commun.* 17:3017, figshare doi:10.6084/m9.figshare.31131808.v1 |
-| ESM-2 protein embeddings (`esm2_t48_15B_UR50D`) | SATURN, Rosen et al. 2024, *Nat. Methods* |
+| Both, as processed counts | CAMEX bundle, Guo, Huang and Zhang 2026, *Nat. Commun.* 17:3017, archived at figshare doi:10.6084/m9.figshare.31131808.v1; the data preparation downloads it from the CAMEX authors' Google Drive folder ([`REPRODUCE.md`](REPRODUCE.md), section 8) |
+| ESM-2 protein embeddings (`esm2_t48_15B_UR50D`) | SATURN, Rosen et al. 2024, *Nat. Methods* (archive `protein_embeddings.tar.gz` at snap.stanford.edu) |
 | Ortholog tables | Ensembl BioMart, release 110 |
 
 The sources of the other cohorts (bone marrow, kidney, pancreatic islet, eye, cerebral cortex,
 lung, skeletal muscle, tumor myeloid cells) and of every reference are listed in the paper and
-in the `MANIFEST.tsv` files of the deposit. Processed objects, ortholog tables, trained models
+in the `MANIFEST.tsv` files of the deposit; how each object is built from them is in
+[`REPRODUCE.md`](REPRODUCE.md), section 8. Processed objects, ortholog tables, trained models
 and per-gene tables are archived at [DOI]. In file names, `panc_*` and `pancreas_*` mean the
 **liver** cohorts.
 

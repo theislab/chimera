@@ -1,11 +1,12 @@
-"""Fig 3 (integration), re-rendered with SATURN, SATURN-Leiden and CAMEX and with label tiers.
+"""Integration figure (fig:integration), rendered with SATURN, SATURN-Leiden and CAMEX and with label tiers.
 
-Three panels on the same rows and columns (T5.5 main view, coordinator 2026-11-02): species mixing
+Three panels on the same rows and columns (the main view of T5_5_benchmark): species mixing
 score, cell-type conservation score, composite (0.4 mixing + 0.6 conservation, as frozen). Columns are
 grouped by how each method uses cell-type labels in training. Chimera uses none on liver and
 cell-type-conditional MMD on testis; its testis cells carry a dashed outline. Row best in bold.
-Source: ``notebooks/cache/baselines_master_ext/master_table_ext.csv`` (T5.5, 10 models, s42).
-The raw kNN species purity view stays in the Supplement (T5.5 file ``composite_mixing_bio_10models``).
+Source: ``notebooks/cache/baselines_master_ext/master_table_ext.csv`` (T5_5_benchmark, 10 models, s42).
+The raw kNN species purity view stays in the Supplement (file ``composite_mixing_bio_10models`` of
+T5_5_benchmark).
 """
 
 from __future__ import annotations

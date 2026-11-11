@@ -1,7 +1,7 @@
 """Build ``08_ortholog_qc.ipynb`` from a single Python source.
 
 Implements *Application 7 — Quality control for ortholog annotations*
-from `chimera-private/protein_structure/round2/ortholog_aware_integration_guide_initial.md`.
+of the model's design notes (the source doc below; not part of this repository).
 
 Two QC flag directions:
 
@@ -50,8 +50,8 @@ cells: list[nbf.NotebookNode] = []
 cells.append(md(r"""
     # Quality control for ortholog annotations
 
-    *Implementation of Application 7 from
-    `chimera-private/protein_structure/round2/ortholog_aware_integration_guide_initial.md`.
+    *Implementation of Application 7 of the model's design notes (the
+    source doc below; not part of this repository).
     A killer use of α / Δα that no other cross-species integration tool
     can produce: **flag candidate ortholog mis-annotations and candidate
     cases of functional conservation despite sequence divergence**, by
@@ -1139,7 +1139,7 @@ cells.append(md(r"""
     consistent / below noise floor**.
 
     1. **§G.1** — *Master summary table.* One row per dataset, every
-       headline statistic in one place; the row a reviewer wants to
+       headline statistic in one place; the row a reader wants to
        cite. Saved as CSV.
     2. **§G.2** — *Disagreement magnitude landscape.* Δα distribution
        per dataset as a per-gene strip plot, dots colored by

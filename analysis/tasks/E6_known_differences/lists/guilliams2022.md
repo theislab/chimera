@@ -44,5 +44,5 @@ GSE192742). If they do, change these rows to `possible`.
 **Not extracted.** The 15-gene "human-mouse conserved KC signature" (Figure 4K/S7A–B) is printed only in figure panels whose text cannot be read at the
 available resolution. Per-cell-type conserved markers (Figure S7N/O) are not extracted for the same reason.
 
-## Circularity (coordinator, at commit)
-The canonical liver cohorts are built from Liver Cell Atlas samples of this paper (human CS170, mouse ABU20; see the X2 ledger). This list is therefore treated as **circular** in `assign.tsv` (`guil_circ`), whatever the `circular` column says.
+## Circularity
+The canonical liver cohorts are built from Liver Cell Atlas samples of this paper (human CS170, mouse ABU20). This list is therefore treated as **circular** in `assign.tsv` (`guil_circ`), whatever the `circular` column says.

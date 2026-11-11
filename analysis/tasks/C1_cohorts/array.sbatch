@@ -5,7 +5,6 @@
 #SBATCH --cpus-per-task=12
 #SBATCH --mem=24G
 #SBATCH --time=23:50:00
-#SBATCH --exclude=cpusrv09,cpusrv18,cpusrv63,cpusrv114
 # Usage: sbatch --array=0-N --output=results/analysis/C1/logs/%x_%A_%a.out analysis/tasks/C1_cohorts/array.sbatch <manifest.tsv>
 source analysis/slurm/_body.sh
 manifest="$1"

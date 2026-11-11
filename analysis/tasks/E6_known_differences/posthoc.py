@@ -1,4 +1,4 @@
-"""E6 post hoc (written after reading auroc.tsv; labelled post hoc in the ledger).
+"""Post hoc analyses (written after reading auroc.tsv).
 
 Q1. Beyond the level gap: does S_g (and per-gene Δα, B1) still place list genes below matched genes once the no-model
     detection gap LVL is matched too? Strata = expr quintile x tau quintile x pi tertile x LVL tertile, primary cohort,

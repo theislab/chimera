@@ -6,7 +6,7 @@ First recipe grid of the bone-marrow cohort and its selection rule, fixed before
 | | |
 |---|---|
 | Question | Model fits beyond the canonical runs: Which further seeds, platform repeats and cohort recipes were trained, and how was each recipe chosen? |
-| Status | recipe search |
+| Status | retired, replaced by `T12_2b_recipe` (kept as the record of what was run; the paper uses the later task) |
 | Environment | `chimera_env` |
 | Used in the paper | Supplementary Table S19 (`tab:harmonised-cohorts`); Supplementary Section C.21.1 (`sssec:rev-plan`) |
 | How we know | described in the Extended Methods |
@@ -26,7 +26,7 @@ First recipe grid of the bone-marrow cohort and its selection rule, fixed before
 - `data/analysis/bone_marrow/`
 - `training/runs/`
 
-**Notes.** README.md states grid and rule. Replaced by T12_2b_recipe on the second build of the cohort.
+**Notes.** README.md states grid and rule. It was run on the first build of the cohort; the recipe of the paper comes from T12_2b_recipe, the same rule on the second build. Its runs (rev-bm-*) and tables are kept as the record.
 <!-- glance:end -->
 
 Cohort: `data/analysis/bone_marrow/bone_marrow_unified.h5ad` (`T12_1_bone_marrow`; human, mouse lemur,

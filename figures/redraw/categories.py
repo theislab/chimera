@@ -1,14 +1,18 @@
 """Δα by gene category for one cohort, redrawn at print size: box plots and the effect-size heat map on the same rows.
 
-    supp_categories_liver/boxes.pdf          Δα of the genes of every gene category (box plots), with the number of genes,
-                                             Cohen's d and a star for a median different from zero
-    supp_categories_liver/effect_sizes.pdf   Cohen's d of Δα ("shift") and of |Δα| ("amplitude") for the same rows (heat map)
+    supp_categories_liver/boxes.pdf           Δα of the genes of every gene category (box plots), with the number of
+    supp_categories_testis/boxes.pdf          genes, Cohen's d and a star for a median different from zero
+    supp_categories_liver/effect_sizes.pdf    Cohen's d of Δα ("shift") and of |Δα| ("amplitude") for the same rows
+    supp_categories_testis/effect_sizes.pdf   (heat map)
 
-Inputs (four-species liver run): ``final_state.npz`` (α and prior); the gene names of
-``data/processed/camex_pancreas_unified.h5ad``; the cohort's ortholog table (through ``notebooks/_paper_utils.py``) and
-the category vocabulary ``notebooks/_gene_categories.py``. The gene table, the categories kept (five genes or more),
-their order (median Δα) and all statistics follow sections A.1 and A.3 of ``notebooks/_alpha_biology_builder.py``.
-Both panels have the same page height and the same row positions, so they are composed with ``Panel(..., ink=False)``.
+Cohorts: the four-species liver model and the testis Human+Macaque model. Inputs, per cohort: ``final_state.npz`` of the
+stored run (α and prior); the gene names of the cohort's data object; the cohort's ortholog table (through
+``notebooks/_paper_utils.py``) and the category vocabulary ``notebooks/_gene_categories.py``. The gene table, the
+categories kept (five genes or more), their order (median Δα) and all statistics follow sections A.1 and A.3 of
+``notebooks/_alpha_biology_builder.py``. Both panels of a cohort have the same page height and the same row positions,
+so they are composed with ``X(...)``. The liver box plot has the Δα axis of every Δα panel; the testis box plot has a
+narrower axis (``AXIS``), because the values of that model span a small range. A row with genes beyond the axis carries
+a mark at its edge.
 
     PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m figures.redraw.categories [cohort ...]
 """
@@ -26,11 +30,13 @@ from matplotlib.textpath import TextPath
 
 from figures.redraw import _common as C
 
-FIGURE = {"liver_4sp": "supp_categories_liver"}      # cohort -> figure key (panel folder)
+FIGURE = {"liver_4sp": "supp_categories_liver", "testis_hmac": "supp_categories_testis"}   # cohort -> figure key (panel folder)
+AXIS = {"testis_hmac": ((-0.10, 0.20), (-0.1, 0.0, 0.1, 0.2))}   # cohort -> limits and ticks of its Δα axis, where not the house axis
 MIN_GENES = 5            # a category is shown when it has at least this many genes in the cohort
 Q = 0.05                 # Benjamini-Hochberg level of the stars
 STAR = "★"
 PITCH = 11.5             # bp per row
+ROW_PITCH = {"testis_hmac": 11.0}   # cohort -> bp per row where not PITCH: 41 rows of testis on the height of its page in the paper
 TOP, BOTTOM = 13.0, 31.0     # bp above the first row (column headings) and below the last (axis label)
 TOTAL, GAP = 486.0, 7.0      # bp: the two panels and the gap between them fill the text width
 CELL = 33.0              # bp, width of one heat-map cell
@@ -110,14 +116,15 @@ def layout(cohort: str) -> dict:
     a_width = TOTAL - GAP - b_width
     a_left = 13.5 + text_width(with_n, ROW_SIZE) + 6.0                       # axis label, row names, ticks
     a_right = D_OFFSET + text_width([f"d = −0.00  {STAR}"], ROW_SIZE) + 3.0  # Cohen's d and star at the right of every row
-    height = TOP + PITCH * len(t) + BOTTOM
-    return dict(label=label, with_n=with_n, a=(a_width, a_left, a_right), b=(b_width, b_left), height=height, rows=len(t))
+    pitch = ROW_PITCH.get(cohort, PITCH)
+    height = TOP + pitch * len(t) + BOTTOM
+    return dict(label=label, with_n=with_n, a=(a_width, a_left, a_right), b=(b_width, b_left), height=height, rows=len(t), pitch=pitch)
 
 
-def panel(width: float, height: float, left: float, axes_width: float, rows: int):
+def panel(width: float, height: float, left: float, axes_width: float, rows: int, pitch: float = PITCH):
     mpl.rcParams.update({"savefig.bbox": None})                              # exact page size
     fig = plt.figure(figsize=(width / 72, height / 72))
-    ax = fig.add_axes([left / width, BOTTOM / height, axes_width / width, PITCH * rows / height])
+    ax = fig.add_axes([left / width, BOTTOM / height, axes_width / width, pitch * rows / height])
     return fig, ax
 
 
@@ -132,7 +139,7 @@ def boxes(cohort: str = "liver_4sp") -> list:
     g = layout(cohort)
     width, left, right = g["a"]
     n = g["rows"]
-    fig, ax = panel(width, g["height"], left, width - left - right, n)
+    fig, ax = panel(width, g["height"], left, width - left - right, n, g["pitch"])
     y = np.arange(n)[::-1]                                                   # first row of the table at the top
     data = [genes.loc[genes["category"] == c, "delta"].to_numpy() for c in t.index]
     ax.boxplot(data, orientation="horizontal", positions=y, widths=0.62, patch_artist=True, manage_ticks=False,
@@ -141,9 +148,9 @@ def boxes(cohort: str = "liver_4sp") -> list:
                whiskerprops=dict(color=C.INK, linewidth=0.5), capprops=dict(color=C.INK, linewidth=0.5),
                flierprops=dict(marker="o", markersize=1.0, markerfacecolor=C.INK, markeredgecolor="none", alpha=0.4))
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--", zorder=0)
-    lo, hi = fd.DELTA_ALPHA_RANGE
+    (lo, hi), ticks = AXIS.get(cohort, (fd.DELTA_ALPHA_RANGE, fd.DELTA_ALPHA_TICKS))
     ax.set_xlim(lo, hi)
-    ax.set_xticks(list(fd.DELTA_ALPHA_TICKS))
+    ax.set_xticks(list(ticks))
     ax.set_ylim(-0.5, n - 0.5)
     ax.set_yticks(y, g["with_n"], fontsize=ROW_SIZE)
     ax.tick_params(axis="y", pad=2.0)
@@ -163,7 +170,8 @@ def boxes(cohort: str = "liver_4sp") -> list:
         if below or above:
             q1, q3 = np.percentile(d, [25, 75])
             off.append(f"{c}: {below} below {lo}, {above} above {hi} of {len(d)} genes; median {np.median(d):+.3f}, quartiles {q1:+.3f} to {q3:+.3f}")
-    print(f"{cohort}: {len(genes):,} genes, {n} categories; stars at the boxes: {int((t['q_box'] < Q).sum())}")
+    print(f"{cohort}: {len(genes):,} genes, {n} categories; stars at the boxes: {int((t['q_box'] < Q).sum())}; "
+          f"Δα axis {lo} to {hi}, all genes of the cohort from {genes['delta'].min():+.3f} to {genes['delta'].max():+.3f}")
     print("rows with genes beyond the Δα axis (marked at its edge):\n   " + "\n   ".join(off or ["none"]))
     return [C.save_panel(fig, FIGURE.get(cohort, f"supp_categories_{cohort}"), "boxes", exact=True)]
 
@@ -174,7 +182,7 @@ def effect_sizes(cohort: str = "liver_4sp") -> list:
     g = layout(cohort)
     width, left = g["b"]
     n = g["rows"]
-    fig, ax = panel(width, g["height"], left, 2 * CELL, n)
+    fig, ax = panel(width, g["height"], left, 2 * CELL, n, g["pitch"])
     values = t[["shift", "amplitude"]].to_numpy()
     stars = (t[["q_shift", "q_amplitude"]].to_numpy() < Q)
     vmax = float(max(np.abs(values).max(), 1.0))
@@ -193,7 +201,7 @@ def effect_sizes(cohort: str = "liver_4sp") -> list:
     for s in ax.spines.values():
         s.set_visible(False)
     ax.set_xlabel("Cohen's $d$ on Δα / signed |Δα|\n" + f"({cohort_phrase(cohort)})", fontsize=C.SIZE["tick"], labelpad=4.0, linespacing=1.15)
-    h = PITCH * n / g["height"]
+    h = g["pitch"] * n / g["height"]
     cax = fig.add_axes([(left + 2 * CELL + 10.0) / width, BOTTOM / g["height"] + 0.33 * h, 6.0 / width, 0.34 * h])
     cb = fig.colorbar(im, cax=cax)
     cb.set_label("effect size", fontsize=C.SIZE["tick"], labelpad=2.0)
@@ -207,7 +215,7 @@ def effect_sizes(cohort: str = "liver_4sp") -> list:
 PANELS = {"boxes": boxes, "effect_sizes": effect_sizes}
 
 if __name__ == "__main__":
-    for cohort in sys.argv[1:] or ["liver_4sp"]:
+    for cohort in sys.argv[1:] or list(FIGURE):
         for name, draw in PANELS.items():
             for p in draw(cohort):
                 print("wrote", p)

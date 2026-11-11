@@ -1,26 +1,26 @@
 """Overview of the benchmark: methods by tasks, in the scIB funky-heatmap style, merging tracks A, B, C, D.
 
-Rule, fixed and committed before results. For each task and metric, rank every applicable method (best 1, ties share the mean rank), scaled by (rank - 1) / (n - 1); n = applicable methods with a
+Rule, fixed before results. For each task and metric, rank every applicable method (best 1, ties share the mean rank), scaled by (rank - 1) / (n - 1); n = applicable methods with a
 value in the task. Aggregate of a track = mean of a method's within-task scaled ranks over the track's tasks. Overall = mean of the track aggregates, equal weight per track. Unscaled mean ranks are written
 beside. A method applicable to a task but with no value (failed fit, tool that failed there) ranks last in it. Not applicable (static score on agreement; a tool not run on that setting) is left out and drawn
 hatched. A row of the tidy tables enters if rank_direction is 'higher' or 'lower'. Every task appears: the overview panel groups tasks by track and family, the task panel draws every task as its own column.
 
-Undefined cells (amendment by the coordinator after the liver 1:20 reading, before the overview was first computed). A method with no value in a task that is applicable to it (for instance a profile score when one species keeps fewer than two shared types) is not a measured
-loss. The committed rule stays and is reported as `overall`: it ranks last. Beside it `overall_excl_undefined`: such cells are left out and each task ranked among the methods with a value. Both are written for every method, Chimera included; in the figures undefined cells are drawn NA,
+Undefined cells (amendment after the liver 1:20 reading, before the overview was first computed). A method with no value in a task that is applicable to it (for instance a profile score when one species keeps fewer than two shared types) is not a measured
+loss. The fixed rule stays and is reported as `overall`: it ranks last. Beside it `overall_excl_undefined`: such cells are left out and each task ranked among the methods with a value. Both are written for every method, Chimera included; in the figures undefined cells are drawn NA,
 never as a low score. `undefined_cells.csv` lists every such cell, with the groups left in the setting where known; the text states their number.
 
-Runs tried and finished (coordinator, same reason). A failed fit or a tool that crashes or returns nothing stays out of the scores; `completion.py` counts them per method and setting, joined here as tried and finished. A cell with fewer finished than tried carries a small
-"f/t"; a cell where nothing finished is a failure, drawn with a cross, not a blank, and it ranks last under the committed rule.
+Runs tried and finished (added for the same reason). A failed fit or a tool that crashes or returns nothing stays out of the scores; `completion.py` counts them per method and setting, joined here as tried and finished. A cell with fewer finished than tried carries a small
+"f/t"; a cell where nothing finished is a failure, drawn with a cross, not a blank, and it ranks last under the fixed rule.
 
 Identity cells (found when the overview was first read; applies to every method alike). An agreement value that compares a reading with itself (a deterministic method on
 `full`, a label-blind deterministic tool on a label-only setting) is 1 by identity, not a measurement. score_b flags these rows and they are tabled, not ranked. The aggregate with
-them ranked, as the committed rule first read, is written to aggregate_with_identity.csv.
+them ranked, as the fixed rule first read, is written to aggregate_with_identity.csv.
 
-Track I (integration, added by the coordinator's instruction before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
-keeps its committed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
+Track I (integration, added before it was scored) is a track of its own, on its own methods (the 10 integration models, prefixed I:). Integration is the substrate of Chimera's readouts, not its aim, so the overall of the gene-level tracks A, B, C, D
+keeps its fixed rule and does not include I; `overall_with_I` is written beside it for the methods that appear in both (SATURN, CAMEX, and Chimera's latent shown against B1z).
 
 Inputs: results/analysis/B1/*.csv|parquet (tracks A, D: columns track, task, setting, method, metric, value, ci_lo, ci_hi, n, rank_direction), results/analysis/B2/track_B/*.parquet, track_C/units and lists.
-Re-runnable as B1, C1 and new cohorts add results. Outputs: results/analysis/B2/overview/{ranks_long.csv, aggregate.csv} and the two panels
+Re-runnable as B1_ground_truth, C1_cohorts and new cohorts add results. Outputs: results/analysis/B2/overview/{ranks_long.csv, aggregate.csv} and the two panels
 figures/panels/supp_benchmark_overview/{overview, tasks}.pdf, drawn at print size (648 bp wide) and saved through figures/style.py.
     python -m analysis.tasks.B2_benchmark.overview            # rank, aggregate, draw
     python -m analysis.tasks.B2_benchmark.overview --draw     # draw only, from the two tables (draw_panels); CHIMERA_FIGURES_OUT=<folder> for a dry run
@@ -97,10 +97,10 @@ SLANT = np.deg2rad(45)
 
 def read_tidy() -> pd.DataFrame:
     fr = []
-    b1 = RU.REPO / "results/analysis/B1/B1_overview.csv"  # B1's rows for the overview: tracks A and D
+    b1 = RU.REPO / "results/analysis/B1/B1_overview.csv"  # rows of B1_ground_truth for the overview: tracks A and D
     if b1.exists():
         d = pd.read_csv(b1)
-        d["method"] = d["method"].replace({"Delta_alpha": "D", "Delta_alpha_free": "D_free", "S_deploy": "SATURN", "C_cos": "CAMEX"})  # B1's names to the overview's
+        d["method"] = d["method"].replace({"Delta_alpha": "D", "Delta_alpha_free": "D_free", "S_deploy": "SATURN", "C_cos": "CAMEX"})  # names of B1_ground_truth to the overview's
         a = d[d["track"] == "A"].copy()
         # one column per task x cohort x metric; the all-cohort rows repeat them and stay out, so that nothing counts twice
         coh = a["setting"].astype(str).str.extract(r"cohort=([^;]+)")[0]
@@ -111,7 +111,7 @@ def read_tidy() -> pd.DataFrame:
             a.loc[m, "value"] = -(a.loc[m, "value"] - x).abs()  # distance from the nominal value, ranked higher = closer
             a.loc[m, "rank_direction"] = "higher"
         fr.append(a)
-        # Track D: B1's rows are per tool or per family of readouts. One fit gives every Chimera readout; the direct family gives every direct score.
+        # Track D: the rows of B1_ground_truth are per tool or per family of readouts. One fit gives every Chimera readout; the direct family gives every direct score.
         dd = d[d["track"] == "D"].copy()
         expand = {"Chimera": RU.CHIMERA, "Chimera (one fit)": RU.CHIMERA, "Direct (B1, B1b, B1c, B2b, Sdir, B3a)": ["B1", "B1b", "B1c", "B2b", "Sdir", "B3a"],
                   "SATURN + direct": ["SATURN"], "CAMEX + direct": ["CAMEX"], "SATURN": ["SATURN"], "CAMEX": ["CAMEX"]}
@@ -130,7 +130,7 @@ def read_tidy() -> pd.DataFrame:
     if not fr:
         raise SystemExit("no tidy tables yet")
     t = pd.concat(fr, ignore_index=True)
-    # final scope (owner): B2 tiers 0-2, so Track B main settings only, every cohort; the other liver settings ran before the tiers and stay in the tables; the depth
+    # final scope: tiers 0-2 of this benchmark, so Track B main settings only, every cohort; the other liver settings ran before the tiers and stay in the tables; the depth
     # law arm is a second Chimera reading beside depth25 and is tabled, not ranked
     from analysis.tasks.B2_benchmark.tiers import MAIN
 
@@ -170,7 +170,7 @@ def rank_tasks(t: pd.DataFrame) -> pd.DataFrame:
         r = (-v).rank(method="average")
         n_def = len(v)
         missing = []
-        if track == "B":  # the committed rule acts where every method has a reading to give
+        if track == "B":  # the fixed rule acts where every method has a reading to give
             missing = [m for m in RU.CHIMERA + RU.DIRECT if m not in v.index and applicable(track, task, m) and (task, m) not in skip]
             missing += [m for m in RU.TOOLS if m not in v.index and tool_ran(m, task) and (task, m) not in skip]
         n = n_def + len(missing)

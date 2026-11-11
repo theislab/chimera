@@ -12,13 +12,13 @@ fonttools==4.68.0
 formulaic==1.2.2
 google-crc32c==1.9.0
 h5py==3.16.0
-hnswlib @ file:///home/conda/feedstock_root/build_artifacts/hnswlib_1789746975047/work
-igraph @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-igraph_h80505a6_1793568967/work
+hnswlib==0.8.0
+igraph==1.0.0
 interface_meta==2.0.1
 joblib==1.6.0
 kiwisolver==1.5.1
 legacy-api-wrap==1.5
-leidenalg @ file:///home/conda/feedstock_root/build_artifacts/leidenalg_1779687570686/work
+leidenalg==0.12.0
 llvmlite==0.50.0
 matplotlib==3.11.2
 msgspec==0.22.0
@@ -27,20 +27,20 @@ natsort==8.4.0
 networkx==3.7
 numba==0.68.1
 numcodecs==0.17.1
-numpy @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_numpy_1791675329/work/dist/numpy-2.5.4-cp312-cp312-linux_x86_64.whl#sha256=178b27cd788a1fd47a724c4a529ca6054a72d95a6db1aea709048b7bbad60010
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1785888127/work
-pandas @ file:///home/conda/feedstock_root/build_artifacts/pandas_1759265541279/work
+numpy==2.5.4
+packaging==26.3
+pandas==2.3.3
 patsy==1.0.3
 pillow==13.0.0
-pip @ file:///home/conda/feedstock_root/build_artifacts/pip_1793659322676/work
+pip==26.2.2
 pydantic==2.14.2
 pydantic-settings==2.16.2
 pydantic_core==2.50.2
 pynndescent==0.7.0
 pyparsing==3.3.3
-python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-dateutil_h5ded981_1793535232/work
+python-dateutil==4.0.0
 python-dotenv==1.2.4
-pytz @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_pytz_h5ded981_1793296577/work
+pytz==2026.6
 PyYAML==6.0.3
 sc-samap @ git+https://github.com/atarashansky/SAMap@8ffeaec17d738477d4a6302045098943a2726be7
 scanpy==1.12.5
@@ -51,12 +51,12 @@ seaborn==0.13.2
 session-info2==0.4.2
 setuptools==84.2.1
 statsmodels==0.15.0
-texttable @ file:///home/conda/feedstock_root/build_artifacts/texttable_1792383212851/work
+texttable==1.7.2
 threadpoolctl==3.7.0
 tqdm==4.70.1
 typing-inspection==0.4.4
 typing_extensions==4.16.0
-tzdata @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-tzdata_h5ded981_1793205938/work
+tzdata==2026.6
 umap-learn==0.5.12
 uv==0.11.28
 wheel==0.48.0

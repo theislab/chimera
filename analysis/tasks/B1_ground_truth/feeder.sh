@@ -5,7 +5,7 @@ CAP=${1:-170}; MEMCAP=${2:-680}
 Q=analysis/tasks/B1_ground_truth/queue.tsv
 T=analysis/tasks/B1_ground_truth
 L=results/analysis/B1/logs
-EX=--exclude=${B1_EXCLUDE:-cpusrv114}  # node where every job fails with mamba not found (2026-11-02)
+EX=${B1_EXCLUDE:+--exclude=$B1_EXCLUDE}  # nodes to leave out, if any: B1_EXCLUDE=<node list>
 n=$(($(wc -l < $Q) - 1))
 STATE=results/analysis/B1/feeder.state
 i=$(cat "$STATE" 2>/dev/null || echo 0)

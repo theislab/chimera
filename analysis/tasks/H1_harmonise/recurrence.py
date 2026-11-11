@@ -1,4 +1,4 @@
-"""H1 step 4: set z per cohort, recurrence across the six tissues with a within-cohort permutation null, tissue-specific sets, separate axis.
+"""Step 4: set z per cohort, recurrence across the six tissues with a within-cohort permutation null, tissue-specific sets, separate axis.
 
 Definitions: rules.py. Reads results/analysis/H1/genes/. Writes results/analysis/H1/{sets_membership.csv, set_z.csv, recurrence.csv, tissue_specific.csv,
 lineage_z.csv, axis.csv}.
@@ -26,7 +26,7 @@ sys.path.insert(0, str(RU.REPO / "notebooks"))
 import _gene_categories_broad as GB  # noqa: E402
 
 HALLMARK = __import__("pathlib").Path.home() / ".cache/gseapy/Enrichr.MSigDB_Hallmark_2020.gmt"
-FAMILY = {"hallmark": "Hallmark", "class": "gene class", "broad": "first-submission category"}
+FAMILY = {"hallmark": "Hallmark", "class": "gene class", "broad": "category"}
 
 
 def bh(p):
@@ -101,7 +101,7 @@ def strata(g: pd.DataFrame, with_pi: bool, pi_col: str = "pi_raw", with_tau: boo
 
 
 def block_scores(res: np.ndarray, blocks: np.ndarray, M: sp.csr_matrix, n: int, rng) -> np.ndarray:
-    """Post hoc null respecting protein neighbourhoods: genes ordered by ESM module, module order shuffled, values laid back over the same gene slots.
+    """Post hoc null respecting protein neighborhoods: genes ordered by ESM module, module order shuffled, values laid back over the same gene slots.
     Keeps most of the within-module correlation that a gene-level permutation breaks. res = values minus their stratum mean."""
     order = np.argsort(blocks, kind="stable")
     b = blocks[order]
@@ -271,7 +271,7 @@ def axis_table(cohorts: dict) -> pd.DataFrame:
 
 
 def ensure_blocks(c: str) -> None:
-    """ESM modules for a thread tissue without a Y1 cache: T4.3 esm_blocks on the cohort's 64 ESM PCs, as every other tissue's blocks."""
+    """ESM modules for a thread tissue without a cache of Y1_gene_tissue: esm_blocks of T4_3_scoreboard on the cohort's 64 ESM PCs, as every other tissue's blocks."""
     import anndata as ad
 
     from analysis.tasks.T4_3_scoreboard import inputs as I

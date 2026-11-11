@@ -8,7 +8,7 @@ Shared inputs of the functional-layer tests: residual readouts, strata and gene 
 | Question | What the readouts find in liver and testis: Which genes, cell types, pathways and gene classes sit above or below the protein prior? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.11 (`sssec:rev-functional`) |
+| Used in the paper | Supplementary Section C.21.10 (`sssec:rev-functional`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

@@ -8,7 +8,7 @@ Tests whether the readouts recover species differences in cell-type gene express
 | Question | What the count evidence adds: What do the readouts add to direct baselines and to other tools, on real and on ground-truth data? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.6 (`sec:adds`); Supplementary Section D.5 (`ssec:er-e6`); Supplementary Figure S30 (`fig:supp-e6`) |
+| Used in the paper | Section 3.4 (`sec:adds`); Supplementary Section D.5 (`ssec:er-e6`); Supplementary Figure S33 (`fig:supp-e6`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

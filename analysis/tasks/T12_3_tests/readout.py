@@ -1,22 +1,22 @@
-"""T12.3 step 2: bone-marrow gene table, D and baselines (plan sections 2, 3, 5 and 12).
+"""Step 2: bone-marrow gene table, D and baselines (pre-specified analysis plan, sections 2, 3, 5 and 12).
 
 One row per vocabulary gene of build 2 (``gene_ids.h5ad_path("bone_marrow")``, 12,417 genes):
 
-* covariates C (section 3): raw prior (the run's ``conservation_prior_raw.npy``, checked against the
+* covariates C (plan, section 3): raw prior (the run's ``conservation_prior_raw.npy``, checked against the
   h5ad prior), species-balanced mean log1p CP10K and detection (``cohorts.gene_covariates``), log
   human CDS length (``controls.cds_table``);
-* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PCs (``T4_3 inputs.esm_blocks``);
-* D (section 2): mean over the seeds admitted by ``seed_health.py`` (``seed_health.json``: seeds
-  passing G-V, amendment chimera-private a82eaad) of alpha - prior as anchored (clamped 0.85), minus
+* ESM blocks: Leiden modules of a 15-NN graph on the 64 ESM PCs (``inputs.esm_blocks`` of T4_3_scoreboard);
+* D (plan, section 2): mean over the seeds admitted by ``seed_health.py`` (``seed_health.json``: seeds
+  passing G-V, amendment log of the plan) of alpha - prior as anchored (clamped 0.85), minus
   the cohort median. ``D_raw`` = mean alpha - pi_raw minus its median (named sensitivity);
   ``D_all`` = the same D over every finite seed, G-V failures included (the amendment's
   sensitivity); ``S_ema`` = mean ``S_g_ema`` (Family 3);
   per-seed leave-one-out rho on the C-residual scale; rel(D|C) over the 10 2-vs-3 splits;
-* B1 (section 12): ``B1_raw`` = E, the T4.2 cross-species pseudobulk profile correlation over the
-  nine harmonised types (``cell_ontology_class``), units = ``obs['batch']`` (species | donor |
-  tissue) with >= 30 cells, the three species pairs Fisher-z pooled (``T4_2.pooled_E``);
-  ``B1_pi`` = E residualised on the spline of rank pi_raw only ("B1 residualised on pi");
-  ``B1b`` = E residualised on pi, expression and detection (T4.2 B1b, beside); pairwise
+* B1 (plan, section 12): ``B1_raw`` = E, the cross-species pseudobulk profile correlation of
+  T4_2_gene_baselines over the nine harmonized types (``cell_ontology_class``), units = ``obs['batch']``
+  (species | donor | tissue) with >= 30 cells, the three species pairs Fisher-z pooled (``T4_2.pooled_E``);
+  ``B1_pi`` = E residualized on the spline of rank pi_raw only ("B1 residualised on pi");
+  ``B1b`` = E residualized on pi, expression and detection (B1b of T4_2_gene_baselines, beside); pairwise
   ``E_human_mouse``, ``E_human_mouse_lemur`` for E4.
 
 No COE, Shay list or other external measurement is read here.

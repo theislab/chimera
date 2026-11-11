@@ -4,7 +4,7 @@
 
 **DOI check (2026-11-03).** `curl -sI https://doi.org/10.1126/science.ade9516` gives HTTP 302 to `https://www.science.org/doi/10.1126/science.ade9516`. The Crossref CSL record from `doi.org` (Accept: application/vnd.citationstyles.csl+json) gives the title above, *Science* 382, eade9516, issued 2023-10-13, first author Jorstad, 44 authors.
 
-**Data and circularity.** snRNA-seq (10x Cv3, plus SSv4 for apes) of the middle temporal gyrus (MTG) from human, chimpanzee, gorilla, rhesus macaque and marmoset. These donors and this region are not in our cohorts: our DLPFC data are Ma 2022, our M1 data are Bakken 2021. So `circular = no`. **However, MTG from Jorstad is already used elsewhere in the project as a held-out-region profile reference.** Anyone combining E6 with that analysis should keep this in mind: the same MTG data feed both.
+**Data and circularity.** snRNA-seq (10x Cv3, plus SSv4 for apes) of the middle temporal gyrus (MTG) from human, chimpanzee, gorilla, rhesus macaque and marmoset. These donors and this region are not in our cohorts: our DLPFC data are Ma 2022, our M1 data are Bakken 2021. So `circular = no`. **However, MTG from Jorstad is already used elsewhere in the project as a held-out-region profile reference.** Anyone combining this task with that analysis should keep this in mind: the same MTG data feed both.
 
 **Files.** All files are in `data/analysis/E6/jorstad2023/`; see `MANIFEST.tsv`.
 - The files come from the PMC author-manuscript supplement (`pmc.ncbi.nlm.nih.gov/articles/instance/10659116/bin/...`). PMC serves a browser proof-of-work page first. The download helper completed the same SHA-256 nonce step a browser does, then fetched the file.

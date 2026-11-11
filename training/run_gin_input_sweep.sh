@@ -1,5 +1,5 @@
 #!/bin/bash
-# GIN-input ablation sweep (round2 §1526 & Issue 15.3).
+# GIN-input ablation sweep.
 # Four 100-epoch runs on H+Mo subset, all with iter16 config:
 #   1. gin-abl-baseline:    reference (all 8 informative features + 64 ESM-2 PCA)
 #   2. gin-abl-no-esm2:     zero the 64 ESM-2 PCA dims (scalar features only)

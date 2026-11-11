@@ -15,6 +15,7 @@
 # notebook 03 writes when RUN_FIGURE=1.
 # Exit code 0 means every check passed.
 set -euo pipefail
+case "${1:-}" in -h|--help) sed -n '2,/^set -euo/{/^set -euo/d;s/^# \{0,1\}//;p}' "${BASH_SOURCE[0]}"; exit 0 ;; esac
 
 ROOT="${CHIMERA_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$ROOT"

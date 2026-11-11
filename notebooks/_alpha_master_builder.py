@@ -837,7 +837,7 @@ cells.append(md("""
     decoder learns; `L_residual_sparsity` rises as the residual is
     permitted to grow during the FQR warmup (epoch 20+) and stabilizes.
     Together with the anchor + FQR panel above, this completes the
-    four-loss picture from the round2 docs (`L_residual`, `L_aux`,
+    four-loss picture of the design (`L_residual`, `L_aux`,
     `L_anchor`, `L_fit`) — none collapses, none diverges.
 """))
 
@@ -1248,7 +1248,7 @@ cells.append(md("""
     ## §B.2 — Cross-species α consistency: liver
 
     Source `33_four_species_validation.ipynb` §15 — extended to cover
-    *every* combination requested by the prompt. For liver:
+    *every* combination of species sets. For liver:
 
     * **Unified-vs-each-pair** (3 comparisons): the 4-species model's α
       vs each 2-species model's α on shared genes.
@@ -1553,7 +1553,7 @@ cells.append(md("""
     testis prior, cross-tissue Δα agreement is small. This is the headline
     honest finding of §B.4 and is correct: tissue context is a first-order
     biological variable in conservation behaviour, and the architecture
-    (correctly) reflects that. A good reviewer will then ask "which genes
+    (correctly) reflects that. A careful reader will then ask "which genes
     *do* agree across tissue?" and that gene-by-gene question is what the
     Δα-as-biology notebook is for.
 """))
@@ -1695,7 +1695,7 @@ cells.append(md("""
     histogram), Panel 3 (α vs prior scatter), and the requested **log-y
     third panel** (residual magnitude vs α).
 """))
-# Δα histogram (already shown in A1.2 — but the prompt asks for it from this source explicitly).
+# Δα histogram (already shown in A1.2; drawn again here from this source).
 cells.append(code(r"""
     fig, ax = fd.make_axes(fd.FIGSIZE_SQUARE)
     ax.hist(da, bins=fd.DELTA_ALPHA_BINS, color="#222222", edgecolor="none")
@@ -1787,7 +1787,7 @@ cells.append(md("""
        *did* correlate with α would mean the α head was leaking back
        into the residual decoder — a bug we want to rule out.
 
-    *What a reviewer should take from this:* the architecture
+    *What a reader should take from this:* the architecture
     cleanly separates "what to predict" (residual decoder, α-blind)
     from "how much to use it" (α gate). The figure is the proof.
 
@@ -1876,7 +1876,7 @@ cells.append(md("""
 cells.append(md("""
     ## §C.4 — α and Δα vs per-gene expression statistics (mean / detection rate / variance)
 
-    The reviewer's question this section exists to answer: *do
+    The question this section exists to answer: *do
     highly-expressed (or highly-detected, or highly-variable) genes
     drive Δα?* If the answer is yes, the GIN's "learned correction"
     would mostly be re-coding a power-of-fit artefact rather than
@@ -2236,10 +2236,10 @@ cells.append(md("""
 cells.append(md("""
     # §D — Self-review
 
-    Re-read end-to-end as a hostile reviewer. Four concessions:
+    Re-read end-to-end as a hostile reader. Four concessions:
 
     1. **The cross-organism / cross-tissue / cross-seed comparison
-       panels show Δα only — α is intentionally omitted.** A reviewer
+       panels show Δα only — α is intentionally omitted.** A reader
        might want both. Our case: α is dominated by the conservation
        prior anchor, so an α-vs-α scatter measures how much *the
        prior* agrees across runs (trivially high) more than how much
@@ -2248,7 +2248,7 @@ cells.append(md("""
        That is the load-bearing reproducibility claim of the paper.
        (α distribution shape, vs prior overlap, and trajectory live
        in §A; α biology by gene category lives in §C.0.) If a
-       reviewer insists on seeing the α scatters, swap
+       reader insists on seeing the α scatters, swap
        `quantity="alpha"` in the relevant `compare_two_runs(...)`
        calls.
 
@@ -2266,7 +2266,7 @@ cells.append(md("""
     3. **The cross-species panels in §B.2 / §B.3 are visually dense.**
        Six and three figures respectively. A LaTeX layout will pick
        a subset; the notebook intentionally keeps all of them so the
-       reviewer can ask "what about pair X vs pair Y?" and get an
+       reader can ask "what about pair X vs pair Y?" and get an
        answer.
 
     4. **The trajectory panels (§A.2) are not seed-averaged.** Every

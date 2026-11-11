@@ -1,17 +1,16 @@
-"""Panels first made by notebooks 04 and 06, redrawn at their size on the page, from the same data.
+"""The Hallmark panels first made by notebook 06, redrawn at their size on the page, from the same data.
 
-supp_testis_categories_{a,b}  A1 box plot and A3 effect sizes of ``_alpha_biology_builder.py`` for testis
-                              Human+Macaque: gene table from the notebook's own cells, the same statistics,
-                              row pitch of 11.5 pt so all 41 categories fit one page at a readable size.
 supp_hallmark_{a,b,c}         B1, B2 and D1 of ``_pathway_builder.py`` from the cached GSEA tables, with
                               the cohort names of the paper in place of the internal ``panc`` run names.
+
+The gene-category panels of testis Human+Macaque, which this script also drew, are drawn by
+``figures/redraw/categories.py`` together with those of the four-species liver model.
 
     PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.F1_figures.notebook_panels
 """
 
 from __future__ import annotations
 
-import json
 import re
 
 import matplotlib.pyplot as plt
@@ -21,127 +20,7 @@ from adjustText import adjust_text
 
 from analysis.tasks.T8_4_figures import common as cm
 
-NB = cm.REPO / "notebooks"
 RUNS = cm.REPO / "training" / "runs"
-
-
-def notebook_namespace(path, stop_after: int, dataset_order: list) -> dict:
-    """Run the notebook's setup cells only, restricted to some datasets, in a fresh namespace."""
-    cells = json.loads(path.read_text())["cells"]
-    ns = {"__name__": "nb"}
-    for i, c in enumerate(cells[: stop_after + 1]):
-        if c["cell_type"] != "code":
-            continue
-        src = "".join(c["source"])
-        src = src.replace("plt.show()", "pass")
-        src = re.sub(r"^for k in DATASET_ORDER:\n\s+plot_\w+\(.*\)$", "", src, flags=re.M)
-        if i == 10:  # coverage heatmap: only cats_admissible is needed
-            src = src.split("\n")[0]
-        exec(compile(src, f"{path.name}[{i}]", "exec"), ns)  # noqa: S102
-        if "DATASET_ORDER" in ns and ns["DATASET_ORDER"] != dataset_order:
-            ns["DATASET_ORDER"] = dataset_order
-    return ns
-
-
-# Display names for the category keys of the gene-category vocabulary (keys stay as in the notebooks).
-CATEGORY_DISPLAY = {
-    "apoptosis": "Apoptosis", "autophagy": "Autophagy", "cell_cycle": "Cell cycle", "chaperones_hsp": "Chaperones (HSP)",
-    "coagulation_serum": "Coagulation and serum", "complement": "Complement", "cytochrome_p450": "Cytochrome P450",
-    "cytokines_chemokines": "Cytokines and chemokines", "cytoskeleton_actin": "Actin cytoskeleton",
-    "cytoskeleton_intermediate": "Intermediate filaments", "cytoskeleton_microtubule": "Microtubules",
-    "dna_replication_repair": "DNA replication and repair", "ecm_collagen": "ECM: collagens", "ecm_other": "ECM: other",
-    "glutathione_redox": "Glutathione and redox", "hedgehog_signaling": "Hedgehog signaling", "histone": "Histones",
-    "housekeeping": "Housekeeping", "immediate_early": "Immediate early genes", "interferon_response": "Interferon response",
-    "kinases_signaling": "Signaling kinases", "metabolism_glycolysis": "Glycolysis", "metabolism_lipid": "Lipid metabolism",
-    "mitochondrial_dna_encoded": "Mitochondrially encoded", "notch_signaling": "Notch signaling",
-    "nuclear_receptors": "Nuclear receptors", "oxphos_nuclear_encoded": "OXPHOS, nuclear-encoded", "proteasome": "Proteasome",
-    "ribosomal_mt": "Mitochondrial ribosome", "ribosomal_structural": "Cytosolic ribosome", "ribosome_biogenesis": "Ribosome biogenesis",
-    "splicing_factors": "Splicing factors", "tf_forkhead_etc": "Forkhead and other TFs", "tf_homeobox": "Homeobox TFs",
-    "tf_zinc_finger": "Zinc-finger TFs", "tgfb_bmp_signaling": "TGF-β/BMP signaling",
-    "translation_elongation": "Translation elongation", "translation_initiation": "Translation initiation",
-    "wnt_signaling": "Wnt signaling", "mhc_class_I": "MHC class I", "mhc_class_II": "MHC class II",
-}
-
-
-def display(key: str) -> str:
-    return CATEGORY_DISPLAY.get(key, key.replace("_", " ").capitalize())
-
-
-def testis_categories() -> list:
-    ns = notebook_namespace(NB / "04_delta_alpha_biology.ipynb", 13, ["test_hmac"])
-    key = "test_hmac"
-    sub, order = ns["_category_order_and_subset"](key)
-    df = ns["GENE_TABLES"][key]
-    label = ns["DATASETS"][key]["display_label"]
-    pu, fd = ns["pu"], ns["fd"]
-    n = len(order)
-    pitch = 11.5 / 72
-    H = pitch * n + 0.5
-
-    # (a) A1 box plot, same statistics and styles; only the size changes.
-    fig = plt.figure(figsize=(3.95, H))
-    ax = fig.add_axes([1.3 / 3.95, 0.42 / H, 2.05 / 3.95, pitch * n / H])
-    data = [sub.loc[sub["category"] == c, "delta_alpha"].values for c in order]
-    ax.boxplot(data, vert=False, positions=range(n), widths=0.62, patch_artist=True,
-               medianprops=dict(color="#0072B2", linewidth=1.0),
-               boxprops=dict(facecolor="#dddddd", edgecolor="#222222", linewidth=0.5),
-               whiskerprops=dict(color="#222222", linewidth=0.5), capprops=dict(color="#222222", linewidth=0.5),
-               flierprops=dict(marker="o", markersize=1.0, markerfacecolor="#222222", markeredgecolor="none", alpha=0.4))
-    ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--", zorder=0)
-    ax.set_xlim(*fd.DELTA_ALPHA_RANGE)
-    ax.set_xticks(list(fd.DELTA_ALPHA_TICKS))
-    ax.set_xlabel(f"{fd.LABEL['delta_alpha']}  ({label})", fontsize=6.5, labelpad=1)
-    ax.set_ylim(-0.5, n - 0.5)  # largest median at the top, as in (b)
-    ax.set_yticks(range(n))
-    ax.set_yticklabels([f"{display(c)}  ($n${int((sub['category'] == c).sum())})" for c in order], fontsize=5.5)
-    ax.set_ylabel("Gene category", fontsize=6.5, labelpad=1)
-    ax.tick_params(axis="x", labelsize=6)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ns["_annotate_significance_per_category"](ax, sub, order, df["delta_alpha"].values)
-    out = [cm.save(fig, "supp_testis_categories_a")]
-
-    # (b) A3 effect sizes, same statistics and BH pool as plot_effect_size_heatmap_for_dataset.
-    from scipy.stats import mannwhitneyu, wilcoxon
-
-    v_all = df["delta_alpha"].values
-    a_all = np.abs(v_all)
-    sd_full, sd_abs, mean_abs = np.std(v_all, ddof=1), np.std(a_all, ddof=1), np.mean(a_all)
-    rows = []
-    for c in order:
-        m = (df["category"] == c).values
-        d_shift = np.mean(v_all[m]) / sd_full
-        d_amp = (np.mean(a_all[m]) - mean_abs) / sd_abs * (1.0 if d_shift >= 0 else -1.0)
-        p_d = wilcoxon(v_all[m], alternative="two-sided", zero_method="wilcox")[1]
-        p_amp = mannwhitneyu(a_all[m], a_all[~m], alternative="greater")[1]
-        rows.append(dict(category=c, d=d_shift, d_amp=d_amp, p_d=p_d, p_amp=p_amp))
-    enr = pd.DataFrame(rows)
-    q = pu.bh_fdr(np.r_[enr.p_d.values, enr.p_amp.values])
-    enr["sig_d"], enr["sig_amp"] = q[: n] < 0.05, q[n:] < 0.05
-    enr = enr.set_index("category").loc[list(reversed(order))]
-    val, sig = enr[["d", "d_amp"]].values, enr[["sig_d", "sig_amp"]].values
-    vmax = float(max(np.abs(val).max(), 1.0))
-    fig = plt.figure(figsize=(2.72, H))
-    ax = fig.add_axes([1.2 / 2.72, 0.42 / H, 1.02 / 2.72, pitch * n / H])
-    im = ax.imshow(val, cmap="RdBu_r", aspect="auto", vmin=-vmax, vmax=vmax)
-    for i in range(n):
-        for j in range(2):
-            ax.text(j, i, f"{val[i, j]:+.2f}", ha="center", va="center", fontsize=5.2,
-                    color="white" if abs(val[i, j]) > 0.6 * vmax else "#222222")
-            if sig[i, j]:
-                ax.text(j + 0.40, i - 0.18, "★", ha="center", va="center", fontsize=4,
-                        color="white" if abs(val[i, j]) > 0.6 * vmax else "#222222")
-    ax.set_xticks([0, 1], ["shift", "amplitude"], fontsize=6)
-    ax.set_xlabel(r"Cohen's $d$ on $\Delta\alpha$ / signed $|\Delta\alpha|$" + f"\n({label})", fontsize=6, labelpad=1)
-    ax.set_yticks(range(n))
-    ax.set_yticklabels([display(c) for c in enr.index], fontsize=5.5)
-    ax.tick_params(length=0)
-    cax = fig.add_axes([2.3 / 2.72, 0.42 / H + 0.33 * pitch * n / H, 0.09 / 2.72, 0.34 * pitch * n / H])
-    cb = fig.colorbar(im, cax=cax, label="effect size")
-    cb.ax.tick_params(labelsize=5.5)
-    cb.ax.yaxis.label.set_size(6)
-    out.append(cm.save(fig, "supp_testis_categories_b"))
-    return out
 
 
 HALL = "MSigDB_Hallmark_2020"
@@ -218,7 +97,7 @@ def hallmark() -> list:
     for k, (lab, col) in styles.items():
         ax.bar(x, q[k].values, bottom=bottom, color=col, edgecolor="#222222", linewidth=0.4, width=0.78, label=lab)
         bottom += q[k].values
-    ax.set_xticks(x, [s.split(" ", 1)[1] for s in q.index], fontsize=5.8, rotation=20, ha="right",
+    ax.set_xticks(x, [cm.style.cohort_name(s).split(" ", 1)[1] for s in q.index], fontsize=5.8, rotation=20, ha="right",
                   rotation_mode="anchor")
     ax.set_ylabel("Hallmark pathways at FDR < 0.05", fontsize=6.5)
     ax.tick_params(axis="y", labelsize=6)
@@ -249,8 +128,8 @@ def hallmark() -> list:
     ax.axvline(0, color="#444444", linewidth=0.5, zorder=0)
     texts = [ax.text(r.NES, r.nl, _nice(r.pathway, 30), fontsize=5.3, ha="center", va="center", color="#222222")
              for s in (sp, sn) for _, r in s.nlargest(5, "nl").iterrows()]
-    ax.set_xlabel(r"NES  (rank metric: $\Delta\alpha_{\rm liver}-\Delta\alpha_{\rm testis}$)", fontsize=6.5)
-    ax.set_ylabel(r"$-\log_{10}(\mathrm{FDR}\;q)$", fontsize=6.5)
+    ax.set_xlabel("NES  (genes ranked by Δα in liver − Δα in testis)", fontsize=6.5)
+    ax.set_ylabel("−log₁₀ (FDR $q$)", fontsize=6.5)
     ax.tick_params(labelsize=6)
     ax.margins(x=0.18)
     ax.legend(loc="center right", frameon=False, fontsize=6, handletextpad=0.1, borderaxespad=0)
@@ -262,7 +141,7 @@ def hallmark() -> list:
 
 def main() -> None:
     cm.setup()
-    for p in hallmark() + testis_categories():
+    for p in hallmark():
         print(p.name, cm.check_pdf(p))
 
 

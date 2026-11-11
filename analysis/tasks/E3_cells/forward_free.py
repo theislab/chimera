@@ -1,12 +1,12 @@
-"""E3: checkpoint-only forward passes of the per-gene (free) gate fits kept by Z4, so the count
-margin S_g of the per-gene read-out decomposes by species and cell type exactly as the canonical
-forward passes (T2.5 code unchanged: ``forward_sums``). Nothing is written to run dirs.
+"""Checkpoint-only forward passes of the per-gene (free) gate fits kept by Z4_free_gate_all, so the count
+margin S_g of the per-gene read-out decomposes by species and cell type exactly as the canonical forward
+passes (code of T2_5_celltype_margin unchanged: ``forward_sums``). Nothing is written to run dirs.
 
     PYTHONPATH=$PWD python analysis/tasks/E3_cells/forward_free.py manifest
     PYTHONPATH=$PWD python analysis/tasks/E3_cells/forward_free.py run --row I --threads 4
 
 Output: ``results/analysis/E3/forward_free/<cohort>/fw_s<seed>.npz`` (grouping = the cohort's
-registry cell-type key, as H1).
+registry cell-type key, as in H1_harmonise).
 """
 from __future__ import annotations
 
@@ -49,7 +49,8 @@ def run(row: int, threads: int, batch: int) -> None:
     T25RUN.C.read_adata = C.read_adata
     T25RUN.GROUP_KEYS["liver"] = [reg["ct"]]
     T25RUN.GROUP_KEYS["testis"] = [reg["ct"]]
-    # landmark genes only feed T2.5's bootstrap, not used here; skip the symbol lookup (no table key for some cohorts)
+    # landmark genes only feed the bootstrap of T2_5_celltype_margin, not used here; skip the symbol lookup
+    # (no table key for some cohorts)
     T25RUN.gene_ids.symbols = lambda _c, vn: pd.Series([""] * len(vn))
     fw = T25RUN.forward_sums(f"{c}_s{seed}", c, rn, threads, batch)
     fw["run"] = np.array(rn)

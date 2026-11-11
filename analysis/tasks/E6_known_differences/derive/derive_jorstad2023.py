@@ -1,4 +1,4 @@
-"""E6 literature list: Jorstad et al. 2023 Science 382:eade9516 (MTG; human, chimpanzee, gorilla, macaque, marmoset).
+"""Literature list: Jorstad et al. 2023 Science 382:eade9516 (MTG; human, chimpanzee, gorilla, macaque, marmoset).
 
 Usage:
     python -I derive_jorstad2023.py <data_dir> <out_tsv>

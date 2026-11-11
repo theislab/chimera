@@ -75,11 +75,13 @@ def above(ax, text: str, ha: str = "right", **kw) -> None:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Figure 2: the gate value against the protein prior (liver Human+Monkey)
+# main_alpha_vs_prior: the gate value against the protein prior (liver Human+Monkey)
 # ---------------------------------------------------------------------------------------------------------------------
 GATE = "main_alpha_vs_prior"
 GATE_COHORT = "liver_hmonkey"
 PRIOR_LABEL = "protein prior π"
+TAIL = 0.05                       # a gene is in a tail of Δα beyond this distance from the prior
+TAIL_SHARES = (16, 22)            # percent of the genes above +TAIL and below −TAIL, as the paper states them
 
 
 def gate_values() -> tuple:
@@ -109,11 +111,28 @@ def scatter() -> list:
 
 
 def shift() -> list:
+    """Panel ``main_alpha_vs_prior/shift``: the histogram of Δα = α − prior over the genes of the liver Human+Monkey run.
+
+    The dashed line is Δα = 0, the protein prior. The two dotted lines stand at ±0.05 (``TAIL``); beside each, the share
+    of the genes beyond it (above +0.05, below −0.05). The note above the axes gives the shares above and below zero;
+    genes beyond the axis are counted at its edge. Reads ``final_state.npz`` of the run (arrays ``alpha`` and
+    ``prior``). The two tail shares are counted from these arrays and must equal the shares the paper states
+    (``TAIL_SHARES``); the function stops otherwise.
+
+        python -m figures.redraw.main_figures shift     # in chimera_env, from the repository root
+    """
     alpha, prior = gate_values()
     delta = alpha - prior
     fd, fig, ax = gate_frame()
     ax.hist(delta, bins=fd.DELTA_ALPHA_BINS, color="#bdbdbd", edgecolor="#888888", linewidth=0.3)
     ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
+    tails = (100 * (delta > TAIL).mean(), 100 * (delta < -TAIL).mean())
+    if (round(tails[0]), round(tails[1])) != TAIL_SHARES:
+        raise SystemExit(f"shift: {tails[0]:.2f}% of the genes above +{TAIL} and {tails[1]:.2f}% below −{TAIL}; the paper states {TAIL_SHARES}")
+    for x, share, side, ha in ((TAIL, tails[0], f"above +{TAIL}", "left"), (-TAIL, tails[1], f"below −{TAIL}", "right")):
+        ax.axvline(x, color=C.MUTED, linewidth=0.5, linestyle=":")
+        ax.text(x + (0.035 if x > 0 else -0.035), 0.6, f"{share:.0f}%\n{side}", transform=ax.get_xaxis_transform(), ha=ha, va="center",
+                fontsize=NOTE, color=C.INK, linespacing=1.15)
     fd.style_delta_alpha_axis(ax, "x")
     ax.set_xlabel("Δα")
     ax.set_ylabel("number of genes")
@@ -125,7 +144,8 @@ def shift() -> list:
         ax.text(0.02, 0.13, f"← {below} genes", transform=ax.transAxes, ha="left", va="bottom", fontsize=NOTE, color=C.MUTED)
     if over:
         ax.text(0.98, 0.13, f"{over} genes →", transform=ax.transAxes, ha="right", va="bottom", fontsize=NOTE, color=C.MUTED)
-    print(f"shift: above 0 {up:.4f}, below 0 {down:.4f}; beyond the axis: {below} below {lo}, {over} above {hi}")
+    print(f"shift: above 0 {up:.4f}, below 0 {down:.4f}; above +{TAIL} {tails[0]:.2f}%, below −{TAIL} {tails[1]:.2f}%; "
+          f"beyond the axis: {below} below {lo}, {over} above {hi}")
     return [C.save_panel(fig, GATE, "shift", exact=True)]
 
 
@@ -148,15 +168,20 @@ def distribution() -> list:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Figure 4 a, b: Δα of the twelve largest gene categories (liver 4 species)
+# main_delta_alpha_liver, panels a, b: Δα of the twelve largest gene categories (liver 4 species)
 # ---------------------------------------------------------------------------------------------------------------------
 DEPLOYMENT = "main_delta_alpha_liver"
 CATEGORY_COHORT = "liver_4sp"
 N_CATEGORIES = 12
-ROW_HEIGHT = 271.3            # bp: height of panel (c) of the figure, so that the three panels of the row are at scale 1
-ROW_TOP, ROW_BOTTOM = 13.0, 31.0
+PRIOR_LANDSCAPE = (202.96, 205.44)   # bp: panel (c) of the figure as composed (prior_landscape, cropped to its ink), on the 0.24 bp grid on
+ROW_HEIGHT = PRIOR_LANDSCAPE[1]      # which the layout tool measures a page. Panels (a) and (b) take its height and the rest of the text
+#                                      width, so that the three panels of the row are at scale 1
+ROW_TOP, ROW_BOTTOM = 9.5, 17.2   # bp above the first row (column headings) and below the last (axis title, on the line of panel (c))
 BOX_RANGE, BOX_TICKS = (-0.25, 0.15), (-0.2, -0.1, 0.0, 0.1)   # holds every whisker; genes beyond it are marked at its edge
-EFFECT_WIDTH, CELL = 93.0, 26.0
+EFFECT_WIDTH, CELL = 84.0, 24.0
+ROW_TITLE, ROW_TEXT, ROW_SMALL, ROW_STAR = 6.2, 5.5, 5.2, 4.2   # pt: axis titles; row names, ticks and values; small numbers; stars
+ROW_NAME_WIDTH = 77.0         # bp: a row name with its gene count that is wider goes on two lines
+ROW_LINE = 0.5                # pt: axes, boxes and whiskers
 # Printed on the first version of the two panels (category, genes, shift, amplitude, star at shift, star at amplitude).
 FIRST_VERSION_CATEGORIES = (
     ("ecm_other", 55, +0.51, -0.20, True, False), ("tf_homeobox", 58, +0.19, -0.52, True, False),
@@ -209,32 +234,55 @@ def two_lines(name: str, count: str, limit: float, size: float) -> str:
 
 
 def category_rows() -> tuple:
-    """Row names of the two panels (name and number of genes) and the width of the box-plot panel."""
+    """Row names of the two panels (name and number of genes), the width of the box-plot panel and of its name column."""
     _, rows = largest_categories()
-    names = [two_lines(C.category(c), f"(n = {int(n):,})", 68.0, categories.ROW_SIZE) for c, n in zip(rows.index, rows["n"])]
-    left = 2.0 + max(categories.text_width(s.split("\n"), categories.ROW_SIZE) for s in names) + 6.0
-    return names, TEXT_WIDTH - 2 * GAP - 199.5 - EFFECT_WIDTH, left      # 199.5 bp: width of panel (c) as composed
+    names = [two_lines(C.category(c), f"(n = {int(n):,})", ROW_NAME_WIDTH, ROW_TEXT) for c, n in zip(rows.index, rows["n"])]
+    left = 1.5 + max(categories.text_width(s.split("\n"), ROW_TEXT) for s in names) + 4.5
+    return names, TEXT_WIDTH - 2 * GAP - PRIOR_LANDSCAPE[0] - EFFECT_WIDTH, left
 
 
 def category_boxes() -> list:
+    """Panel ``main_delta_alpha_liver/category_boxes``: Δα of the genes of the twelve gene categories with the most
+    genes, four-species liver, as box plots.
+
+    What it draws. One row per category, from the largest median Δα down; the row name carries the number of genes.
+    Box: the quartiles of Δα over the genes of the category; blue line: the median; whiskers: the last gene within 1.5
+    interquartile ranges of the box; dots: the genes beyond the whiskers. The dashed line is Δα = 0, the protein prior.
+    The axis holds every whisker (the function stops otherwise); where single genes lie beyond its left end, the row
+    carries an arrowhead and their number.
+
+    Reads the gene table and the rows of ``largest_categories``, which come from ``categories.category_table``:
+    ``final_state.npz`` of the stored four-species liver run (arrays ``alpha`` and ``prior``; Δα is their difference),
+    the gene names of the data object of the cohort, its ortholog table (gene symbols) and the category vocabulary
+    ``notebooks/_gene_categories.py``. Columns used here: ``category`` and ``delta`` of the gene table, ``n`` of the
+    rows. Nothing is computed here but the quartiles that the box plot draws.
+
+    The page has the height of panel (c) of the figure and the rows of ``category_effect_sizes``; the two panels
+    are drawn together and composed with ``X(...)``:
+
+        python -m figures.redraw.main_figures category_boxes category_effect_sizes     # in chimera_env, from the repository root
+    """
     genes, rows = largest_categories()
     names, width, left = category_rows()
     n = len(rows)
     _, fig, ax = page(width, ROW_HEIGHT, left=left, right=4.0, bottom=ROW_BOTTOM, top=ROW_TOP)
     y = np.arange(n)[::-1]
     data = [genes.loc[genes["category"] == c, "delta"].to_numpy() for c in rows.index]
-    ax.boxplot(data, orientation="horizontal", positions=y, widths=0.6, patch_artist=True, manage_ticks=False,
-               medianprops=dict(color=C.DOWN, linewidth=1.0), boxprops=dict(facecolor="#dddddd", edgecolor=C.INK, linewidth=0.5),
-               whiskerprops=dict(color=C.INK, linewidth=0.5), capprops=dict(color=C.INK, linewidth=0.5),
-               flierprops=dict(marker="o", markersize=1.2, markerfacecolor=C.INK, markeredgecolor="none", alpha=0.45))
-    ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--", zorder=0)
+    thin = dict(color=C.INK, linewidth=ROW_LINE)
+    ax.boxplot(data, orientation="horizontal", positions=y, widths=0.62, patch_artist=True, manage_ticks=False,
+               medianprops=dict(color=C.DOWN, linewidth=1.0), boxprops=dict(facecolor="#dddddd", edgecolor=C.INK, linewidth=ROW_LINE),
+               whiskerprops=thin, capprops=thin,
+               flierprops=dict(marker="o", markersize=1.1, markerfacecolor=C.INK, markeredgecolor="none", alpha=0.45))
+    ax.axvline(0, color="#888888", linewidth=ROW_LINE, linestyle="--", zorder=0)
     lo, hi = BOX_RANGE
     ax.set_xlim(lo, hi)
     ax.set_xticks(list(BOX_TICKS), [minus(f"{v:+.1f}") if v else "0" for v in BOX_TICKS])
     ax.set_ylim(-0.5, n - 0.5)
-    ax.set_yticks(y, names, fontsize=categories.ROW_SIZE, linespacing=1.1)
-    ax.tick_params(axis="y", pad=2.0)
-    ax.set_xlabel(f"Δα ({categories.cohort_phrase(CATEGORY_COHORT)})")
+    ax.set_yticks(y, names, linespacing=1.0)
+    for s in ax.spines.values():
+        s.set_linewidth(ROW_LINE)
+    ax.tick_params(labelsize=ROW_TEXT, width=0.4, length=2.0, pad=1.5)
+    ax.set_xlabel(f"Δα ({categories.cohort_phrase(CATEGORY_COHORT)})", fontsize=ROW_TITLE, labelpad=1.3)
     off = []
     for yy, c, d in zip(y, rows.index, data):
         q1, q3 = np.percentile(d, [25, 75])
@@ -244,9 +292,9 @@ def category_boxes() -> list:
         if (d > hi).any():
             raise SystemExit(f"{c}: genes above the axis")
         if below:                                                  # single genes beyond the axis: a mark and their number at its edge
-            ax.plot([0.022], [yy], "<", transform=ax.get_yaxis_transform(), markersize=2.8, color=C.MUTED, markeredgewidth=0, clip_on=False,
+            ax.plot([0.022], [yy], "<", transform=ax.get_yaxis_transform(), markersize=2.4, color=C.MUTED, markeredgewidth=0, clip_on=False,
                     zorder=6)
-            ax.text(0.05, yy + 0.33, f"{below}", transform=ax.get_yaxis_transform(), ha="left", va="center", fontsize=NOTE - 0.3,
+            ax.text(0.05, yy + 0.33, f"{below}", transform=ax.get_yaxis_transform(), ha="left", va="center", fontsize=ROW_SMALL,
                     color=C.MUTED)
             off.append(f"{c}: {below} of {len(d)} genes below {lo}")
     print("category_boxes: genes beyond the Δα axis (marked at its edge with their number):\n   " + "\n   ".join(off or ["none"]))
@@ -254,9 +302,28 @@ def category_boxes() -> list:
 
 
 def category_effect_sizes() -> list:
+    """Panel ``main_delta_alpha_liver/category_effect_sizes``: two effect sizes of Δα for the rows of ``category_boxes``,
+    as a heat map with the value in every cell.
+
+    What it draws. One row per gene category, at the height of its box plot, and two columns. "shift": Cohen's d of Δα,
+    the mean Δα of the genes of the category over the standard deviation of Δα of all genes of the cohort. "amplitude":
+    Cohen's d of |Δα| against all genes, written with the sign of the shift. Both columns share one diverging color
+    scale centered on zero (color bar at the right). A star marks q < 0.05, Benjamini-Hochberg over the 24 tests of the
+    two columns (shift: Wilcoxon signed-rank test of Δα against zero; amplitude: one-sided Mann-Whitney test of |Δα|
+    against the other genes).
+
+    Reads the rows of ``largest_categories`` and nothing else, columns ``shift``, ``amplitude``, ``star_shift`` and
+    ``star_amplitude``. They come from ``categories.category_table``, which reads ``final_state.npz`` of the stored
+    four-species liver run (arrays ``alpha`` and ``prior``), the gene names of the data object of the cohort, its
+    ortholog table and the category vocabulary ``notebooks/_gene_categories.py``. No value is computed here.
+
+    Drawn together with ``category_boxes`` (same page height, same rows) and composed with ``X(...)``:
+
+        python -m figures.redraw.main_figures category_boxes category_effect_sizes     # in chimera_env, from the repository root
+    """
     _, rows = largest_categories()
     n = len(rows)
-    width, left = EFFECT_WIDTH, 3.0
+    width, left = EFFECT_WIDTH, 2.0
     _, fig, ax = page(width, ROW_HEIGHT, left=left, right=width - left - 2 * CELL, bottom=ROW_BOTTOM, top=ROW_TOP)
     values = rows[["shift", "amplitude"]].to_numpy()
     stars = rows[["star_shift", "star_amplitude"]].to_numpy()
@@ -265,22 +332,22 @@ def category_effect_sizes() -> list:
     for i in range(n):
         for j in range(2):
             ink = "white" if abs(values[i, j]) > 0.6 * vmax else C.INK
-            ax.text(j, i, minus(f"{values[i, j]:+.2f}"), ha="center", va="center_baseline", fontsize=categories.ROW_SIZE, color=ink)
+            ax.text(j, i, minus(f"{values[i, j]:+.2f}"), ha="center", va="center_baseline", fontsize=ROW_TEXT, color=ink)
             if stars[i, j]:
-                ax.text(j + 0.36, i - 0.27, categories.STAR, ha="center", va="center", fontsize=4.6, color=ink)
+                ax.text(j + 0.40, i - 0.29, categories.STAR, ha="center", va="center", fontsize=ROW_STAR, color=ink)
     ax.xaxis.tick_top()
-    ax.set_xticks([0, 1], ["shift", "amplitude"], fontsize=NOTE)
+    ax.set_xticks([0, 1], ["shift", "amplitude"], fontsize=ROW_TEXT)
     ax.set_yticks([])
     ax.tick_params(length=0, pad=2.0)
     for s in ax.spines.values():
         s.set_visible(False)
-    fig.text(0.5, (ROW_BOTTOM - 5.0) / ROW_HEIGHT, "Cohen's $d$ of Δα and\nof |Δα| (signed)", ha="center", va="top",
-             fontsize=C.SIZE["tick"], linespacing=1.15)                # centered on the page: wider than the two columns
+    fig.text(0.5, (ROW_BOTTOM - 2.4) / ROW_HEIGHT, "Cohen's $d$ of Δα and\nof |Δα| (signed)", ha="center", va="top",
+             fontsize=ROW_TITLE, linespacing=1.05)                     # centered on the page: wider than the two columns
     h = 1 - (ROW_BOTTOM + ROW_TOP) / ROW_HEIGHT
-    cax = fig.add_axes([(left + 2 * CELL + 6.0) / width, ROW_BOTTOM / ROW_HEIGHT + 0.30 * h, 5.5 / width, 0.40 * h])
+    cax = fig.add_axes([(left + 2 * CELL + 5.0) / width, ROW_BOTTOM / ROW_HEIGHT + 0.28 * h, 5.0 / width, 0.44 * h])
     cb = fig.colorbar(im, cax=cax)
-    cb.set_label("effect size", fontsize=C.SIZE["tick"], labelpad=1.5)
-    cb.ax.tick_params(labelsize=NOTE, length=2.0, pad=1.5)
+    cb.set_label("effect size", fontsize=ROW_TITLE, labelpad=1.5)
+    cb.ax.tick_params(labelsize=ROW_SMALL, length=1.8, width=0.4, pad=1.5)
     cb.ax.set_yticks([-1, -0.5, 0, 0.5, 1], ["−1", "−0.5", "0", "0.5", "1"])
     cb.outline.set_linewidth(0.4)
     print(f"category_effect_sizes: color range ±{vmax:.2f}; stars: shift {int(stars[:, 0].sum())}, amplitude {int(stars[:, 1].sum())}")
@@ -288,7 +355,7 @@ def category_effect_sizes() -> list:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Figure 8 a: share of each input group under four attribution methods (liver 4 species)
+# supp_gin_inputs_controls, panel a: share of each input group under four attribution methods (liver 4 species)
 # ---------------------------------------------------------------------------------------------------------------------
 PROTEIN = "main_protein"
 # Percent of the total importance per input group, as printed by cell 29 of notebooks/09_gin_attention_overall.ipynb
@@ -300,8 +367,7 @@ STORED_ATTRIBUTION = {
     "integrated gradients": (75.8, 2.9, 0.5, 18.0, 2.9),
     "ablation": (38.1, 8.6, 1.6, 47.1, 4.5),
 }
-GROUP_COLOR = {"ESM-2 PCs": "#cccccc", "esm2_intersp_var": "#56B4E9", "mean_identity": "#0072B2", "expression": "#D55E00",
-               "identity_spread": "#888888"}                       # as in the first version of the panel
+GROUP_COLOR = C.GATE_GROUP_COLOR                                   # one color per input group, shared with the residue cards
 DARK_GROUP = ("expression", "mean_identity", "identity_spread")   # a percentage on these is written in white
 PRINTED_FROM = 6.0                                                 # percent: narrower segments carry no number
 SHARES_SIZE = (267.4, 163.9)   # bp: with panel (b) at 0.92 of its drawn size the two fill the text width at one height
@@ -336,7 +402,7 @@ def attribution_shares() -> list:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Figure 8 d to h: the protein map of the four-species liver run
+# main_protein: the protein map of the four-species liver run
 # ---------------------------------------------------------------------------------------------------------------------
 ATLAS_COHORT = "liver_4sp"
 MAP_HEIGHT = 125.0
@@ -395,10 +461,57 @@ def map_page(width: float = THIRD):
     return fig, ax
 
 
-def colored_map(name: str, values: np.ndarray, cmap: str, vmin: float, vmax: float, label: str, ticks, extend: str = "neither") -> list:
+# Categories named on the Δα map (panel b), so that it can be read without the category map (panel d): those of the
+# twelve whose genes lie together and that have free room beside them (the zinc-finger factors lie together too, with
+# no free room). key -> where the name stands, in fractions of the map box (``at``, ``ha``), in how many lines, and
+# where its leader stops, in pt from the middle of the category (None: the name stands beside its category).
+LANDMARKS = {
+    "ribosomal_mt": dict(at=(0.64, 0.82), ha="left", lines=2, leader=5.0),
+    "tf_homeobox": dict(at=(0.41, 0.955), ha="left", lines=1, leader=None),
+    "ecm_other": dict(at=(0.80, 0.085), ha="center", lines=1, leader=9.0),
+}
+LANDMARK_RADIUS, LANDMARK_SHARE = 1.0, 0.6   # a named category has at least this share of its genes within this distance (map units) of their middle
+
+
+def landmarks() -> list:
+    """Name and middle (median place on the stored map) of the categories of ``LANDMARKS``. The panel stops if the genes of
+    one of them do not lie together (``LANDMARK_SHARE`` of them within ``LANDMARK_RADIUS`` of the middle): a name on the
+    map must stand for a place."""
+    genes, _ = largest_categories()
+    xy = protein_map()["xy"]
+    category = genes["category"].to_numpy()
+    out = []
+    for key in LANDMARKS:
+        place = xy[category == key]
+        middle = np.median(place, axis=0)
+        near = float((np.hypot(*(place - middle).T) < LANDMARK_RADIUS).mean())
+        if near < LANDMARK_SHARE:
+            raise SystemExit(f"landmark {key}: only {100 * near:.0f}% of its genes lie within {LANDMARK_RADIUS} of their middle")
+        print(f"landmark {C.category(key)}: {len(place)} genes, {100 * near:.0f}% within {LANDMARK_RADIUS} of ({middle[0]:+.2f}, {middle[1]:+.2f})")
+        out.append((key, C.category(key), middle))
+    return out
+
+
+def colored_map(name: str, values: np.ndarray, cmap: str, vmin: float, vmax: float, label: str, ticks, extend: str = "neither",
+                named: tuple = ()) -> list:
+    """One map of the protein-space atlas, colored by a value of every gene (panels a to c of the main figure
+    ``main_protein``: ``main_protein/atlas_alpha``, ``atlas_delta_alpha``, ``atlas_correction``).
+
+    Every dot is a gene at its stored place on the map (``protein_map``: ``cache/esm2_umap.npy`` of the four-species
+    liver run), colored by ``values`` (α, Δα = α − prior, or the absolute correction of the gate network, from
+    ``final_state.npz`` of the same run: arrays ``alpha``, ``prior``, ``correction``). ``named``: categories to name on
+    the map (``landmarks``; the Δα map names three). Nothing is fitted.
+
+        python -m figures.redraw.main_figures atlas_alpha atlas_delta_alpha atlas_correction     # in chimera_env, from the repository root
+    """
     fig, ax = map_page()
     xy = protein_map()["xy"]
     sc = ax.scatter(xy[:, 0], xy[:, 1], c=values, cmap=cmap, vmin=vmin, vmax=vmax, **DOT)
+    for key, text, middle in named:
+        mark = LANDMARKS[key]
+        leader = None if mark["leader"] is None else dict(arrowstyle="-", color="#555555", linewidth=0.35, shrinkA=1.0, shrinkB=mark["leader"])
+        ax.annotate(text.replace(" ", "\n", mark["lines"] - 1), xy=tuple(middle), xycoords="data", xytext=mark["at"], textcoords="axes fraction",
+                    ha=mark["ha"], va="center", fontsize=NOTE, color=C.INK, linespacing=1.0, zorder=6, arrowprops=leader)
     b = MAP_BOX
     cax = fig.add_axes([(b["left"] + b["width"] + 4.0) / THIRD, (b["bottom"] + 0.2 * b["height"]) / MAP_HEIGHT, 4.5 / THIRD,
                         0.6 * b["height"] / MAP_HEIGHT])
@@ -416,10 +529,11 @@ def atlas_alpha() -> list:
 
 
 def atlas_delta_alpha() -> list:
+    named = tuple(landmarks())  # before the page is set up: reading the categories resets the drawing defaults (600 dpi for the clouds)
     delta = protein_map()["delta_alpha"]
     limit = float(np.percentile(np.abs(delta), 99))               # as in the first version: 99th percentile of |Δα|
     print(f"atlas_delta_alpha: color range ±{limit:.3f}; {int((np.abs(delta) > limit).sum())} genes beyond it take the end colors")
-    return colored_map("atlas_delta_alpha", delta, "RdBu_r", -limit, limit, "Δα", [-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], extend="both")
+    return colored_map("atlas_delta_alpha", delta, "RdBu_r", -limit, limit, "Δα", [-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], extend="both", named=named)
 
 
 def atlas_correction() -> list:
@@ -451,15 +565,25 @@ def category_draws() -> list:
 
 
 def atlas_categories() -> list:
+    """Panel d of the main figure ``main_protein`` (``main_protein/atlas_categories``): the twelve gene categories with
+    the most genes on the map, at most 30 genes each (``category_draws``; the same draw on every run), over all genes in
+    light gray. Reads the stored map and the category vocabulary ``notebooks/_gene_categories.py``; the key is the
+    separate panel ``atlas_categories_key``.
+
+        python -m figures.redraw.main_figures atlas_categories atlas_categories_key     # in chimera_env, from the repository root
+    """
+    draws = category_draws()  # before the page is set up: reading the categories resets the drawing defaults (600 dpi for the clouds)
     fig, ax = map_page()
     xy = protein_map()["xy"]
     ax.scatter(xy[:, 0], xy[:, 1], s=0.9, color="#cccccc", alpha=0.4, linewidths=0, rasterized=True, zorder=1)
-    for _, _, color, index in category_draws():
+    for _, _, color, index in draws:
         ax.scatter(xy[index, 0], xy[index, 1], s=6.5, color=color, edgecolor="white", linewidth=0.3, alpha=0.9, zorder=4, rasterized=True)
     return [C.save_panel(fig, PROTEIN, "atlas_categories", exact=True)]
 
 
 def atlas_categories_key() -> list:
+    """The key of ``atlas_categories``: the twelve categories with their colors and gene numbers, as a panel of its own
+    (``main_protein/atlas_categories_key``), placed above the cluster panel in the figure."""
     C.design()
     width, height = KEY_SIZE
     fig = plt.figure(figsize=(width / 72, height / 72))
@@ -493,6 +617,15 @@ def cluster_medians() -> dict:
 
 
 def atlas_clusters() -> list:
+    """Panel e of the main figure ``main_protein`` (``main_protein/atlas_clusters``): for each of the four liver cohorts
+    the median Δα of twelve protein clusters, sorted from lowest to highest within the cohort, with the value in every
+    cell. The values are printed with three decimals and without the zero before the point (a cell is 21 bp wide), so
+    that the spread along a row can be read and no value shows as a signed zero. The medians are those of
+    ``cluster_medians`` (``final_state.npz`` of the four liver runs and the 64 ESM-2 components stored with the data
+    objects); the script stops if they differ, at two decimals, from the values of the first version of the panel.
+
+        python -m figures.redraw.main_figures atlas_clusters     # in chimera_env, from the repository root
+    """
     C.design()
     medians = cluster_medians()
     table = np.vstack([medians[c] for c in atlas.LIVER])
@@ -502,9 +635,12 @@ def atlas_clusters() -> list:
     _, fig, ax = page(width, CLUSTER_HEIGHT, left=left, right=2.0, bottom=25.5, top=1.5)
     limit = float(np.abs(table).max())
     ax.imshow(table, cmap="RdBu_r", vmin=-limit, vmax=limit, aspect="auto")
+    if (np.round(table, 3) == 0).any():
+        raise SystemExit("atlas_clusters: a median prints as zero at three decimals; print it with more")
     for i in range(table.shape[0]):
         for j in range(table.shape[1]):
-            ax.text(j, i, minus(f"{table[i, j]:+.2f}"), ha="center", va="center_baseline", fontsize=NOTE,
+            value = f"{table[i, j]:+.3f}"                             # "+0.019" -> "+.019": the cell has no room for the zero
+            ax.text(j, i, minus(value[0] + value[2:]), ha="center", va="center_baseline", fontsize=NOTE,
                     color="white" if abs(table[i, j]) > 0.6 * limit else C.INK)
     ax.set_xticks(range(N_CLUSTERS), [str(i + 1) for i in range(N_CLUSTERS)], fontsize=NOTE)
     ax.set_yticks(range(len(labels)), labels)
@@ -519,7 +655,7 @@ def atlas_clusters() -> list:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Figure 8 i, k to n: the three gene archetypes of the gate network (liver 4 species)
+# supp_atlas_archetypes: the three gene archetypes of the gate network (liver 4 species)
 # ---------------------------------------------------------------------------------------------------------------------
 # Printed by cell 11 of notebooks/11_gene_archetypes.ipynb: k-means on the hidden layer of the gate network for 3 to 12
 # archetypes, 30 seeds each (silhouette score; mean adjusted Rand index over the pairs of seeds).

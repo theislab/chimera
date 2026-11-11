@@ -7,5 +7,5 @@ until [[ -d $G && -n "$(ls -A $G 2>/dev/null)" ]]; do
   sleep 300
 done
 sleep 600  # let the graph writer finish
-sbatch --exclude=cpusrv114 -J b1tool_samap --array="$(cat results/analysis/B1/samap_tier3_index.txt)%6" -c 16 --mem=100G --time=12:00:00 \
+sbatch -J b1tool_samap --array="$(cat results/analysis/B1/samap_tier3_index.txt)%6" -c 16 --mem=100G --time=12:00:00 \
   -o results/analysis/B1/logs/%x_%A_%a.out analysis/tasks/B1_ground_truth/tool_array.sbatch samap analysis/tasks/B1_ground_truth/grid_tools_v2.tsv

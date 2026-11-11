@@ -287,7 +287,7 @@ def check_all(run: dict) -> list[dict]:
             add("E3.1", "alpha_init_is_prior", "no snapshots", "≤ 0.05", None, "E3 GIN", "skipped")
 
         # E3.2 alpha histogram healthy.
-        # Tightened iter108 from prior 0.5/50% bar to refinement.md target (<5%).
+        # Tightened iter108 from prior 0.5/50% bar to the target of the design notes (<5%).
         # Pre-iter108, this gate silently passed runs with up to 50% saturation;
         # the testis "★" runs (26-35% sat) and pancreas H+Mo (6%) are correctly
         # flagged by the strict bar.
@@ -624,7 +624,7 @@ def check_all(run: dict) -> list[dict]:
                 both_active, "E9 GIN bidirectionality")
         # E9.1 cross-seed α robustness is a multi-run check; run separately via
         # iter108_alpha_audit.py / a future cross_seed_check.py.
-        # Threshold (revised 2026-04-25 per user direction): min Spearman ρ over
+        # Threshold (revised 2026-04-25): min Spearman ρ over
         # all available seed pairs of the same config ≥ 0.50 (prior bar was ≥ 0.90).
         # See workflow.md E9.1 row for rationale.
 

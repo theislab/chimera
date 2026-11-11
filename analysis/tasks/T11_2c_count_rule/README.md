@@ -25,7 +25,7 @@ Chooses the recipe of the five-species eye cohort by count dependence, a rule th
 
 - `training/runs/`
 
-**Notes.** README.md states the rule. Writes under results/analysis/T11/, not T11_2c.
+**Notes.** README.md states the rule. Writes under results/analysis/T11/, not T11_2c. This is the recipe the paper uses for the five-species eye cohort.
 <!-- glance:end -->
 
 The full-cohort recipe was first chosen by the integration composite. Under the amended rule (amendment log of the pre-specified analysis plan), recipes rank on count dependence. Grids 2 and 6 were not selectable before (saturation 7.7%, 6.7%, now allowed up to 10%).

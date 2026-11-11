@@ -1,8 +1,8 @@
-"""F2 per-gene figure: per-gene tables behind the panels, built with Z3's own harness (no new statistic).
+"""Per-gene figure: per-gene tables behind the panels, built with the harness of analysis/tasks/Z3_free_gate (no new statistic).
 
-Reads only Z3 outputs and the frozen T4.3 inputs, through ``Z3_free_gate.scoreboard.patch`` and the unchanged T4.3
-``prepare``, ``universe``, ``design`` and ``rho_p_matrix``. Every rank correlation that a panel draws is recomputed here
-and checked against ``results/analysis/Z3/compare_*.csv`` before it is written.
+Reads only the outputs of Z3_free_gate and the frozen inputs of T4_3_scoreboard, through ``Z3_free_gate.scoreboard.patch`` and
+the unchanged ``prepare``, ``universe``, ``design`` and ``rho_p_matrix`` of T4_3_scoreboard. Every rank correlation that a panel
+draws is recomputed here and checked against ``results/analysis/Z3/compare_*.csv`` before it is written.
 
     PYTHONPATH=$PWD mamba run -n chimera_env python -m analysis.tasks.F2_per_gene.data
 Output: results/analysis/F2/
@@ -10,8 +10,9 @@ Output: results/analysis/F2/
   gate_vs_S.csv                per gene, count-supported flag, D and S of each gate (liver H+Mouse, testis H+Mouse)
   named_genes.csv              spermatocyte-peak (strict) and hepatocyte catabolic core genes with D under each gate and
                                its percentile among all genes of the cohort
-  checks.csv                   recomputed value, Z3 value, absolute difference
-  summary.json                 numbers quoted in the caption and draft that are not in a Z3 table (rho of D with S, D_free vs D_can)
+  checks.csv                   recomputed value, value of Z3_free_gate, absolute difference
+  summary.json                 numbers quoted in the caption and text that are not in a table of Z3_free_gate (rho of D with S,
+                               D_free vs D_can)
 """
 
 from __future__ import annotations

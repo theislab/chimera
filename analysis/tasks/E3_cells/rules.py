@@ -1,37 +1,40 @@
-"""E3 Cells, lineages and evolutionary contrasts (EXPLORATORY). Definitions, fixed before any E3 association.
+"""Cells, lineages and evolutionary contrasts (EXPLORATORY). Definitions, fixed before any association of this task.
 
-Read-outs (CHIMERA_MECHANISM vocabulary):
-* canonical gate (main model): H1 per-gene tables ``results/analysis/H1/genes/<c>.parquet`` (D, S_ema, flags);
-  per-(species, type) S_gsk from the canonical forward passes (``build.py``).
-* per-gene gate: Z4 tables ``results/analysis/Z4/h1/genes/<c>.parquet`` (D_free); per-(species, type) S_gsk from
-  E3's forward passes of the Z4 fits (``forward_free.py``).
-* direct baselines beside every Chimera statistic: B1 (pseudobulk profile correlation, H1 tables) and a per-type
-  direct level gap (|log2 fold change| at the gene's home type, ``build.py`` pseudobulk).
+Read-outs:
+* canonical gate (main model): per-gene tables of H1_harmonise ``results/analysis/H1/genes/<c>.parquet`` (D, S_ema,
+  flags); per-(species, type) S_gsk from the canonical forward passes (``build.py``).
+* per-gene gate: tables of Z4_free_gate_all ``results/analysis/Z4/h1/genes/<c>.parquet`` (D_free); per-(species,
+  type) S_gsk from this task's forward passes of those fits (``forward_free.py``).
+* direct baselines beside every Chimera statistic: B1 (pseudobulk profile correlation, tables of H1_harmonise) and a
+  per-type direct level gap (|log2 fold change| at the gene's home type, ``build.py`` pseudobulk).
 
 Analyses
 A. Home compartments. Each gene's home type = peak type in HUMAN pseudobulk only, log2(1 + CPM), peak minus mean
-   over the human types >= 1 log2 and human detection in the peak type >= 10% (X1's rule, all tissues); types with
-   fewer than 30 human cells are not candidates; otherwise "broad". Types map to cross-tissue compartments
-   (COMPARTMENT) and tissue subgroups (SUBGROUP). Matched excess as X1 (40 nearest non-group genes in rank space
-   of C_pat = raw prior, species-balanced expression, detection, tau; 1,000 draws; SD units; two-sided p),
-   computed for D (canonical), D_free, S_ema, B1 and the direct level gap.
+   over the human types >= 1 log2 and human detection in the peak type >= 10% (the rule of X1_testis_discovery, all
+   tissues); types with fewer than 30 human cells are not candidates; otherwise "broad". Types map to cross-tissue
+   compartments (COMPARTMENT) and tissue subgroups (SUBGROUP). Matched excess as in X1_testis_discovery (40 nearest
+   non-group genes in rank space of C_pat = raw prior, species-balanced expression, detection, tau; 1,000 draws; SD
+   units; two-sided p), computed for D (canonical), D_free, S_ema, B1 and the direct level gap.
 B. Attribution: for genes of a home group, share of the group's positive and negative canonical margin mass in
-   each type divided by the type's weight (X1's enrichment); per species the same.
+   each type divided by the type's weight (the enrichment of X1_testis_discovery); per species the same.
 C. Species-specific departures in fits with >= 3 species. For gene g, type k shared by all species (>= 30 cells
    each): dev_s = S_gsk(s) - mean over the other species. A departure of species s: S_gsk(s) is the minimum row,
    dev_s < 0 and |dev_s| >= 2 SD of the other rows (scale-free within a gene and type). Counted on genes
    count-supported in the cohort. Direct analogue: per-type pseudobulk log2(1 + CPM), species s minus the mean of
    the others, departure if |diff| >= 1 and beyond 2 SD of the others' spread (same rule). Divergence times
    (TimeTree, My from human; branch lengths in BRANCH_MY).
-D. Named genes: nameable (H1 rule) and not saturated in the read-out named, count-supported, sign-stable over
-   seeds; O1 flags respected through ``nameable``; DLPFC lower tails are reference artefacts by H1's rule.
+D. Named genes: nameable (rule of H1_harmonise) and not saturated in the read-out named, count-supported, sign-stable
+   over seeds; flags of O1_orthologs respected through ``nameable``; DLPFC lower tails are reference artifacts by the
+   rule of H1_harmonise.
 
-Predictions (before reading any E3 association; what I knew: H1 lineage z, X1 stage excess, X2/X4 hepatocyte
-level cost, C1 drivers (cortex positive mass in glia and endothelium, negative in excitatory IT neurons), T11 V3
-(eye drivers follow species-only types), Z4 verdicts):
-P1. Specialised home genes sit above matched genes on S_ema and D_free in most tissues (>= 5 of 8 thread tissues),
+Predictions (before reading any association of this task; what I knew: lineage z of H1_harmonise, stage excess of
+X1_testis_discovery, hepatocyte level cost of X2_liver_biology and X4_where_differs, drivers of C1_cohorts (cortex
+positive mass in glia and endothelium, negative in excitatory IT neurons), V3 of T11_6_vz_glaucoma (eye drivers follow
+species-only types), verdicts of Z4_free_gate_all):
+P1. Specialized home genes sit above matched genes on S_ema and D_free in most tissues (>= 5 of 8 thread tissues),
     mostly as pattern gain; broad genes below.
-P2. Immune-home genes above matched genes in most tissues on S and D (inflammatory programmes recur above, H1).
+P2. Immune-home genes above matched genes in most tissues on S and D (inflammatory programs recur above,
+    H1_harmonise).
 P3. Exceptions are level-cost compartments: hepatocytes (liver), and spermatids on D in testis.
 P4. B1 shows the same sign for most compartments; the direct level gap is larger where S is negative.
 P5. Cortex: glial home genes above neuronal ones on S; excitatory neuron genes carry negative mass.
@@ -54,7 +57,7 @@ MIN_TYPE_CELLS = 30
 DEP_SD = 2.0
 DIRECT_LFC = 1.0
 
-# H1 thread: one human+mouse model per tissue or the closest fit holding both (H1 ledger); muscle sensitivity
+# Thread of H1_harmonise: one human+mouse model per tissue or the closest fit holding both; muscle sensitivity
 THREAD = {"liver": "liv_hmouse", "testis": "test_hmouse", "bone marrow": "bone_marrow", "kidney": "kidney",
           "islet": "islet", "eye": "vz_hmouse", "cortex": "brain_m1_hmouse", "lung": "lung_healthy"}
 SENSITIVITY = {"skeletal muscle": "muscle_ageing"}

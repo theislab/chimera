@@ -1,7 +1,7 @@
-"""T12.3 supplementary figure: bone-marrow D and S_g against Shay et al. 2013 COE, with the B1 baseline.
+"""Supplementary figure: bone-marrow D and S_g against Shay et al. 2013 COE, with the B1 baseline.
 
 Panels (all from ``results/analysis/P12``; nothing is recomputed except the binned residuals of a):
-a  mean C-residual rank of D, S_g and B1 (residualised on pi) per COE decile (E1 universe);
+a  mean C-residual rank of D, S_g and B1 (residualized on pi) per COE decile (E1 universe);
 b  E1: rho_p(score, COE | C) with 95% ESM-block CI, all genes and top pi tertile;
 c  E2: stratified AUROC, Shay divergent vs COE-conserved genes, 95% CI (0.5 = no separation);
 d  E3: named-lineage hits of 10 genes, with the chance expectation;

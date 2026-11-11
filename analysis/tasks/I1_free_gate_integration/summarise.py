@@ -1,4 +1,4 @@
-"""Summary: per-seed tidy table, Fig 3 scores on the frozen panel bounds, free vs canonical per cohort and metric, verdict.
+"""Summary: per-seed tidy table, scores of the integration benchmark (fig:integration) on the frozen panel bounds, free vs canonical per cohort and metric, verdict.
 
     python -m analysis.tasks.I1_free_gate_integration.summarise [--cohorts a,b,...]
 
@@ -205,7 +205,7 @@ def main():
     v["z3"]["cohorts"] = sorted(z3.cohort.unique())
     v["all"] = RU.verdict(Q, sorted(Q.metric.unique()))
     v["all"]["cohorts"] = sorted(Q.cohort.unique())
-    # Fig 3 metrics and H1_harmonise metrics separately (Fig 3 rows only have fig3)
+    # metrics of the integration benchmark and H1_harmonise metrics separately (benchmark rows only have fig3)
     for fam in ("fig3", "h1", "z2"):
         q = Q[Q.metric.str.startswith(fam + "|")]
         if len(q):

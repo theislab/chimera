@@ -3,7 +3,8 @@ through figures/style.py to figures/panels/<figure>/; reads the result tables of
 
 Every panel is drawn at its size on the page and saved at that exact size, so the figures compose at scale 1:
 supp_cell_compartments (compartments, pattern_vs_level), supp_cell_lineages (lineages, named) and
-supp_primate_branches (branch, mtg, human_lineage). The panel compartments is also a panel of the main figure on tissues.
+supp_primate_branches (branch, mtg, human_lineage). The panel compartments alone is also the main figure on specialized
+cells (main_specialized_cells).
 
     PYTHONPATH=$PWD python -m analysis.tasks.E3_cells.figure [panel ...]     # every panel, or the named ones, from the cached tables (draw_panels)
     CHIMERA_FIGURES_OUT=<folder> ... the same command                         # dry run: panels under <folder>/panels
@@ -63,7 +64,7 @@ def cohort_label(k: str) -> str:
     name, tissue = style.cohort_name(REG[k]["label"]), REG[k]["tissue"]
     if name.lower().startswith(tissue + " "):
         name = name[len(tissue) + 1:]
-    return {"primates": "3 primates"}.get(name, name).replace(", own table", ",\nown ortholog table")
+    return name.replace(", own table", ",\nown ortholog table")
 
 
 def _clean(ax):
@@ -78,7 +79,21 @@ def excess(universe="count_supported"):
 
 
 def panel_compartments():
-    """Genes by home compartment: excess over matched genes, one mark per cohort (filled, p < 0.01), for four scores."""
+    """The main figure on specialized cells and panel a of the supplementary figure (``supp_cell_compartments/compartments``,
+    486 x 150 bp; figure keys ``main_specialized_cells`` and ``supp_cell_compartments``).
+
+    What it draws. Rows: the home compartment of a gene (specialized cells, stromal, vascular, immune, no home type).
+    Four plots, one score each: Δα with the protein-feature gate, Δα with the per-gene gate, profile correlation, and
+    level similarity at the home cell type. x: the excess of the genes of a compartment over matched genes, in SD
+    units; one mark per cohort (filled, p < 0.01), the bar is the median over cohorts, and the gray count beside a
+    row is the number of cohorts above zero.
+
+    Reads ``results/analysis/E3/excess.csv`` and nothing else (columns ``universe``, ``level``, ``group``, ``score``,
+    ``excess_d``, ``p``; rows of ``universe == count_supported`` and ``level == compartment``). The median and the
+    count of cohorts above zero are taken from these rows at draw time.
+
+        python -m analysis.tasks.E3_cells.figure supp_cell_compartments/compartments      # in chimera_env, from the repository root
+    """
     e = excess()
     e = e[e.level == "compartment"]
     # the two gates first, then the direct baselines; a count of cohorts above zero beside every row

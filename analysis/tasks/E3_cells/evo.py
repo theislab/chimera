@@ -1,14 +1,14 @@
-"""E3 analysis C, continued: do species-specific departures in the 4-primate cortex fit replicate in independent
-data, and which programmes depart on which branch. Run after ``departures.py``. Post hoc beside the card,
-labelled in the ledger.
+"""Analysis C, continued: do species-specific departures in the 4-primate cortex fit replicate in independent
+data, and which programs depart on which branch. Run after ``departures.py``. Post hoc: not among the
+definitions fixed in ``rules.py``.
 
-* MTG check (Jorstad 2023 MTG, never trained; C1 golds): a gene departing on the marmoset branch more than on the
+* MTG check (Jorstad 2023 MTG, never trained; references of C1_cohorts): a gene departing on the marmoset branch more than on the
   macaque branch should show a larger human-marmoset than human-macaque level gap in MTG (Spearman of the two
   differences, partial on expression and detection by rank residuals; gene bootstrap 1,000). Human departures
   against an MTG human-specific score: min(|gap macaque|, |gap marmoset|) where the two signed gaps agree, else 0.
-* Ma 2022 human-lineage genes (C1 references.tsv, set human_lineage with a cell type): is the human row a
+* Ma 2022 human-lineage genes (references.tsv of C1_cohorts, set human_lineage with a cell type): is the human row a
   departure in the named type, against the cohort's human departure rate in that type.
-* Programmes: matched excess (C_pat) of each species' departure fraction for H1's 72 sets.
+* Programs: matched excess (C_pat) of each species' departure fraction for the 72 sets of H1_harmonise.
 
     PYTHONPATH=$PWD python analysis/tasks/E3_cells/evo.py
 """

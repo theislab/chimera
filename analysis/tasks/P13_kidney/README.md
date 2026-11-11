@@ -8,12 +8,12 @@ Kidney, human acute kidney injury against mouse ischemia-reperfusion injury: obj
 | Question | Disease: Which human disease responses does a mouse model reproduce, and where do drug targets and disease genes sit? |
 | Status | in the paper |
 | Environment | `chimera_env`, revision_de_env for de.py |
-| Used in the paper | Section 3.8 (`sec:disease`); Figure 7a, b, c (`fig:disease`); Supplementary Section D.11 (`ssec:er-disease`); Supplementary Section C.21.14 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
+| Used in the paper | Supplementary Section D.12 (`sec:disease`); Supplementary Figure S59a, b, c (`fig:disease`); Supplementary Section D.12 (`ssec:er-disease`); Supplementary Section C.21.13 (`sssec:rev-disease`); Supplementary Table S18 (`tab:data-preparation`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/P13_kidney/fetch_kidney.sh
+    bash analysis/tasks/P13_kidney/fetch_kidney.sh $PWD
     python -I analysis/tasks/P13_kidney/build_orthologs.py <repo>
     python -m analysis.tasks.P13_kidney.build
     python -m analysis.tasks.P13_kidney.split_units

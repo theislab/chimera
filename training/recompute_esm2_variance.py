@@ -4,7 +4,7 @@ Background
 ----------
 During audit we discovered that ``varm['gene_features'][:, 64]`` (the ESM-2
 inter-species variance feature) is all zeros in the current pipeline output.
-The v2.4 spec (`critical_reexamination_modules.md` §74, 78-86) treats this
+The design of the model treats this
 feature as a primary signal for alpha learning: it captures "how much does the
 protein structure differ across species for this gene", a signal not encoded
 by either the consensus ESM-2 PCA or the amino-acid identity percentage.

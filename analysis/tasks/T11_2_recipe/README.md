@@ -26,7 +26,7 @@ Recipe grid of the five-species eye cohort and its selection rule, fixed before 
 - `data/analysis/van_zyl/`
 - `training/runs/`
 
-**Notes.** README.md states grid and rule. run_profile.py imports its sibling by bare name: run it as python analysis/tasks/T11_2_recipe/run_profile.py with PYTHONPATH set to the repository root.
+**Notes.** README.md states grid and rule. run_profile.py imports its sibling by bare name: run it as python analysis/tasks/T11_2_recipe/run_profile.py with PYTHONPATH set to the repository root. Its selection by the integration composite was replaced by the count-dependence rule of T11_2c_count_rule, which chooses among the runs of this grid and gives the recipe of the paper (grid 2).
 <!-- glance:end -->
 
 Written before the training run whose results are used. The recipe of this cohort

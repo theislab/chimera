@@ -38,7 +38,7 @@ A set is named by the gene's marker status in human, marmoset and mouse (H, Mar,
 | primate_gradient_L5ET_marker (ST22) | — | up_in_human | human>macaque>marmoset>mouse_M1 |
 
 - **ST21 rows.** The set is decided by human, marmoset and mouse status only. Macaque status is kept in `note`/`effect` as `marker_in=…`.
-- **ST7 and ST10 effect column.** `effect` holds the per-species AUC and avg.1/avg.2 (log SCT-normalised expression in the subclass and in the rest of its class).
+- **ST7 and ST10 effect column.** `effect` holds the per-species AUC and avg.1/avg.2 (log SCT-normalized expression in the subclass and in the rest of its class).
 
 ## Counts
 

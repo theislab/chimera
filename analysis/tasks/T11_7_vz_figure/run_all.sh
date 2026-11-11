@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# T11.5-T11.7, one pass, re-runnable: forward passes and residuals for any D seed without output, then
+# Eye cohort, gene readouts to figure, one pass, re-runnable: forward passes and residuals for any D seed without output, then
 # readout, integration scoring, glaucoma readouts, figure and summary. Run from chimera/; baselines for a new dataset go through
 # analysis/tasks/T11_4_vz_integration/baselines.tsv first (score.py reports missing latents).
 set -euo pipefail

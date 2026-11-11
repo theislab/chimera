@@ -17,13 +17,13 @@ diverges across species?"** by composing four ingredients:
      trained on.
 
   3. **Per-residue ESM-2 (35M) embeddings** of every species' ortholog
-     of the curated genes.  ESM-2 3B is the model that produced the
-     consensus embeddings the training PCA was fit on, but its 12 GB+
-     memory footprint is impractical here; we use ESM-2 35M as a
+     of the curated genes.  ESM-2 15B is the model that produced the
+     consensus embeddings the training PCA was fit on, but its 30 GB of
+     weights are impractical here; we use ESM-2 35M as a
      faithful structural-language proxy, and we are explicit about the
      proxy / approximation at every step.  The 35M model captures the
      same hydrophobicity / secondary-structure / context features as
-     3B at coarser resolution — the *qualitative* per-residue pattern
+     15B at coarser resolution — the *qualitative* per-residue pattern
      (which residues stand out from the gene's mean) is preserved
      across ESM-2 model scales.
 
@@ -107,16 +107,16 @@ cells.append(md(r"""
 
     ## What we can and cannot do exactly
 
-    The training pipeline used **ESM-2 3B** to produce the per-protein
+    The training pipeline used **ESM-2 15B** to produce the per-protein
     consensus that the 5120 → 64 PCA was fit on. Reproducing
-    *per-residue* 5120-d embeddings would require ESM-2 3B inference,
-    which needs ~12 GB beyond our 17 GB RAM and is therefore not
+    *per-residue* 5120-d embeddings would require ESM-2 15B inference,
+    which needs about 30 GB for the weights alone, beyond our 17 GB RAM, and is therefore not
     practical inside this notebook.
 
     We do the next best thing — use **ESM-2 35M** (480-d per residue,
     cached on disk for our 24 sequences from notebook 09) for the
     per-residue layer. The 35M model captures the same kind of
-    structural-language information as 3B at lower resolution; the
+    structural-language information as 15B at lower resolution; the
     *qualitative pattern of which residues stand out from a protein's
     own mean* is preserved across ESM-2 model scales (the small
     model loses some fine detail in the embedding norm, not the
@@ -1397,7 +1397,7 @@ cells.append(md(r"""
     This is the per-residue *implicit* attention of the trained
     GIN through its protein-language input channel — read in 35M
     space, with the explicit caveat that the trained PCA was fit
-    on 3B-space consensus embeddings.
+    on 15B-space consensus embeddings.
 """))
 cells.append(code(r"""
     from scipy.stats import zscore
@@ -1444,11 +1444,11 @@ cells.append(md(r"""
     To get the **real trained-GIN per-residue attention**, we need to
     project per-residue 5120-d embeddings onto the trained PCA basis
     `V`, weight each PC by its captum attribution `w_k`, and sum.
-    The bottleneck: per-residue 5120-d embeddings come from ESM-2 3B,
+    The bottleneck: per-residue 5120-d embeddings come from ESM-2 15B,
     which exceeds our memory budget.
 
     The fix is a **linear bridge**: fit a regression
-    `W : ℝ^480 → ℝ^5120` on (ESM-2 35M consensus, ESM-2 3B SATURN
+    `W : ℝ^480 → ℝ^5120` on (ESM-2 35M consensus, ESM-2 15B SATURN
     consensus) pairs across many ortholog groups. SATURN gives us
     the 5120-d consensus per-gene-per-species directly; we run
     ESM-2 35M on canonical human proteins for a sample of ortholog
@@ -2396,7 +2396,7 @@ cells.append(md(r"""
        approximated)*. Build the GIN's attention direction in
        5120-d ESM-2 space `D_5120 = Σ_k(w_k · V[:, k])`, project
        it through a learned linear bridge `W` (480 → 5120,
-       fitted on (ESM-2 35M consensus, ESM-2 3B SATURN consensus)
+       fitted on (ESM-2 35M consensus, ESM-2 15B SATURN consensus)
        pairs across ~800 sampled ortholog groups in the dataset)
        to get `D_480 = D_5120 @ W^T`, then dot with each
        per-residue 480-d ESM-2 35M embedding (centered on the
@@ -2443,7 +2443,7 @@ cells.append(md(r"""
     The composition of *consensus deviation × cross-species
     divergence* is therefore the residue-level analog of *what the
     GIN sees about cross-species protein-language information*. We
-    use 35M as the per-residue layer (3B is impractical here at
+    use 35M as the per-residue layer (15B is impractical here at
     17 GB total RAM) and frame the per-residue figures as 35M proxies
     explicitly — but the gene-level part of the analysis remains
     *exact* (captum on the trained GIN, true training PCA, true
@@ -4747,7 +4747,7 @@ cells.append(md(r"""
     - **Methods / supplementary text** — the §L.5 LOGO sensitivity
       block:  *"the headline (hydrophobic > positive) holds across
       all 70 leave-one-gene-out splits; worst-case Wilcoxon
-      p = 0.0004"*.  This kills the "single-gene driver" reviewer
+      p = 0.0004"*.  This kills the "single-gene driver"
       concern with one number.
     - **Supplementary figure 1 (mechanism)** —
       `l_variance_partition.pdf` (§L.4.1).  Bar chart of unique
@@ -4760,7 +4760,7 @@ cells.append(md(r"""
     - **Supplementary figure 2 (advanced biology)** —
       `l_disorder_idr.pdf` + `l_contact_density.pdf` +
       `l_special_aa_classes.pdf`.  Together: IDR / contact-hub /
-      aromatic-glycine-proline.  A reviewer expecting these to be
+      aromatic-glycine-proline.  A reader expecting these to be
       where the GIN's signal lives sees that **none** of them
       survives the per-gene paired Wilcoxon — every "hot" pooled
       effect is a between-gene composition artefact.
@@ -4849,9 +4849,9 @@ cells.append(md(r"""
       statistics.  This explains why §L.3 panel A (helix / sheet /
       coil) is the only structural panel where the per-gene
       Wilcoxon and the MWU disagree — the SS labels are noisier than
-      the SASA / pLDDT / chem labels.  Replace with DSSP in revision.
+      the SASA / pLDDT / chem labels.  DSSP labels would be cleaner.
     - Per-residue real GIN attention is bridge-approximated
-      (480-d ESM-2 35M → 5120-d ESM-2 3B via §G.5; held-out PC R²
+      (480-d ESM-2 35M → 5120-d ESM-2 15B via §G.5; held-out PC R²
       reported in §G.5.3).  The §L conclusions are robust to bridge
       fidelity because every test reports either an effect size
       (Cliff's δ) or a within-gene permutation / per-gene Wilcoxon
@@ -4859,7 +4859,7 @@ cells.append(md(r"""
       scaling.
     - The §D.1 reconstruction has ~25 % per-PC numerical drift vs
       the training PCA basis (randomised-SVD noise, *not* a form
-      error — see the saved `MEMORY.md` audit).  This affects
+      error).  This affects
       absolute attention magnitudes per gene but does **not** affect
       the §L statistics: within-gene permutation cancels per-gene
       scaling, the mixed-effects gene random intercept absorbs the
@@ -4874,7 +4874,7 @@ cells.append(md(r"""
 
     *A figure-by-figure plain-English read of the §L results, written
     so a reader who has not run the notebook (an advisor, a co-author,
-    a reviewer) can absorb every panel from the bullets below.  Every
+    a colleague) can absorb every panel from the bullets below.  Every
     number is taken from the cached pickles in this run (70 genes,
     36 832 residues), not from generic boilerplate.  Where a panel has
     multiple sub-files (per-panel PDFs in §L.3, special-AA panels in
@@ -5000,7 +5000,7 @@ cells.append(md(r"""
       gene, the effect vanishes.  The GIN does not preferentially
       attend to disordered regions per se.**  This is one of the most
       important "negative" results in §L because it directly addresses
-      a reviewer's natural intuition.
+      a reader's natural intuition.
 
     ### `l_contact_density.pdf`  (§L.9)
 
@@ -5143,7 +5143,7 @@ cells.append(md(r"""
     hydrophobic side-chains, strongest in genes whose α correction
     deviates from the cross-species consensus prior in the
     expression-divergent (M-flag) regime, and decoupled from
-    everything reviewers will reach for first (disorder, contact
+    everything readers will reach for first (disorder, contact
     hubs, aromatics, conservation, model output magnitude).*  That is
     a paper-grade mechanistic claim no other cross-species
     single-cell integration tool can make, because no other tool has

@@ -8,7 +8,7 @@ Builds the environments of SATURN and CAMEX and fetches the two tools at their p
 | Question | Cell-level integration: Does one fit align the cells across species, and how does it compare with other tools? |
 | Status | infrastructure |
 | Environment | `saturn_env`, `camex_env` |
-| Used in the paper | Supplementary Section C.21.9 (`sssec:rev-benchmark`) |
+| Used in the paper | Supplementary Section C.19.2 (`sssec:rev-benchmark`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

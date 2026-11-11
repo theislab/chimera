@@ -8,7 +8,7 @@ Compares cell-level integration of the per-gene gate and the protein-feature gat
 | Question | The per-gene gate: What does Δα show when it is read gene by gene from counts, without the protein-feature network? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.5 (`sec:per-gene`); Supplementary Table S23 (`tab:integration-per-gene-gate`); Supplementary Table S24 (`tab:integration-per-gene-gate-harmonised`); Supplementary Section D.1 (`ssec:er-model`) |
+| Used in the paper | Section 3.4 (`sec:per-gene`); Supplementary Table S23 (`tab:integration-per-gene-gate`); Supplementary Table S24 (`tab:integration-per-gene-gate-harmonised`); Supplementary Section D.1 (`ssec:er-model`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

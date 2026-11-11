@@ -1,8 +1,6 @@
 """Chimera v2.4 — Hyperparameter defaults, feature dimensions, architectural constants.
 
-All values sourced from:
-  - ortholog_aware_integration_guide_initial.md, "Hyperparameter ranges (v2.4)" table
-  - critical_reexamination_modules.md, Component 10 "Updated hyperparameter table"
+Defaults of the model; the paper's Supplement (Hyperparameters) gives the rationale of each.
 """
 
 from dataclasses import dataclass, field
@@ -95,7 +93,7 @@ GIN_N_FEATURES: int = 72
 """Default GIN input features (64 ESM-2 PCA + 8 scalars). Overridden by actual gene_features.shape[1]."""
 
 GIN_N_HIDDEN: int = 32
-"""GIN hidden layer size. 72 -> 64 -> 32 -> 1. Total params: ~6,753."""
+"""GIN hidden layer size. 72 -> 64 -> 32 -> 1. Total params: 6,785."""
 
 GIN_LR_FACTOR: float = 0.1
 """GIN learning rate = base_lr * GIN_LR_FACTOR. Default: 1e-4 when base_lr=1e-3."""
@@ -194,7 +192,7 @@ class AblationConfig:
     extra: Dict[str, object] = field(default_factory=dict)
 
 
-# Ablation configs A-M per round2 spec (dataclass format, kept for backward compat)
+# Named configurations A to M (dataclass form, kept for compatibility)
 ABLATION_CONFIGS_DC: Dict[str, AblationConfig] = {
     "A": AblationConfig(
         name="A",

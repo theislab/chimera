@@ -3,7 +3,6 @@
 #SBATCH --partition=cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --time=03:00:00
-#SBATCH --exclude=cpusrv114
 # Usage (from chimera/): sbatch --array=<rows>%N -c 8 --mem=16G --output=results/analysis/D1/logs/%x_%A_%a.out analysis/tasks/D1_sparse_genes/lf.sbatch
 source analysis/slurm/_body.sh
 set -e

@@ -2,7 +2,7 @@
 same config.
 
 E9.1 — `alpha_cross_seed_robust`: min Spearman ρ over all seed pairs of the
-same config; threshold ≥ 0.50 (revised 2026-04-25 per user direction; prior
+same config; threshold ≥ 0.50 (revised 2026-04-25; prior
 bar was ≥ 0.90 — see workflow.md E9.1 row for rationale).
 
 Usage

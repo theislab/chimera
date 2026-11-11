@@ -1,4 +1,4 @@
-"""E2 follow-ups, written after reading the scan (post hoc, labelled so in the ledger).
+"""Follow-ups to the scan of this task, written after reading the scan (post hoc).
 
 1. Dosage split: pHaplo given pTriplo and pTriplo given pHaplo (rank residuals on C, then on each other).
 2. Complex coherence without core machinery (ribosome, proteasome, spliceosome, respiratory chain, RNA polymerase, mediator,

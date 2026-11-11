@@ -1,11 +1,12 @@
-"""X8: where the two gate read-outs place a gene differently. Definitions, fixed before any gap statistic was computed.
+"""Where the two gate read-outs place a gene differently. Definitions, fixed before any gap statistic was computed.
 
 Two read-outs of one fit design. Canonical gate (the main model): Delta-alpha places a gene's deployment against the protein prior as
-predicted from its protein-feature neighbourhood. Per-gene (free) gate: one offset per gene, Delta-alpha is the gene's own count
-evidence placed against the prior. The gap marks genes whose counts place them differently from their protein neighbourhood.
+predicted from its protein-feature neighborhood. Per-gene (free) gate: one offset per gene, Delta-alpha is the gene's own count
+evidence placed against the prior. The gap marks genes whose counts place them differently from their protein neighborhood.
 
 Universe U_c: genes count-supported in both consensus tables (|S_ema| >= 1e-6 in both), human Ensembl ID present and unique.
-Values: per seed d_s = alpha_s - pi_clamped, z_s = inverse-normal rank within U_c; consensus z_f, z_c = INT(mean d_s) (= INT of H1's D).
+Values: per seed d_s = alpha_s - pi_clamped, z_s = inverse-normal rank within U_c; consensus z_f, z_c = INT(mean d_s) (= INT of the
+D of analysis/tasks/H1_harmonise).
 Gap delta = z_f - z_c. Sensitivities r_f|c and r_c|f: residual of one on a df-4 spline of the other.
 Amendment 1 (after the gold-free calibration null failed, before any gold, set, constraint or gene name was read): consensus is the
 mean of the seed z (equal weight per seed; INT(mean d) let one high-amplitude canonical seed dominate, so v/n understated its noise),
@@ -15,7 +16,7 @@ and seed variances are moderated by an empirical-Bayes prior (limma fitFDist, pr
 Call: q < Q_CALL, |delta| >= MIN_GAP, every cross-gate seed pair has the sign of delta; strict: q < Q_STRICT.
 Calibration null: one gate with >= 4 seeds split into two disjoint groups (2 vs 2-3), N_SPLITS splits, same rule on z(A) - z(B).
 
-Exploratory; nothing here changes a status, row, modifier, H1 or Z4 table. Ledger: chimera-private .../ledgers/X8_gate_divergence.md.
+Exploratory; nothing here changes a status, row, modifier or a table of H1_harmonise or Z4_free_gate_all.
 """
 
 from __future__ import annotations
@@ -60,7 +61,7 @@ COV_LABEL = {"expr": "expression", "detection": "detection", "abs_S_free": "|S_g
 
 
 def cohorts() -> dict:
-    """The 26 cohorts of H1/Z4, registry order."""
+    """The 26 cohorts of H1_harmonise and Z4_free_gate_all, registry order."""
     import os
 
     os.environ.setdefault("H1_OUT", str(RES / "H1"))

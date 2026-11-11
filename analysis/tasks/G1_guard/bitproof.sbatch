@@ -5,7 +5,6 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=20G
 #SBATCH --time=06:00:00
-#SBATCH --exclude=cpusrv114
 #SBATCH --output=results/analysis/G1/logs/%x_%j.out
 # G1 step 2. usage: sbatch bitproof.sbatch <before tree> <after tree>. All fits in this one job, so on one node.
 set -uo pipefail

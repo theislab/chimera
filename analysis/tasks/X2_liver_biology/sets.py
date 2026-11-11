@@ -71,7 +71,7 @@ ZONATION_SOURCES = {
 }
 
 # ---- named genes on the figures --------------------------------------------------
-# Fig 4c themes, verbatim from notebooks/_alpha_biology_simpler_builder.py (H_THEMES)
+# Landmark themes of the prior landscape panel (fig:dalpha-biology), verbatim from notebooks/_alpha_biology_simpler_builder.py (H_THEMES)
 FIG4C_THEMES = {
     "Urea cycle / GNG": ["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"],
     "mtDNA OXPHOS": ["MT-CO1", "MT-CO2", "MT-CO3", "MT-CYB", "MT-ND1", "MT-ND2", "MT-ND4", "MT-ATP6"],
@@ -80,7 +80,7 @@ FIG4C_THEMES = {
 }
 # urea-cycle enzymes and transporters (T2_6_matched list)
 UREA_CYCLE = ["CPS1", "OTC", "ASS1", "ASL", "ARG1", "NAGS", "ARG2", "SLC25A15", "SLC25A13", "SLC25A2"]
-# extra named genes in T2_5_celltype_margin landmarks and Fig 7 (CPS1)
+# extra named genes in T2_5_celltype_margin landmarks and in the validation figure, fig:validation (CPS1)
 EXTRA_NAMED = ["ASS1", "NAGS", "ALB", "APOA1"]
 
 # ---- divergent-but-protein-conserved selection (fixed before D was read) --------------------

@@ -6,7 +6,7 @@ First recipe grid of the healthy islet model and its selection rule, fixed befor
 | | |
 |---|---|
 | Question | Model fits beyond the canonical runs: Which further seeds, platform repeats and cohort recipes were trained, and how was each recipe chosen? |
-| Status | recipe search |
+| Status | retired, replaced by `T7_9_recipe_b` (kept as the record of what was run; the paper uses the later task) |
 | Environment | `chimera_env` |
 | Used in the paper | Supplementary Table S19 (`tab:harmonised-cohorts`); Supplementary Section C.21.1 (`sssec:rev-plan`) |
 | How we know | described in the Extended Methods |
@@ -27,7 +27,7 @@ First recipe grid of the healthy islet model and its selection rule, fixed befor
 - `data/analysis/disease_islet/`
 - `training/runs/`
 
-**Notes.** README.md states grid and rule. Writes under results/analysis/T7_9/.
+**Notes.** README.md states grid and rule. Writes under results/analysis/T7_9/. No row of this grid passed the training-health gate; the recipe of the paper comes from the second grid, T7_9_recipe_b, with the same rule. Its runs and tables are kept as the record.
 <!-- glance:end -->
 
 Cohort: `data/analysis/disease_islet/islet_healthy_train.h5ad` (built by `analysis/tasks/T7_9_islet/build.py`):

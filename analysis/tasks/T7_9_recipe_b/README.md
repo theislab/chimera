@@ -27,7 +27,7 @@ Second recipe grid of the healthy islet model with the unchanged selection rule,
 - `data/analysis/disease_islet/`
 - `training/runs/`
 
-**Notes.** README.md states grid and rule. Writes under results/analysis/T7_9/.
+**Notes.** README.md states grid and rule. This is the recipe the paper uses for the islet. Writes under results/analysis/T7_9/.
 <!-- glance:end -->
 
 Second grid, declared after the first grid (`analysis/tasks/T7_9_recipe/`, rows 1-8) failed G-D2 in

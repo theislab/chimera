@@ -1,26 +1,26 @@
-"""T12.3: tests E1-E5 of plan section 12 (bone marrow vs Shay et al. 2013 COE), Family 3 throughout.
+"""Tests E1-E5 of the pre-specified analysis plan, section 12 (bone marrow vs Shay et al. 2013 COE), Family 3 throughout.
 
 Inputs: ``results/analysis/P12/readout/bm_genes.parquet`` (``readout.py``: D, S_ema, D_raw, C, ESM
 blocks, B1), ``results/analysis/P12/drivers/drivers_genes.parquet`` (``drivers.py``: per-type and
 per-species S_g contributions, B1 leave-one-type-out), ``data/analysis/bone_marrow/shay_coe.tsv``
-(T12.1 recomputation, the pre-declared filter reading, 4,974 genes; 161 divergent).
+(recomputation of T12_1_bone_marrow, the pre-declared filter reading, 4,974 genes; 161 divergent).
 
-Mechanics (amendment-log row "Section 12 T12.3 mechanics", committed before D was computed):
+Mechanics (amendment log of the plan, row "Section 12 T12.3 mechanics", fixed before D was computed):
 
-* E1: rho_p(score, COE | C) (section 3: ranks residualised on splines of rank pi_raw, expression,
+* E1: rho_p(score, COE | C) (plan, section 3: ranks residualized on splines of rank pi_raw, expression,
   detection, CDS length; Pearson of residuals). Universe: genes with D, COE, C and B1 all defined (one
   universe for every score). One-sided p from 10,000 permutations of the score residuals within
   pi_raw x expression strata; 95% CI from 10,000 ESM-block bootstraps (refit in each draw); gene
-  bootstrap CI beside. Scores: D, B1_pi (B1 residualised on pi), B1_raw, and S_ema, D_raw beside
+  bootstrap CI beside. Scores: D, B1_pi (B1 residualized on pi), B1_raw, and S_ema, D_raw beside
   (Family 3), and D_all (D over every finite seed, G-V failures included). Delta = rho_p(D) - rho_p(B) on the same block-bootstrap draws. Repeated within the top
   tertile of rank pi_raw (design rebuilt there). Raw Spearman and rho_pi beside.
 * E2: set = Shay divergent genes; comparison = genes with COE above the median COE of the E1
   universe; both inside the E1 universe. Stratified AUROC within pi_raw decile x expression decile
   cells taken over the vocabulary, cells kept with >= 1 divergent and >= 5 conserved genes per
-  divergent gene (section 4 rule). One-sided p (lower) from 10,000 within-stratum label permutations;
-  95% CI from 2,000 stratified bootstraps, the same draws for every score; Delta oriented so that
-  positive favours D: AUROC(B) - AUROC(D). Raw AUROC and the pi x expression tertile version (the
-  P13 E-K3 mechanics) beside.
+  divergent gene (rule of plan, section 4). One-sided p (lower) from 10,000 within-stratum label
+  permutations; 95% CI from 2,000 stratified bootstraps, the same draws for every score; Delta oriented
+  so that positive favors D: AUROC(B) - AUROC(D). Raw AUROC and the pi x expression tertile version (the
+  E-K3 mechanics of P13_kidney) beside.
 * E3: the ten genes whose divergent lineage Shay names (Dataset S3 not obtained, so no further
   rows). Chimera: the top divergent type (argmax_k max(-C_gk, 0), five-seed mean, all species rows);
   a gene with no negative C_gk counts as a miss. Chance per gene = the vocabulary base rate of
@@ -31,8 +31,8 @@ Mechanics (amendment-log row "Section 12 T12.3 mechanics", committed before D wa
   of the divergent S_g mass; gene-bootstrap 95% CI (10,000), one-sided Wilcoxon signed-rank p
   (mouse > lemur); vocabulary and COE-conserved genes beside as the expectation. Baseline: mean of
   E(human, lemur) - E(human, mouse) (pseudobulk correlation), same CI and test.
-* E5: needs the Shay Dataset S3 list, not obtained (T12.1): not run.
-* Success (section 12, as stated): D non-inferior to B1_pi on E1 (all-gene universe) and on E2,
+* E5: needs the Shay Dataset S3 list, not obtained (T12_1_bone_marrow): not run.
+* Success (plan, section 12, as stated): D non-inferior to B1_pi on E1 (all-gene universe) and on E2,
   i.e. Delta >= -0.03 or its 95% CI includes 0, and E3 above chance (one-sided p < 0.05).
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T12_3_tests/tests.py [--n-perm 10000] [--n-boot 10000]
@@ -61,7 +61,7 @@ SEED = 20261104
 SCORES = ["D", "B1_pi", "B1_raw", "S_ema", "D_raw", "D_all"]
 MARGIN = 0.03
 TYPES = ["B", "HSPC", "NK", "T", "erythroid", "macrophage", "monocyte", "neutrophil", "plasma"]
-NAMED = {  # section 12 E3; Shay granulocyte = our neutrophil
+NAMED = {  # plan, section 12, test E3; Shay granulocyte = our neutrophil
     "DPP4": ["B"], "NT5E": ["B"], "CD27": ["NK"], "TFEC": ["B"], "LMO2": ["B"],
     "IL15": ["neutrophil", "monocyte", "B"], "MYBL1": ["NK", "T"], "LDB2": ["HSPC", "NK"],
     "NFIX": ["HSPC", "monocyte"], "PRDM1": ["monocyte", "NK"],

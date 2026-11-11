@@ -8,7 +8,7 @@ Gene classes (transcription factors, receptors, enzymes and others) and protein-
 | Question | What the readouts find in liver and testis: Which genes, cell types, pathways and gene classes sit above or below the protein prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.9 (`sec:protein`) |
+| Used in the paper | Section 3.6 (`sec:protein`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

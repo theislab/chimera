@@ -8,7 +8,7 @@ Sensitivity build of the eye cohort without cell types that have fewer than 50 c
 | Question | Model fits beyond the canonical runs: Which further seeds, platform repeats and cohort recipes were trained, and how was each recipe chosen? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.14 (`sssec:rev-disease`) |
+| Used in the paper | Supplementary Section C.21.13 (`sssec:rev-disease`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

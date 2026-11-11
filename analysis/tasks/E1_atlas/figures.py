@@ -225,7 +225,7 @@ def panel_tissue():
         prev = rows[0][0]
         for i, (own, _) in enumerate(rows):  # a white rule between the groups of two tissues
             if own != prev:
-                ax.axhline(i - 0.5, color="#ffffff", lw=1.2)
+                ax.axhline(i - 0.5, color="#ffffff", lw=1.2, zorder=0.5)  # over the cells, under the outlines of the own tissue
                 prev = own
         for i, (own, k) in enumerate(rows):
             rr = t[(t.readout == r_) & (t.tissue == own) & (t.key == k)].iloc[0]
@@ -267,7 +267,9 @@ def panel_distance():
             for gate, filled in (("canonical", True), ("per-gene", False)):
                 x = d[(d.tissue == lad) & (d.gate == gate)].sort_values("divergence_my")
                 x = x.groupby("divergence_my", as_index=False).mean(numeric_only=True)
-                kw = dict(color=m.color, marker=m.marker, ms=3.4, lw=0.9, mfc=m.color if filled else "white", mew=0.7, ls="-" if filled else "--")
+                # the plus and the cross are thin: drawn open they need more room to show their white inside
+                kw = dict(color=m.color, marker=m.marker, ms=3.4 if filled or m.marker not in "PX" else 4.6, lw=0.9, mfc=m.color if filled else "white",
+                          mew=0.7 if filled or m.marker not in "PX" else 0.5, ls="-" if filled else "--")
                 if col == "pole":
                     ax.plot(x.divergence_my, x.above_pole, **kw)
                     ax.plot(x.divergence_my, x.below_pole, **kw)

@@ -1,15 +1,19 @@
-"""Fig 5 controls panel: feature destruction, count permutation and matched cell types, with the seed floor.
+"""Control panel of fig:gin-esm2: feature destruction, count permutation and matched cell types, with the seed floor.
 
 Each point is one control run; its value is the Spearman correlation of the run's readout with the
-reference readout of normal training (consensus over the other seeds of the cohort). The grey band is
+reference readout of normal training (consensus over the other seeds of the cohort). The gray band is
 the seed floor: the range of the same correlation between one normal seed and the consensus of the
-others (T3.4 ``floors.csv``, T3.5 ``floor.csv``, T3.6 ``floor.csv``), i.e. what an unperturbed rerun gives.
+others (``floors.csv`` of T3_4_destroy_features, ``floor.csv`` of T3_5_count_perm and of T3_6_matched),
+i.e. what an unperturbed rerun gives.
 Count permutation is shown twice: the readout at the gene's own sequence ("stays with sequence") and at
 the gene whose counts moved there ("follows the counts"); the thin bar is the offline projection
-null for the first (T3.5 ``null_per_run.csv``, 2.5-97.5%).
+null for the first (``null_per_run.csv`` of T3_5_count_perm, 2.5-97.5%).
 
-Sources: T3.4 ``arms.csv``; T3.5 ``per_run.csv``; T3.6 ``matched_vs_canonical.csv`` and
-``matched_three_seeds.csv``.
+Sources: ``arms.csv`` of T3_4_destroy_features; ``per_run.csv`` of T3_5_count_perm;
+``matched_vs_canonical.csv`` and ``matched_three_seeds.csv`` of T3_6_matched.
+
+Inputs: ``results/analysis/T3_4/`` (``arms.csv``, ``floors.csv``), ``results/analysis/T3_5/`` (``per_run.csv``,
+``null_per_run.csv``, ``floor.csv``), ``results/analysis/T3_6/matched_three_seeds.csv`` (bundle ``analysis_results``).
 """
 
 from __future__ import annotations
@@ -67,7 +71,7 @@ def floor(c: str) -> dict:
 
 def panel() -> plt.Figure:
     blocks = [(c, rows_for(c), floor(c)) for c in COHORTS]
-    # cross-check: T3.4 floors agree with T3.5 floors (same seeds, same definition)
+    # cross-check: the floors of T3_4_destroy_features agree with those of T3_5_count_perm (same seeds, same definition)
     f4 = pd.read_csv(cm.RES / "T3_4" / "floors.csv").set_index("cohort")
     for c, _, fl in blocks:
         v = [float(x) for x in f4.loc[c, "F_spearman"].split()]
@@ -91,7 +95,7 @@ def panel() -> plt.Figure:
             ax.add_patch(plt.Rectangle((fl[key][0], lo), fl[key][1] - fl[key][0], hi - lo, color="#E6E6E6",
                                        lw=0, zorder=0))
             ax.text(-0.38, lo - 0.25, cm.COHORT[c], ha="left", va="bottom", fontsize=6.5, fontweight="bold",
-                    color=cm.INK)
+                    color=cm.INK, zorder=5, bbox=dict(facecolor="white", edgecolor="none", pad=0.8))  # the zero line stops at the name
         for _, rows, _ in blocks:
             for r in rows:
                 vals = [v for v in r[key] if np.isfinite(v)]

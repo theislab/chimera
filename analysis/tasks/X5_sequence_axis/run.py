@@ -33,7 +33,7 @@ BLUE, GREY, TREND = style.COUNT_EVIDENCE, style.IMPUTED, style.TREND  # genes wi
 INK, MUTED, REF_LINE = style.INK, style.MUTED, "#888888"  # REF_LINE: zero and identity lines
 S_TICK = style.SIZE_TICK  # axis labels and titles take their sizes from style.apply()
 PI, DNDS, ALPHA, DELTA = "protein identity π", "log₁₀ dN/dS (human–mouse)", "α", "Δα"
-KEY_EVIDENCE, KEY_IMPUTED, KEY_TREND, KEY_BEYOND = "genes with count evidence", "genes without (Δα imputed from features)", "median in 14 equal-count bins", "genes beyond an axis"
+KEY_EVIDENCE, KEY_IMPUTED, KEY_TREND, KEY_BEYOND = "genes with count evidence", "genes without count evidence (Δα imputed from features)", "median in 14 equal-count bins", "genes beyond an axis"
 RASTER_DPI = 360  # rasterized gene clouds: above 300 ppi on the page
 
 

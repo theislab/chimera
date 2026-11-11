@@ -1,17 +1,22 @@
-"""F2 per-gene figure: Δα read gene by gene from counts (per-gene gate) beside the protein-feature gate, on the
-independent golds. Exploratory (decided after the pre-specified test); every number comes from Z3 outputs or from
-``F2_per_gene/data.py``, which recomputes them with Z3's harness and checks them against Z3's tables.
+"""Per-gene gate panels: Δα read gene by gene from counts (per-gene gate) beside the protein-feature gate, on the
+independent golds. Exploratory (decided after the pre-specified test); every number comes from the outputs of
+Z3_free_gate or from ``F2_per_gene/data.py``, which recomputes them with the harness of Z3_free_gate and checks them
+against its tables.
 
-Panels, one PDF each at its exact size (``figures/revision/fig_per_gene_{a..e}.pdf``):
+Panels, one PDF each at its exact size (``figures/panels/main_validation/*.pdf``):
   a  forest: rho_p with 95% block-bootstrap CI on H1-H4 and the 4-species liver estimates, per-gene gate (free5) vs
      protein-feature gate (can5, same seeds), all genes and genes with count evidence; pre-specified value marked;
      paired difference with its CI (Z3 compare_hyp.csv, compare_pairs.csv); status letters only for the frozen
-     pre-specified test of the protein-feature gate (Table 1), with their key on the panel; the default gate is drawn first
+     pre-specified test of the protein-feature gate (tab:validation), with their key on the panel; the default gate is drawn first
   b  testis level: Δα rank against EVEE testis level, raw and given the covariates C, binned (data.py; the reversal)
   c  Δα against the count evidence S_g of the same fit, per gene, liver and testis (Z3 consensus)
-  d  named findings: spermatocyte-peak genes (C42) and hepatocyte catabolic genes (C43), matched excess under each gate
+  d  named findings: spermatocyte-peak genes and hepatocyte catabolic genes, matched excess under each gate
      (Z3 compare_y3.csv)
   e  separate axis: rho(Δα, dN/dS) and rho(Δα, protein prior) under each gate (Z3 compare_x5.csv)
+
+Inputs: ``results/analysis/Z3/`` (``compare_hyp.csv``, ``compare_pairs.csv``, ``compare_reversal.csv``,
+``compare_y3.csv``, ``compare_x5.csv``) and ``results/analysis/F2/`` (``testis_level_residuals.csv``,
+``gate_vs_S.csv``), bundle ``analysis_results``. "Z3" in this file is the task Z3_free_gate.
 
     PYTHONPATH=$PWD mamba run --no-capture-output -n chimera_env python -m analysis.tasks.F2_per_gene.panels
 """
@@ -74,7 +79,7 @@ PANEL_H, PANEL_BOTTOM, PANEL_TOP = 2.48, 0.74, 0.26  # forest and testis-level p
 
 def panel_forest() -> plt.Figure:
     """Points with CIs for both gates; the only status letters are the frozen pre-specified ones of the
-    protein-feature gate (Table 1), in their own column with a key. The per-gene gate gets no status."""
+    protein-feature gate (tab:validation), in their own column with a key. The per-gene gate gets no status."""
     T = pd.read_csv(Z3 / "compare_hyp.csv")
     P = pd.read_csv(Z3 / "compare_pairs.csv")
     H = PANEL_H
@@ -381,16 +386,207 @@ def panel_axes() -> plt.Figure:
     return fig
 
 
-def main() -> list:
+# ------------------------------------------------------------------------------------------------ main figure, panels d and e
+# The two panels of the main validation figure (fig:validation d, e), drawn small. Type in pt at print size.
+M_TITLE, M_LABEL, M_TICK, M_NOTE = 6.0, 6.0, 5.5, 5.2
+M_ORDER = (SG, CAN, FREE)  # marks of a row from top to bottom: the order of figures/style.py (count evidence, then the two gates)
+M_H = 140.0  # height of both panels, bp
+# The four independent references: hypothesis of the pre-specified plan -> block and row of the panel.
+REFERENCES = [("Cell-state pattern", [("H3", "Liver Human+Mouse"), ("H4", "Testis Human+Mouse")]),
+              ("Expression level", [("H1", "Liver Human+Mouse"), ("H2", "Testis Human+Mouse")])]
+# What the paper prints for the twelve estimates (three decimals) and the status of the pre-specified test.
+PRINTED = {"S": {"H3": 0.148, "H4": 0.116, "H1": 0.041, "H2": 0.014},
+           "can": {"H3": 0.110, "H4": 0.015, "H1": 0.013, "H2": -0.230},
+           "free": {"H3": 0.145, "H4": 0.123, "H1": 0.037, "H2": 0.029}}
+PRINTED_STATUS = {"H3": "V", "H4": "N", "H1": "N", "H2": "R"}
+STATUS_WORD = {"V": "supported", "N": "null", "R": "reversed"}  # the status of the table of results, as a word on the panel
+READOUT_ROWS = {"S": ("all_S_ema", "frozen"), "can": ("all", "frozen"), "free": ("all", "free5")}  # (universe, line) of compare_hyp.csv
+
+
+def readout_estimates() -> pd.DataFrame:
+    """The twelve estimates of ``panel_readouts``, read from ``results/analysis/Z3/compare_hyp.csv`` (index: readout,
+    hypothesis; columns ``rho_p``, ``ci_lo``, ``ci_hi``, ``status_rule``). Nothing is computed. Stops if an estimate or
+    a status differs from what the paper prints (``PRINTED``, ``PRINTED_STATUS``)."""
+    T = pd.read_csv(Z3 / "compare_hyp.csv")
+    out = []
+    for key, (universe, line) in READOUT_ROWS.items():
+        for h in ("H1", "H2", "H3", "H4"):
+            r = T[(T.hyp == h) & (T.universe == universe) & (T.line == line)]
+            assert len(r) == 1, f"compare_hyp.csv: {len(r)} rows for {h}, {universe}, {line}"
+            r = r.iloc[0]
+            assert abs(r.rho_p - PRINTED[key][h]) < 0.00051, f"{key} {h}: {r.rho_p:.4f} in compare_hyp.csv, the paper prints {PRINTED[key][h]}"
+            if key == "can":
+                assert r.status_rule == PRINTED_STATUS[h], f"{h}: status {r.status_rule} in compare_hyp.csv, the paper prints {PRINTED_STATUS[h]}"
+            out.append(dict(readout=key, hyp=h, rho_p=r.rho_p, ci_lo=r.ci_lo, ci_hi=r.ci_hi, status_rule=r.status_rule))
+    return pd.DataFrame(out).set_index(["readout", "hyp"])
+
+
+def panel_readouts() -> plt.Figure:
+    """Main validation figure, panel d (``main_validation/readouts_vs_references``, 290 x 140 bp): the three readouts
+    against the four independent references.
+
+    What it draws. x: the partial rank correlation with independent data given the covariates, with its 95%
+    block-bootstrap interval; dotted line and light band: the bar of 0.10 set in advance and the side that clears it.
+    Two blocks of two rows: cell-state pattern (liver, testis) and expression level (liver, testis). In each row three
+    marks: the count evidence S_g (square), Δα with the protein-feature gate as pre-specified, ten seeds (circle), and
+    Δα with the per-gene gate, five seeds, evaluated afterward (hexagon). The column at the right gives the status of
+    the pre-specified test as a word (supported, null, reversed; ``status_rule`` V, N, R of the table), which exists
+    for the protein-feature gate only. The per-gene gate and S_g carry no status.
+
+    Reads ``results/analysis/Z3/compare_hyp.csv`` and nothing else (columns ``hyp``, ``universe``, ``line``, ``rho_p``,
+    ``ci_lo``, ``ci_hi``, ``status_rule``): S_g from ``universe == all_S_ema, line == frozen``; the protein-feature
+    gate from ``universe == all, line == frozen``; the per-gene gate from ``universe == all, line == free5``; H3 and H4
+    are the pattern references, H1 and H2 the level references. No value is computed; ``readout_estimates`` checks the
+    twelve estimates and the four status letters against the values the paper prints.
+
+        python -m analysis.tasks.F2_per_gene.panels --panel main_validation/readouts_vs_references     # in chimera_env, from the repository root
+    """
+    E = readout_estimates()
+    W, H = 290.0, M_H
+    left, right, bottom, top = 76.0, 37.0, 37.0, 9.0
+    aw, ah = W - left - right, H - bottom - top
+    fig = plt.figure(figsize=(cm.style.inch(W), cm.style.inch(H)))
+    ax = fig.add_axes([left / W, bottom / H, aw / W, ah / H])
+    xlim = (-0.275, 0.2)
+    ys, heads, y = {}, [], 0.0
+    for block, rows in REFERENCES:  # a heading line, then the rows of the block
+        heads.append((y, block))
+        y += 0.9
+        for h, lab in rows:
+            ys[h] = (y, lab)
+            y += 1.1
+        y += 0.15
+    ax.set_ylim(y - 0.75, -0.5)
+    ax.set_xlim(*xlim)
+    ax.axvspan(0.10, xlim[1], color="#F1F1F1", lw=0, zorder=0)
+    ax.axvline(0.10, color=cm.MUTED, lw=0.6, ls=(0, (1, 1.5)), zorder=1)
+    ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
+    tr = ax.get_yaxis_transform()
+    for yy, block in heads:
+        ax.text(-(left - 2.0) / aw, yy, block, transform=tr, ha="left", va="center", fontsize=M_LABEL, fontweight="bold", color=cm.INK, clip_on=False)
+    for h, (yy, lab) in ys.items():
+        ax.text(-4.0 / aw, yy, lab, transform=tr, ha="right", va="center", fontsize=M_TICK, color=cm.INK, clip_on=False)
+        for off, key, sty in zip((-0.3, 0.0, 0.3), ("S", "can", "free"), M_ORDER):
+            r = E.loc[(key, h)]
+            _ci(ax, yy + off, r.rho_p, r.ci_lo, r.ci_hi, sty, size=3.3, lw=1.0)
+        ax.text(1.0 + 4.0 / aw, yy, STATUS_WORD[E.loc[("can", h)].status_rule], transform=tr, ha="left", va="center", fontsize=M_TICK, fontweight="bold", color=CAN[0], clip_on=False)
+    ax.text(0.10, 1.0, "bar set in advance", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=M_NOTE, color=cm.MUTED, clip_on=False)
+    ax.set_xticks([-0.2, -0.1, 0, 0.1, 0.2])
+    ax.set_xticklabels(["−0.2", "−0.1", "0", "0.1", "0.2"])
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    _style(ax)
+    ax.tick_params(labelsize=M_TICK, length=2, pad=1.5)
+    fig.text(0.5, 17.5 / H, "partial rank correlation with independent data, $\\rho_p$ (95% CI)", fontsize=M_LABEL, ha="center", va="bottom")
+    hs = [Line2D([], [], marker=s[1], color=s[0], ls="none", ms=3.3, label=lab)
+          for s, lab in zip(M_ORDER, ("count evidence $S_g$", "Δα, protein-feature gate", "Δα, per-gene gate"))]
+    fig.legend(handles=hs, loc="lower center", bbox_to_anchor=(0.5, 8.0 / H), ncol=3, fontsize=M_NOTE, handletextpad=0.1, columnspacing=0.9, frameon=False, borderpad=0, borderaxespad=0)
+    fig.text(0.5, 1.5 / H, "status: pre-specified test, protein-feature gate", fontsize=M_NOTE, ha="center", va="bottom", color=CAN[0])
+    return fig
+
+
+def panel_named_compact() -> plt.Figure:
+    """Main validation figure, panel e (``main_validation/named_findings``, 189 x 140 bp): the two named findings
+    under both gates. The estimates of ``panel_named`` (the panel of the supplementary figure), drawn small, with the
+    count evidence first in each row as in panel d.
+
+    What it draws. x: the excess of a gene set over matched background genes in SD units, with its 95% interval.
+    Top: genes that peak in human spermatocytes, on testis Human+Mouse (all 1,103 and the 166 with a strict peak;
+    for each, all genes and those with count evidence): above the prior. Bottom: the hepatocyte catabolic program on
+    four-species liver and liver Human+Mouse (63 genes and its 15 core genes): below the prior. In each row three
+    marks: the count evidence S_g (square), Δα with the protein-feature gate (circle), Δα with the per-gene gate
+    (hexagon).
+
+    Reads ``results/analysis/Z3/compare_y3.csv`` and nothing else (columns ``item``, ``cohort``, ``line``, ``group``,
+    ``value``, ``subset``, ``excess_d``, ``ci_lo``, ``ci_hi``): item ``C42`` (spermatocyte genes; value ``D`` for the
+    gates, ``S`` for the count evidence) and item ``C43`` (catabolic program; value ``D_raw`` and ``S``); lines
+    ``can5`` (protein-feature gate) and ``free5`` (per-gene gate, also the source of S_g, as in ``panel_named``).
+    No value is computed. Two estimates are checked against the text of the paper (+0.34 and −1.56).
+
+        python -m analysis.tasks.F2_per_gene.panels --panel main_validation/named_findings              # in chimera_env, from the repository root
+    """
+    t = pd.read_csv(Z3 / "compare_y3.csv")
+    W, H = 189.0, M_H
+    left, right, bottom, top, gap = 79.0, 5.0, 30.0, 9.0, 19.5
+    ah_total = H - bottom - top - gap
+    ah1 = ah_total * 4.0 / 9.6  # row slots: 4 above, 5.6 below (two cohort lines)
+    ah2 = ah_total - ah1
+    aw = W - left - right
+    fig = plt.figure(figsize=(cm.style.inch(W), cm.style.inch(H)))
+    ax1 = fig.add_axes([left / W, (bottom + ah2 + gap) / H, aw / W, ah1 / H])
+    ax2 = fig.add_axes([left / W, bottom / H, aw / W, ah2 / H])
+
+    def get(item, coh, line, group, value, subset):
+        r = t[(t.item == item) & (t.cohort == coh) & (t.line == line) & (t.group == group) & (t.value == value) & (t.subset == subset)]
+        assert len(r) == 1, f"compare_y3.csv: {len(r)} rows for {item}, {coh}, {line}, {group}, {value}, {subset}"
+        return r.iloc[0]
+
+    assert round(get("C42", "test_hmouse", "can5", "SC", "D", "all").excess_d, 2) == 0.34 and round(get("C42", "test_hmouse", "free5", "SC", "D", "all").excess_d, 2) == 0.34
+    assert round(get("C43", "liv_4sp", "free5", "prog63_noMT", "D_raw", "all").excess_d, 2) == -1.56
+    marks = ((-0.27, "free5", "S", SG), (0.0, "can5", None, CAN), (0.27, "free5", None, FREE))  # the order of M_ORDER
+    for k, (grp, sub, _) in enumerate(C42_ROWS):
+        for off, line, val, sty in marks:
+            r = get("C42", "test_hmouse", line, grp, val or "D", sub)
+            _ci(ax1, k + off, r.excess_d, r.ci_lo, r.ci_hi, sty, size=2.8, lw=0.9)
+    for k, (coh, grp, _) in enumerate(C43_ROWS):
+        for off, line, val, sty in marks:
+            r = get("C43", coh, line, grp, val or "D_raw", "all")
+            _ci(ax2, C43_Y[k] + off, r.excess_d, r.ci_lo, r.ci_hi, sty, size=2.8, lw=0.9)
+    ax1.set_yticks(range(4))
+    ax1.set_yticklabels([lab for _, _, lab in C42_ROWS], fontsize=M_TICK)
+    for i, tk in enumerate(ax1.get_yticklabels()):
+        tk.set_color(cm.MUTED if i % 2 else cm.INK)
+    ax1.set_ylim(3.5, -0.5)
+    ax1.set_xlim(0, 1)
+    ax1.set_xticks([0, 0.5, 1])
+    ax1.set_xticklabels(["0", "+0.5", "+1"])
+    y2 = [0.0, *C43_Y[:2], 2.75, *C43_Y[2:]]
+    labs2 = ["Liver 4 species"] + [lab for _, _, lab in C43_ROWS[:2]] + ["Liver Human+Mouse"] + [lab for _, _, lab in C43_ROWS[2:]]
+    ax2.set_yticks(y2)
+    ax2.set_yticklabels(labs2, fontsize=M_TICK)
+    for i, tk in enumerate(ax2.get_yticklabels()):
+        if i in (0, 3):
+            tk.set_color(cm.MUTED)
+            ax2.yaxis.get_major_ticks()[i].tick1line.set_visible(False)
+    ax2.set_ylim(y2[-1] + 0.6, -0.5)
+    ax2.set_xlim(-4.9, 0.3)
+    ax2.set_xticks([-4, -3, -2, -1, 0])
+    ax2.set_xticklabels(["−4", "−3", "−2", "−1", "0"])
+    for ax, title in ((ax1, "Testis, spermatocyte-peak genes"), (ax2, "Liver, hepatocyte catabolic genes")):
+        ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
+        _style(ax)
+        ax.tick_params(labelsize=M_TICK, length=2, pad=1.5)
+        ax.text(-(left - 2.0) / aw, 1.0 + 1.5 / (ax.get_position().height * H), title, transform=ax.transAxes, ha="left", va="bottom", fontsize=M_TITLE, fontweight="bold", color=cm.INK, clip_on=False)
+    fig.text((W - 3.0) / W, 10.5 / H, "excess over matched genes, SD units (95% CI)", fontsize=M_TICK, ha="right", va="bottom")
+    hs = [Line2D([], [], marker=s[1], color=s[0], ls="none", ms=3.0, label=lab)
+          for s, lab in zip(M_ORDER, ("$S_g$", "Δα, protein-feature gate", "Δα, per-gene gate"))]
+    fig.legend(handles=hs, loc="lower right", bbox_to_anchor=((W - 3.0) / W, 1.5 / H), ncol=3, fontsize=M_NOTE, handletextpad=0.05, columnspacing=0.7, frameon=False, borderpad=0, borderaxespad=0)
+    return fig
+
+
+# panels of the main figure that are saved under their own names: panel -> the function that draws it
+MAIN_PANELS = {"main_validation/readouts_vs_references": panel_readouts, "main_validation/named_findings": panel_named_compact}
+
+
+def main(only=None) -> list:
+    """Draw the five panels of the supplementary figure and the two panels of the main figure (``only``: names of
+    ``MAIN_PANELS`` to draw just those)."""
     cm.setup()
     PREVIEW.mkdir(parents=True, exist_ok=True)
     out = []
-    for name, fn in [("fig_per_gene_a", panel_forest), ("fig_per_gene_b", panel_testis_level),
-                     ("fig_per_gene_c", panel_gate_vs_s), ("fig_per_gene_d", panel_named), ("fig_per_gene_e", panel_axes)]:
-        out.append(save(fn(), name))
+    if not only:
+        for name, fn in [("fig_per_gene_a", panel_forest), ("fig_per_gene_b", panel_testis_level),
+                         ("fig_per_gene_c", panel_gate_vs_s), ("fig_per_gene_d", panel_named), ("fig_per_gene_e", panel_axes)]:
+            out.append(save(fn(), name))
+    for name in only or MAIN_PANELS:  # at their exact size; the preview goes to figures/_work/panels/
+        out.append(cm.style.save_panel(MAIN_PANELS[name](), name, exact=True))
     return out
 
 
 if __name__ == "__main__":
-    for p in main():
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--panel", nargs="+", choices=sorted(MAIN_PANELS), metavar="NAME", help="draw only these panels of the main figure (family/name)")
+    for p in main(ap.parse_args().panel):
         print(p, cm.check_pdf(p))

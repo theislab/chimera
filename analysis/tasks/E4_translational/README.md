@@ -8,7 +8,7 @@ Drug targets and disease genes: where they sit relative to the protein prior in 
 | Question | Disease: Which human disease responses does a mouse model reproduce, and where do drug targets and disease genes sit? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.8 (`sec:disease`); Supplementary Section D.12 (`ssec:er-e4`); Supplementary Figure S53 (`fig:supp-e4`); Supplementary Figure S54 (`fig:supp-e4-targets`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Figure 9 (`fig:drug-targets`); Supplementary Section D.13 (`ssec:er-e4`); Supplementary Figure S61 (`fig:supp-e4`); Supplementary Figure S60 (`fig:supp-e4-targets`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

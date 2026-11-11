@@ -1,7 +1,8 @@
-"""H1: cell-type contributions to S_g per cohort, the T2.5 split (C_gk, posterior-mean z), from existing forward passes. No forward pass is run here.
+"""Cell-type contributions to S_g per cohort, the split of analysis/tasks/T2_5_celltype_margin (C_gk, posterior-mean z), from existing forward passes. No forward pass is run here.
 
-Canonical: T2.5 tables, the runs it covers. New cohorts: fw files of the owning tasks, mean over kept seeds with a file. Islet: Y1's cell-half forward pass, halves summed back to classes
-(the sum over a class's two halves is the class's sum, by construction). Eye: T11 fw files; a cohort of the registry with no file yet is skipped and reported.
+Canonical: tables of T2_5_celltype_margin, the runs it covers. New cohorts: fw files of the owning tasks, mean over kept seeds with a file. Islet: the cell-half forward pass of
+Y1_gene_tissue, halves summed back to classes (the sum over a class's two halves is the class's sum, by construction). Eye: fw files of the eye cohort; a cohort of the registry
+with no file yet is skipped and reported.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/H1_harmonise/drivers.py
 """
@@ -95,7 +96,7 @@ def main() -> int:
     meta = []
     for c, d in RU.cohorts().items():
         seeds = sorted(runs[(runs.cohort == c) & runs.kept].seed)
-        if d.get("source") == "C1":  # C1 ran H1's drivers code on its own forward passes; taken as written
+        if d.get("source") == "C1":  # C1_cohorts ran this drivers code on its own forward passes; taken as written
             src = RU.RES / "C1" / "h1" / "drivers"
             if (src / f"{c}.parquet").exists():
                 pd.read_parquet(src / f"{c}.parquet").to_parquet(OUT / f"{c}.parquet")

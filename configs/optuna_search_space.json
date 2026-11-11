@@ -1,6 +1,6 @@
 {
   "study_name": "chimera_v2.4_hpo",
-  "description": "Optuna hyperparameter search space for Chimera v2.4 (Task 9.5). All loss weights use loguniform sampling to cover the correct order-of-magnitude range. Architecture choices use categorical sampling.",
+  "description": "Optuna hyperparameter search space for Chimera v2.4. All loss weights use loguniform sampling to cover the correct order-of-magnitude range. Architecture choices use categorical sampling.",
   "parameters": {
     "lambda_aux": {
       "type": "loguniform",

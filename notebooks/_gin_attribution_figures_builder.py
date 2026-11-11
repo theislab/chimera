@@ -59,7 +59,7 @@ cells.append(md("""
     End-to-end execution: ~5–10 seconds.*
 
     The figures are organised by **level of evidence**, in the order a
-    reader / reviewer should consume them:
+    reader should consume them:
 
     - **§A — POOLED.**  Per-residue distributions, per-residue scatter
       against continuous covariates, and a pooled Cliff's δ forest
@@ -515,7 +515,7 @@ cells.append(md("""
     Bars are solid when the per-gene paired Wilcoxon survives,
     hollow otherwise.  Right-margin per-row annotation reports both
     the pooled MWU $p$ and the per-gene paired Wilcoxon $p$, so the
-    reviewer can verify both levels at a glance.
+    reader can verify both levels at a glance.
 
     The figure is saved twice: once with the new naming
     (`fig_E1_evidence_chain.pdf`) and once under the legacy name

@@ -8,7 +8,7 @@ Atlas of gene programs across tissues: set statistics per cohort and readout for
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Supplementary Section D.7 (`ssec:er-e1`); Supplementary Figure S35 (`fig:supp-e1`); Supplementary Figure S36 (`fig:supp-e1-cont`); Supplementary Figure S37 (`fig:supp-e1-genes`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Section D.7 (`ssec:er-e1`); Supplementary Figure S39 (`fig:supp-e1`); Supplementary Figure S40 (`fig:supp-e1-cont`); Supplementary Figure S41 (`fig:supp-e1-genes`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

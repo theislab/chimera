@@ -60,7 +60,7 @@ PRIMARY = {  # pre-specified analysis plan, section 4
     "H3": dict(cohort="liv_hmouse", gold="G_H3", cov="C_pat", tissue="liver", kind="pattern"),
     "H4": dict(cohort="test_hmouse", gold="G_H4", cov="C_pat_nsp", tissue="testis", kind="pattern"),
 }
-MULTI = {"H1": "liv_4sp", "H3": "liv_4sp", "H2": "test_3sp", "H4": "test_3sp"}  # Figs 4-6 rule estimates
+MULTI = {"H1": "liv_4sp", "H3": "liv_4sp", "H2": "test_3sp", "H4": "test_3sp"}  # estimates on the canonical multi-species cohorts (family F3_figs4_6)
 J = ["B1b", "B1c", "B2b", "B3a", "B1z"]
 SETS = {"liver": ["C1", "C2", "V1", "V2", "V3"], "testis": ["C1", "C2", "V2", "V3"]}
 SET_COHORT = {"liver": "liv_hmouse", "testis": "test_hmouse"}
@@ -471,7 +471,7 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
                       subset="common4", perm="one"))
         if v["tissue"] == "testis":
             U.append(unit(f"{h}:autosome", "F3", "testis_autosome_only", h, c, g, cov, ["D"], subset="autosome"))
-        # Figs 4-6 rule: canonical multi-species cohort, estimate
+        # family F3_figs4_6: canonical multi-species cohort, estimate
         mc = MULTI[h]
         U.append(unit(f"{h}:multi:D", "F3_figs4_6", "multi_species_estimate", h, mc, g, cov, ["D"], perm="one",
                       seeds=True, rel=True))
@@ -517,7 +517,7 @@ def build_units(tools: pd.DataFrame | None) -> list[dict]:
                 for t in ["D3"] + [x for x in tools.columns if x not in ("hsapiens_gene_id", "cohort")]:
                     U.append(dict(kind="set", id=f"set:{tis}:{s}:{t}", family="F3", tissue=tis, cohort=c, set=s,
                                   score=t, strata="pi_expr", direction=d))
-    for s in SETS["liver"]:  # 4-sp set estimates (Figs 4-6 cohort) and the nonzero-in-every-species subset
+    for s in SETS["liver"]:  # 4-sp set estimates (the cohort of family F3_figs4_6) and the nonzero-in-every-species subset
         d = "above" if s.startswith("C") else "below"
         for sub in (None, "nonzero_all_species"):
             U.append(dict(kind="set", id=f"set:liv_4sp:{s}:D:{sub}", family="F3", tissue="liver", cohort="liv_4sp",

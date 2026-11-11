@@ -1,5 +1,5 @@
 """Post-hoc z-leakage probe — fits linear and non-linear classifiers on z to
-predict species. Refinement.md requires BOTH linear AND non-linear probes;
+predict species. The design requires BOTH linear AND non-linear probes;
 the in-training adversary only covers the GRL-trained classifier, which can
 under-estimate residual species structure in z (cf. iter123 audit, where
 in-training adv_acc=0.765 but post-hoc MLP-64-32 reaches 0.990 on iter101 z).

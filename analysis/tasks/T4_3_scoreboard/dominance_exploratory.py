@@ -5,7 +5,7 @@ confounder that ``calibration_dominant.py`` found the pi x expression strata do 
 Dominance: liver, top quartile of ``hep_enrich`` of analysis/tasks/X2_liver_biology; testis, dominant type of
 analysis/tasks/T2_5_celltype_margin = commonest type.
 - The 9 Family 2 tests with dominance added to the strata (same AUROC, 5:1 rule, permutation).
-- H1-H4 and the Figs 4-6 estimates with dominance added to the design (liver: spline of rank
+- H1-H4 and the multi-species estimates (family F3_figs4_6) with dominance added to the design (liver: spline of rank
   hep_enrich, as C_hep of X2_liver_biology; testis: the binary flag), block bootstrap, stratified permutation
   with the flag added to the strata.
 

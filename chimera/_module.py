@@ -380,9 +380,9 @@ class ChimeraModule(nn.Module):
         # ``use_celltype_conditional_mmd=True`` AND ``lambda_mmd_aux > 0``, the
         # global (across-all-cells) MMD is added on top of the CT-conditional
         # MMD, producing species-mixing pressure on cells in unshared CTs that
-        # CT-cond MMD cannot reach (memory `feedback_ctcond_mmd_4sp.md`: "either
-        # use global MMD alone, or combine global + CT-cond (dual MMD). Never
-        # drop global MMD entirely."). Default 0.0 = byte-identical to all
+        # CT-cond MMD cannot reach (rule kept from iter107 and iter121: use the
+        # global MMD alone or together with the cell-type-conditional one,
+        # never without it). Default 0.0 = byte-identical to all
         # current best-knowns (testis iter109/iter111/iter115 use CT-cond ONLY).
         self.lambda_mmd_aux = float(lambda_mmd_aux)
         # iter122: optional species-pair-conditional MMD weights — heterogeneous
@@ -469,8 +469,15 @@ class ChimeraModule(nn.Module):
         # below for the rationale. Falls back transparently to the global
         # MMD when the cell-type field is not registered.
         self.use_celltype_conditional_mmd = bool(use_celltype_conditional_mmd)
-        # VAMP prior: multimodal p(z) induced by K learnable pseudo-inputs
-        # passed through the same encoder. Replaces N(0, I) when active.
+        # VAMP prior: multimodal p(z) induced by K pseudo-inputs passed
+        # through the same encoder. Replaces N(0, I) when active.
+        # The pseudo-inputs are stored as a parameter but are not trained:
+        # the optimizer of the training plan (``_training_plan.py``,
+        # ``configure_optimizers``) has no parameter group for them, so they
+        # keep the values they are initialized with (K training cells copied
+        # in by ``training/train_and_diagnose.py``; Gaussian noise when that
+        # step is switched off). The prior still moves during training,
+        # because the encoder they pass through is trained.
         # The prior itself carries the cross-species alignment inductive
         # bias (each shared celltype pulls toward one mode regardless of
         # species), so MMD pressure can be reduced or removed without
@@ -819,8 +826,12 @@ class ChimeraModule(nn.Module):
     def _encode_pseudo_inputs(self) -> Tuple[torch.Tensor, torch.Tensor]:
         """Pass the K pseudo-inputs through the shared encoder.
 
-        The pseudo-inputs are learnable "prototype" count vectors
-        (shape ``(K, G)``). They go through the SAME encoder as real
+        The pseudo-inputs are "prototype" count vectors (shape ``(K, G)``):
+        K training cells copied in before training
+        (``training/train_and_diagnose.py``). They are stored as a parameter
+        but are not trained: the optimizer of the training plan has no
+        parameter group for them, so they stay at those cells and the prior
+        changes only through the encoder. They go through the SAME encoder as real
         cells, with zeroed species / batch one-hots (matching the
         ``mask_species_in_encoder`` / ``mask_batch_in_encoder`` regime).
         A ``ReLU`` ensures non-negativity (cells have counts ≥ 0).
@@ -829,7 +840,8 @@ class ChimeraModule(nn.Module):
         that (a) BN uses the accumulated running stats (trained on real
         cells) rather than pseudo-input batch stats, and (b) pseudo-input
         activations don't contaminate the running stats. Gradients still
-        flow back to ``pseudo_inputs`` and all encoder parameters.
+        flow back to all encoder parameters (they also reach
+        ``pseudo_inputs``, which no optimizer updates).
         """
         assert self.pseudo_inputs is not None, "VAMP prior not initialized"
         K = self.pseudo_inputs.shape[0]

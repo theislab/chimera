@@ -8,7 +8,7 @@ Gene by tissue: how much of each readout belongs to the gene and how much to the
 | Question | One reading across tissues: Does the reading hold across tissues, and what goes with deployment above the prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.7 (`sec:tissues`); Figure 6d, e, f, g, h, i (`fig:one-reading`) |
+| Used in the paper | Section 3.5 (`sec:tissues`); Supplementary Figure S42a, b, c, d, e, f (`fig:supp-gene-by-tissue`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

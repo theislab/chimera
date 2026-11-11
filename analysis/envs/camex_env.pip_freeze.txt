@@ -23,7 +23,7 @@ packaging==26.3
 pandas==1.5.3
 patsy==1.0.3
 pillow==11.3.0
-pip @ file:///home/conda/feedstock_root/build_artifacts/pip_1753924886980/work
+pip==25.2
 psutil==7.2.2
 pynndescent==0.5.8
 pyparsing==3.3.3

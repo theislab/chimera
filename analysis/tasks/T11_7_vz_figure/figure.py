@@ -1,4 +1,4 @@
-"""T11.7: Van Zyl (eye) figure and tidy summary table (re-runnable; datasets from ``vz.usable_datasets``).
+"""Eye cohort: Van Zyl figure and tidy summary table (re-runnable; datasets from ``vz.usable_datasets``).
 
 Same panel types, names and palette as the liver and testis panels of the paper
 (``notebooks/_figure_design.py``, ``analysis/tasks/T8_4_figures/common.py``). Writes
@@ -6,7 +6,7 @@ Same panel types, names and palette as the liver and testis panels of the paper
 ``results/analysis/T11/figures/vz_figure.{pdf,png}``:
 
 a    pi vs alpha, 5-species model, named glaucoma genes marked.
-b    Delta-alpha distribution, centred within dataset, all usable datasets.
+b    Delta-alpha distribution, centered within dataset, all usable datasets.
 c    Gene classes: stratified AUROC of Delta-alpha and of profile correlation (B1b) against matched genes.
 d-f  V2, human-macaque-pig-mouse gradient, 5-species model: profile correlation with human, Chimera
      per-species residual, Chimera per-species fit margin; glaucoma genes beside all other genes.
@@ -42,7 +42,7 @@ SP_ORDER = ["macaca_fascicularis", "macaca_mulatta", "pig", "mouse"]
 SP_LABEL = {"macaca_fascicularis": "M. fascicularis", "macaca_mulatta": "M. mulatta", "pig": "pig", "mouse": "mouse"}
 SETS = [("C1", "housekeeping"), ("C2", "ribosome etc."), ("V2", "interferon"), ("V3", "extracellular")]
 MODELS = ["Chimera", "scVI-sp", "scVI-donor", "scANVI", "sysVI", "Harmony", "PCA"]
-C_DA, C_B1B, C_S = cm.STY["D"][0], cm.STY["B1b"][0], cm.STY["S"][0]  # paper's readout colours
+C_DA, C_B1B, C_S = cm.STY["D"][0], cm.STY["B1b"][0], cm.STY["S"][0]  # paper's readout colors
 INK, INK2, GRID, SURFACE, MID = cm.INK, cm.MUTED, "#E6E6E6", "white", "#F0F0F0"
 GENE_GREY = "#BBBBBB"
 DS_COLOR = {"full": "#222222", "hmouse": "#D55E00", "hmmul": "#0072B2", "hpig": "#CC79A7", "hmfas": "#56B4E9", "primates": "#009E73"}

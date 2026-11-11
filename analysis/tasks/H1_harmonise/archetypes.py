@@ -1,6 +1,6 @@
-"""H1: gene archetypes per cohort, the first submission's method (notebooks/_gene_archetypes_builder.py, Supplementary Methods): GIN last hidden layer, dead and saturated
-neurons dropped, rows L2-normalised, KMeans k in 3-12 chosen by the joint z-score of silhouette and cross-seed ARI, relabelled by ascending mean Delta-alpha. One run per cohort,
-the first kept seed, as the first submission used one run. Exploratory, model-internal.
+"""Gene archetypes per cohort, the method of notebooks/_gene_archetypes_builder.py (Supplementary Methods): GIN last hidden layer, dead and saturated
+neurons dropped, rows L2-normalized, KMeans k in 3-12 chosen by the joint z-score of silhouette and cross-seed ARI, relabeled by ascending mean Delta-alpha. One run per cohort,
+the first kept seed, as that notebook uses one run. Exploratory, model-internal.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/H1_harmonise/archetypes.py [--jobs 6]
 """
@@ -21,7 +21,7 @@ from analysis.tasks.H1_harmonise import rules as RU
 
 OUT = RU.OUT / "archetypes"
 K_RANGE = list(range(3, 13))
-N_SEEDS = 10  # first submission 30; ten keep the selection rule at a fraction of the cost, and k is compared with it on liver 4-sp
+N_SEEDS = 10  # the notebook uses 30; ten keep the selection rule at a fraction of the cost, and k is compared with it on liver 4-sp
 SIL_SAMPLE = 2000
 
 

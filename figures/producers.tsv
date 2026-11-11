@@ -1,0 +1,79 @@
+# The script that draws each panel file. The index (INDEX.md) and the manifest take the script of a panel from here, and
+# the build names every panel of a figure that has no row. panels: one or more "family/name" under figures/panels/,
+# separated by spaces (shell patterns; the first matching row counts), or a path under notebooks/figures/ for a panel
+# stored by a notebook. A folder whose panels come from several scripts lists its panels by name, so that a new panel
+# has no script until its row is written. command: run from the repository root in the analysis environment
+# (chimera_env) with PYTHONPATH set to the repository root; it reads stored runs, caches and result tables only.
+panels	script	command
+main_overview/*	figures/redraw/overview/overview.py	python figures/redraw/overview/overview.py
+main_alpha_vs_prior/scatter main_alpha_vs_prior/shift main_alpha_vs_prior/distribution	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
+main_integration/composite_strip	analysis/tasks/T8_4_figures/fig3_integration_ext.py	python -m analysis.tasks.T8_4_figures.fig3_integration_ext --panel main_integration/composite_strip
+main_integration/mixing main_integration/conservation main_integration/composite	analysis/tasks/T8_4_figures/fig3_integration.py	python -m analysis.tasks.T8_4_figures.fig3_integration
+main_delta_alpha_liver/category_boxes main_delta_alpha_liver/category_effect_sizes	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
+main_delta_alpha_liver/prior_landscape main_delta_alpha_liver/celltype_drivers main_delta_alpha_liver/margin_support main_delta_alpha_liver/cross_tissue	analysis/tasks/T8_4_figures/fig4_additions.py	python -m analysis.tasks.T8_4_figures.fig4_additions
+main_delta_alpha_liver/sequence_axis	analysis/tasks/T8_4_figures/fig7_validation.py	python -m analysis.tasks.T8_4_figures.fig7_validation
+main_validation/prespecified_tests main_validation/gene_sets main_validation/head_to_head main_validation/incremental	analysis/tasks/T8_4_figures/fig7_validation.py	python -m analysis.tasks.T8_4_figures.fig7_validation
+main_validation/gates_*	analysis/tasks/F2_per_gene/panels.py	python -m analysis.tasks.F2_per_gene.panels
+main_validation/readouts_vs_references main_validation/named_findings	analysis/tasks/F2_per_gene/panels.py	python -m analysis.tasks.F2_per_gene.panels --panel main_validation/readouts_vs_references main_validation/named_findings
+main_validation/worked_genes	analysis/tasks/Y3_findings/figures.py	python -m analysis.tasks.Y3_findings.figures
+main_validation/celltype_drivers_enzymes	analysis/tasks/T8_4_figures/fig4_additions.py	python -m analysis.tasks.T8_4_figures.fig4_additions --panel main_validation/celltype_drivers_enzymes
+main_axis_tissues/summary main_axis_tissues/clouds	analysis/tasks/H1_harmonise/figures.py	python -m analysis.tasks.H1_harmonise.figures --panel main_axis_tissues/summary main_axis_tissues/clouds
+main_tissues/axis main_tissues/genes main_tissues/recurrence	analysis/tasks/H1_harmonise/figures.py	python -m analysis.tasks.H1_harmonise.figures
+main_tissues/gene_by_tissue_row*	analysis/tasks/Y1_gene_tissue/figure.py	python -I analysis/tasks/Y1_gene_tissue/launch.py analysis.tasks.Y1_gene_tissue.figure
+main_disease/kidney_transfer main_disease/stage_transfer main_disease/healthy_tissue_test main_disease/transfer_vs_null main_disease/injury_genes	analysis/tasks/T7_10_fig8/fig8_disease.py	python -m analysis.tasks.T7_10_fig8.fig8_disease
+main_protein/controls	analysis/tasks/T8_4_figures/fig5_controls.py	python -m analysis.tasks.T8_4_figures.fig5_controls
+main_protein/attribution_shares main_protein/atlas_* main_protein/archetype_*	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
+notebooks/figures/gene_archetypes/*	notebooks/11_gene_archetypes.ipynb	stored by the notebook (needs the trained gate network)
+notebooks/figures/ortholog_qc/*	notebooks/08_ortholog_qc.ipynb	stored by the notebook (needs its pooled gene tables)
+supp_alpha_training/*	figures/redraw/alpha.py	python -m figures.redraw.alpha
+supp_alpha_decorrelation/*	figures/redraw/alpha.py	python -m figures.redraw.alpha
+supp_alpha_robustness/*	figures/redraw/robustness.py	python -m figures.redraw.robustness
+supp_integration_seven_methods/*	figures/redraw/integration_scores.py	python -m figures.redraw.integration_scores
+supp_integration_metrics/*	figures/redraw/integration_scores.py	python -m figures.redraw.integration_scores
+supp_integration_umap_testis/*	figures/redraw/integration_umap.py	python -m figures.redraw.integration_umap testis
+supp_integration_umap_liver/*	figures/redraw/integration_umap.py	python -m figures.redraw.integration_umap liver
+supp_integration_ten_methods/*	figures/redraw/integration_ten_methods.py	python -m figures.redraw.integration_ten_methods scores
+supp_integration_raw_metrics/*	figures/redraw/integration_ten_methods.py	python -m figures.redraw.integration_ten_methods raw_metrics
+supp_integration_eleven_cohorts/*	analysis/tasks/T8_4_figures/fig3_integration_ext.py	python -m analysis.tasks.T8_4_figures.fig3_integration_ext
+supp_sequence_axis/*	analysis/tasks/X5_sequence_axis/run.py	python -c "from analysis.tasks.X5_sequence_axis import run; run.draw_panels()"
+supp_known_measures/*	analysis/tasks/X5_sequence_axis/known.py	python -c "from analysis.tasks.X5_sequence_axis import known; known.draw_panels()"
+supp_relations_heatmap/*	analysis/tasks/X4_where_differs/relations.py	python -c "from analysis.tasks.X4_where_differs import relations; relations.draw_panels()"
+supp_relations_density/*	analysis/tasks/X4_where_differs/relations.py	python -c "from analysis.tasks.X4_where_differs import relations; relations.draw_panels()"
+supp_categories_broad/*	figures/redraw/categories_broad.py	python -m figures.redraw.categories_broad
+supp_categories_liver/*	figures/redraw/categories.py	python -m figures.redraw.categories liver_4sp
+supp_categories_testis/*	figures/redraw/categories.py	python -m figures.redraw.categories testis_hmac
+supp_hallmark/*	analysis/tasks/F1_figures/notebook_panels.py	python -m analysis.tasks.F1_figures.notebook_panels
+supp_celltype_closure/*	analysis/tasks/T2_5_celltype_margin/run.py	python -c "from analysis.tasks.T2_5_celltype_margin import run; run.draw_panels()"
+supp_celltype_seeds/*	analysis/tasks/T8_4_figures/supp_figures.py	python -m analysis.tasks.T8_4_figures.supp_figures
+supp_seed_reliability/*	analysis/tasks/T8_4_figures/supp_figures.py	python -m analysis.tasks.T8_4_figures.supp_figures
+supp_functional_layer/*	analysis/tasks/T6_9_assemble/assemble.py	python -c "from analysis.tasks.T6_9_assemble import assemble; assemble.draw_panels()"
+supp_covariate_audit/*	analysis/tasks/T2_4_covariates/run.py	python -c "from analysis.tasks.T2_4_covariates import run; run.draw_panels()"
+supp_gate_gap/*	analysis/tasks/X8_gate_divergence/figures.py	python -m analysis.tasks.X8_gate_divergence.figures
+supp_gate_gap_classes/*	analysis/tasks/X8_gate_divergence/figures.py	python -m analysis.tasks.X8_gate_divergence.figures
+supp_gate_gap_named/*	analysis/tasks/X8_gate_divergence/figures.py	python -m analysis.tasks.X8_gate_divergence.figures
+supp_published_differences/*	analysis/tasks/E6_known_differences/figures.py	python -m analysis.tasks.E6_known_differences.figures
+supp_ground_truth/*	analysis/tasks/B1_ground_truth/figures.py	python -m analysis.tasks.B1_ground_truth.figures
+supp_benchmark_overview/*	analysis/tasks/B2_benchmark/overview.py	python -m analysis.tasks.B2_benchmark.overview
+supp_tissues_recurrence/*	analysis/tasks/H1_harmonise/figures.py	python -m analysis.tasks.H1_harmonise.figures
+supp_tissues_lineage/*	analysis/tasks/H1_harmonise/figures.py	python -m analysis.tasks.H1_harmonise.figures
+supp_tissue_*/*	analysis/tasks/H1_harmonise/figures.py	python -m analysis.tasks.H1_harmonise.figures
+supp_programs_recurrent/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.tasks.E1_atlas.figures
+supp_programs_by_tissue/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.tasks.E1_atlas.figures
+supp_programs_named_genes/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.tasks.E1_atlas.figures
+supp_bone_marrow_reference/*	analysis/tasks/T12_3_tests/figure.py	python -m analysis.tasks.T12_3_tests.figure
+supp_cell_compartments/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure
+supp_cell_lineages/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure
+supp_primate_branches/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure
+supp_protein_architecture/*	analysis/tasks/E2_protein/figures.py	python -m analysis.tasks.E2_protein.figures
+supp_regulatory_architecture/*	analysis/tasks/E5_regulatory/figures.py	python -m analysis.tasks.E5_regulatory.figures
+supp_disease_genes/*	analysis/tasks/E4_translational/figures.py	python -m analysis.tasks.E4_translational.figures
+supp_drug_targets/*	analysis/tasks/E4_translational/figures.py	python -m analysis.tasks.E4_translational.figures
+supp_gin_inputs_controls/contributions	figures/redraw/gate_network.py	python -m figures.redraw.gate_network inputs_contributions
+supp_gin_*/*	figures/redraw/gate_network.py	python -m figures.redraw.gate_network
+supp_atlas_*/*	figures/redraw/atlas.py	python -m figures.redraw.atlas
+supp_residue_audit/*	figures/redraw/residue_audit.py	python -m figures.redraw.residue_audit
+supp_residue_*/*	figures/redraw/residue.py	python -m figures.redraw.residue
+extra_new_use_cases/*	analysis/tasks/C1_cohorts/figure.py	python -m analysis.tasks.C1_cohorts.figure
+extra_sparse_genes/*	analysis/tasks/D1_sparse_genes/figure.py	python -m analysis.tasks.D1_sparse_genes.figure (writes to the results folder of the task; the panel here is a copy)
+extra_uses/*	analysis/tasks/Y6_uses/figures.py	python -m analysis.tasks.Y6_uses.figures (writes to the results folder of the task; the panel here is a copy)
+extra_embedding/*	analysis/tasks/Z2_embedding/figures.py	python -m analysis.tasks.Z2_embedding.figures (writes to the results folder of the task; the panel here is a copy)

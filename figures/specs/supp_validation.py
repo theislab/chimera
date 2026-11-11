@@ -9,6 +9,35 @@ from __future__ import annotations
 from figures.compose import Col, Figure, LANDSCAPE, P, Row, X
 
 FIGS = {
+    "supp_validation_tests": Figure(
+        Col(Row(P("main_validation/prespecified_tests", "a"), P("main_validation/gene_sets", "b"), same_scale=True),
+            X("main_validation/head_to_head", "c"), X("main_validation/incremental", "d")),
+        label="fig:supp-validation-tests",
+        title="Pre-specified tests against independent data and comparison with direct baselines",
+        shows=("(a) Four tests fixed before the analysis: does Δα agree with independent data on expression "
+               "level and on cell-type pattern, in liver and in testis? Points right of zero mean agreement; the "
+               "dotted line is the bar set in advance. Liver pattern passes. (b) Sets of genes with a known "
+               "expectation, tested against matched background genes. (c) Δα against simpler direct scores and "
+               "against the gene scores of SATURN and CAMEX: right of zero, Δα is closer to the independent "
+               "data. (d) What each score adds when all the others are known: the count evidence S_g adds on "
+               "pattern.")),
+    "supp_gates_readouts": Figure(
+        Col(Row(X("main_validation/gates_tests", "a"), X("main_validation/gates_testis_level", "b"), same_scale=True,
+                gap=4),
+            Row(X("main_validation/gates_vs_count_evidence", "c"), X("main_validation/gates_named_findings", "d"),
+                X("main_validation/gates_sequence_measures", "e"), same_scale=True, gap=4),
+            gap=4),
+        label="fig:supp-gates",
+        title="The tests and two named findings under the protein-feature gate and the per-gene gate",
+        shows=("The model can read Δα in two ways: through the protein-feature gate (the default) or gene by "
+               "gene from each gene's own counts (the per-gene gate). (a) The four pre-specified tests for both "
+               "gates: with the per-gene gate Δα agrees with independent pattern data in liver and in testis. "
+               "Right: the difference between the gates. (b) Testis: Δα against independent expression level; "
+               "the per-gene readout follows the count evidence. (c) Δα against the count evidence of the same "
+               "fit: loosely related with the protein-feature gate, almost identical with the per-gene gate. (d) "
+               "Two named findings, spermatocyte genes above the prior and hepatocyte catabolic genes below it, "
+               "hold under both gates. (e) Under both gates Δα stays unrelated to dN/dS and to the protein "
+               "prior.")),
     "supp_bone_marrow_reference": Figure(
         Col(Row(X("supp_bone_marrow_reference/a", "a"), X("supp_bone_marrow_reference/b", "b"),
                 X("supp_bone_marrow_reference/c", "c"), same_scale=True),

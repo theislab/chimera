@@ -1,13 +1,13 @@
-"""T12.3: cell-type and species decomposition of S_g on the bone-marrow seeds (inputs to E3, E4).
+"""Cell-type and species decomposition of S_g on the bone-marrow seeds (inputs to tests E3 and E4).
 
-Forward pass (``--forward <seed>``): the T2.5 checkpoint-only forward pass
+Forward pass (``--forward <seed>``): the checkpoint-only forward pass of analysis/tasks/T2_5_celltype_margin
 (``T2_5_celltype_margin/run.py::forward_sums``, code unchanged) on one seed run of
-``T12_2b_recipe/seed_map.tsv``, with build 2 as data and the nine harmonised types
+``T12_2b_recipe/seed_map.tsv``, with build 2 as data and the nine harmonized types
 (``cell_ontology_class``) as the grouping. Sums go to ``results/analysis/P12/drivers/fw_s<seed>.npz``;
 nothing is written to the run directory.
 
-Combine (``--combine``), per gene g, species s, type k (T2.5 ``margin.decompose``, posterior-mean z),
-over the seeds admitted to D (``seed_health.json``: G-V passing seeds):
+Combine (``--combine``), per gene g, species s, type k (``margin.decompose`` of T2_5_celltype_margin,
+posterior-mean z), over the seeds admitted to D (``seed_health.json``: G-V passing seeds):
 
 * species-row contribution R_gsk = w_sk S_gsk (w_sk = n_sk / (n_s K)); C_gk = sum_s R_gsk, so that
   sum_k C_gk = S_g; five-seed means;
@@ -15,9 +15,9 @@ over the seeds admitted to D (``seed_health.json``: G-V passing seeds):
   its argmax (no type when every C_gk >= 0); mouse rows only (max(-R_g,mouse,k, 0)) beside it;
 * E4 readout: divergent mass of species s = sum_k max(-R_gsk, 0); share of s = mass_s / sum over the
   three species;
-* B1 leave-one-type-out (E3 baseline): increase_k = E_{-k} - E_all (T4.2 pooled E on the same units),
-  positive when type k carries cross-species disagreement; the B1 top type is its argmax (no type when
-  every increase <= 0).
+* B1 leave-one-type-out (E3 baseline): increase_k = E_{-k} - E_all (pooled E of T4_2_gene_baselines on the
+  same units), positive when type k carries cross-species disagreement; the B1 top type is its argmax (no
+  type when every increase <= 0).
 
     PYTHONPATH=<chimera repo> python analysis/tasks/T12_3_tests/drivers.py --forward 42 [--threads 16]
     PYTHONPATH=<chimera repo> python analysis/tasks/T12_3_tests/drivers.py --combine
@@ -71,8 +71,8 @@ def _bm_adata(cohort: str, backed: bool = False):
 def forward(seed: int, threads: int, batch_size: int) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     run = seed_runs()[seed]
-    C.read_adata = _bm_adata  # the T2.5 forward pass reads the cohort through this helper
-    T25RUN.GROUP_KEYS = {"liver": [KEY], "testis": [KEY]}  # group by the nine harmonised types
+    C.read_adata = _bm_adata  # the forward pass of T2_5_celltype_margin reads the cohort through this helper
+    T25RUN.GROUP_KEYS = {"liver": [KEY], "testis": [KEY]}  # group by the nine harmonized types
     fw = T25RUN.forward_sums(f"bm_s{seed}", COHORT, run, threads, batch_size)
     fw["run"] = np.array(run)
     tmp = OUT / f"fw_s{seed}.tmp.npz"

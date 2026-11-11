@@ -21,7 +21,7 @@ from matplotlib.lines import Line2D
 from analysis.tasks.T8_4_figures import common as cm
 
 REL_COHORTS = ["liv_hmonkey", "liv_hmouse", "liv_4sp", "test_hmouse", "test_3sp"]
-READOUTS = [("spearman_D", "D", "Δα"), ("spearman_S", "S", "count-evidence margin $S_g$"),
+READOUTS = [("spearman_D", "D", "Δα"), ("spearman_S", "S", "count evidence $S_g$"),
             ("spearman_alpha", None, "α")]
 
 def panel_seed_reliability() -> plt.Figure:
@@ -56,6 +56,11 @@ def panel_seed_reliability() -> plt.Figure:
     return fig
 
 
+# Cell types as the liver data sets name them -> the names of the paper (the second line keeps the label column narrow).
+CELL_TYPE_NAME = {"Cholangio": "Cholangiocytes", "fibroblasts": "Fibroblasts", "HsPCs": "hematopoietic stem and\nprogenitor cells",
+                  "B Plasma cells": "B and plasma cells", "NK NKT and T cells": "NK, NKT and T cells"}
+
+
 def panel_celltype_seed_stability() -> plt.Figure:
     st = pd.read_csv(cm.RES / "T2_5" / "seed_stability.csv")
     cohorts = [c for c in ["liv_hmonkey", "liv_hmouse"] if c in set(st.cohort)]
@@ -68,13 +73,13 @@ def panel_celltype_seed_stability() -> plt.Figure:
             ax.plot([v.min(), v.max()], [i, i], color=cm.MUTED, lw=0.8, zorder=2)
             ax.scatter(v, [i] * len(v), s=10, color=cm.STY["S"][0] if w >= 0.10 else "#999999", zorder=3, lw=0)
         ax.set_yticks(range(len(types)))
-        ax.set_yticklabels(["total margin (all cell types)" if t == "(S_g total)" else f"{t} ({w:.2f})"
-                            for t, w in types.items()], fontsize=5.8)
+        ax.set_yticklabels(["total margin (all cell types)" if t == "(S_g total)" else f"{CELL_TYPE_NAME.get(t, t)} ({w:.2f})"
+                            for t, w in types.items()], fontsize=5.8, linespacing=0.95)
         ax.set_ylim(len(types) - 0.5, -0.5)
         ax.axvline(0.9, color=cm.RULE, lw=0.6, ls=(0, (2, 2)))
         ax.set_title(f"{cm.COHORT[c]} (seeds 42, 43, 44)", fontsize=6.5)
     fig.supxlabel("agreement between seeds of a cell type's contribution to $S_g$ (Spearman ρ across genes;\n"
-                  "points: seed pairs; in brackets: cell-type weight; blue: weight at least 0.10)", fontsize=6.2)
+                  "points: seed pairs; in parentheses: cell-type weight; blue: weight at least 0.10)", fontsize=6.2)
     return fig
 
 

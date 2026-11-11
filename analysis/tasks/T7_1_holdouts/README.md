@@ -8,13 +8,12 @@ Downloads the liver disease data sets, checks them against the file lists of GEO
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env`, R for extract_seurat_meta.R |
-| Used in the paper | Supplementary Section C.21.14 (`sssec:rev-disease`) |
+| Used in the paper | Supplementary Section C.21.13 (`sssec:rev-disease`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/T7_1_holdouts/fetch_disease.sh
-    bash analysis/tasks/T7_1_holdouts/fetch_ranged.sh
+    bash analysis/tasks/T7_1_holdouts/fetch_disease.sh $PWD
     python -m analysis.tasks.T7_1_holdouts.verify_downloads
     python -m analysis.tasks.T7_1_holdouts.fix_holdouts
     python -m analysis.tasks.T7_1_holdouts.sample_counts
@@ -29,4 +28,4 @@ Downloads the liver disease data sets, checks them against the file lists of GEO
 
 - `data/analysis/disease/`
 
-**Notes.** holdouts.tsv is the fixed hold-out list.
+**Notes.** holdouts.tsv is the fixed hold-out list. fetch_ranged.sh (download of a large file in chunks) is called by fetch_disease.sh. Downloads are recorded in data/analysis/disease/raw/MANIFEST.tsv (URL, date, sha256).

@@ -20,8 +20,8 @@ Methods (Tier-1 wired end-to-end):
                 SCANVI.from_scvi_model → SCANVI.train.
                 Canonical recipe: scvi-tools harmonization tutorial
                 (https://docs.scvi-tools.org/en/stable/tutorials/notebooks/scrna/harmonization.html).
-                Note: tutorial uses `unlabeled_category="Unknown"`; the
-                prompt's `"UNK"` is overridden in favor of canonical.
+                Note: tutorial uses `unlabeled_category="Unknown"`; it is
+                used here in place of the `"UNK"` first planned.
     sysvi     — scvi.external.SysVI (cross-species VampPrior cVAE,
                 Hrovatin et al. 2023). Now lives in scvi-tools — the
                 standalone `theislab/cross_system_integration` repo is
@@ -35,8 +35,8 @@ Tier-2 (stubs):
 Operational rules (overrides any inferred default):
     - Rule A: CPU only, 5 torch threads. No MPS, no CUDA. Enforced at
       module import via env vars + torch.set_num_threads(5), and at
-      training-call time via `accelerator="cpu"`. Refinement.md's
-      "MPS sequentiality" guidance applies to *Chimera* training; the
+      training-call time via `accelerator="cpu"`. The rule that MPS runs
+      are trained one at a time applies to *Chimera* training; the
       baseline pipeline runs on CPU.
     - Rule B: `max_epochs ≤ 150`, default 100. scANVI two-step's
       `max_epochs_scvi + max_epochs_scanvi ≤ 150` (default 100 + 20).
@@ -595,7 +595,7 @@ def run_scvi(
     `runs/baselines_scvi/<stem>-s<seed>-e<epochs>-nl<n_latent>[-bk_<bk>]`
     cache is therefore reused without retraining.
 
-    Per the prompt's exception note: scVI keeps `max_epochs=100,
+    Exception to the method defaults: scVI keeps `max_epochs=100,
     n_latent=10, n_hidden=128, batch_key=batch (or sample_batch)` to
     stay consistent with what `compare_vs_scvi.py` produces (the Chimera
     iteration loop's E8 gates are calibrated against this).
@@ -743,10 +743,10 @@ def run_scanvi(
     """scvi-tools two-step recipe: SCVI pretrain → SCANVI.from_scvi_model → SCANVI.train.
 
     Reference: scvi-tools harmonization tutorial. Tutorial uses
-    `unlabeled_category="Unknown"` (we follow this — the prompt's `"UNK"`
-    is overridden in favor of the canonical reference, per the prompt's
-    own "trust the canonical reference, surface the conflict in a comment"
-    rule). All cells in our datasets are labeled, so the placeholder is
+    `unlabeled_category="Unknown"` (we follow this in place of the `"UNK"`
+    first planned: where the design of the baselines and a canonical
+    reference differ, the reference is followed and the difference is
+    stated in a comment). All cells in our datasets are labeled, so the placeholder is
     a no-op category.
 
     Cap (Rule B): pretrain ≤ 100, head ≤ 30; sum ≤ 150. Defaults are
@@ -865,7 +865,7 @@ def run_sysvi(
     theislab/cross_system_integration repo is unmaintained per the
     Theislab team.
 
-    Routing (per prompt §Covariate routing):
+    Routing of covariates:
       - SysVI's `batch_key` is the "system" to mix → species_key.
       - SysVI's `categorical_covariate_keys` is the within-system batch
         to correct → [batch_key], BUT only when batch_key actually
@@ -977,10 +977,9 @@ def run_camex(
     adata_path: Path, **_unused: Any
 ) -> Tuple[Path, Path]:
     raise NotImplementedError(
-        "CAMEX baseline is not wired in this runner. Gating step: clone "
-        "CAMEX from its source repository and document its preprocessing + "
-        "training entry-point in `chimera-private/baselines_prompt.md` Tier-2 "
-        "section. Until that is done, this stub deliberately raises so the "
+        "CAMEX baseline is not wired in this runner: CAMEX is run in its own "
+        "environment by `analysis/tasks/T5_3_runs` (see `analysis/README.md`). "
+        "This stub deliberately raises so the "
         "matrix records `FAILED` for camex rather than silently skipping."
     )
 
@@ -993,9 +992,8 @@ def run_saturn(
         "snap-stanford/SATURN and precompute ESM-2 protein embeddings per "
         "species. SATURN expects per-species adatas + species-specific protein "
         "embedding files, which is incompatible with our concatenated "
-        "cross-species adata layout. Document the split + embedding pipeline "
-        "in `chimera-private/baselines_prompt.md` Tier-2 before stubbing this "
-        "out."
+        "cross-species adata layout. SATURN is run in its own environment by "
+        "`analysis/tasks/T5_3_runs` (see `analysis/README.md`)."
     )
 
 

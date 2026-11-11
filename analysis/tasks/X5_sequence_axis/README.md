@@ -8,7 +8,7 @@ Sets protein identity, dN/dS and other known gene measures beside α, Δα and t
 | Question | Δα as an axis of its own: Is deployment relative to the protein prior separate from protein sequence? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.2 (`sec:axis`); Figure 4g (`fig:dalpha-biology`); Supplementary Figure S13 (`fig:supp-sequence-axis`); Supplementary Figure S14 (`fig:supp-known-measures`); Supplementary Section D.2 (`ssec:er-axis`) |
+| Used in the paper | Section 3.2 (`sec:axis`); Supplementary Figure S12c (`fig:supp-dalpha-sources`); Supplementary Figure S14 (`fig:supp-sequence-axis`); Supplementary Figure S15 (`fig:supp-known-measures`); Supplementary Section D.2 (`ssec:er-axis`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

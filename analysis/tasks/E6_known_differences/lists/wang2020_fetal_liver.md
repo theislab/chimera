@@ -29,6 +29,6 @@ early erythrocyte 0/1, primitive erythrocyte 0/3.
 
 **Circularity.** `no`. This is the authors' own fetal data (human W5–W19, mouse E11.0–E17.5).
 
-**Caveats.** This is FETAL liver (hepatoblasts and the haematopoietic fetal liver), and our cohorts are adult. The statistic is
+**Caveats.** This is FETAL liver (hepatoblasts and the hematopoietic fetal liver), and our cohorts are adult. The statistic is
 species-specific co-expression with a cell-type eigengene, not a mean-expression difference. Treat it as weak, secondary
-evidence for adult liver. The haematopoietic rows (HSC, erythroid, myeloid/lymphoid) could also serve the bone-marrow readouts, with the same fetal caveat.
+evidence for adult liver. The hematopoietic rows (HSC, erythroid, myeloid/lymphoid) could also serve the bone-marrow readouts, with the same fetal caveat.

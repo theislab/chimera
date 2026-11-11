@@ -176,7 +176,9 @@ def _qc_filter(
 def download_camex_pancreas(
     data_dir: Union[str, Path, None] = None,
 ) -> ad.AnnData:
-    """Download / load the CAMEX pancreas dataset (4-6 mammalian species).
+    """Download or load the CAMEX liver bundle (human, macaque, mouse, zebrafish).
+
+    File and function names say "pancreas"; the data are liver (``REPRODUCE.md``, section 5).
 
     Parameters
     ----------
@@ -206,7 +208,7 @@ def download_camex_pancreas(
         _download_gdrive_folder("1rwdjEvWFEFw82a0x2JzMi2jXICbUc5eb", camex_dir)
 
     # --- Locate the dev-dataset tissue directory ---
-    # Round2 spec: CAMEX pancreas (3 species). CAMEX dir structure: analysis/{N}{tissue}/dataset/
+    # CAMEX folder layout: analysis/{N}{tissue}/dataset/
     tissue_dir = None
     for pattern in ["*pancreas*", "*Pancreas*", "*liver*", "*Liver*", "1liver"]:
         hits = [d for d in camex_dir.rglob(pattern) if d.is_dir()]
@@ -921,7 +923,7 @@ def download_and_process_esm2(
     """Download ESM-2 embeddings from SATURN and compute consensus per ortholog group.
 
     For each ortholog group, the consensus embedding is the mean of the per-species
-    ESM-2 embeddings (5120-dimensional, from the ESM-2 3B model).
+    ESM-2 embeddings (5120-dimensional, from the ESM-2 15B model ``esm2_t48_15B_UR50D``).
 
     Parameters
     ----------

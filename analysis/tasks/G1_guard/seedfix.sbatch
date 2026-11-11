@@ -5,7 +5,6 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=03:00:00
-#SBATCH --exclude=cpusrv114
 #SBATCH --output=results/analysis/G1/logs/%x_%j.out
 # G1, seed fix in training/train_and_diagnose.py set_seed(). usage: sbatch seedfix.sbatch <base tree> <fixed tree>. One node, one thread.
 #   base, split pinned to the seed by the harness  vs  fixed, nothing pinned (twice): identical means the fix only seeds the split, and new fits repeat.

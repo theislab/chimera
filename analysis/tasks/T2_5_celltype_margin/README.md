@@ -8,7 +8,7 @@ Splits the count evidence S_g of every gene into contributions of species and ce
 | Question | What the readouts find in liver and testis: Which genes, cell types, pathways and gene classes sit above or below the protein prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.3 (`sec:findings`); Figure 4d (`fig:dalpha-biology`); Supplementary Figure S22 (`fig:supp-celltype-closure`); Supplementary Figure S23 (`fig:supp-celltype-seeds`); Supplementary Section C.21.5 (`sssec:rev-decomposition`) |
+| Used in the paper | Section 3.3 (`sec:findings`); Figure 6c (`fig:validation`); Supplementary Figure S12a (`fig:supp-dalpha-sources`); Supplementary Figure S22 (`fig:supp-celltype-closure`); Supplementary Figure S23 (`fig:supp-celltype-seeds`); Supplementary Section C.21.5 (`sssec:rev-decomposition`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

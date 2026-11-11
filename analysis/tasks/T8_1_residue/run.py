@@ -13,7 +13,7 @@ Two nulls replace a_g and recompute every residue's attention, ``--draws`` times
 
 Statistic per gene: difference of category medians of attn. ``scaled`` divides by the gene's
 median attn (swapped attributions change amplitude); ``unscaled`` is the
-raw difference (the published per-gene test). Across genes: median, fraction > 0, Wilcoxon p.
+raw difference (the per-gene test of the residue figures). Across genes: median, fraction > 0, Wilcoxon p.
 Empirical p: (1 + #null with |stat| >= |obs|) / (1 + draws), two-sided; one-sided in the
 observed direction is also written.
 
@@ -395,7 +395,7 @@ def main():
         s, rnd = pick(k, grp, "gene_swap"), pick(k, grp, "random_direction")
         u = pick(k, grp, "gene_swap", "unscaled")
         lab = labels[k] if grp == "all" else f"{labels[k]}, {names[grp]}"
-        if i == len(prim_rows):
+        if i == len(prim_rows) - 1:  # the rule stands above the first class defined from the data
             body.append(r"  \midrule")
         body.append(f"  {lab} & {s.n_genes} & ${s.observed:+.3f}$ & ${s.null_median:+.3f}$ [${s.null_q025:+.3f}$, ${s.null_q975:+.3f}$] & "
                     f"{100 * s.frac_null_p05_same_sign:.0f}\\% & {fp(s.emp_p_two_sided)} & {fp(rnd.emp_p_two_sided)} & "
@@ -408,16 +408,15 @@ def main():
         r"  \centering",
         r"  \scriptsize",
         r"  \caption[Supplementary table]{Residue-level contrasts against attribution-replacement nulls. Per-residue "
-        r"$|\text{attention}|$ was recomputed with each protein's attribution replaced by another protein's (gene swap, a "
+        r"$|\text{attribution}|$ was recomputed with each protein's attribution replaced by another protein's (gene swap, a "
         f"derangement of the $70$ proteins) or by a random direction of the same norm in the $64$-PC attribution space, "
         f"${draws_tex}$ draws each, fixed seed. Statistic: per-protein difference of category medians divided by the "
-        r"protein's median attention, summarized as the median across proteins. Empirical $p$ is two-sided, "
+        r"protein's median attribution, summarized as the median across proteins. Empirical $p$ is two-sided, "
         r"$(1+\#\{|\text{null}|\ge|\text{observed}|\})/(1+\text{draws})$. ``Swaps $p<0.05$'' is the share of swap draws "
-        r"whose per-gene Wilcoxon test reaches $p<0.05$ with the observed sign. Wilcoxon $p$ is the published per-gene "
-        r"test on unscaled differences. Rows below the second rule use data-defined classes; curated M is the hand-assigned class. "
-        r"Of $R^2_\text{marg}="
-        f"{r2_full:.3f}$, residue-level terms alone give ${r_res:.3f}$ and the protein-level ESM-2 PC fraction alone "
-        f"${r_gene:.3f}$" r".}",
+        r"whose per-gene Wilcoxon test reaches $p<0.05$ with the observed sign. Wilcoxon $p$ is the per-gene "
+        r"test on unscaled differences. The four rows below the rule within the body use classes defined from the data "
+        r"(bins of $\Delta\alpha$ at $\pm0.05$, and the M flag of the ortholog quality rule, \cref{ssec:ortholog-qc}); "
+        r"curated M is the hand-assigned class of candidates for a readout below the prior.}",
         r"  \label{tab:residue-specificity}",
         r"  \setlength{\tabcolsep}{3pt}",
         r"  \begin{tabular}{@{}lrrlrrrr@{}}",

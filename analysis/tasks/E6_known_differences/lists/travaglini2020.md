@@ -25,7 +25,7 @@
    - Evo_Type 2 → `evo_type2_expansion`, direction `divergent`.
    - Evo_Type 3 → `evo_type3_switch`, direction `divergent`.
    - Evo_Type NA means the gene is not expressed in lung. These 4,291 genes were dropped.
-   - Type 2 is labelled `divergent` because its side cannot be recovered. The table has no type-2 gene with Mouse_Spec_Num>0 & Human_Spec_Num=0, yet Supp Table 8 reports about 1,095 "expansion in mouse" genes. The columns may be incomplete or mislabelled.
+   - Type 2 is labeled `divergent` because its side cannot be recovered. The table has no type-2 gene with Mouse_Spec_Num>0 & Human_Spec_Num=0, yet Supp Table 8 reports about 1,095 "expansion in mouse" genes. The columns may be incomplete or mislabeled.
 
 **Counts** (rows / unique genes):
 
@@ -54,4 +54,4 @@ The file has 35 distinct `cell_type` values in total.
 
 **Assumptions.**
 - Cluster pairing, as published, is sometimes many-to-one. For example, human Airway and Vascular Smooth Muscle are both compared with mouse Smooth Muscle, and human CD8 Naive and Memory/Effector T with mouse CD8+ T.
-- The Table 9 classification uses binarised expression ("expressed if the median of non-zero values ..."; see Methods). Its direction labels are a mechanical reading of the count columns.
+- The Table 9 classification uses binarized expression ("expressed if the median of non-zero values ..."; see Methods). Its direction labels are a mechanical reading of the count columns.

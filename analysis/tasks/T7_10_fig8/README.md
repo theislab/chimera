@@ -8,7 +8,7 @@ Draws the panels of the disease figure from the result tables of the kidney, isl
 | Question | Disease: Which human disease responses does a mouse model reproduce, and where do drug targets and disease genes sit? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Figure 7 (`fig:disease`) |
+| Used in the paper | Supplementary Figure S59 (`fig:disease`) |
 | How we know | a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
@@ -20,4 +20,4 @@ Draws the panels of the disease figure from the result tables of the kidney, isl
 - `results/analysis/T7_10/`: bundle `analysis_results`
 - `figures/panels/`: tracked in git
 
-**Notes.** The folder name keeps an earlier figure number; the figure is fig:disease.
+**Notes.** Folder and script names keep an earlier figure number (fig8_disease.py); the figure is fig:disease, a supplementary figure.

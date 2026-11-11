@@ -8,7 +8,7 @@ Testis: genes grouped by the stage in which they peak, their Δα and count evid
 | Question | What the readouts find in liver and testis: Which genes, cell types, pathways and gene classes sit above or below the protein prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.3 (`sec:findings`); Supplementary Section C.21.12 (`sssec:rev-exploratory`) |
+| Used in the paper | Section 3.3 (`sec:findings`); Supplementary Section C.21.11 (`sssec:rev-exploratory`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

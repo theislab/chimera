@@ -43,9 +43,9 @@ Unique genes by tissue group (non-conserved sets only):
 | Muscle | 696 | 636 |
 | Testes | 254 | 832 |
 
-**Circularity: yes.** Supp Table 4 lists the data: human = Tabula Sapiens (lung, bone marrow, spleen, liver, muscle), lemur = Tabula Microcebus, mouse = Tabula Muris Senis. This is the same data family as our bone marrow, lung and liver cohorts. The liver rows are TS-vs-TMS based, which the brief says is already used as a gold standard.
+**Circularity: yes.** Supp Table 4 lists the data: human = Tabula Sapiens (lung, bone marrow, spleen, liver, muscle), lemur = Tabula Microcebus, mouse = Tabula Muris Senis. This is the same data family as our bone marrow, lung and liver cohorts. The liver rows are TS-vs-TMS based, a comparison that is already used as an independent reference (`analysis/tasks/T4_1_gold`).
 
-Testes rows use Shami et al. (human/macaque) and Ernst et al. (mouse), so they are marked `circular=no`. Testes is not one of our E6 cohorts.
+Testes rows use Shami et al. (human/macaque) and Ernst et al. (mouse), so they are marked `circular=no`. Testes is not one of the cohorts of this task.
 
 **Assumptions.**
 - "Marrow & Spleen" pools the bone marrow and spleen datasets, as the paper does.

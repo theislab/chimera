@@ -120,7 +120,7 @@ def pretraining_checks(adata: ad.AnnData) -> dict:
     informative = total_expr >= median_expr
     r, _ = spearmanr(conservation_prior[informative], similarity[informative])
     # E1.1 is a signal-presence check for the PRIMARY GIN input (conservation_prior).
-    # Three regimes per round2 (critical_reexamination §96):
+    # Three regimes:
     #   (a) r >= 0.02 ................  prior carries expression signal -> strong pass
     #   (b) |r| < 0.15  ..............  prior carries ~no signal -> OK, GIN falls back
     #                                    to ESM-2 and expression features (which are
@@ -690,7 +690,7 @@ def train_and_diagnose(
         with torch.no_grad():
             model.module.pseudo_inputs.data.copy_(X_init_t)
 
-    # --- Optional: GIN feature-space ablation patch (round2 §1526 & Issue 15.3).
+    # --- Optional: GIN feature-space ablation patch.
     # Applied *after* from_config (which already builds the standard feature
     # matrix from varm['gene_features']) and *before* training. StandardScaler
     # has already been applied upstream, so zeroing a column is equivalent to

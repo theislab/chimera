@@ -128,7 +128,7 @@ def run_alpha_analysis(model, adata, dataset_name="camex_pancreas"):
     }
 
     # === Experiment D: Residualized delta_alpha (confound control) ===
-    # Residualize against 5 confounds (ortholog_aware_integration_guide_initial.md "Confound control")
+    # Confound control: residualize against 5 confounds
     X = adata.X.toarray() if hasattr(adata.X, 'toarray') else np.array(adata.X)
     mean_expr = X.mean(axis=0)                          # (G,)
     var_expr = X.var(axis=0)                             # (G,)

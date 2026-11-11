@@ -8,7 +8,7 @@ Specificity control of the residue-level attribution: the same contrasts recompu
 | Question | Protein space: Is the residue-level attribution specific? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.9 (`sec:protein`); Supplementary Table S25 (`tab:residue-specificity`); Supplementary Section D.15 (`ssec:er-residue`); Supplementary Section C.21.13 (`sssec:rev-residue`) |
+| Used in the paper | Section 3.6 (`sec:protein`); Supplementary Table S26 (`tab:residue-specificity`); Supplementary Section D.16 (`ssec:er-residue`); Supplementary Section C.15.8 (`sssec:rev-residue`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

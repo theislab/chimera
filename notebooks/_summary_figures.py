@@ -787,7 +787,7 @@ def render_B4_logo_summary(
         line, with the worst-case gene labelled.
     B.  Top-10 most-influential gene removals (smallest $-\\log_{10}p$
         ⇒ removing this gene weakens the headline most), as a small
-        bar chart.  This is the panel a reviewer asking "which
+        bar chart.  This is the panel a reader asking "which
         single gene drives the result?" actually wants to see.
     """
     df = logo_df.dropna(subset=["p"]).copy()

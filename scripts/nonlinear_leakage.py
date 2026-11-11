@@ -5,8 +5,6 @@ information that the shallow adversarial classifier (z_dim -> 32 -> K)
 cannot catch.  This is the safety net for the v2.4 bidirectional
 delta_alpha scientific claim.
 
-Round2: critical_reexamination_modules.md, Component 11 Caveat 34.
-
 Relationship to Task 8.6 z-leakage diagnostics:
   - nonlinear_z_leakage_check (Task 8.6, MUST-RUN): sklearn MLP, 5-fold CV,
     quick (~30s). Use for routine checks.

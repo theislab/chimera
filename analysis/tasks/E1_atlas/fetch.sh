@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# E1: fetch GO-slim and the Reactome hierarchy. Hallmark and Reactome gene sets are T6.1's (data/analysis/functional).
+# Fetch GO-slim and the Reactome hierarchy. Hallmark and Reactome gene sets: T6_1_functional (data/analysis/functional).
 # Run from chimera/: bash analysis/tasks/E1_atlas/fetch.sh ; writes data/analysis/E1/ and MANIFEST.tsv (url, UTC date, bytes, sha256).
 set -euo pipefail
 D=data/analysis/E1

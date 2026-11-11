@@ -12,6 +12,8 @@ as in sections A, B, C.1, C.2 and F of ``notebooks/_gin_attention_overall_builde
     supp_gin_method_consensus/     consensus_bars, consensus_heatmap
     supp_gin_orthogonality/        r2_components_from_expression, delta_alpha_inputs_zeroed
     supp_gin_per_pc/               ig_by_component, spearman_by_component, component_rank1, component_rank2, component_rank3
+    supp_gin_inputs_controls/      contributions (the correction from the ESM-2 components alone against the correction from
+                                   the expression inputs alone, gene by gene; section C.3 of the same builder)
 
 ``ig_completeness`` states a bound on the largest completeness error of integrated gradients (below 1e-5). The error
 itself is a rounding-level quantity of single-precision arithmetic (about 3e-06) whose last digits depend on the
@@ -40,7 +42,7 @@ INPUT = [f"PC{i:02d}" for i in range(64)] + SINGLE
 GROUP = {"ESM-2 PCs": np.arange(0, 64), "esm2_intersp_var": np.array([64]), "mean_identity": np.array([65]),
          "expression": np.array([66, 67, 68]), "identity_spread": np.array([69, 70, 71])}
 METHOD = ("weight path", "gradient × input", "integrated gradients", "ablation")
-METHOD_COLOR = ("#CCCCCC", "#56B4E9", "#0072B2", "#D55E00")      # as in the first version of the figure
+METHOD_COLOR = ("#D2D2D2", "#A6A6A6", "#737373", "#333333")      # grays: the hues are kept for the input groups of the other panels
 ZEROED_COLOR = {"ESM-2 PCs": "#0072B2", "expression": "#D55E00"}   # Δα with this input group set to zero, as in the first version
 THRESHOLD_COLOR = "#D55E00"    # the line at R2 = 0.05
 INPUT_SET = {"expression-only": "expression only", "scalars-only": "8 single-number inputs", "ESM-2-only": "ESM-2 components only",
@@ -377,7 +379,7 @@ def attribution_suite() -> list:
     ax.set_ylabel("$f(\\mathbf{x}) - f(\\mathbf{0})$, change of the correction")
     if not a.completeness_error < COMPLETENESS_BOUND:
         raise SystemExit(f"integrated gradients: max |error| = {a.completeness_error:.2e} is not below {COMPLETENESS_BOUND:g}")
-    fd.annotate_stat(ax, "max |error| < 1e-5", "lower right")
+    fd.annotate_stat(ax, "max |error| < 10⁻⁵", "lower right")
     ax.texts[-1].set_fontsize(C.SIZE["text"])
     ax.set_title("integrated gradients")
     out.append(_save(fig, family, "ig_completeness"))
@@ -541,8 +543,80 @@ def per_component() -> list:
     return out
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# supp_gin_inputs_controls, panel b: what the protein-language inputs and the expression inputs each contribute
+# ---------------------------------------------------------------------------------------------------------------------
+CONTRIBUTIONS_SIZE = (211.6, 163.9)   # bp: beside the panel of the attribution shares (267.4 x 163.9) and a gap of 7 bp it fills the text width
+# Spearman correlations of the first rendering of this panel (notebook 09, section C.3), three decimals: the two
+# contributions with each other, each with the full correction. The panel stops if the stored network gives others.
+STORED_CONTRIBUTION_RHO = (0.000, 0.592, 0.675)
+
+
+def inputs_contributions() -> list:
+    """Panel ``supp_gin_inputs_controls/contributions``: for every gene, the correction the gate network gives when only
+    the ESM-2 components are kept (x) against the correction when only the expression inputs are kept (y), colored by Δα.
+
+    What it draws. One dot per gene of the four-species liver run. "Only kept" means that every other input is set to
+    zero, its mean (the inputs are standardized), and the stored network is evaluated once: these are responses of the
+    network under controlled inputs, not attributions. The two responses are unrelated across genes, and each follows
+    the full correction; the three Spearman correlations stand above the axes, clear of the dots.
+
+    Reads what ``gate()`` reads: ``model/model.pt`` (the weights of the gate network), ``final_state.npz`` (correction,
+    prior, α) and ``varm["gene_features"]`` of the data object. Two evaluations of the stored network and three rank
+    correlations are computed, as in section C.3 of ``notebooks/_gin_attention_overall_builder.py``; the correlations
+    must equal those of the first rendering of the panel (``STORED_CONTRIBUTION_RHO``). Nothing is trained.
+
+        python -m figures.redraw.gate_network inputs_contributions     # in chimera_env, from the repository root
+    """
+    import matplotlib as mpl
+    import torch
+    from scipy import stats
+
+    _style()
+    g = gate()
+
+    def only(index: np.ndarray) -> np.ndarray:
+        kept = np.zeros_like(g.x)
+        kept[:, index] = g.x[:, index]
+        with torch.no_grad():
+            return g.net(torch.from_numpy(kept)).numpy()
+
+    esm, expression = only(GROUP["ESM-2 PCs"]), only(GROUP["expression"])
+    rho = (float(stats.spearmanr(esm, expression).correlation), float(stats.spearmanr(esm, g.correction).correlation),
+           float(stats.spearmanr(expression, g.correction).correlation))
+    if tuple(abs(round(v, 3)) if round(v, 3) == 0 else round(v, 3) for v in rho) != STORED_CONTRIBUTION_RHO:
+        raise SystemExit(f"inputs_contributions: Spearman correlations {[round(v, 4) for v in rho]}; the first rendering printed {STORED_CONTRIBUTION_RHO}")
+
+    def printed(v: float) -> str:   # three decimals, signed; a value that rounds to zero carries no sign
+        return "0.000" if round(v, 3) == 0 else _signed(v)
+
+    width, height = CONTRIBUTIONS_SIZE
+    side, left, bottom = 108.0, 37.0, 25.0
+    fig, ax = _page(width, height, left=left, right=width - left - side, top=height - bottom - side, bottom=bottom)
+    sc = ax.scatter(esm, expression, c=g.delta_alpha, cmap="RdBu_r", vmin=-0.2, vmax=0.2, s=1.6, alpha=0.7, linewidths=0, rasterized=True)
+    ax.axhline(0, color="#888888", linewidth=0.6, linestyle="--")
+    ax.axvline(0, color="#888888", linewidth=0.6, linestyle="--")
+    ax.set_xlabel("ESM-2-only correction contribution", fontsize=C.SIZE["tick"])
+    ax.set_ylabel("expression-only correction contribution", fontsize=C.SIZE["tick"])
+    cax = fig.add_axes([(left + side + 9.0) / width, (bottom + 14.0) / height, 5.0 / width, (side - 28.0) / height])
+    cb = fig.colorbar(sc, cax=cax)
+    cb.set_ticks([-0.2, -0.1, 0.0, 0.1, 0.2])
+    cb.set_ticklabels(["−0.2", "−0.1", "0", "+0.1", "+0.2"])
+    cb.ax.tick_params(labelsize=C.SIZE["text"], length=2.0, pad=1.5)
+    cb.outline.set_linewidth(0.4)
+    cb.set_label("Δα", fontsize=C.SIZE["tick"], labelpad=2.0)
+    cb.solids.set(alpha=1.0)
+    lines = (f"Spearman ρ of the two contributions: {printed(rho[0])}", f"ESM-2 only against the full correction: {printed(rho[1])}",
+             f"expression only against the full correction: {printed(rho[2])}")
+    for k, line in enumerate(lines):   # above the axes: never on a dot
+        fig.text(left / width, (bottom + side + 4.5 + (len(lines) - 1 - k) * 7.2) / height, line, ha="left", va="bottom", fontsize=C.SIZE["text"], color=C.INK)
+    print(f"inputs_contributions: {len(esm):,} genes; Spearman {[round(v, 4) for v in rho]}")
+    with mpl.rc_context({"savefig.dpi": 600}):
+        return [_save(fig, "supp_gin_inputs_controls", "contributions")]
+
+
 PANELS = {"linear_baseline": linear_baseline, "attribution_suite": attribution_suite, "method_consensus": method_consensus,
-          "orthogonality": orthogonality, "per_component": per_component}
+          "orthogonality": orthogonality, "per_component": per_component, "inputs_contributions": inputs_contributions}
 
 if __name__ == "__main__":
     for name in sys.argv[1:] or list(PANELS):

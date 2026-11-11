@@ -1,6 +1,6 @@
 """E2: protein-level and gene-architecture properties of deployment (EXPLORATORY). Definitions fixed before any association.
 
-Exploratory throughout; nothing here changes a status, row, modifier or H1/Z4 table. Vocabulary: CHIMERA_MECHANISM.md.
+Exploratory throughout; nothing here changes a status, row, modifier or H1/Z4 table. Vocabulary: that of the paper's Methods.
 Extends Y5 F1 (21 UniProt/Compara/STRING properties, canonical gate, three cohorts) to all 26 harmonised cohorts, both gates and
 new properties. Y5's annotation table (results/analysis/Y5/annot.parquet) is reused for the properties it already defines.
 

@@ -11,7 +11,8 @@ cohort's ortholog table (through ``notebooks/_paper_utils.py``) and the broad ca
 their order (median Δα) and all statistics follow sections A.1 and A.3 of ``notebooks/_alpha_biology_simpler_builder.py``.
 The panels have the layout, type sizes and marks of ``figures/redraw/categories.py``. The liver box plot has the Δα axis of
 every Δα panel, and a row with genes beyond it carries a mark at the edge; the testis box plot has a narrower axis
-(``AXIS``), because the values of that model span a small range; it holds every gene of the ten categories. The four panels
+(``AXIS`` of ``figures/redraw/categories.py``), because the values of that model span a small range; it holds every gene
+of the ten categories. The four panels
 share their column widths and the two heat maps their color range, so the axes of the two cohorts stand under each
 other; they are composed with ``X(...)``.
 
@@ -27,6 +28,7 @@ import pandas as pd
 
 from figures.redraw import _common as C
 from figures.redraw.categories import (
+    AXIS,
     BOTTOM,
     CELL,
     D_OFFSET,
@@ -46,7 +48,6 @@ from figures.redraw.categories import (
 
 FIGURE = "supp_categories_broad"
 COHORTS = {"liver_4sp": "liver", "testis_hmac": "testis"}      # cohort -> prefix of its two panels
-AXIS = {"testis_hmac": ((-0.10, 0.20), (-0.1, 0.0, 0.1, 0.2))}  # cohort -> limits and ticks of its Δα axis, where not the house axis
 
 
 @cache

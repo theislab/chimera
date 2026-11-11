@@ -1,10 +1,10 @@
-"""X8 step 1: per-cohort gap tables, seed noise, calls, calibration null, covariates, ESM-2 neighbourhoods and sequence constraint.
+"""Step 1: per-cohort gap tables, seed noise, calls, calibration null, covariates, ESM-2 neighborhoods and sequence constraint.
 
     PYTHONPATH=$PWD python -m analysis.tasks.X8_gate_divergence.gap [--jobs 8]
 Inputs: results/analysis/Z4/h1/genes/<c>.parquet (per-gene gate), results/analysis/H1/genes/<c>.parquet (canonical gate), the cohort's
 training object (64 ESM-2 PCs in varm['gene_features']).
 Outputs in results/analysis/X8/: genes/<c>.parquet, cohort_gap.csv, calibration.csv, covariates.csv, neighbours.csv, sequence.csv,
-cache/esm__<c>.parquet (PCs and T4.3 Leiden modules of the cohort's genes).
+cache/esm__<c>.parquet (PCs and Leiden modules, as in analysis/tasks/T4_3_scoreboard, of the cohort's genes).
 """
 
 from __future__ import annotations
@@ -165,7 +165,7 @@ def gap_table(c: str) -> tuple[pd.DataFrame, dict]:
     f, k = universe(c)
     Zf, df_ = seed_z(f)
     Zc, dc_ = seed_z(k)
-    zf, zc = Zf.mean(1), Zc.mean(1)  # equal weight per seed (amendment 1)
+    zf, zc = Zf.mean(1), Zc.mean(1)  # equal weight per seed (Amendment 1 in rules.py)
     e = f.expr.to_numpy(float)
     dec = decile(e)
     G = gap_stats(Zf, Zc, dec, borrowed_prior(RU.BORROW[c]) if Zc.shape[1] < 2 else None)
@@ -220,7 +220,7 @@ def calibration(c: str, gate: str, rng) -> list[dict]:
     return rows
 
 
-# ---------------------------------------------------------------- covariates, neighbourhoods, sequence
+# ---------------------------------------------------------------- covariates, neighborhoods, sequence
 
 
 def covariates(t: pd.DataFrame) -> list[dict]:
@@ -248,7 +248,7 @@ def delta_res(t: pd.DataFrame) -> np.ndarray:
 
 
 def esm(c: str) -> pd.DataFrame:
-    """64 ESM PCs and T4.3 Leiden modules of every gene of the cohort's object (cached)."""
+    """64 ESM PCs and Leiden modules (as in T4_3_scoreboard) of every gene of the cohort's object (cached)."""
     import anndata as ad
 
     from analysis.tasks.T4_3_scoreboard import inputs as I
@@ -285,7 +285,7 @@ def neighbours(c: str, t: pd.DataFrame, rng) -> tuple[pd.DataFrame, dict]:
     dec = decile(t.expr.to_numpy(float))
     bydec = [np.flatnonzero(dec == d) for d in range(RU.EXPR_DECILES)]
     null, null_c, null_n = [], [], []
-    for _ in range(RU.N_NULL_NBR):  # random neighbours of the same expression decile
+    for _ in range(RU.N_NULL_NBR):  # random neighbors of the same expression decile
         R = np.empty_like(idx)
         for d, mem in enumerate(bydec):
             w = np.flatnonzero(dec == d)

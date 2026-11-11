@@ -28,7 +28,7 @@ Builds the species subsets of the eye cohort (Human+Mouse, Human+M. mulatta, pri
 
 - `training/runs/`
 
-**Notes.** README.md states grids and rule.
+**Notes.** README.md states grids and rule. The recipes of Human+Pig and Human+M. fascicularis, which this grid did not settle, come from Z1_retune.
 <!-- glance:end -->
 
 Amendment log of the pre-specified analysis plan (2026-11-02): beside the full five-species cohort (`T11_2_recipe`), five

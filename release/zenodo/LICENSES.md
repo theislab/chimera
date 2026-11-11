@@ -3,13 +3,15 @@
 Rule applied: redistribute only processed derivatives of sources with an open license or no use
 restriction, always with attribution; link (do not redistribute) where the license is unstated or
 unclear; never redistribute raw downloads that the source itself serves. Every linked download
-has a `MANIFEST.tsv` (URL, date, sha256) in `data/analysis/**` (deposited in the bundle
-`data_other_cohorts`). "To verify" marks a license that was not confirmed from the source page.
+has a manifest (`MANIFEST*.tsv`: URL, date, sha256) in `data/analysis/**` (deposited in the bundle
+`data_other_cohorts`); the files that the data preparation of liver and testis downloads (CAMEX files,
+SATURN protein embeddings, eye count matrices) are listed in `data/raw/MANIFEST.tsv` (bundle
+`data_liver_testis`). "To verify" marks a license that was not confirmed from the source page.
 Bundle names in the last column are those of `release/zenodo/bundles.yaml` in the code repository.
 
 | Source | Used for | License / terms | In the deposit |
 |---|---|---|---|
-| CAMEX processed bundle, figshare doi:10.6084/m9.figshare.31131808.v1 (Guo, Huang, Zhang 2026) | Raw liver and testis matrices of the 7 canonical cohorts | MIT (figshare record) | Processed h5ad only (`data_liver_testis`); raw bundle linked |
+| CAMEX processed bundle (Guo, Huang, Zhang 2026), archived at figshare doi:10.6084/m9.figshare.31131808.v1; the data preparation downloads it from the CAMEX authors' Google Drive folder (folder id in `chimera/_data_utils.py`) | Raw liver and testis matrices of the 7 canonical cohorts | MIT (figshare record) | Processed h5ad only (`data_liver_testis`); raw bundle linked, each downloaded file with its figshare address, size, MD5 and sha256 in `data/raw/MANIFEST.tsv` (the files are byte-identical in both places) |
 | Guilliams et al. 2022, GEO GSE192742 | Liver human, macaque, mouse (via CAMEX); mouse SD/WD diet series | GEO: NCBI places no restriction on use; submitters may hold rights (attribution) | Processed objects, pseudobulks, obs with re-annotation; raw linked |
 | Wang et al. 2023, GEO GSE198832 | Liver zebrafish (via CAMEX) | GEO terms as above | Processed only |
 | Murat et al. 2023, ArrayExpress E-MTAB-11063/-11068/-11071 | Testis cohorts; held-out species (H4 gold) | EMBL-EBI terms of use, freely available (attribution) | Processed only; derived H4 per-gene values in results |
@@ -19,7 +21,7 @@ Bundle names in the last column are those of `release/zenodo/bundles.yaml` in th
 | Human islet 48-donor atlas, Hrovatin mouse islet (CELLxGENE) | Islet T2D case | CC BY 4.0 (CELLxGENE Discover) | Healthy training object, pseudobulks, obs; raw linked |
 | GSE202379 (Gribben 2024), GSE135251, GSE136103, GSE129516 (GEO) | Liver MASH, bulk direction, second contrast | GEO terms as above | Pseudobulks, author metadata table (`disease/meta`); raw linked |
 | Shay et al. 2013, GEO GSE24759, GSE15907 | Bone-marrow COE gold | GEO terms as above | Recomputed COE table; portal cross-check not deposited |
-| SATURN ESM-2 protein embeddings (`esm2_t48_15B_UR50D`, snap.stanford.edu) | Gene features | Code MIT; data license not stated | **Not redistributed**; derived GIN features inside the h5ad files |
+| SATURN ESM-2 protein embeddings (`esm2_t48_15B_UR50D`, snap.stanford.edu) | Gene features | Code MIT; data license not stated | **Not redistributed**; derived GIN features inside the h5ad files; the downloaded archive is listed in `data/raw/MANIFEST.tsv` |
 | EVEE evolutionary statistics (Chen et al. 2019, Broad portal, Wayback copy) | H1, H2 gold | **License unstated** | **Not redistributed**: per-gene EVEE columns (`G_H1`, `G_H2`, `evee_mean_*`) dropped from every deposited table (`scrubbed.tsv`); summary statistics and correlations kept; link in `data/analysis/gold/G1/MANIFEST.tsv` |
 | Ensembl 99-110 (BioMart, Compara, GTF, CDS, REST) | Ortholog tables, prior, dN/dS, CDS covariates, sequences | No restrictions | Ortholog tables and derived values; dumps linked |
 | gnomAD v4.1 constraint | LOEUF gold | ODbL 1.0 per gnomAD (to verify) | Per-gene LOEUF in derived gold tables (attribution); raw linked |
@@ -31,7 +33,7 @@ Bundle names in the last column are those of `release/zenodo/bundles.yaml` in th
 | Enrichr libraries (MSigDB Hallmark 2020, Reactome 2024) | Gene sets | Enrichr free use; MSigDB terms (to verify) | GSEA results only; libraries linked |
 | HGNC, GO (goa_human, go-basic) | Gene groups, V3 set | HGNC free use; GO CC BY 4.0 | Set memberships in derived tables; raw linked |
 | HuRI, CollecTRI (OmniPath), Skinnider 2021, Lambert 2018, Housekeeping (Eisenberg), Cippà 2018, Gharahkhani 2021, Hagai 2018 | Functional layer, sets, anchors | Unverified / per-resource / article supplements | Derived statistics only; raw linked |
-| Bakken et al. 2021 (M1), Ma et al. 2022 (DLPFC), SEA-AD MTG; Travaglini 2020, Tabula Microcebus, Tabula Muris Senis lung; Kedlian 2024 muscle (all CELLxGENE Discover) | Cortex, lung, skeletal-muscle cohorts; held-out MTG; Alzheimer transfer | CC BY 4.0 (CELLxGENE Discover) | Training objects, ortholog tables, scalers (`data_other_cohorts`, `data/analysis/new_usecases/c1_build/objects`); raw linked (`MANIFEST_C1.tsv`, `MANIFEST.tsv`) |
+| Bakken et al. 2021 (M1), Ma et al. 2022 (DLPFC), SEA-AD MTG; Travaglini 2020, Tabula Microcebus, Tabula Muris Senis lung; Kedlian 2024 muscle (all CELLxGENE Discover) | Cortex, lung, skeletal-muscle cohorts; held-out MTG; Alzheimer transfer | CC BY 4.0 (CELLxGENE Discover) | Training objects, ortholog tables, scalers (`data_other_cohorts`, `data/analysis/new_usecases/c1_build/objects`); raw linked (`data/analysis/new_usecases/MANIFEST_SHA256.tsv`) |
 | Zilionis et al. 2019 GEO GSE127465; lung fibrosis GSE135893, GSE141259; 5xFAD GSE140511 (GEO) | Tumor myeloid cohort; disease transfers | GEO terms as above | Tumor training object; disease DE summaries in results; raw linked |
 | ESM-2 embeddings computed in SATURN format for chimpanzee and marmoset (`data/analysis/new_usecases/esm`), with the model cache | Gene features of the DLPFC cohorts | Derived from ESM-2 (model MIT); treated as the SATURN embeddings | **Not redistributed**; derived GIN features inside the h5ad files |
 | Ensembl 98, 110, 116 GTF and Compara homologies; Ensembl Compara extracts of the ortholog audit | Identifier-joined objects (O1), cohort ortholog checks | No restrictions | Identifier-joined objects and their column logs (`data_identifier_joined`); dumps linked |

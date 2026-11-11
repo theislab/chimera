@@ -36,7 +36,9 @@ A run folder `training/runs/<name>/` holds:
 
 ## Files
 
-**Used by a training run or by the analyses**
+Two groups: the current code, and the record of the period in which the recipes were tuned.
+
+**Current: training, checks and diagnostics of a run, baselines** (used by training runs and by the analyses)
 
 | File | Role |
 |---|---|
@@ -44,19 +46,19 @@ A run folder `training/runs/<name>/` holds:
 | `train_and_diagnose.py` | trains one model and writes the run folder |
 | `check_expectations.py` | evaluates the training expectations (E1 to E9, defined in `workflow.md`, "Pre-registered expectations") on a run |
 | `compare_vs_scvi.py` | integration scorecard of a run against scVI on the same cells; its metric functions are used by the analyses |
-| `baseline_runner.py`, `run_all_baselines.py` | train or load the integration baselines (scVI, scANVI, sysVI, Harmony, PCA, SATURN, CAMEX) for one data set, and for the whole matrix |
+| `baseline_runner.py`, `run_all_baselines.py` | train the integration baselines PCA, Harmony, scVI, scANVI and sysVI for one data set, and for the whole matrix of the seven liver and testis cohorts (`notebooks/02_baselines.ipynb`); each latent goes to `training/runs/baselines_<method>/`. The runner names SATURN and CAMEX but does not run them: their runs are `analysis/tasks/T5_3_runs`, which writes latents in the same format |
 | `build_subset.py` | builds a species subset of a multi-species object |
 | `cross_seed_check.py` | agreement of α across seeds of one recipe |
 | `summarize_runs.py` | one comparison table over the runs in `training/runs/` |
 | `plot_diagnostics.py`, `umap_check.py`, `z_leakage_probe.py`, `gin_signed_diagnostics.py`, `quick_adv_trajectory.py` | diagnostics of one run: training curves, UMAP, species information left in the latent, the gate network's correction, the adversary's trajectory |
 
-**Record of the model's development** (kept as they were run; not needed for any result)
+**Record of the model's development** (kept as they were run; not needed for any result; nothing current calls them)
 
 | File | What it was for | State |
 |---|---|---|
 | `workflow.md` | the tuning protocol: expectations, operating rules, lessons per iteration | text |
 | `iteration_log.md` | one entry per tuning iteration: change, outcome, decision | text |
-| `workflow-best.md` | registry of the best-known recipe per training scenario, with its metrics | text |
+| `workflow-best.md` | registry of the best-known recipe per training scenario during tuning, with its metrics; the recipes of the paper are `configs/canonical_recipes.tsv` | text |
 | `run_xds_sweep.sh` | one early recipe on every Human+other subset | runs as written only on Apple MPS (`--accelerator mps`); `PYTHON` selects the interpreter |
 | `run_gin_input_sweep.sh` | four runs with blocks of gate-network inputs zeroed | as above |
 | `compare_gin_ablation.py` | table over the four runs of the sweep above | needs those runs |

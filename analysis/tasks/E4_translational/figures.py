@@ -2,7 +2,8 @@
 through figures/style.py to figures/panels/<figure>/; reads the result tables of results/analysis/E4 only.
 
 Every panel is drawn at its size on the page and saved at that exact size, so the figures compose at scale 1:
-supp_disease_genes (heat, partial, q1) and supp_drug_targets (targets).
+supp_disease_genes (heat, partial, q1) and the main figure on drug targets, main_drug_targets (targets; the panel
+file is figures/panels/supp_drug_targets/targets.pdf).
 
     PYTHONPATH=$PWD python -m analysis.tasks.E4_translational.figures [panel ...]     # every panel, or the named ones, from the cached tables (draw_panels)
     CHIMERA_FIGURES_OUT=<folder> ... the same command                                  # dry run: panels under <folder>/panels
@@ -85,7 +86,11 @@ def p_heat():
             j = TIS.index(own)
             cc = C[(C.set == k) & (C.readout == r_)]
             hit = len(cc) and (cc.q.iloc[0] < 0.05) and (cc.contrast.iloc[0] > 0)
-            ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, lw=1.0 if hit else 0.5, ec=INK, ls="-" if hit else ":"))
+            # as in the figure of programs by tissue: solid where the own tissue stands above the others, dashed otherwise,
+            # on a white line that keeps the outline visible on dark cells
+            lw = 1.1 if hit else 0.7
+            ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, lw=lw + 0.9, ec="white", clip_on=False))
+            ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, lw=lw, ec=INK, ls="-" if hit else (0, (2, 1.3)), clip_on=False))
         ax.set_xticks(range(nc))
         ax.set_xticklabels([TISSUE_NAME[x] for x in TIS], fontsize=S_TICK, rotation=90, ha="center", va="bottom")
         ax.xaxis.tick_top()
@@ -151,19 +156,63 @@ EXAMPLES = {
     "kidney": {"SERPING1": (14, 4.5), "SLC22A12": (38, 3.75), "SLC9A3": (66, 4.5), "SCNN1G": (74, 3.75)},
 }
 Y_LIM = 4.95  # holds every gene (normal scores reach 3.92) and the two label bands
+# Approved targets above and below the prior under both gates, and the numbers expected from genes of equal identity and
+# expression, over the nine models with human and mouse together, as the text gives them.
+PRINTED_TOTALS = {"above": 284, "exp_above": 181, "below": 58, "exp_below": 90}
+COUNT_LINE = 6.6  # bp: pitch of the two lines of counts between the title of a plot and its axes
+
+
+def target_counts() -> pd.DataFrame:
+    """Per model: the number of approved targets (``n``), how many are called above and below the prior under both gates
+    (``above``, ``below``) and how many are expected from the genes of their strata of identity and expression
+    (``exp_above``, ``exp_below``). Rows of the set ``target:approved`` of ``results/analysis/E4/q23_callshare.csv``.
+
+    Checked before anything is drawn: summed over the nine models with human and mouse, the stored counts are those the
+    text prints (``PRINTED_TOTALS``) and those of the test over all models (``callshare_perm.csv``)."""
+    q = pd.read_csv(RU.OUT / "q23_callshare.csv")
+    q = q[q.set == "target:approved"].set_index("cohort")
+    nine = q.loc[[*RU.HM_THREAD.values(), RU.HM_EXTRA["skeletal muscle"]]]
+    total = {k: int(round(float(nine[k].sum()))) for k in PRINTED_TOTALS}
+    assert total == PRINTED_TOTALS, f"approved targets over the nine models: {total}; the text prints {PRINTED_TOTALS}"
+    pooled = pd.read_csv(RU.OUT / "callshare_perm.csv").set_index("group").loc["approved targets"]
+    assert {k: int(round(float(pooled[k]))) for k in PRINTED_TOTALS} == PRINTED_TOTALS and int(pooled.n) == int(nine.n.sum()), "callshare_perm.csv differs"
+    return q
 
 
 def p_targets():
-    """Approved drug targets on the per-gene gate against the rank of protein identity, four tissues; the approved targets
-    without a call are drawn first and light, the called ones on top."""
+    """The main figure on drug targets (``supp_drug_targets/targets``, 486 x 213 bp; figure key ``main_drug_targets``).
+
+    What it draws. Four plots, one tissue each (bone marrow, cortex, eye, kidney; the models of ``EXAMPLES``). x: the
+    percentile of protein identity among the genes of the model; y: Δα with the per-gene gate as a normal score. Light
+    gray dots: every gene with count evidence. On top, the targets of approved drugs: vermilion, above the prior under
+    both gates; blue, below under both; gray, no call (drawn first); a diamond, the drug is indicated for a disease of
+    that organ system. The named genes and the places of their names are those of ``EXAMPLES``. Under the title of each
+    plot stand the numbers of approved targets called above and below the prior, each with the number expected from
+    genes of equal identity and expression (``target_counts``): the comparison that the title of the figure states.
+
+    Reads ``results/analysis/E4/tables/cohorts.parquet`` (columns ``cohort``, ``hsapiens_gene_id``, ``symbol``,
+    ``pi_raw``, ``int_free``, ``call``), ``results/analysis/E4/annot/targets.parquet`` (``hsapiens_gene_id``,
+    ``approved``, ``ind_<tissue>``) and, for the printed counts, ``results/analysis/E4/q23_callshare.csv`` and
+    ``callshare_perm.csv``. The only arithmetic is the percentile rank of ``pi_raw`` within a model, for the x axis; the
+    printed counts are stored values, and the panel stops if they are not the counts of the points it draws.
+
+        python -m analysis.tasks.E4_translational.figures supp_drug_targets/targets          # in chimera_env, from the repository root
+    """
     T = pd.read_parquet(RU.OUT / "tables" / "cohorts.parquet")
     tg = pd.read_parquet(RU.OUT / "annot" / "targets.parquet").set_index("hsapiens_gene_id")
     reg = H1.cohorts()
-    fig, axs = plt.subplots(1, 4, figsize=(style.inch(WIDTH), style.inch(200)), sharey=True, layout="constrained")
+    counts = target_counts()
+    fig, axs = plt.subplots(1, 4, figsize=(style.inch(WIDTH), style.inch(200 + 2 * COUNT_LINE)), sharey=True, layout="constrained")
     for ax, (t, names) in zip(axs, EXAMPLES.items()):
         u = T[T.cohort == cohort_of(t)].copy()
         u["pi_pct"] = 100 * u.pi_raw.rank(pct=True)
         a = u[u.hsapiens_gene_id.isin(tg.index[tg.approved])]
+        q = counts.loc[cohort_of(t)]
+        drawn = (len(a), int((a.call == 1).sum()), int((a.call == -1).sum()))
+        assert drawn == (int(q.n), int(q.above), int(q.below)), f"{t}: {drawn} approved targets drawn (all, above, below); stored {int(q.n)}, {int(q.above)}, {int(q.below)}"
+        for k, (word, n_, e_, c_) in enumerate((("below", q.below, q.exp_below, DOWN), ("above", q.above, q.exp_above, UP))):
+            ax.annotate(f"{word}: {int(n_)} target{'' if int(n_) == 1 else 's'} ({e_:.0f} expected)", (0.5, 1), xycoords="axes fraction",
+                        xytext=(0, 2.0 + k * COUNT_LINE), textcoords="offset points", ha="center", va="bottom", fontsize=S_TEXT, color=c_)
         ax.scatter(u.pi_pct, u.int_free, s=0.6, c=CLOUD, lw=0, rasterized=True)
         col = np.where(a.call == 1, UP, np.where(a.call == -1, DOWN, NO_CALL))
         ind = a.hsapiens_gene_id.map(tg[f"ind_{t}"]).fillna(False).to_numpy(bool)
@@ -177,7 +226,7 @@ def p_targets():
             ax.annotate(r.symbol, (r.pi_pct, r.int_free), fontsize=S_TEXT, xytext=names[r.symbol], textcoords="data", ha="center", va="center", zorder=5,
                         color=UP if r.call > 0 else DOWN, arrowprops=dict(arrowstyle="-", lw=0.35, color="#555555", shrinkA=0.5, shrinkB=1.5))
         ax.axhline(0, color=RULE, lw=0.5, zorder=1)
-        ax.set_title(style.cohort_name(reg[cohort_of(t)]["label"]), fontsize=S_TITLE, pad=3)
+        ax.set_title(style.cohort_name(reg[cohort_of(t)]["label"]), fontsize=S_TITLE, pad=3 + 2 * COUNT_LINE)
         ax.set_xlabel("protein identity, percentile", fontsize=S_LABEL)
         ax.set_xticks([0, 25, 50, 75, 100])
         ax.set_xlim(-3, 103)
@@ -191,7 +240,8 @@ def p_targets():
          Line2D([], [], ls="", marker="o", ms=3, color=DOWN, label="approved target, below the prior on both gates"),
          Line2D([], [], ls="", marker="o", ms=3, color=NO_CALL, label="approved target, no call"),
          Line2D([], [], ls="", marker="D", ms=3.2, mfc="white", mec=INK, mew=0.4, label="indicated for this organ system"),
-         Line2D([], [], ls="", marker="o", ms=3, color=CLOUD, label="all genes with count evidence")]
+         Line2D([], [], ls="", marker="o", ms=3, color=CLOUD, label="all genes with count evidence"),
+         Line2D([], [], ls="", marker="", label="expected: from genes of equal identity and expression")]
     fig.legend(handles=h, fontsize=S_TICK, frameon=False, loc="outside upper center", ncol=3, handletextpad=0.3, columnspacing=1.2)
     return save(fig, "supp_drug_targets/targets")
 
@@ -200,7 +250,7 @@ def p_q1():
     """Odds ratio per SD of each readout that the mouse mutant of a human disease gene models the same disease, three outcomes."""
     Q = pd.read_csv(RU.OUT / "q1_concordance.csv")
     Q = Q[~Q.readout.str.startswith("covariate")]
-    groups = [("Y_mgi", False, "all disease genes (MGI)"), ("Y_mgi", True, "organ-matched (MGI)"), ("Y_impc", False, "IMPC Phenodigm")]
+    groups = [("Y_mgi", False, "MGI, all disease genes"), ("Y_mgi", True, "MGI, organ-matched subset"), ("Y_impc", False, "IMPC Phenodigm")]
     rds = ["D_can", "D_free", "S", "B1", "pi_raw"]
     step = len(rds) + 1.9
     fig, ax = plt.subplots(figsize=(style.inch(209), style.inch(ROW_H)), layout="constrained")
@@ -217,8 +267,7 @@ def p_q1():
             ax.plot(x.OR, y, READOUT[r].marker, ms=3.2, mfc=READOUT[r].color if sig else "white", mec=READOUT[r].color, mew=0.6)
         if len(sub):
             ax.plot([1, 1], [gi * step - 0.55, gi * step + len(rds) - 0.45], color=RULE, lw=0.6, zorder=0)
-            noun = "" if "genes" in lab else "genes "
-            ax.text(0.0, gi * step - 1.2, f"{lab}: {int(sub.n_pos.max()):,} of {int(sub.n_genes.max()):,} {noun}modeled in mouse",
+            ax.text(0.0, gi * step - 1.2, f"{lab}: {int(sub.n_pos.max()):,} of {int(sub.n_genes.max()):,} modeled in mouse",
                     fontsize=S_TEXT, ha="left", va="center", color=INK, transform=ax.get_yaxis_transform())
     ax.set_xscale("log")
     ax.set_xlim(0.74, 1.2)  # holds every interval (lowest 0.763, highest 1.168)

@@ -1,5 +1,7 @@
 # Iteration log
 
+> Record of the tuning period (April 2026); it is not maintained. The recipes of the paper are in `configs/canonical_recipes.tsv`. "pancreas" means liver. Design notes named here (`refinement.md`) are not part of the repository.
+
 One row per training iteration. Each row is self-contained: config → key metrics → verdict.
 The authoritative summary per run is `runs/<run-name>/summary.json`; this log is a
 human-readable ledger of the decision chain.
@@ -279,8 +281,8 @@ Changes made during this pass:
   ([`training/train_and_diagnose.py:251-263`](chimera/training/train_and_diagnose.py#L251-L263)).
 - E7 convergence block added (E7.1/7.3/7.4/7.5) — activates at
   `max_epochs ≥ 50`, window = "last 20% of epochs (min 10)". Explicitly checks
-  "no overfitting" (E7.4) and "not grossly underfit" (E7.5) per the user's
-  requirement.
+  "no overfitting" (E7.4) and "not grossly underfit" (E7.5) as
+  required.
 - E6.2 trajectory form now uses "≥5/10 tail epochs below midpoint" instead of
   "final < midpoint" — robust to MPS jitter without hiding real failures.
 - GIN inputs + architecture reviewed against round2 spec; no changes made.

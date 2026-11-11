@@ -1,7 +1,7 @@
 """Disease figure (main): which human disease responses the mouse model reproduces.
 
 One PDF per panel in ``figures/panels/main_disease/`` (kidney_transfer, stage_transfer, healthy_tissue_test,
-transfer_vs_null, injury_genes; figure key ``main_disease``); PNG preview of the whole figure and the plotted values
+transfer_vs_null, injury_genes; figure key ``supp_disease_transfer``); PNG preview of the whole figure and the plotted values
 (``fig8_source.tsv``) in ``results/analysis/T7_10/``. Every number is read from the result files below;
 nothing is typed in. Re-runnable: the islet H-D1 slot in panel c is filled when its output exists.
 
@@ -486,7 +486,7 @@ def main() -> int:
     _title(ax_e, "Cippà 2018 injury genes")
     fig.align_xlabels([ax_a, ax_b1, ax_b2])
 
-    # One PDF per panel; the figure spec (figures/specs/main.py, main_disease) places them and the layout tool adds the letters.
+    # One PDF per panel; the figure spec (figures/specs/supp_tissues.py, supp_disease_transfer) places them and the layout tool adds the letters.
     pdfs = [cm.save_axes(fig, f"{NAME}_{k}", axes)
             for k, axes in (("a", [ax_a]), ("b", [ax_b1, ax_b2]), ("c", [ax_c]), ("d", [ax_d]), ("e", [ax_e]))]
     png = cm.fd.save_figure(fig, NAME, formats=("png",), out_dir=OUT, close=True)[0]

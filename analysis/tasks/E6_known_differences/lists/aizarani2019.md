@@ -9,7 +9,7 @@ nature.com/articles/s41586-019-1373-2 (HTTP 200).
 **Files** (`chimera/data/analysis/E6/aizarani2019/`, see MANIFEST.tsv). The `.xls` files are plain tab-delimited text.
 - `41586_2019_1373_MOESM8_ESM.xls`: Supplementary Table 6, "Conservation of hepatocyte zonation between mouse and human"
   (967 ortholog pairs; columns HumanGeneID, HumanModule, HumanPadj, MouseGeneID, MouseModule, MousePadj, ProfileCorrelation).
-  Mouse data: Halpern et al. 2017 (Nature 542:352, GSE84498), re-analysed by the authors and binned into 9 zones.
+  Mouse data: Halpern et al. 2017 (Nature 542:352, GSE84498), re-analyzed by the authors and binned into 9 zones.
 - `41586_2019_1373_MOESM9_ESM.xls`: Supplementary Table 7, "Conservation of liver endothelial cell zonation between mouse and human"
   (494 pairs; mouse p-values taken from Halpern et al. 2018 Nat Biotechnol, 4 layers). Human endothelial cells = MaVECs + LSECs.
 - `41586_2019_1373_MOESM1_ESM.pdf`: Supplementary Notes (Note 3 gives the rule). `MOESM4`/`MOESM6` (human-only zonation tables 2 and 4) were downloaded for reference and are not used.

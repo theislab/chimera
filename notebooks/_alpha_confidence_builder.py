@@ -1,7 +1,6 @@
 """Build ``08_alpha_integration_confidence.ipynb`` from a single Python source.
 
-This notebook realizes Application #1 from
-`chimera-private/protein_structure/round2/ortholog_aware_integration_guide_initial.md`
+This notebook realizes Application #1 of the model's design notes
 (marked **★** killer application): **per-gene integration confidence
 scores**. α_g IS the per-gene confidence score Chimera attaches to the
 alignment it produces; no integration baseline (scVI / scANVI / Harmony /
@@ -88,7 +87,7 @@ cells.append(md("""
        every dataset, count the **drivers**: genes with α > 0.7 AND
        detected (≥ 10 % nonzero) in BOTH species' cells of that
        cell type. Decomposes every alignment Chimera makes into a
-       gene-count tuple a reviewer can quote.
+       gene-count tuple a reader can quote.
     3. **§C** — marker-gene validation. Canonical **liver** markers
        (hepatocytes / cholangiocytes / Kupffer cells / macrophages /
        B-plasma / T-NK / endothelial / stellate / HsPCs) and
@@ -478,7 +477,7 @@ cells.append(md("""
     counts (low tier with detection) round out the breakdown. The triple
     `(n_high, n_med, n_low)` per (dataset, celltype) is the **single
     Chimera-only deliverable**: every alignment Chimera produces gets a
-    gene-count tuple a reviewer can quote, automatically and without
+    gene-count tuple a reader can quote, automatically and without
     re-running anything.
 
     *Why no baseline can produce this.* scVI's z is a `(cells, n_latent)`
@@ -869,7 +868,7 @@ cells.append(md("""
     `ortho_X` IDs between every pair of datasets. We report the
     liver-only block (4 × 4) and the testis-only block (3 × 3),
     plus a top-list of "stable highly-confident" genes (α > 0.7
-    across multiple datasets in the same tissue) that any reviewer
+    across multiple datasets in the same tissue) that any reader
     can drop into the paper as the *prove-it* gene list.
 """))
 
@@ -1139,7 +1138,7 @@ cells.append(md("""
     needed.** Every figure and table is computed from the per-gene
     α already saved in `final_state.npz`. There is no separate
     "confidence model"; the architecture *is* the confidence model.
-    A reviewer who challenges the score is challenging
+    A reader who challenges the score is challenging
     `log_rate_full = log_rate_shared + (1−α) · log_rate_residual`,
     not a Chimera-specific add-on.
 
@@ -1168,7 +1167,7 @@ cells.append(md("""
 
     **1. Single-seed (s42) per dataset.** Cross-seed α stability
     is documented in `03_alpha_master.ipynb` §B.1 (Spearman ρ ≥ 0.5
-    across 3 panc_hmonkey seeds, post 2026-04-25 threshold revision).
+    across 3 panc_hmonkey seeds, post 2026-04-25 threshold change).
     Cross-seed analysis on this notebook would require running every
     figure on three seeds and aggregating — easy in principle, but a
     one-line registry extension that this notebook does not do.
@@ -1184,7 +1183,7 @@ cells.append(md("""
     **3. The α tier boundaries (`< 0.3` / `> 0.7`) are conventional,
     not data-driven.** They are the same thresholds used by §A's
     histogram and §C's marker pass criterion, so the analysis is
-    internally consistent. A reviewer demanding data-driven
+    internally consistent. A reader demanding data-driven
     thresholds would set them at the 25 % and 75 % quantiles per
     dataset; this would change the absolute counts but not the
     qualitative pattern.

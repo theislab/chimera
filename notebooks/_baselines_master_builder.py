@@ -1072,7 +1072,7 @@ cells.append(md("""
        and biology-preservation split, and the 0.4 / 0.6 weighting
        are common conventions for integration scoring (see e.g.
        Luecken et al., *Nat. Methods* 2022). We don't invent a new
-       formula — we apply a transparent one. A reviewer who
+       formula — we apply a transparent one. A reader who
        challenges any single weight or normalization choice can
        recompute from the master CSV in §E.1; the same six raw
        metrics drive every alternative aggregation.
@@ -1103,7 +1103,7 @@ cells.append(md("""
        reconstruct the score from the aggregate — every raw metric
        value for every (dataset × model) cell is in §F. The score
        and the raw values therefore travel together, and a
-       skeptical reviewer can re-aggregate however they want.
+       skeptical reader can re-aggregate however they want.
 
     ## Honest concessions
 

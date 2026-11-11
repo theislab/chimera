@@ -5,7 +5,6 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
-#SBATCH --exclude=cpusrv114
 # Direct readouts on the altered object of a fit that left no scores; the fit is never rerun.
 source analysis/slurm/_body.sh
 set -e

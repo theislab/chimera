@@ -8,7 +8,7 @@ Worked examples in the counts (spermatocyte-peak and hepatocyte catabolic genes)
 | Question | What the readouts find in liver and testis: Which genes, cell types, pathways and gene classes sit above or below the protein prior? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.3 (`sec:findings`); Supplementary Figure S17 (`fig:supp-worked-genes`); Supplementary Section C.21.12 (`sssec:rev-exploratory`) |
+| Used in the paper | Section 3.3 (`sec:findings`); Figure 6a, b (`fig:validation`); Supplementary Figure S25 (`fig:supp-worked-genes`); Supplementary Section C.21.11 (`sssec:rev-exploratory`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
@@ -26,4 +26,4 @@ Worked examples in the counts (spermatocyte-peak and hepatocyte catabolic genes)
 
 - `training/runs/`
 
-**Notes.** Labeled exploratory in the paper.
+**Notes.** Labeled exploratory in the paper. figures.py draws the two worked genes (main_validation/worked_genes) from worked_pseudobulk.csv and worked_readouts.csv.

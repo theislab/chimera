@@ -8,13 +8,13 @@ Downloads the sources of the functional layer (gene sets, protein interaction ne
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | supporting (builds inputs, launches runs, or a check reported as a method detail) |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.11 (`sssec:rev-functional`) |
+| Used in the paper | Supplementary Section C.21.10 (`sssec:rev-functional`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/T6_1_functional/fetch_functional.sh
-    python -m analysis.tasks.T6_1_functional.fetch_enrichr_cache
+    bash analysis/tasks/T6_1_functional/fetch_functional.sh $PWD
+    python -m analysis.tasks.T6_1_functional.fetch_enrichr_cache data/analysis/functional
     python -m analysis.tasks.T6_1_functional.coverage
 
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)

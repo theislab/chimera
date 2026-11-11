@@ -2,7 +2,7 @@
 
 - forest_H1_H4.pdf: rho_p of D with the block-bootstrap 95% CI per hypothesis, primary
   H+Mouse cohort and the canonical multi-species cohort (4-sp liver, 3-sp testis) as an
-  estimate (Figs 4-6 rule); noise ceiling marked where defined.
+  estimate (family F3_figs4_6); noise ceiling marked where defined.
 - head_to_head.pdf: Delta_j = rho_p(D) - rho_p(B_j) on U_pair; thick = per-comparison 95% CI,
   thin = simultaneous 95% CI (max-|t|); dotted lines at +-0.03.
 - set_discrimination.pdf: stratified AUROC of D per set and tissue with 95% CI; pi_raw

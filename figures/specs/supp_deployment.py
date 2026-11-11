@@ -6,9 +6,23 @@ A continuation float has the key of its figure with ``_2``, ``_3`` and the same 
 
 from __future__ import annotations
 
-from figures.compose import Col, Figure, NB, P, Row, SRC, TEXTWIDTH, X
+from figures.compose import Col, Figure, NB, P, Row, TEXTWIDTH, X
 
 FIGS = {
+    # The cell-type sources of the count evidence, margin support, the sequence measures in 16 cohorts and the tissue
+    # comparison: panels drawn by analysis/tasks/T8_4_figures/fig4_additions.py and fig7_validation.py.
+    "supp_delta_alpha_sources": Figure(
+        Col(Row(P("main_delta_alpha_liver/celltype_drivers", "a"),
+                Col(X("main_delta_alpha_liver/margin_support", "b"), X("main_delta_alpha_liver/sequence_axis", "c"))),
+            P("main_delta_alpha_liver/cross_tissue", "d")),
+        label="fig:supp-dalpha-sources",
+        title="Cell-type sources of the count evidence, margin support, sequence measures and tissue comparison",
+        shows=("(a) For each named gene of the liver map, the cell types its count evidence comes from: hepatocytes "
+               "carry most of it. (b) For each cohort, the share of genes in the upper and in the lower tail "
+               "whose Δα is backed by count evidence of the same sign. (c) How α and Δα correlate with protein "
+               "identity and dN/dS in 16 cohorts: identity and dN/dS go together, Δα follows neither. (d) Δα of "
+               "the same genes in liver against testis for two species pairs: no agreement beyond chance, so "
+               "the reading belongs to the tissue.")),
     "supp_categories_broad": Figure(
         Col(Row(X("supp_categories_broad/liver_boxes", "a"), X("supp_categories_broad/liver_effect_sizes", "b"), same_scale=True),
             Row(X("supp_categories_broad/testis_boxes", "c"), X("supp_categories_broad/testis_effect_sizes", "d"), same_scale=True),
@@ -47,12 +61,12 @@ FIGS = {
         note=("panels: figures/redraw/categories.py; both pages have the same row positions, so each category is on "
               "one line")),
     "supp_categories_testis": Figure(
-        Row(P("supp_categories_testis/box", "a"), P("supp_categories_testis/effect_sizes", "b")),
+        Row(X("supp_categories_testis/boxes", "a"), X("supp_categories_testis/effect_sizes", "b"), same_scale=True),
         label="fig:supp-dalpha-testis-detailed",
         title="Δα by gene category, testis Human+Macaque",
         shows=("This is the detailed version of the broad-category figure for testis of human and macaque, with "
                "41 gene categories instead of ten. In panel a each row is one category, with its number of genes "
-               "in brackets; the box shows the spread of Δα across the category's genes, the blue line the "
+               "in parentheses; the box shows the spread of Δα across the category's genes, the blue line the "
                "median, and the dashed line zero, where a gene's shared use is what its protein conservation "
                "predicts. Rows run from the highest median at the top to the lowest at the bottom. The number at "
                "the right of each row is the category's average shift from zero, in units of the spread of all "
@@ -62,7 +76,11 @@ FIGS = {
                "genome lie more than four units above the prior. Collagens, actin and microtubule genes follow "
                "at about one unit, and the mitochondrial ribosome is the only category clearly below zero. Most "
                "testis categories lie above zero because the protein prior is capped in testis, so the order of "
-               "the rows is the reading to take.")),
+               "the rows is the reading to take. The values of the testis model span a small range, so the axis "
+               "of panel a runs from -0.1 to 0.2, as in the broad-category figure, and holds every gene of the 41 "
+               "categories."),
+        note=("panels: figures/redraw/categories.py testis_hmac; both pages have the same row positions, so each "
+              "category is on one line")),
     "supp_hallmark": Figure(
         Col(Row(P("supp_hallmark/scatter", "a"), P("supp_hallmark/counts", "b")), P("supp_hallmark/cross_tissue", "c")),
         label="fig:supp-dalpha-hallmark",
@@ -113,19 +131,6 @@ FIGS = {
                "cover the middle half of each group. All groups sit near zero except the handful of genes encoded in the "
                "mitochondrial genome. The lower rows show Δα gene by gene against three of the measures; the clouds are "
                "flat. Small triangles on the frame of a plot are genes that lie beyond its axis.")),
-    "supp_worked_genes": Figure(
-        X("supp_worked_genes/worked_genes"),
-        label="fig:supp-worked-genes",
-        title="Two worked genes in the counts",
-        shows=("The figure shows two example genes as they appear in the raw data, before any model. For each "
-               "gene the counts of all cells of one type are summed per species and put on a common scale, so "
-               "each line is one species and each point is one cell type. On the left is ZPBP2, a sperm protein "
-               "whose sequence differs clearly between species (protein identity 0.82). Its expression rises to "
-               "a peak in spermatocytes and falls afterward in human, mouse and macaque alike: the protein "
-               "has changed, the pattern of use has not. On the right is ALAS1, the first enzyme of heme "
-               "synthesis, whose protein is well conserved (protein identity 0.87). It is highest in "
-               "hepatocytes in all three mammals, but the mouse expresses it far more strongly than human "
-               "(about 24-fold in hepatocytes): the protein is kept, the level of use differs.")),
     "supp_functional_layer": Figure(
         Row(X("supp_functional_layer/pathways", "a"), X("supp_functional_layer/interactions", "b"),
             Col(X("supp_functional_layer/interologs", "c"), X("supp_functional_layer/regulatory", "d"))),

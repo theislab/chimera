@@ -1,16 +1,18 @@
-"""E3 build: per cohort, one table of (species, cell type) groups with pseudobulk expression and the
+"""Build step: per cohort, one table of (species, cell type) groups with pseudobulk expression and the
 count margin per group, for both read-outs.
 
 * pseudobulk: summed counts / summed library x 1e4 (CP10K) and detection, per (species, type), from the
-  cohort's training h5ad (H1 registry; the cells the model saw).
+  cohort's training h5ad (registry of analysis/tasks/H1_harmonise; the cells the model saw).
 * canonical gate: S_gsk (mean over cells of the per-cell log-likelihood ratio, posterior-mean z) from the
-  existing forward passes H1's drivers read (T2.5, P12, P13, Y1, T11, C1), mean over the seeds with a file.
-* per-gene gate: the same from E3's forward passes of the Z4 fits (``forward_free.py``), when present.
+  existing forward passes that the drivers of H1_harmonise read (T2_5_celltype_margin, the bone-marrow cohort,
+  P13_kidney, Y1_gene_tissue, the eye cohort, C1_cohorts), mean over the seeds with a file.
+* per-gene gate: the same from this task's forward passes of the fits of Z4_free_gate_all (``forward_free.py``),
+  when present.
 
     PYTHONPATH=$PWD python analysis/tasks/E3_cells/build.py [--cohort C]
 
 Output ``results/analysis/E3/build/<cohort>.npz``: var_names, species, groups (species_idx, label, n),
-w (T2.5 weight n_sk / (n_s K)), cp10k, det, S_can, S_can_within, S_free, S_free_within (NaN if missing),
+w (weight n_sk / (n_s K) of T2_5_celltype_margin), cp10k, det, S_can, S_can_within, S_free, S_free_within (NaN if missing),
 seeds_can, seeds_free.
 """
 from __future__ import annotations

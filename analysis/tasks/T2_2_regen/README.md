@@ -8,7 +8,7 @@ Computes, with each cohort's own ortholog table and genes matched between tissue
 | Question | Data: Which objects, ortholog tables and independent references do the analyses read? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.3 (`sssec:rev-identity`); Supplementary Section D.1 (`ssec:er-model`); Supplementary Section D.2 (`ssec:er-axis`); Supplementary Section D.15 (`ssec:er-residue`); Supplementary Figure S3g, h, i, j, k (`fig:supp-alpha-robustness`); Supplementary Figure S18d (`fig:supp-dalpha-broad-categories`); Supplementary Figure S20 (`fig:supp-dalpha-testis-detailed`); Supplementary Figure S21c (`fig:supp-dalpha-hallmark`); Supplementary Figure S65e (`fig:supp-main-gin-protein`) |
+| Used in the paper | Supplementary Section C.21.3 (`sssec:rev-identity`); Supplementary Section D.1 (`ssec:er-model`); Supplementary Section D.2 (`ssec:er-axis`); Supplementary Section D.16 (`ssec:er-residue`); Supplementary Figure S4g, h, i, j, k (`fig:supp-alpha-robustness`); Supplementary Figure S18d (`fig:supp-dalpha-broad-categories`); Supplementary Figure S20 (`fig:supp-dalpha-testis-detailed`); Supplementary Figure S21c (`fig:supp-dalpha-hallmark`); Supplementary Figure S73e (`fig:supp-main-gin-protein`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

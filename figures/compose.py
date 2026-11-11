@@ -17,8 +17,8 @@ Layout. Every node has height ``h = a * w + b`` at width ``w``, so a tree is sol
 
 Panels. ``P("family/name", "a")`` is ``figures/panels/family/name.pdf`` cropped to its ink; ``X(...)`` keeps the whole
 page of a panel that was saved at its exact size, so axes drawn at the same place line up to the point; ``NB("notebook/name")``
-is a panel in ``notebooks/figures/``; ``SRC("name")`` is a file in ``figures/sources/``. Panel letters are drawn by this tool,
-bold, under the panel; a panel file carries no letter of its own.
+is a panel in ``notebooks/figures/``. Panel letters are drawn by this tool, bold, under the panel; a panel file carries no
+letter of its own.
 
 Run from the repository root:
 
@@ -52,7 +52,6 @@ ROOT = Path(__file__).resolve().parent  # .../figures
 REPO = Path(os.environ.get("CHIMERA_ROOT", ROOT.parent))
 OUT = Path(os.environ.get("CHIMERA_FIGURES_OUT", ROOT))  # outputs; set it for a dry run, inputs do not move
 PANELS = ROOT / "panels"
-SOURCES = ROOT / "sources"
 NOTEBOOK_PANELS = REPO / "notebooks" / "figures"
 COMPOSED = OUT / "composed"
 PREVIEW = OUT / "preview"
@@ -139,7 +138,7 @@ def gs_spans(pdf: Path, page: int) -> list:
 
 @dataclass
 class Panel:
-    src: str | Path  # "family/name" in figures/panels, "nb:notebook/name", "src:name", or an absolute path
+    src: str | Path  # "family/name" in figures/panels, "nb:notebook/name", or an absolute path
     label: str | dict | None = None  # "a", or {"a": x, "b": x} with x in bp on the source page, for a region
     # that holds several panels with no gap between them
     page: int = 1
@@ -154,8 +153,6 @@ class Panel:
         s = str(self.src)
         if s.startswith("nb:"):
             q = NOTEBOOK_PANELS / (s[3:] + ".pdf")
-        elif s.startswith("src:"):
-            q = SOURCES / (s[4:] + ".pdf")
         elif Path(s).is_absolute():
             q = Path(s)
         else:
@@ -248,11 +245,6 @@ def X(src: str, label=None, **kw) -> Panel:  # noqa: N802
 def NB(src: str, label=None, **kw) -> Panel:  # noqa: N802
     """A panel rendered by a notebook: notebooks/figures/<notebook>/<name>.pdf."""
     return Panel("nb:" + src, label=label, **kw)
-
-
-def SRC(src: str, label=None, **kw) -> Panel:  # noqa: N802
-    """A file in figures/sources (a page that is not composed from panels)."""
-    return Panel("src:" + src, label=label, **kw)
 
 
 @dataclass

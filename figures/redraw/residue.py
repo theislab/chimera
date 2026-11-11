@@ -48,16 +48,16 @@ TERM = {   # terms of the mixed model
     "esm2_pc_frac_z": "ESM-2 component fraction (z)", "rel_pos_z": "relative position N→C (z)",
 }
 FEATURE = {   # families of the residue contrasts
-    "SS": "secondary structure", "SASA": "solvent accessibility", "pLDDT": "pLDDT", "Chem": "chemistry",
+    "SS": "secondary structure", "SASA": "solvent accessibility", "pLDDT": "pLDDT", "Chem": "side-chain chemistry",
     "Contact": "contact density", "Disorder": "disorder", "Cons.": "conservation", "Special": "special residues",
 }
 SPECIES = {"mmulatta": "Macaque", "mmusculus": "Mouse", "drerio": "Zebrafish"}   # rows of the identity track, top to bottom
 INPUT_GROUP_OF = ["esm2_pc"] * 64 + ["esm2_var", "seq_id"] + ["expr"] * 3 + ["seq_id"] * 3   # the 72 gate inputs, in order
-INPUT_GROUP = {   # key: (name, bar color, color of the percentage on the bar)
-    "esm2_pc": ("ESM-2 components", "#222222", "#ffffff"),
-    "esm2_var": ("ESM-2 distance between species", "#555555", "#ffffff"),
-    "seq_id": ("ortholog identity statistics", "#888888", "#ffffff"),
-    "expr": ("expression", "#bbbbbb", "#222222"),
+INPUT_GROUP = {   # key: (name, bar color, color of the percentage on the bar); the colors of the attribution shares
+    "esm2_pc": ("ESM-2 components", C.GATE_GROUP_COLOR["ESM-2 PCs"], "#222222"),
+    "esm2_var": ("ESM-2 distance between species", C.GATE_GROUP_COLOR["esm2_intersp_var"], "#222222"),
+    "seq_id": ("ortholog identity statistics", C.GATE_GROUP_COLOR["mean_identity"], "#ffffff"),   # mean, SD, minimum, maximum
+    "expr": ("expression", C.GATE_GROUP_COLOR["expression"], "#ffffff"),
 }
 CURATED_CLASS = {"M": "curated M class", "F": "curated F class", "ref": "curated reference class"}
 SMOOTH = 11      # residues in the moving average of the tracks
@@ -72,10 +72,19 @@ def stars(p: float) -> str:
     return "***" if p < 1e-3 else "**" if p < 1e-2 else "*" if p < 5e-2 else "ns"
 
 
+_SUPERSCRIPT = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+
 def fmt_p(p: float) -> str:
+    """A p-value as printed: three decimals; below 0.001 as a power of ten ("9.6×10⁻⁵⁷"); four decimals where three would
+    round a value below a star threshold up to it (0.0496 is not printed as 0.050)."""
     if not np.isfinite(p):
         return "n/a"
-    return f"{p:.1e}" if p < 1e-3 else f"{p:.3f}"
+    if p < 1e-3:
+        mantissa, exponent = f"{p:.1e}".split("e")
+        return f"{mantissa}×10{str(int(exponent)).translate(_SUPERSCRIPT)}"
+    three = f"{p:.3f}"
+    return f"{p:.4f}" if float(three) in (0.05, 0.01) and p < float(three) else three
 
 
 def sheet(width_bp: float, height_bp: float):
@@ -180,6 +189,12 @@ def mixed_effects() -> list:
 
 # ----------------------------------------------------------------------------- residue contrasts (one panel)
 
+def contrast_name(label: str) -> str:
+    """The name of a contrast as it is printed. The stored tables say "sheet" for the secondary-structure class that the
+    paper calls "strand" (class E); the stored label keeps its value, the printed name follows the paper."""
+    return label.replace("sheet", "strand")
+
+
 def cliffs_delta() -> list:
     src = L_CACHE / "summary_contrasts.pkl"
     C.need(src)
@@ -192,7 +207,7 @@ def cliffs_delta() -> list:
     fig = sheet(W, top + n * pitch + bottom)
     feature = [FEATURE[p] for p in df["panel"]]
     w_feature = max(width_of(fig, s, tick) for s in feature)
-    w_contrast = max(width_of(fig, s, tick) for s in df["label"])
+    w_contrast = max(width_of(fig, contrast_name(s), tick) for s in df["label"])
     left = 1 + w_feature + 9 + w_contrast + 5
     x_pool, x_gene, x_n = W - 108.0, W - 49.0, W - 3.0     # right edges of the three number columns
     ax = axes_at(fig, left, top, x_pool - 34 - left, n * pitch)
@@ -219,7 +234,7 @@ def cliffs_delta() -> list:
     for i, r in df.iterrows():
         b = top + (i + 0.5) * pitch + 0.36 * tick   # baseline of the row
         put(fig, 1, b, feature[i], fontsize=tick)
-        put(fig, left - 5, b, r["label"], fontsize=tick, ha="right")
+        put(fig, left - 5, b, contrast_name(r["label"]), fontsize=tick, ha="right")
         for x, p in ((x_pool, r["mwu_p"]), (x_gene, r["pg_p"])):
             put(fig, x, b, fmt_p(p), fontsize=small, ha="right")
             put(fig, x + 3, b, stars(p), fontsize=small, color=C.INK if stars(p) != "ns" else C.MUTED)
@@ -241,6 +256,7 @@ GROUPINGS = [   # heading, column, levels, names of the levels, colors, width of
      ["polar", "positive", "negative", "hydrophobic"], RAMP4, 35.5),
 ]
 DIST = dict(width=486.0, left=26.0, gap=9.0, top=13.0, height=112.0, bottom=24.0, box=14.5)
+PLDDT_RESIDUES = (6446, 2484, 6029, 21873)   # residues per pLDDT bin, from very low to very high, as the paper states them
 
 
 def distribution_axes() -> list:
@@ -259,8 +275,13 @@ def attention_by_feature() -> list:
     C.need(src)
     rt = pd.read_pickle(src)
     rt["sasa_bin"] = np.where(rt["rsasa"] < 0.20, "buried", np.where(rt["rsasa"] > 0.50, "exposed", "intermediate"))
-    rt["plddt_bin"] = np.where(rt["plddt"] < 50, "very low (<50)", np.where(rt["plddt"] < 70, "low (50–70)",
-                               np.where(rt["plddt"] < 90, "high (70–90)", "very high (>90)")))
+    # the bins of the analysis (notebooks/_gin_attribution_builder.py): above 90, above 70, above 50, else very low, so a
+    # residue exactly at an edge belongs to the lower bin
+    rt["plddt_bin"] = np.where(rt["plddt"] > 90, "very high (>90)", np.where(rt["plddt"] > 70, "high (70–90)",
+                               np.where(rt["plddt"] > 50, "low (50–70)", "very low (<50)")))
+    counted = tuple(int((rt["plddt_bin"] == level).sum()) for level in GROUPINGS[2][2])
+    if counted != PLDDT_RESIDUES:
+        raise SystemExit(f"residues per pLDDT bin: {counted}; the paper states {PLDDT_RESIDUES}")
     y_top = float(np.quantile(rt["abs_attn"].to_numpy(), 0.99))
 
     d = DIST

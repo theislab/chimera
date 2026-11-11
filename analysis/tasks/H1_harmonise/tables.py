@@ -1,4 +1,4 @@
-"""H1 step 1-2: harmonised per-gene tables, identity checks, run health, integration facts, data audit, cross-cohort table.
+"""Steps 1-2: harmonized per-gene tables, identity checks, run health, integration facts, data audit, cross-cohort table.
 
 Re-runnable: a cohort's table is rebuilt with --force or when its kept runs change. Reads checkpoints and h5ads; writes only to
 results/analysis/H1/.
@@ -75,8 +75,8 @@ def recipe_source(c: str, run: str) -> str:
 
 
 def c1_flags(c: str, vn: pd.Index, sym: pd.Series) -> pd.DataFrame:
-    """C1 cohorts: the T2 ortholog rule was applied at build (so o1_T2 is False), counts joined by Ensembl ID or through the matrix's own release
-    (so no mapping flag); o1_zero_any = the gene is in C1's zero_genes.tsv for a species of this cohort (exact zero in training cells, never named)."""
+    """Cohorts of C1_cohorts: the T2 ortholog rule was applied at build (so o1_T2 is False), counts joined by Ensembl ID or through the matrix's own release
+    (so no mapping flag); o1_zero_any = the gene is in zero_genes.tsv of C1_cohorts for a species of this cohort (exact zero in training cells, never named)."""
     z = RES / "C1" / C1_PARENT.get(c, c) / "zero_genes.tsv"
     out = pd.DataFrame(dict(o1_T2=False, o1_M_wrong_row=False, o1_M_false_zero=False, o1_zero_any=False), index=vn).astype("boolean")
     if z.exists():
@@ -90,7 +90,7 @@ def c1_flags(c: str, vn: pd.Index, sym: pd.Series) -> pd.DataFrame:
 
 
 def o1_flags(c: str, vn: pd.Index, ens: pd.Series) -> pd.DataFrame:
-    """O1 flags as columns, per var_name; empty when O1 has no row for the cohort. No gene is dropped."""
+    """Flags of O1_orthologs as columns, per var_name; empty when O1_orthologs has no row for the cohort. No gene is dropped."""
     cols = {"T2": "o1_T2", "M_wrong_row": "o1_M_wrong_row", "M_false_zero": "o1_M_false_zero", "zero_any": "o1_zero_any"}
     f = RES / "O1" / "flags_by_cohort.parquet"
     out = pd.DataFrame({v: pd.Series(pd.NA, index=vn, dtype="boolean") for v in cols.values()})
@@ -108,7 +108,7 @@ def o1_flags(c: str, vn: pd.Index, ens: pd.Series) -> pd.DataFrame:
 
 
 def run_health(run: str) -> dict:
-    """The health rule of the amended plan, on the run's own state. No result is read beyond these fields."""
+    """The health rule of the pre-specified analysis plan (as amended), on the run's own state. No result is read beyond these fields."""
     d = RU.RUNS / run
     r = dict(run=run, finished=(d / "final_state.npz").exists(), no_nan=False, healthy=False)
     if not r["finished"]:
@@ -136,8 +136,8 @@ def runs_table() -> pd.DataFrame:
     for c, d in RU.cohorts().items():
         for s, run in sorted(d["tried"].items()):
             h = run_health(run)
-            # C1 cohorts: kept by C1's rule, which for DLPFC reads tails on the anchored prior (coordinator ruling: with 98% of genes at the clamp the
-            # raw-prior upper tail cannot form); the H1 rule's verdict stays in the column `healthy`.
+            # Cohorts of C1_cohorts: kept by its rule, which for DLPFC reads tails on the anchored prior (with 98% of genes at the clamp the
+            # raw-prior upper tail cannot form); the verdict of run_health stays in the column `healthy`.
             keep = (s in t33.get(c, [])) if d["role"] == "reference" else (True if d.get("source") == "C1" else h["healthy"])
             rows.append(dict(cohort=c, tissue=d["tissue"], role=d["role"], seed=s, kept=bool(keep), **h))
     return pd.DataFrame(rows)
@@ -177,10 +177,10 @@ def build_cohort(args) -> dict:
     c, kept = args
     d = RU.cohorts()[c]
     a = ad.read_h5ad(d["h5ad"])
-    a.obs["cell_type"] = a.obs[d["ct"]].astype(str).values  # tau on the harmonised classes; expr and detection do not use it
+    a.obs["cell_type"] = a.obs[d["ct"]].astype(str).values  # tau on the harmonized classes; expr and detection do not use it
     vn = pd.Index(a.var_names, name="var_name")
     table = gene_ids.load_table(d["table"])
-    if d.get("source") == "C1":  # exact gene-by-gene check (C1): the Spearman bar fails on ties when most genes sit at the 0.95 cap
+    if d.get("source") == "C1":  # exact gene-by-gene check (C1_cohorts): the Spearman bar fails on ties when most genes sit at the 0.95 cap
         ids_ = vn.str.replace("ortho_", "", regex=False).astype(int)
         want = np.clip(table.loc[ids_, "mean_identity"].to_numpy(float) / 100, 0.05, 0.95)
         if not np.allclose(a.var["conservation_prior"].to_numpy(float), want, atol=1e-5):
@@ -243,7 +243,7 @@ def build_cohort(args) -> dict:
     fl = c1_flags(c, vn, g["symbol"]) if d.get("source") == "C1" else o1_flags(c, vn, g["hsapiens_gene_id"])
     for k, v in fl.items():
         g[k] = v
-    # DLPFC: the lower tail is not read as biology. C1 checked its top genes on raw counts: single-species reference artefacts (chimpanzee PRNP,
+    # DLPFC: the lower tail is not read as biology. C1_cohorts checked its top genes on raw counts: single-species reference artifacts (chimpanzee PRNP,
     # macaque PRSS55, marmoset SLC39A12). Every DLPFC gene below -0.05 is marked; the share with a 10-fold single-species level gap is recorded.
     g["reference_artefact"] = False
     if c in DLPFC:
@@ -256,8 +256,8 @@ def build_cohort(args) -> dict:
         g["species_level_gap_log10"] = lg.max(0) - lg.min(0)
         g["reference_artefact"] = (g["D"] < -RU.TAIL).to_numpy()
     flagged = (g["o1_M_wrong_row"].fillna(False) | g["o1_M_false_zero"].fillna(False) | g["o1_zero_any"].fillna(False)).astype(bool) | g["reference_artefact"]
-    # Quiet in one species (detection < 0.5%) while at least 5% in another: C1's rule for names, applied to every cohort. The reading of such a gene is a
-    # level gap or a pair that misses the expressed paralog (tumour LYZ, mouse Lyz2 not the 1:1 partner); flagged, kept, never named.
+    # Quiet in one species (detection < 0.5%) while at least 5% in another: the rule of C1_cohorts for names, applied to every cohort. The reading of such a
+    # gene is a level gap or a pair that misses the expressed paralog (tumor LYZ, mouse Lyz2 not the 1:1 partner); flagged, kept, never named.
     det = g[[k for k in g.columns if k.startswith("detection_") and k not in ("detection_spmean", "detection_sprange")]].astype(float)
     g["quiet_in_species"] = ((det.min(1) < 0.005) & (det.max(1) >= 0.05)).to_numpy()
     g["nameable"] = g["strict_support"] & ~flagged & ~g["quiet_in_species"]
@@ -334,7 +334,7 @@ def chance_refs(species) -> dict:
 
 
 def z1_rows(kept_runs: pd.DataFrame) -> pd.DataFrame:
-    """Per-run count dependence from Z1's table; runs absent there through Z1's own function."""
+    """Per-run count dependence from the table of Z1_retune; runs absent there through the function of Z1_retune."""
     Z = RES / "Z1"
     t = pd.concat([pd.read_csv(f, sep="\t") for f in (Z / "diag_reference.tsv", Z / "diag_ref2.tsv") if f.exists()])
     t = t.drop_duplicates("run").set_index("run")
@@ -428,7 +428,7 @@ def within_tissue_agreement(cohorts: dict) -> pd.DataFrame:
 
 
 def scvi_ref(c: str) -> dict:
-    """scVI(species) on the same object, as C1 computed it (k = 15, same labels); empty for cohorts without one."""
+    """scVI(species) on the same object, as C1_cohorts computed it (k = 15, same labels); empty for cohorts without one."""
     f = RES / "C1" / c / "scvi_reference.json"
     if not f.exists():
         return dict(scvi_mixing=np.nan, scvi_label_transfer=np.nan, scvi_silhouette=np.nan)

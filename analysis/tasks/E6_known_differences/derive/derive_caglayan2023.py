@@ -1,4 +1,4 @@
-"""E6 literature list: Caglayan et al. 2023 Nature 620:145 (posterior cingulate cortex BA23; human, chimpanzee, rhesus macaque).
+"""Literature list: Caglayan et al. 2023 Nature 620:145 (posterior cingulate cortex BA23; human, chimpanzee, rhesus macaque).
 
 Usage:
     python -I derive_caglayan2023.py <converted_dir> <out_tsv>

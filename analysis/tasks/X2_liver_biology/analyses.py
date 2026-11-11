@@ -8,8 +8,8 @@ B1c (T4_2_gene_baselines) and per-type pseudobulk log2 fold change to human (``l
 Outputs in results/analysis/X2/:
 * ``presence.csv``: genes per cohort with zero counts / absent from the raw object, per species,
   and how they sit in the D tails.
-* ``drivers.csv``: matched excess of the figure sets (Fig 4c themes, urea cycle, mtDNA, nuclear
-  OXPHOS, Fig 6 archetypes, zonation sets) for every readout and baseline; matchings C and C_hep;
+* ``drivers.csv``: matched excess of the figure sets (landmark themes of the prior landscape panel, urea cycle, mtDNA, nuclear
+  OXPHOS, archetypes of the gate network, zonation sets) for every readout and baseline; matchings C and C_hep;
   universes all genes and complete genes (counts in every species).
 * ``drivers_seeds.csv``: set means of the species contributions per seed (4-sp, 5 seeds;
   H+Mouse, 3 seeds), from the forward sums.

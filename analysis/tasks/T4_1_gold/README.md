@@ -13,8 +13,8 @@ Downloads the independent references of the pre-specified tests and the Ensembl 
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
 
-    bash analysis/tasks/T4_1_gold/fetch_gold.sh
-    bash analysis/tasks/T4_1_gold/fetch_ensembl.sh
+    bash analysis/tasks/T4_1_gold/fetch_gold.sh $PWD
+    bash analysis/tasks/T4_1_gold/fetch_ensembl.sh $PWD
     python -m analysis.tasks.T4_1_gold.h4_map_union
     python -m analysis.tasks.T4_1_gold.dnds_release99_coverage
     python -m analysis.tasks.T4_1_gold.gold_checks --label-map analysis/tasks/T4_3_scoreboard/h3_label_map.tsv <repo> <out>

@@ -1,5 +1,5 @@
-"""H1: Hallmark GSEA per cohort, the first submission's call (notebooks/_pathway_builder.py): gseapy.prerank, 1,000 permutations, seed 0, sizes 10-500, paralog
-collisions keep the largest |value|. Ranked on D over all genes of the cohort, as the first submission ranked Delta-alpha.
+"""Hallmark GSEA per cohort, the call of notebooks/_pathway_builder.py: gseapy.prerank, 1,000 permutations, seed 0, sizes 10-500, paralog
+collisions keep the largest |value|. Ranked on D over all genes of the cohort, as that notebook ranks Delta-alpha.
 
     PYTHONPATH=<chimera repo> python analysis/tasks/H1_harmonise/gsea.py [--jobs 6]
 """

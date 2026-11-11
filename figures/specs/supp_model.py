@@ -6,7 +6,7 @@ A continuation float has the key of its figure with ``_2``, ``_3`` and the same 
 
 from __future__ import annotations
 
-from figures.compose import Col, Figure, NB, Row, SRC, TEXTWIDTH, X
+from figures.compose import Col, Figure, NB, Row, TEXTWIDTH, X
 
 FIGS = {
     "supp_alpha_training": Figure(
@@ -31,11 +31,9 @@ FIGS = {
                 X("supp_alpha_robustness/liver_4sp_hzeb", "f"), same_scale=True),
             Row(X("supp_alpha_robustness/testis_3sp_hmac", "g"), X("supp_alpha_robustness/testis_3sp_hmouse", "h"),
                 X("supp_alpha_robustness/testis_hmac_hmouse", "i"), same_scale=True),
-            Row(X("supp_alpha_robustness/tissues_hmonkey_hmac", "j"), X("supp_alpha_robustness/tissues_hmouse", "k"),
-                same_scale=True, width=321.67),
             gap=4),
         label="fig:supp-alpha-robustness",
-        title="Program-level Δα across seeds, species sets and tissues",
+        title="Program-level Δα across seeds and species sets",
         shows=("Genes are grouped into about 40 named programs, such as ribosomal proteins, cytochrome P450 "
                "enzymes or cell-cycle genes. For each program the figure takes the average Δα of its genes, that "
                "is, how far the program's shared use across species sits above or below what its proteins' "
@@ -45,51 +43,11 @@ FIGS = {
                "the programs line up along the diagonal (rank correlation 0.77 to 0.88). Panels d to f compare "
                "the four-species liver fit with each two-species liver fit: agreement is strong with Human+Mouse "
                "(0.71), moderate with Human+Monkey (0.46) and weak with Human+Zebrafish (0.27). Panels g to i do "
-               "the same for testis, where the three fits agree closely (0.89 to 0.97). Panels j and k compare "
-               "testis with liver for the same pair of species: here the order of programs is unrelated (-0.06 "
-               "and -0.20), so which programs sit above their protein prior depends on the tissue. Every program "
+               "the same for testis, where the three fits agree closely (0.89 to 0.97). Every program "
                "is drawn. One program, the genes encoded on the mitochondrial genome, lies far from the others in "
                "every panel; to show it without squeezing the rest, each axis is compressed five-fold in its outer, "
                "shaded part, and the program is named there."),
-        note=("panels: figures/redraw/robustness.py; all panels have one page size and one axes position; the last row "
-              "keeps the panel size of the others (2 x 157.33 + 7 bp) and is centered")),
-    "supp_alpha_decorrelation": Figure(
-        Row(X("supp_alpha_decorrelation/detection_rate", "a"), X("supp_alpha_decorrelation/mean_count", "b"), X("supp_alpha_decorrelation/count_variance", "c"), same_scale=True),
-        label="fig:supp-alpha-decorrelation",
-        title="Δα against expression magnitude statistics",
-        shows=("Each dot is a gene of the liver model of human and monkey. Its height is Δα, how far the model "
-                "moved the gene from its protein-based starting value. Its horizontal position is (a) the share of "
-                "cells in which the gene is detected, (b) its mean count, (c) the variance of its count. The clouds "
-                "are flat (rank correlations between −0.03 and −0.05): on this cohort Δα does not repeat how "
-                "strongly a gene is expressed. Genes below the Δα axis are marked at its lower edge."),
-        note=("panels: figures/redraw/alpha.py")),
-    "supp_integration_seven_methods": Figure(
-        Col(X("supp_integration_seven_methods/composite", "a"), X("supp_integration_seven_methods/mean_score", "b")),
-        width=330,
-        label="fig:supp-main-integration",
-        title="Integration scores, seven-method panel",
-        shows=("Before genes are read, the cells of the species must be lined up. The figure scores how well seven "
-                "methods do that on the seven liver and testis cohorts. The score combines whether cells of "
-                "different species mix (40%) and whether cell types stay apart (60%), each measurement scaled within "
-                "a cohort. (a) One cell per cohort and method; the best score of a cohort is bold with a star, and "
-                "the Chimera column is outlined. (b) The mean score of each method, with its median rank and the "
-                "number of cohorts in which it scores best."),
-        note=("panels: figures/redraw/integration_scores.py; heat map and bars have the same page width and the same "
-              "seven columns")),
-    "supp_integration_metrics": Figure(
-        Col(Row(X("supp_integration_metrics/knn_species_purity", "a"), X("supp_integration_metrics/knn_mixing_entropy", "b"), same_scale=True),
-            Row(X("supp_integration_metrics/silhouette_species", "c"), X("supp_integration_metrics/knn_celltype_purity", "d"), same_scale=True),
-            Row(X("supp_integration_metrics/silhouette_celltype", "e"), X("supp_integration_metrics/label_transfer_accuracy", "f"), same_scale=True)),
-        label="fig:supp-integration-metrics",
-        title="Raw integration metrics, seven-method panel",
-        shows=("The six measurements behind the composite score, each on its own, for the same seven methods and "
-                "seven cohorts, with the value in every cell. Blue maps ask whether species mix: (a) how often the "
-                "neighbors of a cell are of its own species (lower is better), (b) how mixed the neighbors are "
-                "(higher is better), (c) how far the species sit apart as groups (lower is better). Orange maps ask "
-                "whether cell types are kept: (d) how often neighbors share the cell type, (e) how well cell types "
-                "separate, (f) how well the cell type of one species is predicted from the others (higher is "
-                "better). The darker end of each color scale is the better one."),
-        note=("panels: figures/redraw/integration_scores.py")),
+        note=("panels: figures/redraw/robustness.py; all panels have one page size and one axes position")),
     "supp_integration_umap_testis": Figure(
         X("supp_integration_umap_testis/grid"),
         label="fig:supp-integration-testis-umap",
@@ -143,9 +101,8 @@ FIGS = {
                "lower or higher is better, and each panel is colored over its own range with the better end dark.")),
     "supp_integration_eleven_cohorts": Figure(
         Col(Row(X("supp_integration_eleven_cohorts/mixing", "a"),
-                X("supp_integration_eleven_cohorts/conservation", "b"), same_scale=True, gap=4),
-            Row(X("supp_integration_eleven_cohorts/composite", "c"), width=281)),
-        shrink=0.93,
+                X("supp_integration_eleven_cohorts/conservation", "b"), same_scale=True, gap=4, width=478.64),
+            Row(X("supp_integration_eleven_cohorts/composite", "c"), width=276.78)),
         label="fig:supp-integration-ext",
         title="Integration benchmark on eleven cohorts",
         shows=("Ten methods that place cells of different species in one shared map are scored on eleven "
@@ -153,5 +110,7 @@ FIGS = {
                "marrow, kidney, pancreatic islet, eye). Panel (a) scores how well species mix, panel (b) how "
                "well cell types stay apart, panel (c) the combined score. Each column is scaled so that the best "
                "method of that dataset has 1. Methods are grouped by how much cell-type annotation they use in "
-               "training, because methods that are given the labels have an advantage on (b).")),
+               "training, because methods that are given the labels have an advantage on (b)."),
+        note=("panels: analysis/tasks/T8_4_figures/fig3_integration_ext.py; the widths are those of the panel pages, "
+              "so every panel is placed at scale 1")),
 }

@@ -8,7 +8,7 @@ Where the two gates place a gene differently (the gate gap): its reproducibility
 | Question | The per-gene gate: What does Δα show when it is read gene by gene from counts, without the protein-feature network? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section D.4 (`sec:supp-gate-gap`); Section 3.5 (`sec:per-gene`); Supplementary Figure S27 (`fig:supp-gate-gap`); Supplementary Figure S28 (`fig:supp-gate-gap-cont`); Supplementary Figure S29 (`fig:supp-gate-gap-named`) |
+| Used in the paper | Supplementary Section D.4 (`sec:supp-gate-gap`); Section 3.4 (`sec:per-gene`); Supplementary Figure S30 (`fig:supp-gate-gap`); Supplementary Figure S31 (`fig:supp-gate-gap-cont`); Supplementary Figure S32 (`fig:supp-gate-gap-named`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

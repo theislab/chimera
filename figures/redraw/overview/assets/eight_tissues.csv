@@ -1,0 +1,10 @@
+# the eight models of the one-reading figure; Spearman correlations over the genes with a dN/dS value (results/analysis/H1/axis.csv, universe all)
+tissue,model,n_genes,rho_identity_dnds,rho_delta_alpha_identity,rho_delta_alpha_dnds
+liver,liv_hmouse,7692,-0.7932,0.0943,-0.1324
+testis,test_hmouse,13578,-0.8242,-0.1017,0.1245
+bone marrow,bone_marrow,11498,-0.8426,0.0368,-0.0242
+kidney,kidney,14534,-0.8883,0.15,-0.1367
+islet,islet,12939,-0.8165,0.1824,-0.1874
+eye,vz_hmouse,9139,-0.7646,0.0414,-0.0602
+cortex,brain_m1_hmouse,13471,-0.8823,0.12,-0.1258
+lung,lung_healthy,10171,-0.8366,-0.0124,-0.0255

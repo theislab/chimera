@@ -4,7 +4,6 @@
 #SBATCH --qos=cpu_normal
 #SBATCH --cpus-per-task=8
 #SBATCH --time=16:00:00
-#SBATCH --exclude=cpusrv114
 # G1 step 3, guard arm. sbatch --array=<rows>%K --mem=<mem> --output=results/analysis/G1/logs/%x_%A_%a.out analysis/tasks/G1_guard/step3.sbatch
 # Training goes through analysis/tasks/T12_2b_debug/nan_probe.py (per-step maxima, first non-finite batch), which wraps the package's forward and changes nothing in it.
 source analysis/slurm/_body.sh

@@ -109,7 +109,7 @@ class DatasetSpec:
 #     Chimera recipe was evaluated on it, so it is not part of this matrix.
 # ----------------------------------------------------------------------
 DATASETS: List[DatasetSpec] = [
-    # Pancreas (priority — do these first per the prompt).
+    # Pancreas (priority: these are run first).
     DatasetSpec(
         path="data/processed/camex_human_monkey.h5ad",
         species_col="species",

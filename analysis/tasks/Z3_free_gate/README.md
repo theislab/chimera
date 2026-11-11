@@ -8,7 +8,7 @@ Trains the per-gene gate (--config M: one free offset per gene in place of the p
 | Question | The per-gene gate: What does Δα show when it is read gene by gene from counts, without the protein-feature network? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.5 (`sec:per-gene`); Figure 5e, f, h, i (`fig:validation`); Supplementary Section C.8.4 (`sssec:per-gene-gate`) |
+| Used in the paper | Section 3.4 (`sec:per-gene`); Figure 6d, e (`fig:validation`); Supplementary Figure S27a, b, d, e (`fig:supp-gates`); Supplementary Section C.8.4 (`sssec:per-gene-gate`) |
 | How we know | numbers printed in the paper are read from this task's result files |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

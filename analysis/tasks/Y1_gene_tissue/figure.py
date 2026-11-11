@@ -5,6 +5,10 @@ The panels are saved as three pages of one size, figures/panels/main_tissues/gen
 row of panels drawn. The figure spec cuts the six panels out of these pages at fixed positions, so the page and the
 place of every axes on it are fixed here (PAGE_W, PAGE_H, GRID) and do not depend on any label.
 
+Inputs: ``results/analysis/Y1/`` (``variance_split.csv``, ``contrast_rho.csv``, ``contrast_delta.csv``,
+``within_gene.csv``, ``worked_readouts.csv``, ``posthoc/A_within_matched.csv``, ``posthoc/D_flip_cells.parquet``),
+bundle ``analysis_results``.
+
     python -I analysis/tasks/Y1_gene_tissue/launch.py analysis.tasks.Y1_gene_tissue.figure
 """
 
@@ -39,9 +43,9 @@ NAME = {"S": r"$S_g$", "B1": "profile correlation", "D": r"$\Delta\alpha$", "Sdi
 BLUE, BLUE_LIGHT, ORANGE, PURPLE, PALE = "#0072B2", "#8CC0DC", "#E69F00", "#8A7FD8", "#D9D9D9"  # shares of a bar (panels a and e)
 REFERENCE = "independent reference"  # the independent data a readout is compared with
 TIS = ["liver", "testis", "kidney", "islet", "bone_marrow", "eye"]
-TL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "islet": "islet", "bone_marrow": "bone marrow", "eye": "eye"}
+TL = {"liver": "Liver", "testis": "Testis", "kidney": "Kidney", "islet": "Islet", "bone_marrow": "Bone marrow", "eye": "Eye"}
 # Display name of each reference: the "pancreas" reference is the islet reference (keys stay as in the result files).
-GL = {"liver": "liver", "testis": "testis", "kidney": "kidney", "pancreas": "islet"}
+GL = {"liver": "Liver", "testis": "Testis", "kidney": "Kidney", "pancreas": "Islet"}
 
 # Geometry in bp. A row page is PAGE_W x PAGE_H; GRID gives the outer edges of the grid of axes on it, from the lower
 # left corner of the page.
@@ -83,7 +87,8 @@ def panel_b(axs):
         for i, t in enumerate(TIS):
             for j, g in enumerate(golds):
                 v = M.iloc[i, j]
-                ax.text(j, i, f"{v:.2f}".replace("0.", ".").replace("-", "−"), ha="center", va="center", fontsize=5.8, color="white" if abs(v) > 0.15 else INK)
+                shown = ".00" if round(v, 2) == 0 else f"{v:.2f}".replace("0.", ".").replace("-", "−")  # a value that rounds to zero carries no sign
+                ax.text(j, i, shown, ha="center", va="center", fontsize=5.8, color="white" if abs(v) > 0.15 else INK)
                 if match[g] == t:
                     ax.add_patch(plt.Rectangle((j - .5, i - .5), 1, 1, fill=False, ec=INK, lw=1.1))
         ax.set_title(NAME[sc], fontsize=7, pad=3)  # the readout of this heat map
@@ -117,7 +122,7 @@ def panel_c(ax):
 def panel_d(ax):
     w = pd.read_csv(OUT / "within_gene.csv")
     a = pd.read_csv(OUT / "posthoc" / "A_within_matched.csv")
-    lab = {"liver|testis": "liver, testis", "liver|kidney": "liver, kidney", "liver|pancreas": "liver, islet", "testis|kidney": "testis, kidney", "testis|pancreas": "testis, islet", "kidney|pancreas": "kidney, islet"}
+    lab = {"liver|testis": "Liver, testis", "liver|kidney": "Liver, kidney", "liver|pancreas": "Liver, islet", "testis|kidney": "Testis, kidney", "testis|pancreas": "Testis, islet", "kidney|pancreas": "Kidney, islet"}
     w["key"], a["key"] = w.pair.map(lab), a.pair.map(lab)
     ls = list(lab.values())
     for sc, of in (("S", -0.2), ("B1", 0.2)):

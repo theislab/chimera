@@ -11,6 +11,7 @@
 # remove it first (`mamba env remove -n <env_name> -y`), since a partly built environment is
 # otherwise easy to mistake for a complete one.
 set -euo pipefail
+case "${1:-}" in -h|--help) sed -n '2,/^set -euo/{/^set -euo/d;s/^# \{0,1\}//;p}' "${BASH_SOURCE[0]}"; exit 0 ;; esac
 
 ENV_NAME="${1:-chimera_env}"
 PYTHON_VERSION="3.12.16"

@@ -8,7 +8,7 @@ Trains the testis recipes without cell-type labels (no cell-type-conditional MMD
 | Question | Cell-level integration: Does one fit align the cells across species, and how does it compare with other tools? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Supplementary Section C.21.9 (`sssec:rev-benchmark`); Supplementary Table S22 (`tab:benchmark-label-use`) |
+| Used in the paper | Supplementary Section C.19.2 (`sssec:rev-benchmark`); Supplementary Table S22 (`tab:benchmark-label-use`) |
 | How we know | described in the Extended Methods |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):

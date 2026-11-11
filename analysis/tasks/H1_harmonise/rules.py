@@ -1,40 +1,45 @@
-"""H1: one reading across tissues. Registry and definitions, fixed before any cross-tissue association was computed.
+"""One reading across tissues. Registry and definitions, fixed before any cross-tissue association was computed.
 
-Exploratory throughout. Nothing here changes a status, row or modifier of the plan. Vocabulary: CHIMERA_MECHANISM.md.
+Exploratory throughout. Nothing here changes a status, row or modifier of the plan.
 
 Cohorts. Reference: canonical liver and testis. New: bone marrow, kidney healthy, islet healthy, Van Zyl eye (full, H+Mouse,
-H+M. mulatta, primates; H+Pig and H+M. fascicularis join when their seeds exist). Seeds: canonical = the T3.3 seed sets of the
-paper; new cohorts = every seed passing the health rule (finished, no NaN, 10 of 10 active z dimensions, both raw-prior tails at
->= 2% of genes, saturation at most 10%); 2 or more seeds suffice, failing runs are listed in runs.tsv and not analysed.
+H+M. mulatta, primates; H+Pig and H+M. fascicularis join when their seeds exist). Seeds: canonical = the seed sets of
+analysis/tasks/T3_3_consensus used in the paper; new cohorts = every seed passing the health rule (finished, no NaN, 10 of 10
+active z dimensions, both raw-prior tails at >= 2% of genes, saturation at most 10%); 2 or more seeds suffice, failing runs are
+listed in runs.tsv and not analyzed.
 
 Per-gene readouts, one schema (tables.py):
   pi_raw      unclamped protein-identity prior (conservation_prior_raw.npy, else the run's prior);
   pi_clamped  the prior the run anchors on (equal to pi_raw on unclamped recipes);
   alpha_s<k>  alpha per kept seed;  alpha = their mean;
-  delta_alpha mean alpha - pi_clamped, uncentred;
+  delta_alpha mean alpha - pi_clamped, uncentered;
   D           delta_alpha minus its cohort median;  D_raw = mean alpha - pi_raw minus its cohort median;
   S_ema       mean S_g_ema over kept seeds;
-  count_support  |S_ema| >= 1e-6 (X4, Z1);
+  count_support  |S_ema| >= 1e-6 (X4_where_differs, Z1_retune);
   strict_support count_support, |S_ema| >= cohort median over supported genes, sign(S_ema) = sign(D), sign of S_g_ema and of
               alpha_seed - pi_clamped - seed median stable over every kept seed;  named genes need strict_support. Saturated genes (alpha > 0.95 in any
               seed) are flagged and may be named. Amendment, after the first gene lists: the first rule also excluded saturated genes, which on clamped recipes removes the
               whole upper tail near the ceiling (pi_clamped 0.85 + 0.10), including most lineage genes; their sign is backed by counts, only their rank among themselves is capped;
-  nameable    strict_support, no exact zero count in a species of the cohort and no mapping flag of the ortholog audit (O1). Amendment, after O1: a false zero
-              costs level and put renamed genes at the bottom of liver (BABAM2, MINDY1-3); such genes stay in the tables, flagged, and are not named;
-              second amendment, with the C1 cohorts: also not quiet in one species (detection < 0.5%) while at least 5% in another, C1's naming rule, applied to
-              every cohort; in DLPFC models the lower tail (D < -0.05) is marked `reference_artefact` (C1: single-species reference artefacts) and not named;
-  o1_T2, o1_M_wrong_row, o1_M_false_zero, o1_zero_any  O1 flags on the cohort's own species (flags_by_cohort.parquet); columns only, no gene is dropped;
+  nameable    strict_support, no exact zero count in a species of the cohort and no mapping flag of the ortholog audit
+              (O1_orthologs). Amendment, after O1_orthologs: a false zero costs level and put renamed genes at the bottom of
+              liver (BABAM2, MINDY1-3); such genes stay in the tables, flagged, and are not named; second amendment, with the
+              cohorts of C1_cohorts: also not quiet in one species (detection < 0.5%) while at least 5% in another, the naming
+              rule of C1_cohorts, applied to every cohort; in DLPFC models the lower tail (D < -0.05) is marked
+              `reference_artefact` (C1_cohorts: single-species reference artifacts) and not named;
+  o1_T2, o1_M_wrong_row, o1_M_false_zero, o1_zero_any  flags of O1_orthologs on the cohort's own species
+              (flags_by_cohort.parquet); columns only, no gene is dropped;
   expr, detection  species-balanced mean log1p CP10K and detection on the training object (cohorts.gene_covariates).
 
-Sign. Compared across cohorts only after centring, and in the set analysis only against genes matched on the prior and on
+Sign. Compared across cohorts only after centering, and in the set analysis only against genes matched on the prior and on
 expression in the same cohort.
 
-Set analysis (recurrence.py). Sets: the 50 MSigDB Hallmarks (Enrichr 2020) and the X3 gene classes in CLASSES, by human Ensembl ID
-(Hallmark symbols through the cohort's human symbols). Universe: count-supported genes of the cohort. A set enters a cohort with at
-least MIN_SET genes in the universe. Value: inverse-normal transform of the within-cohort rank of the readout. Set score: mean over
-members. Null: values permuted among genes of the same stratum, within cohort, independently in each cohort, N_PERM draws, same draws
-for all sets. Strata: PI_BINS quantile bins of pi_raw x EXPR_BINS quantile bins of expr (pi_raw and dN/dS as readouts: expr only).
-z = (score - null mean) / null SD; p two-sided empirical; q BH over the sets of the cohort.
+Set analysis (recurrence.py). Sets: the 50 MSigDB Hallmarks (Enrichr 2020) and the gene classes of X3_cross_cohort in CLASSES, by
+human Ensembl ID (Hallmark symbols through the cohort's human symbols). Universe: count-supported genes of the cohort. A set
+enters a cohort with at least MIN_SET genes in the universe. Value: inverse-normal transform of the within-cohort rank of the
+readout. Set score: mean over members. Null: values permuted among genes of the same stratum, within cohort, independently in
+each cohort, N_PERM draws, same draws for all sets. Strata: PI_BINS quantile bins of pi_raw x EXPR_BINS quantile bins of expr
+(pi_raw and dN/dS as readouts: expr only). z = (score - null mean) / null SD; p two-sided empirical; q BH over the sets of the
+cohort.
 Recurrence statistic, per set over the six primary tissues: R = max(number of tissues with z >= Z_CALL, number with z <= -Z_CALL).
 Its null: the same statistic on the permuted draws. p_rec = (1 + #{R_null >= R}) / (N_PERM + 1); q_rec BH over all sets.
 A set is called recurrent when R >= R_MIN and q_rec < 0.05.
@@ -44,20 +49,23 @@ Readouts beside D: S_ema (count evidence, no features), B1 (pseudobulk profile c
 baseline). D_raw and all-gene universes are sensitivities. Because every fit's GIN reads the same ESM coordinates, recurrence on D may
 come from protein features; recurrence on S_ema does not. Both are reported.
 
-Post hoc sensitivities, added after 48 of 72 sets recurred on D and the sequence baselines recurred about as often, which says the gene-level null is a low bar for coherent sets: (i) D_tau, S_tau: strata
-also on cell-type specificity tau (5 bins), since the margin rewards having a pattern; (ii) D_block, S_block: a null that keeps ESM-module structure (block_scores, 2,000 draws) on values centred within strata. The main-figure list
-is the primary rule; survival under (i) and (ii) is shown beside it.
+Post hoc sensitivities, added after 48 of 72 sets recurred on D and the sequence baselines recurred about as often, which says
+the gene-level null is a low bar for coherent sets: (i) D_tau, S_tau: strata also on cell-type specificity tau (5 bins), since
+the margin rewards having a pattern; (ii) D_block, S_block: a null that keeps ESM-module structure (block_scores, 2,000 draws)
+on values centered within strata. The main-figure list is the primary rule; survival under (i) and (ii) is shown beside it.
 
 (iii) D_nosat, S_nosat: genes with alpha > 0.95 in any seed left out, the sensitivity the amended seed rule asks for where a seed is above 5% saturation.
 
-Separate axis (recurrence.axis_table), per cohort: Spearman of D with pi_raw and with log10 dN/dS (Compara human-mouse, T4.3 gold table), on all genes
-and on count-supported genes; the same for S_ema and D_raw; rho(pi_raw, dN/dS) as the reference; partial rho(D, dN/dS | pi_raw, expr, detection).
+Separate axis (recurrence.axis_table), per cohort: Spearman of D with pi_raw and with log10 dN/dS (Compara human-mouse, gold table
+of T4_3_scoreboard), on all genes and on count-supported genes; the same for S_ema and D_raw; rho(pi_raw, dN/dS) as the reference;
+partial rho(D, dN/dS | pi_raw, expr, detection).
 
-Main thread. Human and mouse are in common in every tissue, so the six-tissue reading uses the H+Mouse fit of each tissue; bone marrow
-has only the three-species fit (human, lemur, mouse). The same six as Y1 (which owns gene x tissue variance and tissue-matched tests).
+Main thread. Human and mouse are in common in every tissue, so the six-tissue reading uses the H+Mouse fit of each tissue; bone
+marrow has only the three-species fit (human, lemur, mouse). The same six as Y1_gene_tissue (which owns gene x tissue variance and
+tissue-matched tests).
 
-Lineage panels below are fixed from textbook markers before any readout of these tissues was read in H1; they decide which genes are
-looked at for "what the tissue adds", not which are significant. Only strict-support genes are named.
+Lineage panels below are fixed from textbook markers before any readout of these tissues was read in this task; they decide which
+genes are looked at for "what the tissue adds", not which are significant. Only strict-support genes are named.
 """
 
 from __future__ import annotations
@@ -122,9 +130,9 @@ COHORTS = {
     "vz_primates": dict(tissue="eye", label="Eye primates", species="human, M. fascicularis, M. mulatta", h5ad=VZ / "van_zyl_primates.h5ad", table="van_zyl",
                         ct="cell_ontology_class", role="new", tried={42: "rev-vz-primates-grid2-s42", 43: "rev-vz-primates-s43", 44: "rev-vz-primates-s44"}),
     "vz_full": dict(tissue="eye", label="Eye 5 species", species="human, M. fascicularis, M. mulatta, mouse, pig", h5ad=VZ / "van_zyl_unified.h5ad", table="van_zyl",
-                    ct="cell_ontology_class", role="new", tried={s: f"rev-vz-grid2-s{s}" for s in (42, 43, 44)}),  # grid 2 by the count rule (T11_2c, seed_map_winner.tsv); grid 1, "full_g1", is not an H1 row
+                    ct="cell_ontology_class", role="new", tried={s: f"rev-vz-grid2-s{s}" for s in (42, 43, 44)}),  # grid 2 by the count rule (T11_2c_count_rule, seed_map_winner.tsv); grid 1, "full_g1", is not a row here
 }
-# Added once Z1 lists their selected seeds: one row per run in extra_runs.tsv (cohort, seed, run); see README.
+# Added once Z1_retune lists their selected seeds: one row per run in extra_runs.tsv (cohort, seed, run); see README.
 PENDING = {
     "vz_hpig": dict(tissue="eye", label="Eye H+Pig", species="human, pig", h5ad=VZ / "van_zyl_hpig.h5ad", table="van_zyl", ct="cell_ontology_class", role="new", tried={}),
     "vz_hmfas": dict(tissue="eye", label="Eye H+M. fascicularis", species="human, M. fascicularis", h5ad=VZ / "van_zyl_hmfas.h5ad", table="van_zyl", ct="cell_ontology_class",
@@ -133,8 +141,8 @@ PENDING = {
 PRIMARY = {"liver": "liv_hmouse", "testis": "test_hmouse", "bone marrow": "bone_marrow", "kidney": "kidney", "islet": "islet", "eye": "vz_hmouse",
            "cortex": "brain_m1_hmouse", "lung": "lung_healthy"}
 # The thread: one human+mouse model per tissue, or the closest fit that holds both (bone marrow, lung: human, mouse lemur, mouse). Cortex and lung joined
-# with the C1 cohorts (2026-11-03); the six-tissue thread of the first H1 pass stays computed beside it (SIX). Muscle fits the rule and enters only as a
-# sensitivity (coordinator named cortex and lung); tumour is not healthy tissue and does not enter.
+# with the cohorts of C1_cohorts (2026-11-03); the six-tissue thread of the first pass stays computed beside it (SIX). Muscle fits the rule and enters
+# only as a sensitivity (cortex and lung were the tissues chosen for the thread); tumor is not healthy tissue and does not enter.
 TISSUE_ORDER = ["liver", "testis", "bone marrow", "kidney", "islet", "eye", "cortex", "lung"]
 SIX = ["liver", "testis", "bone marrow", "kidney", "islet", "eye"]
 SENS_EXTRA = {"skeletal muscle": "muscle_ageing"}
@@ -181,7 +189,7 @@ def load_extra():
     return out
 
 
-# C1 cohorts (plan section 13; ledger C1_cohorts.md): runs from results/analysis/C1/kept_runs.tsv, all kept by C1's health rule.
+# Cohorts of C1_cohorts (pre-specified analysis plan, section 13): runs from results/analysis/C1/kept_runs.tsv, all kept by its health rule.
 C1_LABELS = {
     "brain_m1_hmouse": ("Cortex M1 H+Mouse", "human, mouse"),
     "brain_m1": ("Cortex M1 3 species", "human, marmoset, mouse"),
@@ -199,7 +207,7 @@ C1_KEPT = RES / "C1" / "kept_runs.tsv"
 
 
 def _c1_lineage() -> dict:
-    """LINEAGE_C1 as committed in C1_cohorts/h1_c1.py, read as a literal (importing that module would reset H1_OUT)."""
+    """LINEAGE_C1 as fixed in C1_cohorts/h1_c1.py, read as a literal (importing that module would reset H1_OUT)."""
     import ast
 
     src = (REPO / "analysis" / "tasks" / "C1_cohorts" / "h1_c1.py").read_text()
@@ -214,7 +222,7 @@ for _t, _v in _c1_lineage().items():
 
 
 def load_c1(out: dict) -> dict:
-    """Join the C1 cohorts. H1_C1=0 leaves them out (runs that must reproduce the 16-cohort pass, or C1's own adapter)."""
+    """Join the cohorts of C1_cohorts. H1_C1=0 leaves them out (runs that must reproduce the 16-cohort pass, or the adapter of C1_cohorts)."""
     import pandas as pd
 
     if os.environ.get("H1_C1", "1") == "0" or not C1_KEPT.exists():

@@ -8,7 +8,7 @@ Derives per-ortholog scores from SATURN (macrogene weights) and CAMEX (gene embe
 | Question | What the count evidence adds: What do the readouts add to direct baselines and to other tools, on real and on ground-truth data? |
 | Status | in the paper |
 | Environment | `chimera_env` |
-| Used in the paper | Section 3.6 (`sec:adds`); Figure 5c (`fig:validation`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.10 (`sssec:rev-gene-level`) |
+| Used in the paper | Section 3.4 (`sec:adds`); Supplementary Figure S26c (`fig:supp-validation-tests`); Supplementary Section D.3 (`ssec:er-validation`); Supplementary Section C.21.9 (`sssec:rev-gene-level`) |
 | How we know | numbers printed in the paper are read from this task's result files; a script of this task draws panels of the figure |
 
 **Run**, from the repository root, in the order given (set `PYTHONPATH=$PWD` for commands that name a file; `-m` commands need nothing):
@@ -20,6 +20,7 @@ Derives per-ortholog scores from SATURN (macrogene weights) and CAMEX (gene embe
 **Writes** (with the deposit bundle that holds it, see `REPRODUCE.md`)
 
 - `results/analysis/T5_6/`: bundle `tool_runs_saturn_camex`
+- `training/runs/baselines_saturn_1to1/`: bundle `notebook_caches`
 
 **Reads** (as named in the code)
 

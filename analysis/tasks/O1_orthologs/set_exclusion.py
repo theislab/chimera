@@ -5,7 +5,7 @@ one-to-one partner another protein or low-confidence; SELE also no mouse counts)
 from the gene universe of each liver cohort, so they enter neither a set nor its matched null.
 
 Cited numbers and their sources (same code, inputs, seeds and set/score positions as the originals):
-* X2_liver_biology ``drivers.csv``: Fig 4c urea-cycle / gluconeogenesis set, score D, matchings C and C_hep,
+* X2_liver_biology ``drivers.csv``: the urea-cycle / gluconeogenesis set of the prior landscape panel (fig:dalpha-biology), score D, matchings C and C_hep,
   universes all and complete, every liver cohort (main text and Extended Results: 4-sp d -1.36,
   Human+Macaque -2.14, Human+Mouse +0.66, p 0.40).
 * X2_liver_biology ``set_species_share.csv``: species shares of the same set's summed margin (human 69%).
