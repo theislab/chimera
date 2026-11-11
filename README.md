@@ -190,8 +190,10 @@ The sources of the other cohorts (bone marrow, kidney, pancreatic islet, eye, ce
 lung, skeletal muscle, tumor myeloid cells) and of every reference are listed in the paper and
 in the `MANIFEST.tsv` files of the deposit; how each object is built from them is in
 [`REPRODUCE.md`](REPRODUCE.md), section 8. Processed objects, ortholog tables, trained models
-and per-gene tables are archived at [DOI]. In file names, `panc_*` and `pancreas_*` mean the
-**liver** cohorts.
+and per-gene tables are archived at Zenodo, one record per bundle:
+[`REPRODUCE.md`](REPRODUCE.md), section 3, gives the DOI of each, and the code archive of
+release `v0.1.0`, [10.5281/zenodo.24137767](https://doi.org/10.5281/zenodo.24137767), links them
+all. In file names, `panc_*` and `pancreas_*` mean the **liver** cohorts.
 
 ## Reproducing the paper
 

@@ -33,6 +33,13 @@
 #     as: <path>                the expression matrix
 #
 # In `not_included` and `not_deposited`, a path may use `*` and `{a,b}` alternatives.
+#
+# The identifiers of the archived release are declared here too: `release_tag`, `code_doi` and
+# `paper_doi` under `deposit`, and `doi` in each bundle (the DOI of its Zenodo record). `stage.py`
+# writes them into the README and the metadata of every record and into the bundle table of
+# REPRODUCE.md; they are no part of what decides the content of a tarball. One that is not
+# declared is written as a placeholder (`[TAG]`, `[DOI]`, `[DOI <bundle>]`), so a deposit can be
+# staged before its DOIs exist: delete the lines to stage a deposit of your own.
 
 format: 1
 
@@ -45,6 +52,9 @@ deposit:
   docs_naming_every_bundle: [REPRODUCE.md]    # `--check` fails when one of these files does not name a bundle
   record_limit_gb: 50                    # Zenodo limit per record; a tarball above 95 % of it is split
   split_part_gb: 45
+  release_tag: v0.1.0                    # git tag of the code that this deposit belongs to
+  code_doi: 10.5281/zenodo.24137767      # Zenodo record of the code at that tag; it links every record below
+  # paper_doi: <DOI of the article>      # the records link the article once this line is filled in
 
 # Files that are never packed, wherever a selector finds them.
 never_packed:
@@ -134,6 +144,7 @@ bundles:
 
   data_liver_testis:
     title: processed data of the liver and testis cohorts
+    doi: 10.5281/zenodo.24137733
     unpacks_to: "`data/processed/`, `data/raw/MANIFEST.tsv`"
     description: >-
       The seven processed AnnData objects of the canonical cohorts (liver from the CAMEX bundle of
@@ -165,6 +176,7 @@ bundles:
 
   data_other_cohorts:
     title: processed data of the other cohorts, disease data and controls
+    doi: 10.5281/zenodo.24137739
     unpacks_to: "`data/analysis/`, `data/processed/ortholog_table_van_zyl.csv`"
     description: >-
       Processed objects built from public data: the eye cohort (Van Zyl aqueous-humor outflow
@@ -266,6 +278,7 @@ bundles:
 
   data_identifier_joined:
     title: liver and testis objects with counts joined on the Ensembl gene ID, recommended for reuse
+    doi: 10.5281/zenodo.24137741
     unpacks_to: "`data/analysis/O1/repair_*/`, `training/runs/o2-*/`"
     description: >-
       Liver (Human+Mouse, Human+Monkey, 4-species) and testis (Human+Mouse) objects in which
@@ -292,6 +305,7 @@ bundles:
 
   models_canonical:
     title: trained models of the seven canonical cohorts
+    doi: 10.5281/zenodo.24137745
     unpacks_to: "`training/runs/<run>/` (the runs of `configs/canonical_recipes.tsv`)"
     description: >-
       The 11 canonical Chimera runs (liver Human+Monkey seeds 42-44, Human+Mouse seeds 42-44,
@@ -307,6 +321,7 @@ bundles:
 
   models_seeds_controls_cohorts:
     title: trained models of the further seeds, controls and cohorts
+    doi: 10.5281/zenodo.24137747
     unpacks_to: "`training/runs/rev-*/`, `training/runs/g1-*/`"
     description: >-
       Protein-feature-gate runs beyond the 11 canonical ones: further seeds of the canonical
@@ -333,6 +348,7 @@ bundles:
 
   models_per_gene_gate:
     title: trained models with the per-gene gate
+    doi: 10.5281/zenodo.24137749
     unpacks_to: "`training/runs/z3-*/`, `z4-*/`, `rev-ctl-liv_hmouse-m-*/`"
     description: >-
       Fits with a per-gene gate (--config M: the canonical model with one free correction per
@@ -351,6 +367,7 @@ bundles:
 
   gene_tables:
     title: per-gene tables
+    doi: 10.5281/zenodo.24137751
     unpacks_to: "`results/gene_tables/`"
     description: >-
       One CSV per canonical cohort with the human Ensembl ID, symbol, prior, raw prior, alpha,
@@ -380,6 +397,7 @@ bundles:
 
   notebook_caches:
     title: notebook caches and integration baseline runs
+    doi: 10.5281/zenodo.24137755
     unpacks_to: "`notebooks/cache/`, `training/runs/baselines_*`"
     description: >-
       Caches of the workflow notebooks, read by the notebooks and the figure code: integration
@@ -406,9 +424,10 @@ bundles:
 
   analysis_results:
     title: analysis outputs
+    doi: 10.5281/zenodo.24137757
     unpacks_to: "`results/analysis/<task>/`"
     description: >-
-      Outputs of the analyses of the paper, one folder per task (results/analysis/<task>/):
+      Outputs of the analyses of the paper, one folder per task under results/analysis/:
       reliability and consensus, controls, gold standards and baselines, scoreboard, functional
       layer, disease cases, further cohorts, residue checks, the harmonized per-gene tables of 26
       cohorts for both gates (H1, Z4) and the gate comparisons (Z3, Z4), the identifier-joined
@@ -470,6 +489,7 @@ bundles:
 
   tool_runs_saturn_camex:
     title: SATURN and CAMEX runs
+    doi: 10.5281/zenodo.24137761
     unpacks_to: "`results/analysis/T5_*/`"
     description: >-
       SATURN and CAMEX runs (environment smoke test, pilot, cell-level runs on the seven
@@ -483,6 +503,7 @@ bundles:
 
   gene_level_benchmark:
     title: gene-level benchmark
+    doi: 10.5281/zenodo.24137763
     unpacks_to: "`results/analysis/B1/`, `B2/`, `training/runs/b1*-*/`, `b2-*/`"
     description: >-
       The gene-level benchmark: Track A (ground-truth spike-in of pattern, level and loss changes,
@@ -506,6 +527,7 @@ bundles:
 
   analysis_plan:
     title: pre-specified analysis plan
+    doi: 10.5281/zenodo.24137729
     record_type: publication
     unpacks_to: "`results/analysis/_release/`"
     description: >-

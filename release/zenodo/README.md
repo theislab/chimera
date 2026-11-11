@@ -7,7 +7,7 @@ holds what builds them.
 
 | File | Role |
 |---|---|
-| [`bundles.yaml`](bundles.yaml) | The declaration: which files go into which bundle, what is left out and why, which columns are removed. **Edit this file to change the deposit.** |
+| [`bundles.yaml`](bundles.yaml) | The declaration: which files go into which bundle, what is left out and why, which columns are removed, and the identifiers of the archived release (tag and DOIs). **Edit this file to change the deposit.** |
 | [`stage.py`](stage.py) | Builds the staging area from the declaration and the current repository and storage. Uploads nothing. |
 | [`LICENSES.md`](LICENSES.md) | Third-party sources, their licenses, and whether each is redistributed or linked. Copied into every record. |
 | [`texts/`](texts/) | Text files that are packed into a bundle (the column description of the gene tables). |
@@ -38,7 +38,7 @@ beside the checkout (always outside the repository). It needs about as much disk
         MANIFEST.tsv                  every member: path, bytes, sha256, origin
         README.md, LICENSES.md        what the record is; third-party sources
         SHA256SUMS                    sha256 of the files above
-    zenodo_metadata.json            title, description, creators, related identifiers ([TAG], [DOI] placeholders)
+    zenodo_metadata.json            title, description, creators, version, related identifiers
     skipped.tsv                     what was left out, with the reason
     scrubbed.tsv                    members whose content was altered
     review_hits.tsv                 matches of review patterns (not altered)
@@ -64,6 +64,22 @@ the reason.
 The fingerprint trusts sizes and modification times. `--check --deep` also recomputes the
 sha256 of the upload files and of every unaltered source file, so it also finds a file whose
 content changed while its size and time stayed the same. Run it once before an upload.
+
+## Release identifiers
+
+The git tag of the release, the DOI of the code archive and the DOI of each record are declared
+in `bundles.yaml`: `release_tag` and `code_doi` under `deposit`, `doi` in each bundle, and
+`paper_doi` under `deposit` once the article has one. `stage.py` writes them into the README
+and the metadata of every record, and into the table that `--bundle-table` prints for
+`REPRODUCE.md`. In the metadata, each record supplements the code archive and the tagged code
+and references the records of the other bundles; the article is linked once `paper_doi` is
+declared.
+
+The identifiers are no part of the fingerprint. Declaring or changing one rewrites the
+generated texts and `SHA256SUMS` of the staged records and keeps every tarball. One that is not
+declared is written as a placeholder (`[TAG]`, `[DOI]`, `[DOI <bundle>]`), so a deposit can be
+staged before its DOIs exist; `<staging>/README.md` names the placeholders that are left.
+`--check` reports when `REPRODUCE.md` or `CITATION.cff` does not carry a declared identifier.
 
 ## What is altered on the way in
 
@@ -95,3 +111,4 @@ absent, `stage.py` reports that bundle as not built and builds the others.
 | rename or remove a bundle | edit `bundles.yaml`, run `stage.py`, then `stage.py --prune` to delete the old folder |
 | remove a column everywhere | add it to `dropped_columns.columns` |
 | update the bundle table of `REPRODUCE.md` | `python release/zenodo/stage.py --bundle-table` |
+| archive a release | reserve the DOIs at Zenodo, write `release_tag`, `code_doi` and the `doi` of each bundle into `bundles.yaml`, run `stage.py` |

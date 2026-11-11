@@ -4,9 +4,11 @@ All notable changes of the `chimera` package and of this repository, for users. 
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
-## 0.1.0 (first release; the date is set when the release is tagged)
+## 0.1.0 (first release, 2026-11-11)
 
-The version that produced the results of the paper.
+The version that produced the results of the paper. The code at tag `v0.1.0` is archived at
+[10.5281/zenodo.24137767](https://doi.org/10.5281/zenodo.24137767); the records of the
+data deposit are listed with their DOIs in `REPRODUCE.md`, section 3.
 
 ### Package
 

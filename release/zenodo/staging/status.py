@@ -13,6 +13,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import yaml
+
 from .declaration import Declaration
 from .packing import PACK_FORMAT, fingerprint, sha256_file
 from .selection import Selection
@@ -146,10 +148,30 @@ def undeclared_folders(declaration: Declaration, out: Path) -> list[str]:
 
 
 def docs_missing_bundles(repo: Path, declaration: Declaration) -> list[str]:
-    """Bundle names that a documentation file should mention and does not."""
+    """Bundle names and declared identifiers that a documentation file should mention and does not."""
+    dep = declaration.deposit
     missing = []
-    for doc in declaration.deposit.docs_naming_every_bundle:
+    for doc in dep.docs_naming_every_bundle:
         path = repo / doc
         text = path.read_text(encoding="utf-8") if path.is_file() else ""
         missing += [f"{doc} does not name bundle {name}" for name in declaration.bundles if f"`{name}`" not in text]
+        missing += [f"{doc} does not give the DOI of bundle {name} ({bundle.doi})"
+                    for name, bundle in declaration.bundles.items() if bundle.doi and bundle.doi not in text]
+        if dep.code_doi and dep.code_doi not in text:
+            missing.append(f"{doc} does not give the DOI of the code archive ({dep.code_doi})")
+        if dep.release_tag and dep.release_tag not in text:
+            missing.append(f"{doc} does not name the release tag {dep.release_tag}")
     return missing
+
+
+def citation_mismatches(repo: Path, declaration: Declaration) -> list[str]:
+    """Where the citation file disagrees with the declared identifiers of the release."""
+    dep = declaration.deposit
+    path = repo / dep.citation_file
+    cff = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}) if path.is_file() else {}
+    notes = []
+    if dep.code_doi and cff.get("doi") != dep.code_doi:
+        notes.append(f"{dep.citation_file} gives the DOI {cff.get('doi')!r}, the declaration {dep.code_doi} for the code archive")
+    if dep.release_tag and str(cff.get("version", "")) != dep.release_tag.removeprefix("v"):
+        notes.append(f"{dep.citation_file} gives version {cff.get('version')!r}, the declaration the release tag {dep.release_tag}")
+    return notes

@@ -47,7 +47,7 @@ examples:
 where things are:
   repository   the checkout this script is in, or ${ENV_ROOT} when set
   output       --out, else ${ENV_OUT}, else ../{DEFAULT_OUT_NAME} beside the checkout
-  declaration  release/zenodo/bundles.yaml (bundles, exclusions, rules)
+  declaration  release/zenodo/bundles.yaml (bundles, exclusions, rules, release tag and DOIs)
   licenses     release/zenodo/LICENSES.md (copied into every record)
 
 A bundle is rebuilt only when its fingerprint changed: the list of its members with the size
@@ -216,6 +216,7 @@ def cmd_check(stager: Stager, names: list[str], deep: bool) -> int:
     notes = [f"staged folder {n}/ is not a bundle of the declaration (remove it with --prune)"
              for n in status.undeclared_folders(stager.decl, stager.out)]
     notes += status.docs_missing_bundles(stager.repo, stager.decl)
+    notes += status.citation_mismatches(stager.repo, stager.decl)
     if set(selections) == set(stager.decl.bundles):
         notes += [f"{gap} is in no bundle and has no stated reason for being left out"
                   for gap in coverage_gaps(stager.repo, stager.decl, selections)]

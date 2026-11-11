@@ -17,8 +17,8 @@ that. For *using* a release, see [`REPRODUCE.md`](../REPRODUCE.md).
 |---|---|---|---|
 | 1. Stage | The deposit is built from the current repository and storage into a staging folder outside the repository: one folder per bundle with a tarball, a manifest, checksums and the Zenodo metadata. | `python release/zenodo/stage.py` | script |
 | 2. Test from a clean clone | A fresh `git clone`, an environment built from the lock file and the staged bundles are put together, and the checks run there with the working tree hidden. | `bash release/clean_clone_test.sh all` | script |
-| 3. Upload | One Zenodo record per bundle is created from `<staging>/<bundle>/upload/` and `<bundle>/zenodo_metadata.json`; the DOIs are reserved. | by hand (see `<staging>/README.md`) | maintainer |
-| 4. Tag | The reserved DOIs and the tag are written where the placeholders `[DOI]` and `[TAG]` stand in the documents (`REPRODUCE.md`, `README.md`), and the release date and DOI into `CITATION.cff` and `CHANGELOG.md`; `git grep -n -F -e '[DOI]' -e '[TAG]' -- '*.md'` lists the places. Then the commit is tagged and the records are published. | by hand | maintainer |
+| 3. Reserve and upload | One Zenodo record per bundle and one for the code archive are created and their DOIs reserved. The release tag and the DOIs are written into `zenodo/bundles.yaml`; `stage.py` then writes them into the README and the metadata of every record and keeps every tarball whose members did not change, and `stage.py --bundle-table` prints the bundle table of `REPRODUCE.md` with the DOIs. The files of `<staging>/<bundle>/upload/` are uploaded and the form of each record is filled from `<bundle>/zenodo_metadata.json`. | by hand (see `<staging>/README.md`) | maintainer |
+| 4. Tag | The tag and the DOI of the code archive are written into `README.md`, `REPRODUCE.md`, `CITATION.cff` (with the release date) and `CHANGELOG.md`; `stage.py --check` reports when `REPRODUCE.md` or `CITATION.cff` does not carry a declared identifier. Then the commit is tagged, the archive of the tagged code is uploaded to its record, and the records are published. | by hand | maintainer |
 
 No script here uploads, tags or pushes anything. Steps 1 and 2 can be repeated at any time and
 change nothing in the repository.
@@ -48,4 +48,8 @@ test), `analysis/reproduce_smoke.sh` (the checks a user also runs), `analysis/ex
   `REPRODUCE.md` does not name a bundle.
 - After any change to results, data, runs or caches, run `stage.py --check`. It also reports a
   storage folder that is in no bundle and has no stated reason for being left out.
+- The identifiers of a release (its tag, the DOI of the code archive, the DOI of each record)
+  are declared once, in `zenodo/bundles.yaml`. Declaring them rewrites the generated texts of
+  the staged records and leaves the tarballs as they are, so the tarballs that the clean-clone
+  test read are the ones that are uploaded.
 - The clean-clone test uses the committed state of the repository. Commit, stage, then test.

@@ -12,7 +12,7 @@ Layout of a finished bundle folder::
             README.md, LICENSES.md     what the record is; third-party sources
             <loose files>              copies of selected members for direct viewing
             SHA256SUMS                 sha256 of the files above
-        zenodo_metadata.json         deposit metadata with placeholders
+        zenodo_metadata.json         deposit metadata of the record
         skipped.tsv                  what was left out, with the reason
         scrubbed.tsv                 members whose content was altered
         review_hits.tsv              matches of review patterns (not altered)

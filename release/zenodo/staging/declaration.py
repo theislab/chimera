@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ import yaml
 
 FORMAT = 1
 RECORD_TYPES = ("dataset", "publication")
+DOI = re.compile(r"10\.\d{4,9}/\S+")
 
 
 class DeclarationError(ValueError):
@@ -34,6 +36,9 @@ class Deposit:
     docs_naming_every_bundle: tuple[str, ...]
     record_limit_bytes: int
     split_part_bytes: int
+    release_tag: str = ""                   # identifiers of the archived release; "" = not declared
+    code_doi: str = ""
+    paper_doi: str = ""
 
 
 @dataclass(frozen=True)
@@ -142,6 +147,7 @@ class Bundle:
     members: tuple[dict[str, Any], ...]
     not_included: tuple[Exclusion, ...]
     loose_files: tuple[str, ...]
+    doi: str = ""                           # DOI of the record; "" = not declared
 
     def digest(self) -> str:
         """Hash of everything that decides the content of the tarball."""
@@ -254,20 +260,32 @@ def _task_folders(raw: dict[str, Any]) -> TaskFolderRules:
         compact_reason=co["reason"])
 
 
+def _doi(value: Any, where: str) -> str:
+    """A declared DOI in its bare form (``10.5281/zenodo.N``), or "" when none is declared."""
+    doi = str(value or "").strip()
+    if doi and not DOI.fullmatch(doi):
+        raise DeclarationError(f"{where}: {doi!r} is not a DOI (write it as 10.NNNN/suffix, without https://doi.org/)")
+    return doi
+
+
 def _bundle(name: str, raw: dict[str, Any]) -> Bundle:
     d = _take(raw, f"bundles.{name}", required=("title", "description", "members"),
-              optional=("record_type", "unpacks_to", "derived_from", "not_included", "loose_files"))
+              optional=("record_type", "unpacks_to", "derived_from", "not_included", "loose_files", "doi"))
     record_type = d["record_type"] or "dataset"
     if record_type not in RECORD_TYPES:
         raise DeclarationError(f"bundles.{name}.record_type must be one of {RECORD_TYPES}")
     if not d["members"]:
         raise DeclarationError(f"bundles.{name}.members is empty")
+    description = " ".join(str(d["description"]).split())
+    if "<" in description or ">" in description:
+        raise DeclarationError(f"bundles.{name}.description: no angle brackets (Zenodo reads a description as "
+                               "HTML and drops what stands between them)")
     return Bundle(
-        name=name, title=d["title"], description=" ".join(str(d["description"]).split()),
+        name=name, title=d["title"], description=description,
         record_type=record_type, unpacks_to=d["unpacks_to"] or "",
         derived_from=tuple(d["derived_from"] or ()), members=tuple(d["members"]),
         not_included=_exclusions(d["not_included"], f"bundles.{name}.not_included"),
-        loose_files=tuple(d["loose_files"] or ()))
+        loose_files=tuple(d["loose_files"] or ()), doi=_doi(d["doi"], f"bundles.{name}.doi"))
 
 
 def _text_rules(raw: dict[str, Any], private: dict[str, Any] | None) -> TextRules:
@@ -297,20 +315,27 @@ def load(path: Path, private_rules: Path | None = None) -> Declaration:
 
     dep = _take(d["deposit"], "deposit", required=(
         "name", "code_repository", "license", "citation_file", "licenses_file",
-        "record_limit_gb", "split_part_gb"), optional=("docs_naming_every_bundle",))
+        "record_limit_gb", "split_part_gb"),
+        optional=("docs_naming_every_bundle", "release_tag", "code_doi", "paper_doi"))
     npk = _take(d["never_packed"], "never_packed", optional=("names", "suffixes", "name_contains"))
     dc = _take(d["dropped_columns"], "dropped_columns", required=("label", "columns", "reason"))
     bundles = {name: _bundle(name, raw_b) for name, raw_b in d["bundles"].items()}
     for name in bundles:
         if not name.replace("_", "").isalnum() or name != name.lower():
             raise DeclarationError(f"bundle name {name!r}: use lower-case letters, digits and '_'")
+    code_doi = _doi(dep["code_doi"], "deposit.code_doi")
+    declared = [doi for doi in (code_doi, *(b.doi for b in bundles.values())) if doi]
+    if len(declared) != len(set(declared)):
+        raise DeclarationError("deposit.code_doi and the doi of every bundle must differ from each other")
     return Declaration(
         deposit=Deposit(
             name=dep["name"], code_repository=dep["code_repository"], license=dep["license"],
             citation_file=dep["citation_file"], licenses_file=dep["licenses_file"],
             docs_naming_every_bundle=tuple(dep["docs_naming_every_bundle"] or ()),
             record_limit_bytes=int(float(dep["record_limit_gb"]) * 10**9),
-            split_part_bytes=int(float(dep["split_part_gb"]) * 10**9)),
+            split_part_bytes=int(float(dep["split_part_gb"]) * 10**9),
+            release_tag=str(dep["release_tag"] or "").strip(), code_doi=code_doi,
+            paper_doi=_doi(dep["paper_doi"], "deposit.paper_doi")),
         never_packed=NeverPacked(frozenset(npk["names"] or ()), tuple(npk["suffixes"] or ()),
                                  tuple(npk["name_contains"] or ())),
         dropped_columns=DroppedColumns(dc["label"], frozenset(dc["columns"]),
