@@ -48,6 +48,8 @@ ROW_ORDER = {  # tissues whose rows are not in the order of cohort_table.csv
 TISSUE_PREFIX = ("Liver ", "Testis ", "Eye ", "Cortex ", "Lung ", "Muscle ", "Tumor myeloid ")  # dropped from a row name: the block heading says it
 # the recipe of the cortex, lung, muscle and tumor cohorts, in the words of the Methods
 GRID_RECIPE = "row of a grid fixed before training, chosen by the health rule and count dependence"
+# phrases of the recipe column of cohort_table.csv that the paper words differently
+RECIPE_WORDS = {"the testis 3-species value": "the three-species testis value"}
 COHORT_HEAD = (r"\textbf{Cohort} & \textbf{Species} & \textbf{Cells $\times$ genes} & \textbf{Types} & \textbf{Recipe} & \textbf{Runs} & \textbf{Count-supported} & "
                r"\textbf{$\Delta\alpha$ SD} & \textbf{Tails, anchored prior (up / down)} & \textbf{Tails, unclamped prior (up / down)} & \textbf{$\rho(\Delta\alpha, S_g)$ (partial)} & "
                r"\textbf{Mixing (random); label transfer} & \textbf{scVI, same object: mixing; label transfer} \\")
@@ -75,7 +77,12 @@ def name(label: str) -> str:
 
 
 def recipe(source: str) -> str:
-    return GRID_RECIPE if source.startswith("blind grid of the plan") else source
+    """A recipe source of cohort_table.csv in the words of the paper."""
+    if source.startswith("blind grid of the plan"):
+        return GRID_RECIPE
+    for stored, printed in RECIPE_WORDS.items():
+        source = source.replace(stored, printed)
+    return source
 
 
 def cohort_rows(t: pd.DataFrame) -> str:
@@ -129,7 +136,7 @@ def tables() -> str:
         f"$\\star$, count evidence for {pct(tc.loc['tumour_zilionis', 'count_support_share'])} of genes at inDrop depth, the lowest of all cohorts: per-gene claims on tumor stay few. "
         "Muscle and tumor are outside the eight-tissue reading: muscle enters it only as a sensitivity, tumor is not healthy tissue.}")
     lines.append("\\label{tab:harmonised-cohorts}\\\\\n\\toprule\n" + COHORT_HEAD + "\n\\midrule\n\\endfirsthead\n"
-                 "\\multicolumn{13}{@{}l}{\\textit{Supplementary \\cref{tab:harmonised-cohorts}, continued}}\\\\\n\\toprule\n" + COHORT_HEAD + "\n\\midrule\n\\endhead\n\\bottomrule\n\\endlastfoot")
+                 "\\multicolumn{13}{@{}l}{\\textit{Supplementary~\\cref{tab:harmonised-cohorts}, continued}}\\\\\n\\toprule\n" + COHORT_HEAD + "\n\\midrule\n\\endhead\n\\bottomrule\n\\endlastfoot")
     lines.append(cohort_rows(t))
     lines.append("\\end{longtable}\n\\end{landscape}\n\\endgroup\n")
     # ---- data rules of liver, testis, bone marrow, kidney, islet and eye
