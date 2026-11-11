@@ -486,7 +486,7 @@ def p_named(genes: list[str]) -> None:
     M, C = named_matrix(genes)
     nb = pd.read_csv(OUT / "named.csv").set_index("symbol")
     lim, cell_w, cell_h = 3.0, 20.0, 10.0
-    w, left, top, bottom = W_NAMED, 40.0, 12.0, 86.0
+    w, left, top, bottom = W_NAMED, 40.0, 12.0, 93.0  # bottom: the longest tissue name ends above the color bar
     h = top + len(genes) * cell_h + bottom
     fig = page(w, h)
     ax = box(fig, left, bottom, len(tis) * cell_w, len(genes) * cell_h)
@@ -518,6 +518,10 @@ def p_named(genes: list[str]) -> None:
     cb.set_ticks([-3, -2, -1, 0, 1, 2, 3])
     cb.ax.tick_params(labelsize=S_TICK, length=2)
     cb.outline.set_linewidth(0.4)
+    fig.canvas.draw()
+    bar = cax.get_window_extent()
+    lowest = min(t.get_window_extent().y0 for t in ax.get_xticklabels())
+    assert lowest > bar.y1 + 2 * fig.dpi / 72, "a tissue name reaches the color bar"   # 2 bp of air, with the pointed ends of the bar
     hd = [Line2D([], [], marker="o", ls="", color=INK, ms=1.8, label="difference called in a cohort of the tissue"),
           Patch(fc=NA_CELL, ec="none", label="gene without count evidence in both fits")]
     fig.legend(handles=hd, loc="lower left", bbox_to_anchor=(left / w, 1.5 / h), ncol=2, handletextpad=0.4, handlelength=1.0, columnspacing=1.5, borderaxespad=0)

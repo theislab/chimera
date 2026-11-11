@@ -265,7 +265,7 @@ def heatmap(t):
     cb.outline.set_visible(False)
     # notes under the cohort names
     note = dict(ha="left", va="bottom", fontsize=style.SIZE_TEXT, color=INK)
-    fig.text(2.0 / W, 10.0 / H, "Partial ρ: rank partial correlation given the other covariates (identity, expression, detection, coding length).", **note)
+    fig.text(2.0 / W, 10.0 / H, "Partial ρ: partial rank correlation given the other covariates (identity, expression, detection, coding length).", **note)
     fig.add_artist(Rectangle((2.0 / W, 2.2 / H), 9.0 / W, 5.5 / H, transform=fig.transFigure, fc=NA_CELL, ec=RULE, lw=0.4))
     fig.text(13.5 / W, 2.0 / H, "not defined for the cohort.   Liver cohorts are anchored on the raw prior: their columns of the middle maps repeat the top maps.",
              **note)

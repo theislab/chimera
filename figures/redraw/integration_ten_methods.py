@@ -54,6 +54,8 @@ LEFT, MAP_W, RIGHT = 89.3, 126.0, 1.4   # method names (RIGHT where there are no
 PITCH = 10.5                       # one line of a heat map: a method, or the heading of a group
 TOP, NAMES, BAR = 3.0, 72.0, 33.0  # above the map; cohort names under it (4 bp where there are none); color bar and its label
 VALUE_SIZE, METHOD_SIZE, COHORT_SIZE, GROUP_SIZE = 5.5, 6.0, 5.5, 5.5
+SIGNED_VALUE_SIZE = 5.1            # values of a map that holds negative numbers: "−0.02" is two fifths wider than "0.02" and
+                                   # at 5.5 pt reaches the next cell and the dashed outline
 
 
 def table() -> pd.DataFrame:
@@ -92,6 +94,12 @@ def heat(M: pd.DataFrame, label: str, cmap: str, limits: tuple, best: str | None
     im = ax.imshow(np.ma.masked_invalid(A), cmap=colors, vmin=vmin, vmax=vmax, aspect="auto")
     pick = {"max": np.nanargmax, "min": np.nanargmin}.get(best)
     top = {j: int(pick(A[:, j])) for j in range(A.shape[1])} if pick else {}
+
+    def printed(v: float) -> str:   # two decimals, the minus sign; a value that rounds to zero carries no sign
+        return "0.00" if round(float(v), 2) == 0 else f"{v:.2f}".replace("-", "−")
+
+    signed = any(printed(v).startswith("−") for v in A[np.isfinite(A)])
+    value_size = SIGNED_VALUE_SIZE if signed else VALUE_SIZE
     for i, m in enumerate(lines):
         if m is None:
             continue
@@ -99,7 +107,7 @@ def heat(M: pd.DataFrame, label: str, cmap: str, limits: tuple, best: str | None
             v = A[i, j]
             rel = (v - vmin) / max(vmax - vmin, 1e-9)
             dark = rel < 0.4 if cmap.endswith("_r") else rel > 0.6
-            ax.text(j, i, f"{v:.2f}".replace("-", "−"), ha="center", va="center", fontsize=VALUE_SIZE,
+            ax.text(j, i, printed(v), ha="center", va="center", fontsize=value_size,
                     color="white" if dark else C.INK, fontweight="bold" if top.get(j) == i else "normal")
             if m == LABELS_ON_TESTIS and cohort.startswith("test"):
                 ax.add_patch(Rectangle((j - 0.45, i - 0.45), 0.9, 0.9, fill=False, edgecolor="white" if dark else C.INK,

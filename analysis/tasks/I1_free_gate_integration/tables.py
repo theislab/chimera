@@ -40,7 +40,9 @@ def cell(g: pd.Series, d=2) -> str:
         return "--"
     if len(g) == 1:
         return fmt(g.iloc[0], d)
-    return f"{fmt(g.mean(), d)} ({fmt(g.min(), d)}--{fmt(g.max(), d)})"
+    # a range whose lower bound is negative is written with "to", so the dash is not read as a second minus sign
+    sep = " to " if g.min() < 0 else "--"
+    return f"{fmt(g.mean(), d)} ({fmt(g.min(), d)}{sep}{fmt(g.max(), d)})"
 
 
 def mark(call: str) -> str:
@@ -209,7 +211,7 @@ def write_b(tex, caption: str):
          "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.0cm} c *{8}{c} c@{}}",
          "\\caption[Supplementary table]{" + caption + "}", "\\label{tab:integration-per-gene-gate-harmonised}\\\\",
          "\\toprule", hdr, "\\midrule", "\\endfirsthead",
-         "\\multicolumn{11}{@{}l}{\\textit{Supplementary \\cref{tab:integration-per-gene-gate-harmonised}, continued}}\\\\",
+         "\\multicolumn{11}{@{}l}{\\textit{Supplementary~\\cref{tab:integration-per-gene-gate-harmonised}, continued}}\\\\",
          "\\toprule", hdr, "\\midrule", "\\endhead", "\\bottomrule", "\\endlastfoot"]
     L += tex
     L += ["\\end{longtable}", "\\end{landscape}", "\\endgroup", ""]

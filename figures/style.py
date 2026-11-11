@@ -143,6 +143,41 @@ def cohort_name(key_or_label: str, lower: bool = False) -> str:
     return s[0].lower() + s[1:] if lower else s
 
 
+# Hallmark gene sets as named on every figure: sentence case and the spelling a reader knows. Keys: the names of the
+# library (MSigDB Hallmark 2020 as distributed by Enrichr), as the result tables hold them.
+HALLMARK = {
+    "Adipogenesis": "Adipogenesis", "Allograft Rejection": "Allograft rejection", "Androgen Response": "Androgen response",
+    "Angiogenesis": "Angiogenesis", "Apical Junction": "Apical junction", "Apical Surface": "Apical surface", "Apoptosis": "Apoptosis",
+    "Bile Acid Metabolism": "Bile acid metabolism", "Cholesterol Homeostasis": "Cholesterol homeostasis", "Coagulation": "Coagulation",
+    "Complement": "Complement", "DNA Repair": "DNA repair", "E2F Targets": "E2F targets",
+    "Epithelial Mesenchymal Transition": "Epithelial–mesenchymal transition", "Estrogen Response Early": "Estrogen response, early",
+    "Estrogen Response Late": "Estrogen response, late", "Fatty Acid Metabolism": "Fatty acid metabolism", "G2-M Checkpoint": "G2/M checkpoint",
+    "Glycolysis": "Glycolysis", "Hedgehog Signaling": "Hedgehog signaling", "heme Metabolism": "Heme metabolism", "Hypoxia": "Hypoxia",
+    "IL-2/STAT5 Signaling": "IL-2/STAT5 signaling", "IL-6/JAK/STAT3 Signaling": "IL-6/JAK/STAT3 signaling",
+    "Inflammatory Response": "Inflammatory response", "Interferon Alpha Response": "Interferon-α response",
+    "Interferon Gamma Response": "Interferon-γ response", "KRAS Signaling Dn": "KRAS signaling, down", "KRAS Signaling Up": "KRAS signaling, up",
+    "Mitotic Spindle": "Mitotic spindle", "Myc Targets V1": "MYC targets V1", "Myc Targets V2": "MYC targets V2", "Myogenesis": "Myogenesis",
+    "Notch Signaling": "Notch signaling", "Oxidative Phosphorylation": "Oxidative phosphorylation", "PI3K/AKT/mTOR Signaling": "PI3K/AKT/mTOR signaling",
+    "Pancreas Beta Cells": "Pancreas beta cells", "Pperoxisome": "Peroxisome", "Protein Secretion": "Protein secretion",
+    "Reactive Oxygen Species Pathway": "Reactive oxygen species pathway", "Spermatogenesis": "Spermatogenesis", "TGF-beta Signaling": "TGF-β signaling",
+    "TNF-alpha Signaling via NF-kB": "TNF-α signaling via NF-κB", "UV Response Dn": "UV response, down", "UV Response Up": "UV response, up",
+    "Unfolded Protein Response": "Unfolded protein response", "Wnt-beta Catenin Signaling": "Wnt/β-catenin signaling",
+    "Xenobiotic Metabolism": "Xenobiotic metabolism", "mTORC1 Signaling": "mTORC1 signaling", "p53 Pathway": "p53 pathway",
+}
+_HALLMARK_KEY = {" ".join(k.split()).lower(): v for k, v in HALLMARK.items()}
+_HALLMARK_KEY["peroxisome"] = HALLMARK["Pperoxisome"]  # the name without the typo of the library
+
+
+def hallmark_name(name: str) -> str:
+    """The name of a Hallmark gene set as drawn on a figure (``HALLMARK``). ``name`` is the name of the library; its
+    case and the number of blanks between its words do not matter. A name that is not one of the fifty sets is an error:
+    no figure prints a Hallmark set under a name of its own."""
+    key = " ".join(str(name).split()).lower()
+    if key not in _HALLMARK_KEY:
+        raise KeyError(f"'{name}' is not a Hallmark gene set of figures/style.py (HALLMARK)")
+    return _HALLMARK_KEY[key]
+
+
 SIGNIFICANT = "*"  # the one mark for q < 0.05
 
 # ----------------------------------------------------------------------------------------------- no machine paths

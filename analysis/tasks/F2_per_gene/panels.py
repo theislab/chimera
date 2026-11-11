@@ -387,10 +387,17 @@ def panel_axes() -> plt.Figure:
 
 
 # ------------------------------------------------------------------------------------------------ main figure, panels d and e
-# The two panels of the main validation figure (fig:validation d, e), drawn small. Type in pt at print size.
-M_TITLE, M_LABEL, M_TICK, M_NOTE = 6.0, 6.0, 5.5, 5.2
+# The two panels of the main validation figure (fig:validation d, e), drawn small. Type in pt at print size: block
+# headings (bold) and axis titles; row labels, tick labels and the key; notes.
+M_TITLE, M_LABEL, M_TICK, M_NOTE = 6.5, 6.5, 6.0, 5.5
 M_ORDER = (SG, CAN, FREE)  # marks of a row from top to bottom: the order of figures/style.py (count evidence, then the two gates)
-M_H = 140.0  # height of both panels, bp
+M_NAME = ("count evidence $S_g$", "Δα, protein-feature gate", "Δα, per-gene gate")  # their names in the key, which stands in panel d for both panels
+# bp: the two pages have one height and their lowest axes one bottom, so that the x axes of the row lie on one line; the
+# widths are on the 0.24 bp grid of the layout tool and fill the text width with the gap between the panels.
+M_H, M_BOTTOM, M_TOP = 123.12, 20.0, 9.5
+M_WIDTH = (264.0, 215.04)
+M_ZERO = dict(color=cm.RULE, lw=0.6, zorder=1)  # the zero line of both panels, behind the marks
+M_AXIS_TITLE = 3.8  # bp from the lower edge of the page to the baseline of the axis titles
 # The four independent references: hypothesis of the pre-specified plan -> block and row of the panel.
 REFERENCES = [("Cell-state pattern", [("H3", "Liver Human+Mouse"), ("H4", "Testis Human+Mouse")]),
               ("Expression level", [("H1", "Liver Human+Mouse"), ("H2", "Testis Human+Mouse")])]
@@ -422,28 +429,30 @@ def readout_estimates() -> pd.DataFrame:
 
 
 def panel_readouts() -> plt.Figure:
-    """Main validation figure, panel d (``main_validation/readouts_vs_references``, 290 x 140 bp): the three readouts
+    """Main validation figure, panel d (``main_validation/readouts_vs_references``, 264 x 123 bp): the three readouts
     against the four independent references.
 
     What it draws. x: the partial rank correlation with independent data given the covariates, with its 95%
     block-bootstrap interval; dotted line and light band: the bar of 0.10 set in advance and the side that clears it.
     Two blocks of two rows: cell-state pattern (liver, testis) and expression level (liver, testis). In each row three
     marks: the count evidence S_g (square), Δα with the protein-feature gate as pre-specified, ten seeds (circle), and
-    Δα with the per-gene gate, five seeds, evaluated afterward (hexagon). The column at the right gives the status of
-    the pre-specified test as a word (supported, null, reversed; ``status_rule`` V, N, R of the table), which exists
-    for the protein-feature gate only. The per-gene gate and S_g carry no status.
+    Δα with the per-gene gate, five seeds, evaluated afterward (hexagon); the key of the three marks stands in the
+    upper left corner of the plot and serves panel e as well. The column at the right, headed "pre-specified test",
+    gives the status of that test as a word (supported, null, reversed; ``status_rule`` V, N, R of the table), which
+    exists for the protein-feature gate only. The per-gene gate and S_g carry no status.
 
     Reads ``results/analysis/Z3/compare_hyp.csv`` and nothing else (columns ``hyp``, ``universe``, ``line``, ``rho_p``,
     ``ci_lo``, ``ci_hi``, ``status_rule``): S_g from ``universe == all_S_ema, line == frozen``; the protein-feature
     gate from ``universe == all, line == frozen``; the per-gene gate from ``universe == all, line == free5``; H3 and H4
     are the pattern references, H1 and H2 the level references. No value is computed; ``readout_estimates`` checks the
-    twelve estimates and the four status letters against the values the paper prints.
+    twelve estimates and the four status letters against the values the paper prints. The panel stops if an interval
+    reaches into the corner that holds the key.
 
         python -m analysis.tasks.F2_per_gene.panels --panel main_validation/readouts_vs_references     # in chimera_env, from the repository root
     """
     E = readout_estimates()
-    W, H = 290.0, M_H
-    left, right, bottom, top = 76.0, 37.0, 37.0, 9.0
+    W, H = M_WIDTH[0], M_H
+    left, right, bottom, top = 72.0, 40.0, M_BOTTOM, M_TOP
     aw, ah = W - left - right, H - bottom - top
     fig = plt.figure(figsize=(cm.style.inch(W), cm.style.inch(H)))
     ax = fig.add_axes([left / W, bottom / H, aw / W, ah / H])
@@ -456,46 +465,56 @@ def panel_readouts() -> plt.Figure:
             ys[h] = (y, lab)
             y += 1.1
         y += 0.15
-    ax.set_ylim(y - 0.75, -0.5)
+    ylim = (y - 0.75, -0.5)
+    ax.set_ylim(*ylim)
     ax.set_xlim(*xlim)
     ax.axvspan(0.10, xlim[1], color="#F1F1F1", lw=0, zorder=0)
     ax.axvline(0.10, color=cm.MUTED, lw=0.6, ls=(0, (1, 1.5)), zorder=1)
-    ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
+    ax.axvline(0, **M_ZERO)
     tr = ax.get_yaxis_transform()
     for yy, block in heads:
-        ax.text(-(left - 2.0) / aw, yy, block, transform=tr, ha="left", va="center", fontsize=M_LABEL, fontweight="bold", color=cm.INK, clip_on=False)
+        ax.text(-(left - 2.0) / aw, yy, block, transform=tr, ha="left", va="center_baseline", fontsize=M_TITLE, fontweight="bold", color=cm.INK, clip_on=False)
     for h, (yy, lab) in ys.items():
-        ax.text(-4.0 / aw, yy, lab, transform=tr, ha="right", va="center", fontsize=M_TICK, color=cm.INK, clip_on=False)
+        ax.text(-4.0 / aw, yy, lab, transform=tr, ha="right", va="center_baseline", fontsize=M_TICK, color=cm.INK, clip_on=False)
         for off, key, sty in zip((-0.3, 0.0, 0.3), ("S", "can", "free"), M_ORDER):
             r = E.loc[(key, h)]
             _ci(ax, yy + off, r.rho_p, r.ci_lo, r.ci_hi, sty, size=3.3, lw=1.0)
-        ax.text(1.0 + 4.0 / aw, yy, STATUS_WORD[E.loc[("can", h)].status_rule], transform=tr, ha="left", va="center", fontsize=M_TICK, fontweight="bold", color=CAN[0], clip_on=False)
-    ax.text(0.10, 1.0, "bar set in advance", transform=ax.get_xaxis_transform(), ha="center", va="bottom", fontsize=M_NOTE, color=cm.MUTED, clip_on=False)
+        ax.text(1.0 + 4.0 / aw, yy, STATUS_WORD[E.loc[("can", h)].status_rule], transform=tr, ha="left", va="center_baseline", fontsize=M_TICK, fontweight="bold", color=CAN[0], clip_on=False)
+    # over the four words, what they are the status of
+    ax.annotate("pre-specified\ntest", (1.0, 1.0), xycoords="axes fraction", xytext=(4.0, 1.6 - 1.1 * M_NOTE), textcoords="offset points", ha="left", va="baseline",
+                fontsize=M_NOTE, color=CAN[0], linespacing=1.1, annotation_clip=False)
+    ax.text(0.10, 1.0 + 1.6 / ah, "bar set in advance", transform=ax.get_xaxis_transform(), ha="center", va="baseline", fontsize=M_NOTE, color=cm.MUTED, clip_on=False)
+    # The key of the three marks, for this panel and the one beside it: in the white corner left of zero, its three lines
+    # centered on the line of the first heading, above the first row.
+    step, names = 0.45, []
+    for k, (sty, lab) in zip((-1, 0, 1), zip(M_ORDER, M_NAME)):
+        ax.plot([7.0 / aw], [k * step], marker=sty[1], ms=3.3, color=sty[0], mec=sty[0], mew=0.8, ls="none", transform=tr, zorder=4, clip_on=False)
+        names.append(ax.text(11.5 / aw, k * step, lab, transform=tr, ha="left", va="center_baseline", fontsize=M_TICK, color=cm.INK))
+    fig.canvas.draw()
+    corner = ax.transData.inverted().transform((max(t.get_window_extent().x1 for t in names) + 2.0 * fig.dpi / 72, 0))[0]  # right end of the key, with 2 bp of air
+    reach = min(float(E.loc[(key, h)].ci_lo) for key in ("S", "can", "free") for h, (yy, _) in ys.items() if yy - 0.3 < step + 0.3)
+    assert corner < min(reach, 0.0), "an interval or the zero line reaches into the key"
     ax.set_xticks([-0.2, -0.1, 0, 0.1, 0.2])
-    ax.set_xticklabels(["−0.2", "−0.1", "0", "0.1", "0.2"])
+    ax.set_xticklabels(["−0.2", "−0.1", "0", "+0.1", "+0.2"])
     ax.set_yticks([])
     ax.spines["left"].set_visible(False)
     _style(ax)
-    ax.tick_params(labelsize=M_TICK, length=2, pad=1.5)
-    fig.text(0.5, 17.5 / H, "partial rank correlation with independent data, $\\rho_p$ (95% CI)", fontsize=M_LABEL, ha="center", va="bottom")
-    hs = [Line2D([], [], marker=s[1], color=s[0], ls="none", ms=3.3, label=lab)
-          for s, lab in zip(M_ORDER, ("count evidence $S_g$", "Δα, protein-feature gate", "Δα, per-gene gate"))]
-    fig.legend(handles=hs, loc="lower center", bbox_to_anchor=(0.5, 8.0 / H), ncol=3, fontsize=M_NOTE, handletextpad=0.1, columnspacing=0.9, frameon=False, borderpad=0, borderaxespad=0)
-    fig.text(0.5, 1.5 / H, "status: pre-specified test, protein-feature gate", fontsize=M_NOTE, ha="center", va="bottom", color=CAN[0])
+    ax.tick_params(labelsize=M_TICK, length=2.5, width=0.5, pad=1.5)
+    fig.text(0.5, M_AXIS_TITLE / H, "partial rank correlation with independent data, $\\rho_p$ (95% CI)", fontsize=M_LABEL, ha="center", va="baseline")
     return fig
 
 
 def panel_named_compact() -> plt.Figure:
-    """Main validation figure, panel e (``main_validation/named_findings``, 189 x 140 bp): the two named findings
+    """Main validation figure, panel e (``main_validation/named_findings``, 215 x 123 bp): the two named findings
     under both gates. The estimates of ``panel_named`` (the panel of the supplementary figure), drawn small, with the
     count evidence first in each row as in panel d.
 
-    What it draws. x: the excess of a gene set over matched background genes in SD units, with its 95% interval.
-    Top: genes that peak in human spermatocytes, on testis Human+Mouse (all 1,103 and the 166 with a strict peak;
-    for each, all genes and those with count evidence): above the prior. Bottom: the hepatocyte catabolic program on
-    four-species liver and liver Human+Mouse (63 genes and its 15 core genes): below the prior. In each row three
-    marks: the count evidence S_g (square), Δα with the protein-feature gate (circle), Δα with the per-gene gate
-    (hexagon).
+    What it draws. x: the excess of a gene set over matched background genes in SD units, with its 95% interval; the
+    gray line is zero. Top: genes that peak in human spermatocytes, on testis Human+Mouse (all 1,103 and the 166 with
+    a strict peak; for each, all genes and those with count evidence): above the prior. Bottom: the hepatocyte
+    catabolic program on four-species liver and liver Human+Mouse (63 genes and its 15 core genes): below the prior.
+    In each row three marks: the count evidence S_g (square), Δα with the protein-feature gate (circle), Δα with the
+    per-gene gate (hexagon); their key stands in panel d, beside this panel.
 
     Reads ``results/analysis/Z3/compare_y3.csv`` and nothing else (columns ``item``, ``cohort``, ``line``, ``group``,
     ``value``, ``subset``, ``excess_d``, ``ci_lo``, ``ci_hi``): item ``C42`` (spermatocyte genes; value ``D`` for the
@@ -506,8 +525,8 @@ def panel_named_compact() -> plt.Figure:
         python -m analysis.tasks.F2_per_gene.panels --panel main_validation/named_findings              # in chimera_env, from the repository root
     """
     t = pd.read_csv(Z3 / "compare_y3.csv")
-    W, H = 189.0, M_H
-    left, right, bottom, top, gap = 79.0, 5.0, 30.0, 9.0, 19.5
+    W, H = M_WIDTH[1], M_H
+    left, right, bottom, top, gap = 85.0, 6.0, M_BOTTOM, M_TOP, 18.0
     ah_total = H - bottom - top - gap
     ah1 = ah_total * 4.0 / 9.6  # row slots: 4 above, 5.6 below (two cohort lines)
     ah2 = ah_total - ah1
@@ -537,7 +556,7 @@ def panel_named_compact() -> plt.Figure:
     for i, tk in enumerate(ax1.get_yticklabels()):
         tk.set_color(cm.MUTED if i % 2 else cm.INK)
     ax1.set_ylim(3.5, -0.5)
-    ax1.set_xlim(0, 1)
+    ax1.set_xlim(-0.06, 1)
     ax1.set_xticks([0, 0.5, 1])
     ax1.set_xticklabels(["0", "+0.5", "+1"])
     y2 = [0.0, *C43_Y[:2], 2.75, *C43_Y[2:]]
@@ -547,20 +566,18 @@ def panel_named_compact() -> plt.Figure:
     for i, tk in enumerate(ax2.get_yticklabels()):
         if i in (0, 3):
             tk.set_color(cm.MUTED)
-            ax2.yaxis.get_major_ticks()[i].tick1line.set_visible(False)
     ax2.set_ylim(y2[-1] + 0.6, -0.5)
     ax2.set_xlim(-4.9, 0.3)
     ax2.set_xticks([-4, -3, -2, -1, 0])
     ax2.set_xticklabels(["−4", "−3", "−2", "−1", "0"])
     for ax, title in ((ax1, "Testis, spermatocyte-peak genes"), (ax2, "Liver, hepatocyte catabolic genes")):
-        ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=1)
+        ax.axvline(0, **M_ZERO)  # the zero line as in panel d: no left spine, the rows named beside the plot
         _style(ax)
-        ax.tick_params(labelsize=M_TICK, length=2, pad=1.5)
+        ax.spines["left"].set_visible(False)
+        ax.tick_params(labelsize=M_TICK, length=2.5, width=0.5, pad=1.5)
+        ax.tick_params(axis="y", length=0, pad=4.0)
         ax.text(-(left - 2.0) / aw, 1.0 + 1.5 / (ax.get_position().height * H), title, transform=ax.transAxes, ha="left", va="bottom", fontsize=M_TITLE, fontweight="bold", color=cm.INK, clip_on=False)
-    fig.text((W - 3.0) / W, 10.5 / H, "excess over matched genes, SD units (95% CI)", fontsize=M_TICK, ha="right", va="bottom")
-    hs = [Line2D([], [], marker=s[1], color=s[0], ls="none", ms=3.0, label=lab)
-          for s, lab in zip(M_ORDER, ("$S_g$", "Δα, protein-feature gate", "Δα, per-gene gate"))]
-    fig.legend(handles=hs, loc="lower right", bbox_to_anchor=((W - 3.0) / W, 1.5 / H), ncol=3, fontsize=M_NOTE, handletextpad=0.05, columnspacing=0.7, frameon=False, borderpad=0, borderaxespad=0)
+    fig.text((W - 3.0) / W, M_AXIS_TITLE / H, "excess over matched genes, SD units (95% CI)", fontsize=M_LABEL, ha="right", va="baseline")
     return fig
 
 

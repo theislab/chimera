@@ -6,7 +6,7 @@
 # (chimera_env) with PYTHONPATH set to the repository root; it reads stored runs, caches and result tables only.
 panels	script	command
 main_overview/*	figures/redraw/overview/overview.py	python figures/redraw/overview/overview.py
-main_alpha_vs_prior/scatter main_alpha_vs_prior/shift main_alpha_vs_prior/distribution	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
+main_alpha_vs_prior/scatter main_alpha_vs_prior/shift main_alpha_vs_prior/distribution main_alpha_vs_prior/training	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
 main_integration/composite_strip	analysis/tasks/T8_4_figures/fig3_integration_ext.py	python -m analysis.tasks.T8_4_figures.fig3_integration_ext --panel main_integration/composite_strip
 main_integration/mixing main_integration/conservation main_integration/composite	analysis/tasks/T8_4_figures/fig3_integration.py	python -m analysis.tasks.T8_4_figures.fig3_integration
 main_delta_alpha_liver/category_boxes main_delta_alpha_liver/category_effect_sizes	figures/redraw/main_figures.py	python -m figures.redraw.main_figures
@@ -61,6 +61,7 @@ supp_programs_recurrent/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.
 supp_programs_by_tissue/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.tasks.E1_atlas.figures
 supp_programs_named_genes/*	analysis/tasks/E1_atlas/figures.py	python -m analysis.tasks.E1_atlas.figures
 supp_bone_marrow_reference/*	analysis/tasks/T12_3_tests/figure.py	python -m analysis.tasks.T12_3_tests.figure
+main_specialized_cells/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure main_specialized_cells/compartments main_specialized_cells/pattern_vs_level
 supp_cell_compartments/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure
 supp_cell_lineages/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure
 supp_primate_branches/*	analysis/tasks/E3_cells/figure.py	python -m analysis.tasks.E3_cells.figure

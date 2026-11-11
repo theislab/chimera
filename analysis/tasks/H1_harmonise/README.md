@@ -54,7 +54,7 @@ Run from `chimera/`, in `chimera_env`:
 |---|---|---|---|---|
 | Deployment is an axis of its own in every tissue (`main_axis_tissues`), a | `main_axis_tissues/summary` | `main_axis_summary()` | `axis.csv` | `python -m analysis.tasks.H1_harmonise.figures --panel main_axis_tissues/summary` |
 | the same, b | `main_axis_tissues/clouds` | `main_axis_clouds()` | `genes/<cohort>.parquet`, `axis.csv` | `python -m analysis.tasks.H1_harmonise.figures --panel main_axis_tissues/clouds` |
-| One reading across eight tissues (`main_tissues`) | `main_tissues/recurrence` | `main_recurrence(compact=True)` | `recurrence.csv`, `tissue_specific.csv` | `python -m analysis.tasks.H1_harmonise.figures --panel main_tissues/recurrence` |
+| One reading across eight tissues (`main_tissues`) | `main_tissues/recurrence` | `main_recurrence_compact()` | `recurrence.csv`, `tissue_specific.csv` | `python -m analysis.tasks.H1_harmonise.figures --panel main_tissues/recurrence` |
 
 The docstring of each function says what the panel shows and which columns it reads. `main_axis_summary()` stops if
 the correlations of `axis.csv` differ from the ranges the paper prints (`AXIS_ROWS`). Nothing is computed for these

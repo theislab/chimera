@@ -23,9 +23,10 @@ Inputs, all in ``assets/`` next to this file (made once by ``build_assets.py``):
     liver_human_monkey_umap.csv          panel (d) embedding: 1,500 cells of the same model
     eight_tissues.csv                    panel (e) strip: Spearman correlations of delta alpha and of dN/dS
                                          with protein identity in the eight tissues of the one-reading figure
-Everything else in the figure is a schematic and uses no data: the two genes of panel (a), the dial of
-panel (c), and in panel (d) the five example genes with their count evidence, gate and delta alpha (the
-values printed under the dials are those of the drawn dials). The output is the same file on every run.
+Everything else in the figure is a schematic and uses no data: the two genes of panel (a), which stand
+again as two small profiles beside the histogram of panel (d), the dial of panel (c), and in panel (d) the
+five example genes with their count evidence, gate and delta alpha (the values printed under the dials are
+those of the drawn dials). The output is the same file on every run.
 
 Colors follow the other figures: above the protein prior vermilion, below it blue; the shared decoder
 takes the color of "above" (a gene the shared decoder explains moves above its prior) and the species-aware
@@ -69,7 +70,13 @@ CELLTYPE_OF = {"Hepatocytes": "hepatocytes", "Endothelial": "endothelial", "fibr
                "Kupffer cells": "macrophages", "Macrophages": "macrophages"}  # the rest: other
 DELTA_ALPHA, SEQUENCE = "#D55E00", "#A6761D"  # delta alpha and the sequence measures in the other figures
 
-TITLE, HEAD, BODY, SMALL, TINY = 7.6, 6.2, 6.0, 5.4, 5.1  # font sizes, pt on the page
+TITLE, HEAD, BODY, SMALL, TINY = 7.6, 6.2, 6.0, 5.4, 5.1  # font sizes, pt on the page; keys are set in BODY
+# The two schematic genes of panel (a), drawn again as small marks in panel (d): expression across five cell states in
+# two species, values in 0..1. "level": one pattern in both species, one species above the other. "alike": the
+# profiles of the two species coincide.
+_PATTERN = np.array([0.2, 1.0, 0.55, 0.3, 0.15])
+CASES = {"level": {"human": 0.02 + 0.5 * _PATTERN, "mouse": 0.47 + 0.5 * _PATTERN},
+         "alike": {"human": [0.15, 0.3, 0.92, 0.5, 0.15], "mouse": [0.22, 0.36, 0.8, 0.42, 0.1]}}
 LETTER = 7.0
 LW_HAIR, LW, LW_FLOW = 0.5, 0.8, 1.25  # three line weights: axes and rules, connectors, the two decoder streams
 FRAME = 1.2  # inset of a card from the edge of its file, so no ink touches the edge of a panel file
@@ -193,6 +200,15 @@ def node(ax, x, y, r=5.2, s="", fc="white", ec=INK, size=BODY, lw=LW):
         T(ax, x, y, s, size=size, ha="center", va="center_baseline")
 
 
+def _inset(tri, d):
+    """A triangle with every side moved inward by d: scaled about the center of its inscribed circle."""
+    a, b, c = (np.hypot(*(tri[1] - tri[2])), np.hypot(*(tri[2] - tri[0])), np.hypot(*(tri[0] - tri[1])))
+    center = (a * tri[0] + b * tri[1] + c * tri[2]) / (a + b + c)
+    u, v = tri[1] - tri[0], tri[2] - tri[0]
+    radius = abs(u[0] * v[1] - u[1] * v[0]) / (a + b + c)
+    return [center + (q - center) * (radius - d) / radius for q in tri]
+
+
 def arrow(ax, pts, color=INK, lw=LW, dashed=False, head=True, hl=3.4, hw=2.8, r=2.4, z=3):
     """Line through pts with rounded corners and a filled head at the end."""
     pts = [np.asarray(p, float) for p in pts]
@@ -202,8 +218,10 @@ def arrow(ax, pts, color=INK, lw=LW, dashed=False, head=True, hl=3.4, hw=2.8, r=
         d = d / np.hypot(*d)
         n = np.array([-d[1], d[0]])
         base = end - hl * d
-        ax.add_patch(Polygon([end, base + n * hw / 2, base - n * hw / 2], closed=True, fc=color, ec=color, lw=0.3,
-                             zorder=z + 0.1, joinstyle="miter", clip_on=False))
+        # filled triangle with an outline of the thinnest line weight; drawn smaller by 0.1 on every side, so that
+        # the head with its outline is 0.15 larger than hl x hw on every side
+        ax.add_patch(Polygon(_inset([end, base + n * hw / 2, base - n * hw / 2], 0.1), closed=True, fc=color, ec=color,
+                             lw=LW_HAIR, zorder=z + 0.1, joinstyle="miter", clip_on=False))
         pts = pts[:-1] + [end - 0.8 * hl * d]
     ax.add_patch(PathPatch(_rounded(pts, r), fc="none", ec=color, lw=lw, ls=(0, (2.2, 1.5)) if dashed else "-",
                            zorder=z, capstyle="butt", joinstyle="round", clip_on=False))
@@ -239,16 +257,16 @@ def strips(ax, x, y, mismatch, n=10, species=("human", "mouse"), marks=True, cel
     return (n - 1) * pitch + cell
 
 
-def profile(ax, x, y, w, h, series):
+def profile(ax, x, y, w, h, series, lw=1.0, ms=3.4, pad=1.8, tick=1.5):
     """Expression of one gene across cell states, one line per species; series: {species: values in 0..1}."""
     ax.plot([x, x + w], [y, y], color=INK, lw=LW_HAIR, zorder=3, solid_capstyle="butt", clip_on=False)
     for sp, v in series.items():
         xs = x + (np.arange(len(v)) + 0.5) * w / len(v)
-        ys = y + 1.8 + np.asarray(v) * (h - 3.6)
-        ax.plot(xs, ys, color=SPECIES[sp], lw=1.0, zorder=4, solid_joinstyle="round", clip_on=False)
-        ax.scatter(xs, ys, s=3.4, color=SPECIES[sp], linewidths=0, zorder=5, clip_on=False)
+        ys = y + pad + np.asarray(v) * (h - 2 * pad)
+        ax.plot(xs, ys, color=SPECIES[sp], lw=lw, zorder=4, solid_joinstyle="round", clip_on=False)
+        ax.scatter(xs, ys, s=ms, color=SPECIES[sp], linewidths=0, zorder=5, clip_on=False)
     for xs in x + (np.arange(len(v)) + 0.5) * w / len(v):
-        ax.plot([xs, xs], [y, y - 1.5], color=INK, lw=LW_HAIR, zorder=3, clip_on=False)
+        ax.plot([xs, xs], [y, y - tick], color=INK, lw=LW_HAIR, zorder=3, clip_on=False)
 
 
 def dial(ax, cx, cy, r, prior, alpha, track=2.4, imputed=False, needle=1.0, hub=1.25, base=True):
@@ -275,19 +293,16 @@ def dial(ax, cx, cy, r, prior, alpha, track=2.4, imputed=False, needle=1.0, hub=
 def panel_problem(ax, w, h, shapes):
     card(ax, FRAME, FRAME, w - FRAME, h - FRAME)
     title(ax, PAD, h - 12.0, "Problem", "two measurements")
-    pattern = np.array([0.2, 1.0, 0.55, 0.3, 0.15])  # one pattern across cell states
     genes = [  # caption of the protein, differing positions, profiles, caption of the use
         # upper card: the same pattern in both species, one species clearly above the other (a difference of level)
-        (["conserved", "protein"], [6], {"human": 0.02 + 0.5 * pattern, "mouse": 0.47 + 0.5 * pattern},
-         ["used at a", "different level"]),
-        (["less conserved", "protein"], [1, 4, 7], {"human": [0.15, 0.3, 0.92, 0.5, 0.15], "mouse": [0.22, 0.36, 0.8, 0.42, 0.1]},
-         ["used", "alike"]),
+        (["conserved", "protein"], [6], CASES["level"], ["used at a", "different level"]),
+        (["less conserved", "protein"], [1, 4, 7], CASES["alike"], ["used", "alike"]),
     ]
     # species key
     x = w - PAD
     for sp in ("mouse", "human"):
-        x -= width(ax, sp, SMALL)
-        T(ax, x, h - 24.6, sp, size=SMALL, color=SUB)
+        x -= width(ax, sp)
+        T(ax, x, h - 24.6, sp, color=SUB)
         hs = {"human": 9.6, "mouse": 6.2}[sp]
         x -= 2.2 + shapes[sp]["aspect"] * hs
         silhouette(ax, shapes, sp, x, h - 25.8, hs, SPECIES[sp])
@@ -359,7 +374,7 @@ def panel_inputs_model(ax, w, h, shapes):
     xz = xe1 + 10.2
     arrow(ax, [(xe1, y_enc), (xz - 5.6, y_enc)], hl=3.0, hw=2.5)
     node(ax, xz, y_enc, 5.6, "$z$", fc="white", size=6.6)
-    lines(ax, x0, y_enc + 29.0, ["cell state $z$,", "species-mixed", "(GRL + MMD)"], size=SMALL, color=SUB)
+    lines(ax, x0, y_enc + 22.7, ["cell state $z$,", "species-mixed"], size=SMALL, color=SUB)
     # decoders
     xd0, xd1 = xz + 14.0, xz + 78.0
     xbr = xz + 8.6
@@ -450,15 +465,15 @@ def panel_outputs(ax, w, h, hist, cells_):
     umap(PAD, y1, [SPECIES[sp_name[sp]] for sp in cells_["species"][order]])
     T(ax, xl, y1 + side - 6.5, "by species", size=TINY, color=MUTED)
     for i, (lab, key) in enumerate([("human", "human"), ("monkey", "macaque")]):
-        ax.add_patch(Circle((xl + 1.7, y1 + side - 12.6 - i * 6.5), 1.4, fc=SPECIES[key], ec="none", zorder=3, clip_on=False))
-        T(ax, xl + 5.2, y1 + side - 14.5 - i * 6.5, lab, size=SMALL)
+        ax.add_patch(Circle((xl + 1.7, y1 + side - 12.6 - i * 7.0), 1.4, fc=SPECIES[key], ec="none", zorder=3, clip_on=False))
+        T(ax, xl + 5.2, y1 + side - 14.7 - i * 7.0, lab)
     ct = [CELLTYPE_OF.get(c, "other") for c in cells_["cell_type"][order]]
     y2 = y1 - 4.0 - side
     umap(PAD, y2, [CELLTYPE[c] for c in ct])
     T(ax, xl, y2 + side - 6.5, "by cell type", size=TINY, color=MUTED)
     for i, lab in enumerate(CELLTYPE):
-        ax.add_patch(Circle((xl + 1.7, y2 + side - 12.6 - i * 6.4), 1.4, fc=CELLTYPE[lab], ec="none", zorder=3, clip_on=False))
-        T(ax, xl + 5.2, y2 + side - 14.5 - i * 6.4, lab, size=SMALL)
+        ax.add_patch(Circle((xl + 1.7, y2 + side - 12.6 - i * 7.0), 1.4, fc=CELLTYPE[lab], ec="none", zorder=3, clip_on=False))
+        T(ax, xl + 5.2, y2 + side - 14.7 - i * 7.0, lab)
     lines(ax, PAD, y2 - 7.4, ["species aligned: clustering,", "label transfer; the substrate", "of the gene readouts"],
           size=TINY, color=SUB, pitch=5.9)
 
@@ -488,7 +503,7 @@ def panel_outputs(ax, w, h, hist, cells_):
     T(ax, gx, yt, "$\\Delta\\alpha_g=\\alpha_g-\\pi_g$")
     T(ax, sx1, yt, "gray: imputed from protein features", size=TINY, ha="right", color=MUTED)
     T(ax, gx, yt - 7.0, "protein-feature gate", size=SMALL)
-    T(ax, gx, yt - 13.7, "per-gene readout", size=SMALL)
+    T(ax, gx, yt - 13.7, "per-gene gate", size=SMALL)
     for i, (cx, (_, p, a, free)) in enumerate(zip(cols, genes, strict=True)):
         d = a - p
         col = MUTED if i == 4 else ABOVE if d > 0 else BELOW
@@ -516,6 +531,10 @@ def panel_outputs(ax, w, h, hist, cells_):
     lines(ax, hx0 - 4.0, hy1 - 11.2, ["pattern or level", "parts between", "species"], size=TINY, ha="right", color=SUB, pitch=5.9)
     T(ax, hx1 + 4.0, hy1 - 5.0, "above the prior", size=SMALL, color=ABOVE, weight="bold")
     lines(ax, hx1 + 4.0, hy1 - 11.2, ["pattern shared", "across species"], size=TINY, color=SUB, pitch=5.9)
+    # the two genes of panel (a) as small marks at the outer edges, on the axis of the histogram: a difference of
+    # level on the side below the prior, one shared pattern on the side above it
+    profile(ax, gx, hy0, 16.0, 9.0, CASES["level"], lw=0.8, ms=1.8, pad=1.2, tick=1.0)
+    profile(ax, sx1 - 16.0, hy0, 16.0, 9.0, CASES["alike"], lw=0.8, ms=1.8, pad=1.2, tick=1.0)
 
 
 def panel_applications(ax, w, h, tissues):
@@ -547,14 +566,14 @@ def panel_applications(ax, w, h, tissues):
             ax.plot([cx + dx, cx + dx], [yz, yz + v * unit], color=col, lw=1.0, zorder=3, solid_capstyle="butt", clip_on=False)
             ax.scatter([cx + dx], [yz + v * unit], s=7.5 if mk == "o" else 6.5, marker=mk, color=col, linewidths=0, zorder=4,
                        clip_on=False)
-    yl = ty0 + 3.2
+    yl = ty0 + 3.8
     x = tx0 + 3.0
-    T(ax, x, yl, "Spearman ρ with protein identity:", size=TINY, color=SUB)
-    x += width(ax, "Spearman ρ with protein identity:", TINY) + 6.0
+    T(ax, x, yl, "Spearman ρ with protein identity:", color=SUB)
+    x += width(ax, "Spearman ρ with protein identity:") + 6.0
     for lab, col, mk in (("$\\Delta\\alpha$", DELTA_ALPHA, "o"), ("dN/dS", SEQUENCE, "s")):
-        ax.scatter([x], [yl + 1.8], s=7.5 if mk == "o" else 6.5, marker=mk, color=col, linewidths=0, zorder=4, clip_on=False)
-        T(ax, x + 3.6, yl, lab, size=TINY, color=SUB)
-        x += 3.6 + width(ax, lab, TINY) + 7.0
+        ax.scatter([x], [yl + 2.1], s=7.5 if mk == "o" else 6.5, marker=mk, color=col, linewidths=0, zorder=4, clip_on=False)
+        T(ax, x + 3.6, yl, lab, color=SUB)
+        x += 3.6 + width(ax, lab) + 7.0
     # ---- the other uses
     rows = [
         ("genes", "Genes, programs, cell types", "above or below the protein prior"),

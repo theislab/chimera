@@ -18,8 +18,8 @@ Empirical p: (1 + #null with |stat| >= |obs|) / (1 + draws), two-sided; one-side
 observed direction is also written.
 
 Rows: five contrasts on all genes and hydrophobic-vs-polar on the curated M class and on
-Delta-alpha < -0.05 (the two class rows of A8), plus data-defined classes (QC rule, sign bins).
-Also: R^2_marg of the published MixedLM split into residue-level and gene-level parts.
+Delta-alpha < -0.05 (the two class rows of the audit table), plus data-defined classes (QC rule, sign bins).
+Also: R^2_marg of the mixed model of the residue analysis, split into residue-level and gene-level parts.
 
 Inputs (``notebooks/cache/gin_attribution/``): ``L_analysis/{residue_table.pkl,attr_l.npz,
 delta_alpha_attention.pkl,mixedlm_meta.json}``, ``embeddings/<gene>__hsapiens.npy``,
@@ -261,7 +261,7 @@ def main():
         h = genes[(i + 7) % G]
         swap_corr.append(spearmanr(at.attn(x, obs_attr[x]), at.attn(x, obs_attr[h]))[0])
 
-    # ---- R^2_marg split (published MixedLM, same formula and coding as builder section L.4)
+    # ---- R^2_marg split (mixed model of the residue analysis, same formula and coding as builder section L.4)
     import statsmodels.formula.api as smf
     import warnings
     warnings.filterwarnings("ignore")
@@ -308,7 +308,7 @@ def main():
     out.csv(r2, "r2_marginal_split.csv")
     r2_full = r2.loc[r2.model == "full", "r2_marginal"].item()
     if abs(r2_full - meta["r2_marginal"]) > 0.002:
-        raise SystemExit(f"MixedLM refit R2_marg {r2_full:.4f} does not match published {meta['r2_marginal']:.4f}")
+        raise SystemExit(f"MixedLM refit R2_marg {r2_full:.4f} does not match the stored value {meta['r2_marginal']:.4f}")
     print(r2.to_string())
 
     # ---- summary
@@ -320,8 +320,8 @@ def main():
              f"Draws per null: {args.draws}; seed {args.seed}; {G} genes, {len(rt)} human residues.",
              f"abs_attn reproduction: per-gene Pearson median {rep.pearson.median():.6f}, min {rmin:.6f}; "
              f"max |diff| {rep.max_abs_diff.max():.2e}.",
-             f"Published MixedLM R²_marg {meta['r2_marginal']:.4f}; refit here {r2_full:.4f}.", "",
-             "## Primary rows (scaled statistic; A8 section 2.3 layout)", "",
+             f"Mixed model of the residue analysis, R²_marg {meta['r2_marginal']:.4f}; refit here {r2_full:.4f}.", "",
+             "## Primary rows (scaled statistic)", "",
              "| Row | n | Observed | Swap null median [95%] | Swaps p<0.05 same sign | Emp. p swap / random (two-sided) | one-sided swap / random |",
              "|---|---|---|---|---|---|---|"]
     prim_rows = [(k, "all") for k in KEYS] + [("hyd_pol", "curated_M"), ("hyd_pol", "da_lt_-0.05")]
@@ -330,7 +330,7 @@ def main():
         lines.append(f"| {s.row} | {s.n_genes} | {s.observed:.3f} | {s.null_median:.3f} [{s.null_q025:.3f}, {s.null_q975:.3f}] | "
                      f"{100 * s.frac_null_p05_same_sign:.0f}% | {s.emp_p_two_sided:.4f} / {rnd.emp_p_two_sided:.4f} | "
                      f"{s.emp_p_one_sided:.4f} / {rnd.emp_p_one_sided:.4f} |")
-    lines += ["", "## Same rows, unscaled per-gene difference (published statistic)", "",
+    lines += ["", "## Same rows, unscaled per-gene difference (the statistic of the residue figures)", "",
               "| Row | n | Observed | Wilcoxon p | Emp. p swap / random (two-sided) |", "|---|---|---|---|---|"]
     for k, grp in prim_rows:
         s, rnd = pick(k, grp, "gene_swap", "unscaled"), pick(k, grp, "random_direction", "unscaled")

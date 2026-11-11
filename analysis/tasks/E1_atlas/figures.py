@@ -75,6 +75,8 @@ def program_label(name: str, library: str) -> str:
         source = "category" if "(category)" in n else "gene class"
     else:
         source = SOURCE[library]
+    if library == "hallmark":  # one name per Hallmark set on every figure
+        return f"{style.hallmark_name(n)} ({source})"
     n = SOURCE_TAG.sub("", SHORT.get(n, n))
     return f"{sentence_case(n)} ({source})"
 

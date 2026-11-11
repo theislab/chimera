@@ -1,5 +1,5 @@
 """Y3 (EXPLORATORY): the two worked genes in the counts, panels a and b of the main validation figure
-(``figures/panels/main_validation/worked_genes.pdf``, 320 x 120 bp, placed with the letters a and b).
+(``figures/panels/main_validation/worked_genes.pdf``, 317 x 120 bp, placed with the letters a and b).
 
 What the panel draws. Two plots, each under a heading that names the finding its gene illustrates:
 
@@ -45,10 +45,12 @@ OUT = gene_ids.REPO_ROOT / "results" / "analysis" / "Y3"
 MARK = {"Human": "o", "Macaque": "s", "Monkey": "s", "Mouse": "^", "Zebrafish": "D"}  # one marker per species, beside its color
 NICE = {"Monkey": "Macaque", "Other_somatic": "other", "fibroblasts": "Fibro-\nblasts", "Hepatocytes": "Hepato-\ncytes", "Cholangio": "Cholangio-\ncytes",
         "Endothelial": "Endo-\nthelial"}  # the testis stages keep their short names (SG, SC, rSD, eSD: the caption spells them out)
-S_HEAD, S_TICK, S_NOTE = 6.5, 5.5, 5.2  # type in pt at print size: heading; gene line, ticks and names; notes
-# Sizes in bp: one panel with two plots of the same size (in the figure it stands beside a third panel in one row).
-PANEL_W, PANEL_H = 320.0, 120.0
-LEFT, BETWEEN, RIGHT, ABOVE_AXES, BELOW_AXES = 20.0, 9.0, 1.0, 31.0, 15.5
+S_HEAD, S_NAME, S_TICK, S_NOTE = 6.5, 6.0, 5.5, 5.5  # type in pt at print size: heading and axis title; numbers of the y axis and species names; gene line, readings and the names of the cell types under the x axis (at 6.0 pt two of them would touch); notes
+LINE, MARKER = 1.3, 3.5  # pt: the lines of the species and their markers
+# Sizes in bp: one panel with two plots of the same size (in the figure it stands beside a third panel in one row); the
+# page width is on the 0.24 bp grid of the layout tool.
+PANEL_W, PANEL_H = 316.8, 120.0
+LEFT, BETWEEN, RIGHT, ABOVE_AXES, BELOW_AXES = 22.0, 9.0, 2.5, 31.0, 17.0
 PLOT_W = (PANEL_W - 2 * LEFT - BETWEEN - RIGHT) / 2
 # The two genes: cohort, order of the cell types or stages, species, heading, where, what the paper prints
 # (Δα, S_g), the digits of S_g, the type that is marked, and the room for the species names at the right
@@ -57,7 +59,7 @@ WORKED = [
     dict(cohort="test_3sp", order=["SG", "SC", "rSD", "eSD", "Sertoli", "Other_somatic"], species=["Human", "Macaque", "Mouse"],
          heading="Less conserved protein,\nused alike", where="testis 3 species", printed=(0.17, 0.055), s_digits=3, mark="SC", room=1.6),
     dict(cohort="liv_4sp", order=["Hepatocytes", "Cholangio", "Endothelial", "fibroblasts"], species=["Human", "Monkey", "Mouse"],
-         heading="Conserved protein,\nused at a different level", where="liver 4 species", printed=(-0.24, -0.11), s_digits=2, mark="Hepatocytes", room=0.9),
+         heading="Conserved protein,\nused at a different level", where="liver 4 species", printed=(-0.24, -0.11), s_digits=2, mark="Hepatocytes", room=1.08),
 ]
 HEPATOCYTE_GAP = 4.6  # log2, mouse above human, as the paper prints it
 
@@ -73,13 +75,13 @@ def lines(ax, t: pd.DataFrame, order: list, species: list) -> dict:
     for s in species:
         v = t[t.species == s].set_index("type").log2cpm.reindex(order).to_numpy(float)
         col = style.SPECIES[NICE.get(s, s).lower()]
-        ax.plot(range(len(order)), v, color=col, marker=MARK[s], ms=3.2, lw=0.9, mec="white", mew=0.3, zorder=3)
+        ax.plot(range(len(order)), v, color=col, marker=MARK[s], ms=MARKER, lw=LINE, mec="white", mew=0.3, zorder=3)
         i = np.where(np.isfinite(v))[0][-1]
-        ax.annotate(NICE.get(s, s), (i, v[i]), xytext=(4, 0), textcoords="offset points", va="center", fontsize=S_NOTE, color=col)
+        ax.annotate(NICE.get(s, s), (i, v[i]), xytext=(4.5, 0), textcoords="offset points", va="center", fontsize=S_NAME, color=col)
         out[s] = v
     ax.set_xticks(range(len(order)), [NICE.get(k, k) for k in order])
-    ax.tick_params(axis="x", labelsize=S_NOTE, length=2, pad=1.5)
-    ax.tick_params(axis="y", labelsize=S_NOTE, length=2, pad=1.5)
+    ax.tick_params(axis="x", labelsize=S_TICK, length=2.5, pad=1.5)
+    ax.tick_params(axis="y", labelsize=S_NAME, length=2.5, pad=1.5)
     for lab in ax.get_xticklabels():
         lab.set_linespacing(0.95)
     return out
@@ -115,7 +117,7 @@ def draw_panels() -> None:
             xb = k - 0.24
             ax.annotate("", (xb, v["Mouse"][k]), (xb, v["Human"][k]), arrowprops=dict(arrowstyle="<->", color=style.MUTED, lw=0.7, shrinkA=0, shrinkB=0, mutation_scale=5))
             ax.text(xb - 0.06, (v["Mouse"][k] + v["Human"][k]) / 2, f"{HEPATOCYTE_GAP} log$_2$", rotation=90, ha="right", va="center", fontsize=S_NOTE, color=style.MUTED)
-        ax.set_ylabel(r"log$_2$(1 + CPM)", fontsize=S_NOTE, labelpad=1)
+        ax.set_ylabel(r"log$_2$(1 + CPM)", fontsize=S_HEAD, labelpad=1)
         # above the plot: the finding, then the gene and its cohort; in the free upper right corner of the plot: its reading
         xl = (x0 - LEFT + 2.0) / PANEL_W
         fig.text(xl, (PANEL_H - 1.2) / PANEL_H, w["heading"], ha="left", va="top", fontsize=S_HEAD, fontweight="bold", color=style.INK, linespacing=1.12)

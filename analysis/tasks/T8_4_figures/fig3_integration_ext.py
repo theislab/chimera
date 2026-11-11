@@ -89,7 +89,7 @@ CHIMERA_COLOR = cm.style.READOUT["delta_alpha"].color  # the color of the model'
 OTHER_COLOR = "#8C8C8C"
 # The two tools whose composites the text quotes get marks of their own (still gray, still the shape of their use of
 # labels): keyword arguments of ``ax.plot`` for each.
-NAMED_METHODS = {"SATURN": dict(ms=3.6, mfc="#6E6E6E", mec="#222222", mew=0.45, alpha=1.0, zorder=2.6),
+NAMED_METHODS = {"SATURN": dict(ms=3.6, mfc="#6E6E6E", mec="#222222", mew=0.5, alpha=1.0, zorder=2.6),
                  "CAMEX": dict(ms=3.5, mfc="white", mec="#555555", mew=0.7, alpha=1.0, zorder=2.5)}
 LABEL_USE = [("no cell-type labels", "o"), ("within-species clusters", "^"), ("cell-type labels", "s")]  # the three first groups of fig3_integration.TIERS
 TISSUE_OF = {"liv": "Liver", "tes": "Testis"}  # the first three letters of a cohort key of the seven liver and testis cohorts
@@ -98,16 +98,17 @@ CHIMERA_COMPOSITE = [0.65, 0.45, 0.26, 0.60, 0.59, 0.59, 0.64, 0.41, 0.58, 0.69,
 
 
 def composite_strip() -> plt.Figure:
-    """Main integration figure (``main_integration/composite_strip``, one column: 234 x 145 bp): the composite
+    """Main integration figure (``main_integration/composite_strip``, one column: 234 x 138.5 bp): the composite
     integration score of ten methods on eleven cohorts, one row per cohort.
 
     What it draws. x: the composite score, scaled within cohort (0 lowest, 1 highest on the scale of the benchmark).
     Each row is a cohort, grouped by tissue; each mark is a method. The nine other methods are gray; the marker shape
     says how a method uses cell-type labels (none, within-species clusters, cell-type labels), in the groups of the
     supplementary heat maps. Two of the nine have marks of their own and an entry in the key, because the text quotes
-    their scores: SATURN (dark gray with an outline) and CAMEX (open). Chimera is drawn in color and joined by a line
-    across the cohorts; it uses no cell-type labels on the liver cohorts and labels on the others, and its marker
-    shape says so. No rank and no method name is printed beside the marks.
+    their scores: SATURN (dark gray with an outline) and CAMEX (open). Chimera is drawn in color, last and largest; it uses no cell-type labels on the liver cohorts and labels on the
+    others, and its marker shape says so. The methods are named in one line above the plot, the marker shapes in one
+    line under the axis title. Where the mark of SATURN or CAMEX touches the mark of Chimera in a row, it is drawn over
+    it (CAMEX as an outline), so that no named mark is hidden. No rank and no method name is printed beside the marks.
 
     Reads ``results/analysis/B2/integration/master_table_extended.csv`` and nothing else (110 rows, eleven cohorts by
     ten methods; columns ``dataset``, ``model``, ``total_score``). No value is computed: every mark is a stored score.
@@ -122,8 +123,9 @@ def composite_strip() -> plt.Figure:
     assert M.shape == (11, 10) and M.notna().all().all(), "master_table_extended.csv: expected eleven cohorts by ten methods"
     assert [round(float(v), 2) for v in M["Chimera"]] == CHIMERA_COMPOSITE, f"composite of Chimera in the table: {[round(float(v), 2) for v in M['Chimera']]}"
     shape = {m: mk for (_, ms), (_, mk) in zip(F3.TIERS[:3], LABEL_USE) for m in ms}
-    W, H = 234.0, 145.0
-    left, right, bottom, top = 76.0, 6.0, 31.0, 4.0
+    W, H = 234.0, 138.5
+    left, right, bottom, top = 80.0, 1.5, 26.5, 10.5   # bp: cohort names; edge of the column; ticks, axis title and shape key; method key
+    s_tick, s_title, s_key = 6.0, 6.5, 6.0             # pt: cohort names, tick labels; axis title; the two keys
     fig = plt.figure(figsize=(cm.style.inch(W), cm.style.inch(H)))
     ax = fig.add_axes([left / W, bottom / H, (W - left - right) / W, (H - bottom - top) / H])
     y, ys = 0.0, []
@@ -131,18 +133,36 @@ def composite_strip() -> plt.Figure:
         y += 1.0 + (0.45 if i and tissue[i] != tissue[i - 1] else 0.0)
         ys.append(y)
     tr = ax.get_yaxis_transform()
+    # No mark of a method named in the key may be hidden. Chimera's mark is the largest and is drawn over the unnamed
+    # marks; a named mark that touches it in a row is drawn over it, CAMEX without its white fill (an outline does not
+    # hide the color beneath), SATURN as it is (the smaller mark: Chimera's shows beside it). The panel stops if a
+    # named mark would still hide another.
+    bp = (W - left - right) / 1.06                                           # bp per unit of the score (x from -0.03 to 1.03)
+    over = {}                                                               # (cohort, method) -> the named mark goes over Chimera's
+    for (d, name), t in zip(rows, tissue):
+        r_chimera = (5.0 if t == "Liver" else 4.6) / 2 + 0.3                # half its size, with the white edge
+        for m, s in NAMED_METHODS.items():
+            r, gap = s["ms"] / 2 + s["mew"] / 2, abs(M.loc[d, m] - M.loc[d, "Chimera"]) * bp
+            if gap < r_chimera + r:
+                over[(d, m)] = name
+                assert m == "CAMEX" or r_chimera + gap - r >= 1.0, f"{name}: the mark of {m} would hide the mark of Chimera"
+        named_gap = abs(M.loc[d, "SATURN"] - M.loc[d, "CAMEX"]) * bp
+        assert named_gap >= sum(s["ms"] / 2 + s["mew"] / 2 for s in NAMED_METHODS.values()), f"{name}: the marks of SATURN and CAMEX lie on each other"
+    print("named marks drawn over the mark of Chimera: " + ("; ".join(f"{m} in {name}" for (_, m), name in over.items()) or "none"))
     n_marks = 0
     for (d, name), yy in zip(rows, ys):
         ax.plot([0, 1], [yy, yy], color="#E8E8E8", lw=0.5, zorder=0)
         for m in F3.COLS:
             if m == "Chimera":
                 continue
-            ax.plot(M.loc[d, m], yy, ls="none", marker=shape[m], **NAMED_METHODS.get(m, dict(ms=3.3, mfc=OTHER_COLOR, mec="white", mew=0.3, alpha=0.9, zorder=2)))
+            look = dict(NAMED_METHODS.get(m, dict(ms=3.3, mfc=OTHER_COLOR, mec="white", mew=0.3, alpha=0.9, zorder=2)))
+            if (d, m) in over:
+                look.update(zorder=5, **({"mfc": "none"} if m == "CAMEX" else {}))
+            ax.plot(M.loc[d, m], yy, ls="none", marker=shape[m], **look)
             n_marks += 1
-        ax.text(-5.0 / (W - left - right), yy, name, transform=tr, ha="right", va="center", fontsize=5.5, color=cm.INK, clip_on=False)
-    ax.plot(M["Chimera"].to_numpy(), ys, color=CHIMERA_COLOR, lw=0.6, alpha=0.7, zorder=3)
-    for (d, _), yy, t in zip(rows, ys, tissue):
-        ax.plot(M.loc[d, "Chimera"], yy, ls="none", marker="o" if t == "Liver" else "s", ms=4.6 if t == "Liver" else 4.2, mfc=CHIMERA_COLOR, mec="white", mew=0.5, zorder=4)
+        ax.text(-5.0 / (W - left - right), yy, name, transform=tr, ha="right", va="center", fontsize=s_tick, color=cm.INK, clip_on=False)
+    for (d, _), yy, t in zip(rows, ys, tissue):  # Chimera last, over the other marks; the light line of the row leads the eye to it
+        ax.plot(M.loc[d, "Chimera"], yy, ls="none", marker="o" if t == "Liver" else "s", ms=5.0 if t == "Liver" else 4.6, mfc=CHIMERA_COLOR, mec="white", mew=0.6, zorder=4)
         n_marks += 1
     assert n_marks == 110, f"{n_marks} marks drawn, expected 110"
     ax.set_ylim(ys[-1] + 0.65, ys[0] - 0.65)
@@ -152,18 +172,25 @@ def composite_strip() -> plt.Figure:
     ax.set_yticks([])
     for sp in ("top", "right", "left"):
         ax.spines[sp].set_visible(False)
-    ax.tick_params(labelsize=5.5, length=2, pad=1.5)
-    ax.set_xlabel("composite integration score (scaled within cohort)", fontsize=5.8, labelpad=1.5)
+    ax.spines["bottom"].set_linewidth(0.6)
+    ax.tick_params(labelsize=s_tick, length=2.5, width=0.5, pad=1.5)
+    # the axis title is longer than the axis: it ends with the axis
+    fig.text((W - right) / W, (bottom - 16.2) / H, "composite integration score (scaled within cohort)", ha="right", va="baseline", fontsize=s_title, color=cm.INK)
     from matplotlib.lines import Line2D
 
-    kw = dict(ls="none", mec="white", mew=0.3)
+    # Two keys of one line each: the methods above the plot, the use of cell-type labels (the marker shape) under the axis title.
     assert set(NAMED_METHODS) <= set(shape), "a named method is not one of the nine other methods"
     named = [Line2D([], [], ls="none", marker=shape[m], label=m, **{k: v for k, v in style_.items() if k != "zorder"}) for m, style_ in NAMED_METHODS.items()]
-    hs = [Line2D([], [], marker="o", ms=4.4, mfc=CHIMERA_COLOR, color=CHIMERA_COLOR, lw=0.6, mec="white", mew=0.5, label="Chimera"), *named,
-          Line2D([], [], marker="o", ms=3.3, mfc=OTHER_COLOR, label="seven other methods", **kw)]
-    fig.legend(handles=hs, loc="lower left", bbox_to_anchor=(2.0 / W, 8.0 / H), ncol=4, fontsize=5.2, handletextpad=0.2, columnspacing=0.9, handlelength=1.5, frameon=False, borderpad=0, borderaxespad=0)
+    hs = [Line2D([], [], ls="none", marker="o", ms=5.0, mfc=CHIMERA_COLOR, mec="white", mew=0.6, label="Chimera"), *named,
+          Line2D([], [], ls="none", marker="o", ms=3.3, mfc=OTHER_COLOR, mec="white", mew=0.3, label="seven other methods")]
+    key = dict(fontsize=s_key, handletextpad=0.4, handlelength=0.9, columnspacing=1.1, frameon=False, borderpad=0, borderaxespad=0)
+    methods = fig.legend(handles=hs, loc="lower right", bbox_to_anchor=((W - right) / W, (H - top + 3.0) / H), ncol=4, **key)
     hs = [Line2D([], [], marker=mk, ms=3.3, mfc="white", mec=cm.INK, mew=0.5, ls="none", label=name) for name, mk in LABEL_USE]
-    fig.legend(handles=hs, loc="lower left", bbox_to_anchor=(2.0 / W, 1.0 / H), ncol=3, fontsize=5.2, handletextpad=0.1, columnspacing=0.8, handlelength=1.0, frameon=False, borderpad=0, borderaxespad=0)
+    shapes = fig.legend(handles=hs, loc="lower right", bbox_to_anchor=((W - right) / W, 1.2 / H), ncol=3, **{**key, "columnspacing": 0.9})
+    fig.canvas.draw()
+    for name, lg in (("method", methods), ("shape", shapes)):
+        box = lg.get_window_extent()
+        assert box.x0 >= 0 and box.x1 <= fig.bbox.width + 0.5, f"the {name} key is wider than the column"
     return fig
 
 

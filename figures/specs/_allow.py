@@ -6,10 +6,6 @@ letters, unreadable_text_layer. An entry whose check passes is an error, so the 
 """
 
 ALLOW: dict = {
-    # specs/main.py
-    "main_protein": {
-        "scale": "the atlas is composed 422 bp wide, its panels at 0.86 to 0.87 of their drawn size, so that the "
-                 "figure is at most 242 bp high; the smallest text prints at 5.0 pt"},
     # specs/supp_protein.py
     "supp_atlas_archetypes": {
         "scale": "panel b is the panel stored by the notebook (it needs the trained gate network); it is drawn for a "

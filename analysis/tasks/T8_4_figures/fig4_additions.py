@@ -1,10 +1,11 @@
 """Panels on the liver reading: prior landscape, cell-type drivers, margin support, tissue comparison.
 
-  fig4c_prior_landscape    Prior landscape (fig:dalpha-biology): protein-identity prior vs Delta-alpha on
-                           liver 4 species, with four named gene groups and no
-                           internal run name on any axis. A dagger marks a named tail gene (|Delta-alpha|
+  fig4c_prior_landscape    Prior landscape (fig:dalpha-biology c): protein-identity prior vs Delta-alpha on
+                           liver 4 species, with five groups of named genes, each named on the plane in the color
+                           of its markers. A dagger marks a named tail gene (|Delta-alpha|
                            > 0.05) that lacks margin support (T2_5_celltype_margin: count evidence S_g unmasked, of
-                           the sign of Delta-alpha and at least the cohort median |S_g|), i.e. imputed from features.
+                           the sign of Delta-alpha and at least the cohort median |S_g|), i.e. placed through its
+                           protein features. Saved at its exact size as ``main_delta_alpha_liver/prior_landscape``.
   fig4_celltype_drivers    Where each named gene's count-evidence margin S_g comes from: the exact
                            per-cell-type split C_gk (posterior-mean z) of T2_5_celltype_margin, liver 4 species.
   fig4_margin_support      Fraction of tail genes (|Delta-alpha| > 0.05) with margin support, per cohort and
@@ -27,18 +28,20 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from adjustText import adjust_text
-from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
+from matplotlib.text import Text
 from scipy.stats import spearmanr
 
 from analysis.tasks.T8_4_figures import common as cm
 
 T25 = cm.RES / "T2_5"
 T23 = cm.RES / "T2_3"
-# Gene groups of the prior landscape panel (notebooks/_alpha_biology_builder.py, H_THEMES), same colors.
+# Gene groups of the prior landscape panel (notebooks/_alpha_biology_builder.py, H_THEMES), same colors. The first group
+# holds enzymes of hepatocyte metabolism: the urea cycle (CPS1, ARG1, ASL, OTC), gluconeogenesis (PCK1) and the breakdown
+# of phenylalanine (PAH).
+HEPATOCYTE_ENZYMES = "hepatocyte metabolic enzymes"
 THEMES = {
-    "urea cycle / gluconeogenesis": (["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"], "#0072B2"),
+    HEPATOCYTE_ENZYMES: (["CPS1", "ARG1", "ASL", "OTC", "PCK1", "PAH"], "#0072B2"),
     "mitochondrially encoded OXPHOS": (["MT-CO1", "MT-CO2", "MT-CO3", "MT-CYB", "MT-ND1", "MT-ND2", "MT-ND4",
                                         "MT-ATP6"], "#5B3E80"),
     "supporting tissue": (["SELP", "SELE", "VCAM1", "F3", "CR2", "CD40LG", "COL17A1", "PDGFRB", "KIT", "C1QC"],
@@ -56,10 +59,45 @@ O1_DROPPED = {"OTC", "COL17A1", "CD40LG", "SELE", "SELP"}
 # Genes of the lower tail that pass every check of the named-gene table (same sign in all five seeds, margin support,
 # counts in every species): named in bold in the landscape panel, which otherwise names genes that the text qualifies.
 EVERY_CHECK = ["HAL", "ARG2", "CYP7A1"]
-EVERY_CHECK_NAME, EVERY_CHECK_COLOR = "enzymes passing every check", "#111111"
-# Where their symbols stand: offset of a corner of the symbol from the marker (bp) and the corner. Fixed, because two of
-# the three markers nearly coincide; the other symbols are placed around them.
-EVERY_CHECK_PLACE = {"CYP7A1": ((-2.6, 2.6), "right", "bottom"), "ARG2": ((-2.6, -2.6), "right", "top"), "HAL": ((2.6, -2.6), "left", "top")}
+EVERY_CHECK_NAME, EVERY_CHECK_COLOR = "enzymes passing every check", cm.INK
+
+# The landscape panel is the third panel of the main Δα figure. Its page has the height of the two panels beside it and its
+# axes their band of rows (ROW_HEIGHT, ROW_BOTTOM and ROW_TOP of figures/redraw/main_figures.py), so that the three x axes
+# lie on one line; its width is what the two panels leave of the text width. All in bp, on the 0.24 bp grid of the layout tool.
+LANDSCAPE_PANEL = "main_delta_alpha_liver/prior_landscape"
+LANDSCAPE_SIZE = (216.0, 190.56)
+LANDSCAPE_BAND = (19.56, 11.0)            # under the axes (tick labels, axis title) and above them (the margin plot)
+LANDSCAPE_VIEW = ((0.45, 1.0), (-0.60, 0.25))   # prior and Δα; the few genes left of it are marked at the frame
+# The groups as they are named on the plane: text, place of its anchor (bp from the lower left corner of the axes; the
+# baseline of the last line) and alignment. Each name stands in the color of its markers, beside them.
+GROUP_LABEL = {
+    "supporting tissue": ("supporting tissue", (74.0, 152.0), "center"),
+    "mitochondrially encoded OXPHOS": ("mitochondrially encoded", (4.0, 3.0), "left"),
+    HEPATOCYTE_ENZYMES: ("hepatocyte\nmetabolic enzymes", (174.5, 3.0), "right"),
+    "conserved controls": ("conserved controls", (174.5, 127.5), "right"),
+    "enzymes passing every check": ("enzymes passing\nevery check", (80.0, 75.5), "right"),
+}
+DAGGER_NOTE = (f"{DAGGER} placed through\nprotein features", (174.5, 147.5), "right")
+# Where the symbol of a gene stands: offset of its anchor from the marker (bp), horizontal and vertical alignment. A symbol
+# farther than LEADER bp from its marker is tied to it by a line.
+SYMBOL_PLACE = {
+    "F3": ((-3.8, 1.5), "right", "center"), "CR2": ((-3.4, -5.5), "right", "center"), "VCAM1": ((-3.0, -4.2), "center", "top"),
+    "C1QC": ((-1.0, -10.5), "center", "top"), "KIT": ((2.0, -4.2), "center", "top"), "PDGFRB": ((3.8, 0.5), "left", "center"),
+    "NDUFA1": ((-3.8, -0.5), "right", "center"), "COX4I1": ((-3.8, -1.0), "right", "center"), "DDX4": ((0.0, 4.0), "center", "bottom"),
+    "HNF4A": ((-3.8, -1.5), "right", "center"), "RPL3": ((-3.8, 0.0), "right", "center"), "EEF2": ((-3.8, 0.0), "right", "center"),
+    "CYP7A1": ((-3.6, 3.0), "right", "bottom"), "ARG2": ((-3.6, -3.0), "right", "top"), "HAL": ((3.6, -3.0), "left", "top"),
+    "MT-ND2": ((-3.8, 0.0), "right", "center"), "MT-ND4": ((-3.8, 0.5), "right", "center"), "MT-ATP6": ((-3.8, -0.5), "right", "center"),
+    "MT-CO2": ((2.0, -4.2), "center", "top"), "MT-CYB": ((0.0, 4.2), "center", "bottom"), "MT-CO3": ((6.0, -6.2), "left", "top"),
+    "MT-CO1": ((3.8, 0.0), "left", "center"), "ARG1": ((-0.7, 12.5), "right", "bottom"), "PAH": ((-5.6, -6.0), "right", "top"),
+    "ASL": ((-2.4, 5.5), "center", "bottom"), "PCK1": ((-1.0, 11.0), "center", "bottom"), "CPS1": ((3.8, 0.0), "left", "center"),
+}
+LEADER = 6.5
+COINCIDE = 1.5  # bp: two named genes of different groups closer than this would hide each other; they share one marker
+
+
+def signed(v: float, digits: int = 2) -> str:
+    """A value with its sign and the minus sign (not a hyphen); a value that rounds to zero carries no sign."""
+    return f"{0:.{digits}f}" if round(float(v), digits) == 0 else f"{v:+.{digits}f}".replace("-", "−")
 
 
 def genes_4sp() -> pd.DataFrame:
@@ -97,102 +135,115 @@ def named(g: pd.DataFrame) -> pd.DataFrame:
 
 
 def panel_landscape() -> plt.Figure:
-    """Main Δα figure, panel c (``main_delta_alpha_liver/prior_landscape``, 203 x 205 bp): every gene of the four-species
+    """Main Δα figure, panel c (``main_delta_alpha_liver/prior_landscape``, 216 x 191 bp): every gene of the four-species
     liver model on the plane of protein prior and Δα, with five groups of named genes.
 
-    What it draws. One gray dot per gene, protein prior π on the x axis and Δα on the y axis; the dashed line is Δα = 0.
-    The two margins hold the distribution of each quantity over all genes (60 bins). The genes of ``THEMES`` are
-    colored markers with their symbols (those of ``O1_DROPPED`` are left out); a dagger after a symbol marks a tail gene
-    (|Δα| > 0.05) whose Δα is not backed by count evidence of the same sign. The genes of ``EVERY_CHECK`` are black
-    markers with bold symbols: three hepatocyte enzymes below the prior that pass every check (``every_check``). The key
-    stands above the plot, so that the x axis lies on one line with the panels beside it
-    (``figures/redraw/main_figures.py`` takes the height of its two panels from this one).
+    What it draws. One gray dot per gene, protein prior π on the x axis (from 0.45; the 17 genes left of it are small
+    triangles on the frame, at their Δα) and Δα on the y axis; the gray line is Δα = 0. The two margins hold the
+    distribution of each quantity over all genes (60 bins). The genes of ``THEMES`` are colored markers with their
+    symbols (those of ``O1_DROPPED`` are left out); a dagger after a symbol marks a tail gene (|Δα| > 0.05) whose Δα is
+    not backed by count evidence of the same sign, that is, a gene placed through its protein features. The genes of
+    ``EVERY_CHECK`` are larger black markers with bold symbols: three hepatocyte enzymes below the prior that pass
+    every check (``every_check``). Each group is named on the plane in the color of its markers (``GROUP_LABEL``);
+    there is no key. Two named genes of different groups that lie closer than ``COINCIDE`` (PAH and MT-CO3, 0.7 bp
+    apart) would hide each other: they share one marker at the middle of the two, a little larger than a single one,
+    its left half in the color of the gene with the lower prior and its right half in the color of the other, each
+    with its symbol on its side.
 
     Reads ``results/analysis/T2_5/liv_4sp__genes.parquet``, columns ``symbol``, ``prior``, ``delta_alpha`` and
-    ``lacks_margin_support`` (the dagger), and for the three genes of ``EVERY_CHECK`` their class in
-    ``results/analysis/X2/named_genes.csv``. No value is computed.
+    ``lacks_margin_support`` (the dagger) and ``dominant_cell_type`` (the group named "hepatocyte metabolic enzymes"
+    must have hepatocytes as the cell type that contributes most to the count evidence of each of its genes), and for
+    the three genes of ``EVERY_CHECK`` their class in ``results/analysis/X2/named_genes.csv``. No value is computed.
 
-    Symbols are placed by ``adjust_text``, which keeps them off the markers and off each other and stops by itself; the
-    same placement comes out on every run. The three bold symbols stand at a fixed place beside their markers
-    (``EVERY_CHECK_PLACE``). The panel stops when a gene lies outside the axes, or when a symbol still
-    lies on a marker or on another symbol.
+    Every symbol stands at a fixed place beside its marker (``SYMBOL_PLACE``), tied to it by a line when it stands
+    apart. The panel stops when a named gene lies outside the axes, or when a symbol or a group name lies on a marker
+    or on another symbol or name. The page and the band of the axes are those of the two panels beside it
+    (``LANDSCAPE_SIZE``, ``LANDSCAPE_BAND``).
 
         python -m analysis.tasks.T8_4_figures.fig4_additions --panel main_delta_alpha_liver/prior_landscape     # in chimera_env, from the repository root
     """
-    from matplotlib.transforms import Bbox
-
     g = genes_4sp()
     nm = pd.concat([named(g), every_check(g)])
-    W, H = 203.5, 205.1  # bp, before the crop to the ink
-    left, bottom, margin, gap, key = 25.0, 17.0, 12.0, 1.5, 23.5  # bp: y-axis band, x-axis band, depth of a margin plot, its gap, band of the key
-    w, h = W - left - gap - margin - 0.6, H - bottom - gap - margin - key
-    xlim, ylim = (0.15, 1.0), (-0.56, 0.23)
-    assert g.prior.between(*xlim).all() and g.delta_alpha.between(*ylim).all(), "a gene lies outside the axes"
-    mark, size, line = 11.0, 5.3, 0.5  # area of a named marker (pt^2); pt of gene symbols and key; pt of the axes
+    (W, H), (bottom, band) = LANDSCAPE_SIZE, LANDSCAPE_BAND
+    left, gap, air = 28.0, 2.0, 0.8  # bp: y-axis band, distance of a margin plot from the plot, white kept at the page edge
+    margin = band - gap - air  # depth of a margin plot
+    w, h = W - left - gap - margin - air, H - bottom - band
+    xlim, ylim = LANDSCAPE_VIEW
+    assert g.delta_alpha.between(*ylim).all() and (g.prior <= xlim[1]).all(), "a gene lies above, below or right of the axes"
+    assert nm.prior.between(*xlim).all(), "a named gene lies outside the axes"
+    assert (nm[nm.theme == HEPATOCYTE_ENZYMES].dominant_cell_type == "Hepatocytes").all(), "a gene of the hepatocyte group is not led by hepatocytes"
+    mark, strong, size, name_size, line = 3.5, 4.5, 5.5, 6.0, 0.5  # pt: marker of a named gene, of a gene of EVERY_CHECK; symbols; group names; thin lines
+    double = 4.4  # pt: a marker that two genes share, so that each half can be seen
     fig = plt.figure(figsize=(W / 72, H / 72))
     ax = fig.add_axes([left / W, bottom / H, w / W, h / H])
     top = fig.add_axes([left / W, (bottom + h + gap) / H, w / W, margin / H], sharex=ax)
     right = fig.add_axes([(left + w + gap) / W, bottom / H, margin / W, h / H], sharey=ax)
-    cm.fd.density_scatter(ax, g.prior, g.delta_alpha, s=1.2, alpha=0.25, color="#BBBBBB")
-    texts, fixed = [], []
+    shown = g[g.prior >= xlim[0]]
+    cm.fd.density_scatter(ax, shown.prior, shown.delta_alpha, s=1.2, alpha=0.25, color="#BBBBBB")
+    edge = g[g.prior < xlim[0]]  # genes left of the axis: on the frame, at their Δα
+    ax.scatter(np.full(len(edge), 2.6 / w), edge.delta_alpha, marker="<", s=5, color="#999999", linewidths=0, transform=ax.get_yaxis_transform(), zorder=3)
+    ax.axhline(0, color=cm.MUTED, lw=0.6, zorder=2)
+    texts, owners = [], []
     groups = [(theme, col) for theme, (_, col) in THEMES.items()] + [(EVERY_CHECK_NAME, EVERY_CHECK_COLOR)]
+    # Named genes of different groups that would hide each other: one marker for the two, a half for each.
+    at = np.c_[(nm.prior - xlim[0]) / (xlim[1] - xlim[0]) * w, (nm.delta_alpha - ylim[0]) / (ylim[1] - ylim[0]) * h]  # bp in the axes
+    shared = [(i, j) for i in range(len(nm)) for j in range(i) if nm.theme.iloc[i] != nm.theme.iloc[j] and np.hypot(*(at[i] - at[j])) < COINCIDE]
+    assert len({k for pair in shared for k in pair}) == 2 * len(shared), "more than two named genes at one place"
+    halved = set()
+    for pair in shared:
+        a, b = sorted(pair, key=lambda k: nm.prior.iloc[k])  # the gene with the lower prior at the left
+        ax.plot([nm.prior.iloc[[a, b]].mean()], [nm.delta_alpha.iloc[[a, b]].mean()], marker="o", fillstyle="left", ms=double, mfc=nm.color.iloc[a],
+                markerfacecoloralt=nm.color.iloc[b], mec="white", mew=0.4, ls="none", zorder=4)
+        halved |= {nm.symbol.iloc[a], nm.symbol.iloc[b]}
+        print(f"one marker for {nm.symbol.iloc[a]} (left half) and {nm.symbol.iloc[b]} (right half), {np.hypot(*(at[a] - at[b])):.2f} bp apart")
     for theme, col in groups:
         s = nm[nm.theme == theme]
-        ax.scatter(s.prior, s.delta_alpha, s=mark, color=col, edgecolor="white", linewidth=0.35, zorder=4)
+        bold = theme == EVERY_CHECK_NAME
+        own = s[~s.symbol.isin(halved)]
+        ax.scatter(own.prior, own.delta_alpha, s=(strong if bold else mark) ** 2, color=col, edgecolor="white", linewidth=0.6 if bold else 0.4, zorder=5 if bold else 4)
         for r in s.itertuples():
-            if theme == EVERY_CHECK_NAME:
-                offset, ha, va = EVERY_CHECK_PLACE[r.symbol]
-                fixed.append(ax.annotate(r.label, (r.prior, r.delta_alpha), xytext=offset, textcoords="offset points", fontsize=size, ha=ha, va=va,
-                                         color=cm.INK, zorder=5, fontweight="bold"))
-            else:
-                texts.append(ax.text(r.prior, r.delta_alpha, r.label, fontsize=size, ha="center", va="center", color=cm.INK, zorder=5))
-    ax.axhline(0, color="#888888", lw=line, ls="--", zorder=2)
-    ax.set_xlabel("protein prior π", fontsize=6.2, labelpad=2.1)
-    ax.set_ylabel("Δα (liver 4 species)", fontsize=6.2, labelpad=1.5)
-    ax.tick_params(labelsize=5.5, length=2.0, width=0.4, pad=1.5)
+            (dx, dy), ha, va = SYMBOL_PLACE[r.symbol]
+            apart = np.hypot(dx, dy) > LEADER
+            tie = dict(arrowstyle="-", color=cm.MUTED, lw=line, shrinkA=0.6, shrinkB=(double / 2 + 1.0) if r.symbol in halved else (mark / 2 + 0.8),
+                       relpos=({"left": 0.0, "center": 0.5, "right": 1.0}[ha], {"bottom": 0.0, "center": 0.5, "top": 1.0}[va])) if apart else None
+            texts.append(ax.annotate(r.label, (r.prior, r.delta_alpha), xytext=(dx, dy), textcoords="offset points", fontsize=name_size if bold else size,
+                                     ha=ha, va=va, color=cm.INK, zorder=6, fontweight="bold" if bold else "normal", arrowprops=tie))
+            owners.append(r.symbol)
+        text, at, ha = GROUP_LABEL[theme]
+        texts.append(ax.annotate(text, at, xycoords="axes points", ha=ha, va="baseline", fontsize=name_size, color=col, zorder=6,
+                                 fontweight="bold" if bold else "normal", linespacing=1.05))
+        owners.append(None)
+    text, at, ha = DAGGER_NOTE
+    texts.append(ax.annotate(text, at, xycoords="axes points", ha=ha, va="baseline", fontsize=size, color=cm.MUTED, zorder=6, linespacing=1.1))
+    owners.append(None)
+    ax.set_xlabel("protein prior π", fontsize=6.5, labelpad=2.0)
+    ax.set_ylabel("Δα (liver 4 species)", fontsize=6.5, labelpad=1.0)
+    ax.tick_params(labelsize=6.0, length=2.5, width=0.5, pad=1.5)
     ax.set_xlim(*xlim)
-    ax.set_xticks([0.2, 0.4, 0.6, 0.8, 1.0])
+    ax.set_xticks([0.5, 0.6, 0.7, 0.8, 0.9, 1.0], ["0.5", "0.6", "0.7", "0.8", "0.9", "1"])
     ax.set_ylim(*ylim)
-    ax.set_yticks(np.arange(-5, 3) / 10)
-    top.hist(g.prior, bins=60, color="#999999", edgecolor="none")
-    right.hist(g.delta_alpha, bins=60, color="#999999", edgecolor="none", orientation="horizontal")
-    for a, hide in ((top, ("top", "right", "left")), (right, ("top", "right", "bottom"))):
-        for sp in hide:
-            a.spines[sp].set_visible(False)
-    for a in (ax, top, right):
-        for sp in a.spines.values():
-            sp.set_linewidth(line)
-    top.set_yticks([])
-    top.tick_params(axis="x", bottom=False, labelbottom=False)
-    right.set_xticks([])
-    right.tick_params(axis="y", left=False, labelleft=False)
-    # The key, above the plot, in two columns: the four groups, then the genes that pass every check (bold, as their
-    # symbols) and the dagger.
-    for i, (theme, col) in enumerate(groups):
-        x, y = left + 0.5 + 106.0 * (i // 2 if i < 4 else 0), H - 4.9 - 6.9 * (i % 2 if i < 4 else 2)
-        fig.add_artist(Line2D([(x + 1.8) / W], [(y + 1.9) / H], transform=fig.transFigure, ls="none", marker="o", ms=mark**0.5,
-                              mfc=col, mec="white", mew=0.35))
-        fig.text((x + 5.5) / W, y / H, theme, fontsize=size, ha="left", va="baseline", color=cm.INK, fontweight="bold" if i == 4 else "normal")
-    fig.text((left + 0.5 + 106.0 + 1.8) / W, (H - 18.7) / H, DAGGER, fontsize=size, ha="center", va="baseline", color=cm.INK)
-    fig.text((left + 0.5 + 106.0 + 5.5) / W, (H - 18.7) / H, "no margin support", fontsize=size, ha="left", va="baseline", color=cm.INK)
-    # Symbols: pushed off each other, off a box of 3.2 bp around every marker (the marker and some air) and off the
-    # three symbols that stand at a fixed place.
-    rx, ry = 3.2 * (xlim[1] - xlim[0]) / w, 3.2 * (ylim[1] - ylim[0]) / h
-    disks = [Bbox.from_extents(x - rx, y - ry, x + rx, y + ry) for x, y in zip(nm.prior, nm.delta_alpha)]
+    ticks = np.arange(-6, 3) / 10
+    ax.set_yticks(ticks, ["0" if v == 0 else f"{v:+.1f}".replace("-", "−") for v in ticks])
+    top.hist(g.prior, bins=60, color="#BBBBBB", edgecolor="none")
+    right.hist(g.delta_alpha, bins=60, color="#BBBBBB", edgecolor="none", orientation="horizontal")
+    for a in (top, right):  # margin plots: the bars alone
+        a.axis("off")
+    for sp in ("left", "bottom"):
+        ax.spines[sp].set_linewidth(0.6)
+    # No symbol or group name on a marker (the marker, its edge and 0.5 bp of air), on another symbol or name, or outside the page.
     fig.canvas.draw()
-    held = [t.get_window_extent().transformed(ax.transData.inverted()) for t in fixed]
-    adjust_text(texts, x=nm.prior.to_numpy(), y=nm.delta_alpha.to_numpy(), objects=disks + held, ax=ax, expand=(1.05, 1.2),
-                force_text=(0.25, 0.35), force_static=(0.25, 0.35), force_explode=(0.2, 0.4), pull_threshold=35, iter_lim=400,
-                arrowprops=dict(arrowstyle="-", color="#999999", lw=0.3), min_arrow_len=1.0)
-    texts += fixed  # in the order of the markers (nm): the check below names a symbol by its place in this list
-    fig.canvas.draw()
-    boxes = [t.get_window_extent() for t in texts]
+    boxes = [Text.get_window_extent(t) for t in texts]  # the words alone, without the line to the marker
     points = ax.transData.transform(nm[["prior", "delta_alpha"]].to_numpy())
-    reach = (mark**0.5 / 2 + 0.35 + 0.5) * fig.dpi / 72  # a marker, its edge and 0.5 bp of air, in pixels
+    reach = (strong / 2 + 0.6 + 0.5) * fig.dpi / 72
+    clash = []
     for i, b in enumerate(boxes):
-        on = [nm.label.iloc[j] for j, (x, y) in enumerate(points) if np.hypot(max(b.x0 - x, 0, x - b.x1), max(b.y0 - y, 0, y - b.y1)) < reach]
+        on = [nm.symbol.iloc[j] for j, (x, y) in enumerate(points) if np.hypot(max(b.x0 - x, 0, x - b.x1), max(b.y0 - y, 0, y - b.y1)) < reach]
         on += [texts[j].get_text() for j in range(i) if b.overlaps(boxes[j])]
-        assert not on, f"the symbol {texts[i].get_text()} lies on {', '.join(on)}"
+        if b.x0 < 0 or b.y0 < 0 or b.x1 > fig.bbox.x1 or b.y1 > fig.bbox.y1:
+            on.append("the edge of the page")
+        if on:
+            clash.append(f"{texts[i].get_text()!r} lies on {', '.join(on)}")
+    assert not clash, "; ".join(clash)
     return fig
 
 
@@ -203,8 +254,18 @@ CT_GROUPS = [("hepatocytes", ["Hepatocytes"], "#E69F00"), ("endothelial", ["Endo
 
 
 def panel_drivers() -> plt.Figure:
+    """Cell-type sources of the count evidence (``main_delta_alpha_liver/celltype_drivers``): for every gene named on the
+    landscape panel, the three bold ones included, the contribution of each cell type to its count evidence $S_g$
+    (stacked, positive to the right, negative to the left; tick, the total), genes ordered by Δα (in parentheses).
+
+    Reads ``results/analysis/T2_5/liv_4sp__genes.parquet`` and ``liv_4sp__C_gk.parquet`` (contribution of each cell type
+    to the margin of each gene, and the weight of each cell type). The contributions of the cell types of a group are
+    summed for the bar; nothing else is computed.
+
+        python -m analysis.tasks.T8_4_figures.fig4_additions --panel main_delta_alpha_liver/celltype_drivers     # in chimera_env, from the repository root
+    """
     g = genes_4sp()
-    nm = named(g).sort_values("delta_alpha")
+    nm = pd.concat([named(g), every_check(g)]).sort_values("delta_alpha")
     C = pd.read_parquet(T25 / "liv_4sp__C_gk.parquet")
     C = C[C.var_name.isin(nm.var_name)]
     named_types = {t for _, ts, _ in CT_GROUPS if ts for t in ts}
@@ -224,7 +285,9 @@ def panel_drivers() -> plt.Figure:
         ax.plot([c.sum()], [y], marker="|", ms=5, color=cm.INK, mew=0.9, zorder=4)
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=0)
     ax.set_yticks(range(len(nm)))
-    ax.set_yticklabels([f"{r.label}  ({r.delta_alpha:+.2f})" for r in nm.itertuples()], fontsize=5.6)
+    ax.set_yticklabels([f"{r.label}  ({signed(r.delta_alpha)})" for r in nm.itertuples()], fontsize=5.6)
+    for tick, r in zip(ax.get_yticklabels(), nm.itertuples()):  # bold, as on the landscape panel
+        tick.set_fontweight("bold" if r.symbol in EVERY_CHECK else "normal")
     ax.set_ylim(len(nm) - 0.4, -0.6)
     ax.set_xlabel("contribution to count evidence $S_g$, by cell type\n(liver 4 species; tick: total $S_g$)",
                   fontsize=6.5)
@@ -243,13 +306,14 @@ ENZYME_PANEL = "main_validation/celltype_drivers_enzymes"
 
 
 def panel_drivers_enzymes() -> plt.Figure:
-    """Main validation figure, panel c (``main_validation/celltype_drivers_enzymes``, 159 x 120 bp): the cell types
+    """Main validation figure, panel c (``main_validation/celltype_drivers_enzymes``, 162 x 120 bp): the cell types
     behind the count evidence of seven hepatocyte enzymes. It is ``panel_drivers`` for the genes of ``ENZYMES``, drawn small.
 
     What it draws. One bar per gene on four-species liver: the count evidence S_g split exactly into the
     contributions of the cell types (posterior-mean z), stacked from zero, negative parts to the left and positive
     parts to the right, in the colors of the liver cell types of ``figures/style.py``; the black tick is the sum, the
-    count evidence of the gene. For these seven genes nearly all of it comes from hepatocytes.
+    count evidence of the gene. For these seven genes nearly all of it comes from hepatocytes. The key names the
+    groups of ``CT_GROUPS`` in the words of ``figures/style.py`` ("stellate and fibroblasts").
 
     Reads ``results/analysis/T2_5/liv_4sp__C_gk.parquet`` and nothing else (columns ``symbol``, ``cell_type``,
     ``C_gk_meanz``): the rows of the seven genes, summed within the cell-type groups of ``CT_GROUPS`` as
@@ -262,8 +326,8 @@ def panel_drivers_enzymes() -> plt.Figure:
     C = C[C.symbol.isin(ENZYMES)]
     assert set(C.symbol) == set(ENZYMES), f"liv_4sp__C_gk.parquet lacks {sorted(set(ENZYMES) - set(C.symbol))}"
     named_types = {t for _, ts, _ in CT_GROUPS if ts for t in ts}
-    W, H = 159.0, 120.0
-    left, right, bottom, top = 28.0, 4.0, 42.0, 31.0
+    W, H = 162.24, 120.0  # the width is on the 0.24 bp grid of the layout tool
+    left, right, bottom, top = 29.0, 5.0, 44.0, 31.0
     fig = plt.figure(figsize=(cm.style.inch(W), cm.style.inch(H)))
     ax = fig.add_axes([left / W, bottom / H, (W - left - right) / W, (H - bottom - top) / H])
     for y, sym in enumerate(ENZYMES):
@@ -281,21 +345,25 @@ def panel_drivers_enzymes() -> plt.Figure:
         ax.plot([c.sum()], [y], marker="|", ms=5.5, color=cm.INK, mew=0.9, zorder=4)
     ax.axvline(0, color=cm.MUTED, lw=0.6, zorder=0)
     ax.set_yticks(range(len(ENZYMES)))
-    ax.set_yticklabels(ENZYMES, fontsize=5.5)
+    ax.set_yticklabels(ENZYMES, fontsize=6.0)
     ax.set_ylim(len(ENZYMES) - 0.45, -0.55)
     ax.set_xlim(-0.42, 0.06)
     ax.set_xticks([-0.4, -0.3, -0.2, -0.1, 0])
     ax.set_xticklabels(["−0.4", "−0.3", "−0.2", "−0.1", "0"])
-    ax.tick_params(labelsize=5.5, length=2, pad=1.5)
+    ax.tick_params(labelsize=6.0, length=2.5, width=0.5, pad=1.5)
     ax.tick_params(axis="y", length=0, pad=2)
     for sp in ("top", "right", "left"):
         ax.spines[sp].set_visible(False)
-    ax.set_xlabel("contribution to count evidence $S_g$ (tick: total)", fontsize=5.5, labelpad=1.5)
+    fig.text(0.5, (bottom - 16.6) / H, "contribution to count evidence $S_g$ (tick: total)", ha="center", va="baseline", fontsize=6.5, color=cm.INK)
     fig.text(2.0 / W, (H - 1.2) / H, "Cell types behind\nthe count evidence", ha="left", va="top", fontsize=6.5, fontweight="bold", color=cm.INK, linespacing=1.12)
     fig.text(2.0 / W, (H - 22.6) / H, "seven hepatocyte enzymes, liver 4 species", ha="left", va="baseline", fontsize=5.5, color=cm.INK)
-    hs = [Patch(color=col, label=name) for name, _, col in CT_GROUPS]
-    fig.legend(handles=hs, loc="lower left", bbox_to_anchor=(2.0 / W, 1.0 / H), ncol=2, fontsize=5.2, handlelength=0.9, handleheight=0.7, columnspacing=0.8, handletextpad=0.35,
-               labelspacing=0.25, frameon=False, borderpad=0, borderaxespad=0)
+    # The key, in the order of the stack down the first column and on into the second; the two long names share the second column.
+    names = [name.replace(" / ", " and ") for name, _, _ in CT_GROUPS]
+    assert set(names[:4]) == set(cm.style.LIVER_CELL_TYPE) - {"other"}, "the key does not use the names of figures/style.py"
+    hs = [Patch(facecolor=col, edgecolor="none", label=name) for name, (_, _, col) in zip(names, CT_GROUPS)]
+    order = [0, 1, 4, 2, 3]  # hepatocytes, endothelial, other cell types | stellate and fibroblasts, Kupffer cells and macrophages
+    fig.legend(handles=[hs[i] for i in order], loc="lower left", bbox_to_anchor=(2.0 / W, 1.2 / H), ncol=2, fontsize=6.0, handlelength=0.85, handleheight=0.7,
+               columnspacing=0.9, handletextpad=0.35, labelspacing=0.16, frameon=False, borderpad=0, borderaxespad=0)
     return fig
 
 
@@ -405,7 +473,7 @@ def panel_cross_tissue() -> plt.Figure:
         ax.set_ylim(-lim, lim)
         ax.set_xlabel("Δα in liver (raw prior, centered)", fontsize=6.5)
         ax.set_title(title, fontsize=6.3)
-        cm.fd.annotate_stat(ax, f"Spearman ρ = {rho:+.3f}, n = {len(ix):,}\nsign differs in {r.flip_rate_observed:.0%}"
+        cm.fd.annotate_stat(ax, f"Spearman ρ = {signed(rho, 3)}, n = {len(ix):,}\nsign differs in {r.flip_rate_observed:.0%}"
                                 f" of genes\n(expected if unrelated: {r.flip_rate_expected:.0%})", "lower right")
     axes[0].set_ylabel("Δα in testis (raw prior, centered)", fontsize=6.5)
     axes[0].legend(loc="upper left", fontsize=5.5, handletextpad=0.2, borderaxespad=0.1)
@@ -416,8 +484,13 @@ def main(only=None) -> list:
     """Draw the panels of this script; ``only``: panel names ("family/name") to draw just those."""
     cm.setup()
     out = []
-    for name, fn in [("fig4c_prior_landscape", panel_landscape), ("fig4_celltype_drivers", panel_drivers),
-                     ("fig4_margin_support", panel_margin_support), ("fig4_cross_tissue", panel_cross_tissue)]:
+    if not only or LANDSCAPE_PANEL in only:  # at its exact size, with its preview beside those of the other panels
+        fig = panel_landscape()
+        out.append(cm.style.save_panel(fig, LANDSCAPE_PANEL, exact=True, preview=False, close=False))
+        with plt.rc_context({"savefig.bbox": "standard"}):
+            fig.savefig(cm.PREVIEW / "fig4c_prior_landscape.png", format="png", dpi=200)
+        plt.close(fig)
+    for name, fn in [("fig4_celltype_drivers", panel_drivers), ("fig4_margin_support", panel_margin_support), ("fig4_cross_tissue", panel_cross_tissue)]:
         if not only or cm.style.panel_for(name) in only:
             out.append(cm.save(fn(), name, exact=name == "fig4_margin_support"))
     if not only or ENZYME_PANEL in only:  # at its exact size; the preview goes to figures/_work/panels/

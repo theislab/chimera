@@ -40,7 +40,7 @@ def panel_seed_reliability() -> plt.Figure:
         rv = r.rel_all if np.isfinite(r.rel_all) else r.rel_core
         ax.text(1.02, i, f"{rv:.2f}" if np.isfinite(rv) else "not estimated\n(3 seeds)",
                 transform=ax.get_yaxis_transform(), ha="left", va="center", fontsize=6 if np.isfinite(rv) else 5)
-    ax.text(1.02, -0.75, "reliability of\nseed-mean Δα", transform=ax.get_yaxis_transform(), ha="left",
+    ax.text(1.02, -0.75, "reliability of the\nmulti-seed\nconsensus of Δα", transform=ax.get_yaxis_transform(), ha="left",
             va="bottom", fontsize=5.5, color=cm.MUTED)
     ax.set_yticks(range(len(REL_COHORTS)))
     ax.set_yticklabels([f"{cm.COHORT[c]}\n({int(rel.loc[c, 'n_seeds'])} seeds)" for c in REL_COHORTS],

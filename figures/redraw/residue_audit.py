@@ -256,7 +256,7 @@ def diagnostic() -> list:
         if hit:
             raise SystemExit(f"the name '{t.get_text()}' lies on the point of: {hit}")
     handles = [Line2D([0], [0], marker="o", color="none", markerfacecolor=FILL, markeredgecolor=C.INK, markersize=4.2, label="per-gene $p$ < 0.05"),
-               Line2D([0], [0], marker="s", color="none", markerfacecolor="white", markeredgecolor=C.INK, markersize=4.0, label="pooled test only"),
+               Line2D([0], [0], marker="s", color="none", markerfacecolor="white", markeredgecolor=C.INK, markersize=4.0, label="per-gene $p$ ≥ 0.05"),
                Line2D([0], [0], color=DARK, linewidth=0.6, linestyle="--", label="pooled $p$ = per-gene $p$")]
     fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(left / W_DIAGNOSTIC, 0.0), ncol=3, frameon=False, fontsize=SMALL, handlelength=1.4,
                handletextpad=0.4, columnspacing=1.0, borderpad=0.2)

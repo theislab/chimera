@@ -12,6 +12,7 @@ file is figures/panels/supp_drug_targets/targets.pdf).
 from __future__ import annotations
 
 import sys
+from types import SimpleNamespace
 
 import matplotlib
 
@@ -159,7 +160,6 @@ Y_LIM = 4.95  # holds every gene (normal scores reach 3.92) and the two label ba
 # Approved targets above and below the prior under both gates, and the numbers expected from genes of equal identity and
 # expression, over the nine models with human and mouse together, as the text gives them.
 PRINTED_TOTALS = {"above": 284, "exp_above": 181, "below": 58, "exp_below": 90}
-COUNT_LINE = 6.6  # bp: pitch of the two lines of counts between the title of a plot and its axes
 
 
 def target_counts() -> pd.DataFrame:
@@ -179,16 +179,33 @@ def target_counts() -> pd.DataFrame:
     return q
 
 
+# The figure on drug targets: sizes in bp and pt at print size, and its marks from back to front.
+TG = dict(height=205.0, left=23.0, right=5.0, gap=8.0, bottom=20.0, top=42.5, key=17.0,
+          s_head=6.5, s_title=6.5, s_tick=6.0, s_count=6.0, s_key=6.0, s_note=5.5,
+          spread=3.0)                                                      # the tied genes are drawn over ± this many percentile units
+NO_CALL_MARK = dict(marker="o", ms=2.2, mfc="#A0A0A0", mec="none", mew=0)
+NO_CALL_INDICATED = dict(marker="D", ms=2.3, mfc="none", mec="#888888", mew=0.5)
+CALLED_MARK = dict(marker="o", ms=3.4, mec="white", mew=0.4)               # in the color of the call
+CALLED_INDICATED = dict(marker="D", ms=3.4, mec=INK, mew=0.5)              # in the color of the call
+TIED_NOTE = "upper bound of the prior"
+
+
 def p_targets():
-    """The main figure on drug targets (``supp_drug_targets/targets``, 486 x 213 bp; figure key ``main_drug_targets``).
+    """The main figure on drug targets (``supp_drug_targets/targets``, 486 x 205 bp; figure key ``main_drug_targets``).
 
     What it draws. Four plots, one tissue each (bone marrow, cortex, eye, kidney; the models of ``EXAMPLES``). x: the
     percentile of protein identity among the genes of the model; y: Δα with the per-gene gate as a normal score. Light
-    gray dots: every gene with count evidence. On top, the targets of approved drugs: vermilion, above the prior under
-    both gates; blue, below under both; gray, no call (drawn first); a diamond, the drug is indicated for a disease of
-    that organ system. The named genes and the places of their names are those of ``EXAMPLES``. Under the title of each
-    plot stand the numbers of approved targets called above and below the prior, each with the number expected from
-    genes of equal identity and expression (``target_counts``): the comparison that the title of the figure states.
+    gray dots: every gene with count evidence. On top, the targets of approved drugs, the marks of the finding last and
+    largest: small gray dots, targets without a call (an open diamond where the drug is indicated for a disease of
+    that organ system); vermilion and blue, targets called above and below the prior under both gates (a diamond with
+    a dark edge where indicated). The named genes and the places of their names are those of ``EXAMPLES``. Under the
+    name of each tissue stand the numbers of approved targets called above and below the prior, each with the number
+    expected from genes of equal identity and expression (``target_counts``): the comparison that the title of the
+    figure states.
+
+    The genes at the upper bound of the prior have one protein identity and so one percentile. They are drawn over
+    ``TG["spread"]`` percentile units to either side of it, in the order of their gene identifiers (a place that says
+    nothing about Δα), so that their marks do not print on each other; the first plot names the band (``TIED_NOTE``).
 
     Reads ``results/analysis/E4/tables/cohorts.parquet`` (columns ``cohort``, ``hsapiens_gene_id``, ``symbol``,
     ``pi_raw``, ``int_free``, ``call``), ``results/analysis/E4/annot/targets.parquet`` (``hsapiens_gene_id``,
@@ -198,51 +215,70 @@ def p_targets():
 
         python -m analysis.tasks.E4_translational.figures supp_drug_targets/targets          # in chimera_env, from the repository root
     """
+    g = SimpleNamespace(**TG)
     T = pd.read_parquet(RU.OUT / "tables" / "cohorts.parquet")
     tg = pd.read_parquet(RU.OUT / "annot" / "targets.parquet").set_index("hsapiens_gene_id")
     reg = H1.cohorts()
     counts = target_counts()
-    fig, axs = plt.subplots(1, 4, figsize=(style.inch(WIDTH), style.inch(200 + 2 * COUNT_LINE)), sharey=True, layout="constrained")
-    for ax, (t, names) in zip(axs, EXAMPLES.items()):
+    W, H = WIDTH, g.height
+    w, h = (W - g.left - g.right - 3 * g.gap) / 4, g.height - g.bottom - g.top
+    fig = plt.figure(figsize=(style.inch(W), style.inch(H)))
+    axs = []
+    for k, (t, names) in enumerate(EXAMPLES.items()):
+        x0 = g.left + k * (w + g.gap)
+        ax = fig.add_axes([x0 / W, g.bottom / H, w / W, h / H])
+        axs.append(ax)
         u = T[T.cohort == cohort_of(t)].copy()
         u["pi_pct"] = 100 * u.pi_raw.rank(pct=True)
+        tied = (u.pi_raw == u.pi_raw.max()).to_numpy()                     # the genes at the upper bound of the prior
+        assert tied.sum() > 0.05 * len(u) and u.pi_pct[tied].nunique() == 1, f"{t}: no group of genes at the upper bound of the prior"
+        at = float(u.pi_pct[tied].iloc[0])
+        order = u.hsapiens_gene_id[tied].rank(method="first").to_numpy()   # a place within the band that says nothing about Δα
+        u.loc[tied, "pi_pct"] = at + g.spread * (2 * (order - 1) / max(tied.sum() - 1, 1) - 1)
         a = u[u.hsapiens_gene_id.isin(tg.index[tg.approved])]
         q = counts.loc[cohort_of(t)]
         drawn = (len(a), int((a.call == 1).sum()), int((a.call == -1).sum()))
         assert drawn == (int(q.n), int(q.above), int(q.below)), f"{t}: {drawn} approved targets drawn (all, above, below); stored {int(q.n)}, {int(q.above)}, {int(q.below)}"
-        for k, (word, n_, e_, c_) in enumerate((("below", q.below, q.exp_below, DOWN), ("above", q.above, q.exp_above, UP))):
-            ax.annotate(f"{word}: {int(n_)} target{'' if int(n_) == 1 else 's'} ({e_:.0f} expected)", (0.5, 1), xycoords="axes fraction",
-                        xytext=(0, 2.0 + k * COUNT_LINE), textcoords="offset points", ha="center", va="bottom", fontsize=S_TEXT, color=c_)
-        ax.scatter(u.pi_pct, u.int_free, s=0.6, c=CLOUD, lw=0, rasterized=True)
-        col = np.where(a.call == 1, UP, np.where(a.call == -1, DOWN, NO_CALL))
+        ax.scatter(u.pi_pct, u.int_free, s=0.6, c=CLOUD, lw=0, rasterized=True, zorder=1)
         ind = a.hsapiens_gene_id.map(tg[f"ind_{t}"]).fillna(False).to_numpy(bool)
         called = (a.call != 0).to_numpy()
-        for c_, z in ((False, 2), (True, 3)):
-            m = (called == c_) & ~ind
-            ax.scatter(a.pi_pct[m], a.int_free[m], s=3.5 if not c_ else 5, c=col[m], lw=0, alpha=0.8 if not c_ else 0.95, zorder=z)
-            m = (called == c_) & ind
-            ax.scatter(a.pi_pct[m], a.int_free[m], s=9, c=col[m], marker="D", lw=0.25 if not c_ else 0.4, edgecolors="#6F6F6F" if not c_ else INK, zorder=z + 0.5)
+        color = np.where(a.call == 1, UP, DOWN)
+        ax.plot(a.pi_pct[~called & ~ind], a.int_free[~called & ~ind], ls="none", zorder=2, **NO_CALL_MARK)
+        ax.plot(a.pi_pct[~called & ind], a.int_free[~called & ind], ls="none", zorder=2.5, **NO_CALL_INDICATED)
+        for c_ in (DOWN, UP):                                              # the marks of the finding last
+            m = called & (color == c_)
+            ax.plot(a.pi_pct[m & ~ind], a.int_free[m & ~ind], ls="none", mfc=c_, zorder=3, **CALLED_MARK)
+            ax.plot(a.pi_pct[m & ind], a.int_free[m & ind], ls="none", mfc=c_, zorder=3.5, **CALLED_INDICATED)
         for _, r in a[a.symbol.isin(list(names)) & (a.call != 0)].iterrows():
-            ax.annotate(r.symbol, (r.pi_pct, r.int_free), fontsize=S_TEXT, xytext=names[r.symbol], textcoords="data", ha="center", va="center", zorder=5,
-                        color=UP if r.call > 0 else DOWN, arrowprops=dict(arrowstyle="-", lw=0.35, color="#555555", shrinkA=0.5, shrinkB=1.5))
-        ax.axhline(0, color=RULE, lw=0.5, zorder=1)
-        ax.set_title(style.cohort_name(reg[cohort_of(t)]["label"]), fontsize=S_TITLE, pad=3 + 2 * COUNT_LINE)
-        ax.set_xlabel("protein identity, percentile", fontsize=S_LABEL)
-        ax.set_xticks([0, 25, 50, 75, 100])
+            ax.annotate(r.symbol, (r.pi_pct, r.int_free), fontsize=g.s_note, xytext=names[r.symbol], textcoords="data", ha="center", va="center", zorder=5,
+                        color=UP if r.call > 0 else DOWN, arrowprops=dict(arrowstyle="-", lw=0.5, color=MUTED, shrinkA=0.5, shrinkB=2.0))
+        ax.axhline(0, color=RULE, lw=0.6, zorder=0.5)
+        ax.set_xticks([0, 50, 100])
         ax.set_xlim(-3, 103)
-        ax.tick_params(labelsize=S_TICK, length=2)
         ax.set_ylim(-Y_LIM, Y_LIM)
-        ax.set_yticks([-4, -2, 0, 2, 4])
+        ax.set_yticks([-4, -2, 0, 2, 4], ["−4", "−2", "0", "+2", "+4"] if k == 0 else [])
+        ax.tick_params(labelsize=g.s_tick, length=2.5, width=0.5, pad=1.5)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
-    axs[0].set_ylabel(f"{READOUT['D_free'].name} (normal score)", fontsize=S_LABEL)
-    h = [Line2D([], [], ls="", marker="o", ms=3, color=UP, label="approved target, above the prior on both gates"),
-         Line2D([], [], ls="", marker="o", ms=3, color=DOWN, label="approved target, below the prior on both gates"),
-         Line2D([], [], ls="", marker="o", ms=3, color=NO_CALL, label="approved target, no call"),
-         Line2D([], [], ls="", marker="D", ms=3.2, mfc="white", mec=INK, mew=0.4, label="indicated for this organ system"),
-         Line2D([], [], ls="", marker="o", ms=3, color=CLOUD, label="all genes with count evidence"),
-         Line2D([], [], ls="", marker="", label="expected: from genes of equal identity and expression")]
-    fig.legend(handles=h, fontsize=S_TICK, frameon=False, loc="outside upper center", ncol=3, handletextpad=0.3, columnspacing=1.2)
+        for s in ("left", "bottom"):
+            ax.spines[s].set_linewidth(0.6)
+        # the tissue, and under it the two counts with what is expected: left edge on the axes
+        y0 = g.bottom + h
+        fig.text(x0 / W, (y0 + 18.2) / H, style.cohort_name(reg[cohort_of(t)]["label"]), ha="left", va="baseline", fontsize=g.s_head, fontweight="bold", color=INK)
+        for line, (word, n_, e_, c_) in enumerate((("above", q.above, q.exp_above, UP), ("below", q.below, q.exp_below, DOWN))):
+            fig.text(x0 / W, (y0 + 10.4 - 7.2 * line) / H, f"{word}: {int(n_)} ({e_:.0f} expected)", ha="left", va="baseline", fontsize=g.s_count, color=c_)
+        if k == 0:  # the band of the tied genes, named once, beside it
+            ax.text(at + g.spread + 2.0, 0.6, TIED_NOTE, rotation=90, ha="left", va="center", fontsize=g.s_note, color=MUTED, zorder=5)
+    fig.text((g.left + (W - g.right - g.left) / 2) / W, 2.4 / H, "protein identity, percentile", ha="center", va="baseline", fontsize=g.s_title, color=INK)
+    fig.text(5.0 / W, (g.bottom + h / 2) / H, f"{READOUT['D_free'].name} (normal score)", rotation=90, ha="center", va="center", fontsize=g.s_title, color=INK)
+    hd = [Line2D([], [], ls="", mfc=UP, label="approved target, above the prior on both gates", **CALLED_MARK),
+          Line2D([], [], ls="", mfc=DOWN, label="approved target, below the prior on both gates", **CALLED_MARK),
+          Line2D([], [], ls="", label="approved target, no call", **NO_CALL_MARK),
+          Line2D([], [], ls="", mfc="white", label="indicated for this organ system", **{**CALLED_INDICATED, "mew": 0.5}),
+          Line2D([], [], ls="", marker="o", ms=1.6, mfc=CLOUD, mec="none", label="all genes with count evidence"),
+          Line2D([], [], ls="", marker="", label="expected: from genes of equal identity and expression")]
+    fig.legend(handles=hd, fontsize=g.s_key, frameon=False, loc="upper left", bbox_to_anchor=(g.left / W, 1 - 1.0 / H), ncol=3, handletextpad=0.4, handlelength=1.0,
+               columnspacing=1.4, labelspacing=0.3, borderpad=0, borderaxespad=0)
     return save(fig, "supp_drug_targets/targets")
 
 
