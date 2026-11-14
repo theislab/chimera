@@ -203,8 +203,22 @@ the tests of a release (`bash analysis/reproduce_smoke.sh`).
 
 ## Citation
 
-If you use Chimera, please cite the paper (reference added on publication) and the software;
-see [`CITATION.cff`](CITATION.cff).
+If you use Chimera, please cite:
+
+Inecik K, Sevinc ES, Erken E, Theis FJ. Chimera: Cross-Species Single-Cell Generative Modeling of
+Expression Deployment Relative to Protein Conservation. *bioRxiv* 2026.11.11.766029 (2026).
+[doi:10.64898/2026.11.11.766029](https://doi.org/10.64898/2026.11.11.766029)
+
+```bibtex
+@article{inecik2026chimera,
+  title   = {Chimera: Cross-Species Single-Cell Generative Modeling of Expression Deployment Relative to Protein Conservation},
+  author  = {Inecik, Kemal and Sevinc, Eylul Sevinc and Erken, Erkmen and Theis, Fabian J.},
+  journal = {bioRxiv},
+  year    = {2026},
+  doi     = {10.64898/2026.11.11.766029},
+  url     = {https://www.biorxiv.org/content/10.64898/2026.11.11.766029v1}
+}
+```
 
 ## License
 

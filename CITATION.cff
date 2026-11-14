@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use Chimera, please cite it as below."
+message: "If you use Chimera, please cite the preprint given under preferred-citation."
 title: "Chimera: Cross-Species Single-Cell Generative Modeling of Expression Deployment Relative to Protein Conservation"
 type: software
 authors:
@@ -25,3 +25,25 @@ keywords:
   - cross-species integration
   - orthologs
   - variational autoencoder
+preferred-citation:
+  type: article
+  title: "Chimera: Cross-Species Single-Cell Generative Modeling of Expression Deployment Relative to Protein Conservation"
+  authors:
+    - family-names: Inecik
+      given-names: Kemal
+      affiliation: "Institute of Computational Biology, Helmholtz Munich"
+    - family-names: Sevinc
+      given-names: Eylul Sevinc
+      affiliation: "Institute of Computational Biology, Helmholtz Munich"
+    - family-names: Erken
+      given-names: Erkmen
+      affiliation: "Institute of Computational Biology, Helmholtz Munich"
+    - family-names: Theis
+      given-names: Fabian J.
+      affiliation: "Institute of Computational Biology, Helmholtz Munich"
+  journal: bioRxiv
+  year: 2026
+  month: 11
+  doi: 10.64898/2026.11.11.766029
+  url: "https://www.biorxiv.org/content/10.64898/2026.11.11.766029v1"
+  notes: "Preprint, bioRxiv 2026.11.11.766029"
